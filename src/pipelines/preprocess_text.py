@@ -25,10 +25,14 @@ from collections import defaultdict
 #nltk.download()
 from data import process_corpus
 from util.save_load import SaveLoad
+from pipelines import test_representations
+from util import split
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 def pipeline(corpus, classes, file_name, output_folder, bowmin, no_below, no_above, remove_stop_words=False):
+
+    doc_amt = split.get_doc_amt(data_type)
 
     # Process and save corpus
     corpus_save = SaveLoad()
@@ -37,32 +41,31 @@ def pipeline(corpus, classes, file_name, output_folder, bowmin, no_below, no_abo
 
     # Get the PPMI values
     ppmi_save = SaveLoad()
-    ppmi_unfiltered = ppmi.PPMI(p_corpus.bow.value, ppmi_save, output_folder + "bow/" + file_name + "_")
+    ppmi_unfiltered = ppmi.PPMI(p_corpus.bow.value, doc_amt, output_folder + "bow/" + file_name + "_", ppmi_save)
     ppmi_unfiltered.process_and_save()
-    ppmi_unf_matrix = ppmi_unfiltered.ppmi_matrix.values
-
+    ppmi_unf_matrix = ppmi_unfiltered.ppmi_matrix.value
+    """
     # Get the PPMI values
     ppmi_filtered_save = SaveLoad()
-    ppmi_filtered = ppmi.PPMI(p_corpus.filtered_bow.value, ppmi_filtered_save, output_folder + "bow/" + file_name + "_")
+    ppmi_filtered = ppmi.PPMI(p_corpus.filtered_bow.value, doc_amt,  output_folder + "bow/" + str(no_above) + "_" + str(no_below) + "_" + file_name + "_", ppmi_filtered_save)
     ppmi_filtered.process_and_save()
-    ppmi_filtered_matrix = ppmi_filtered.ppmi_matrix.values
-
-
-    
+    ppmi_filtered_matrix = ppmi_filtered.ppmi_matrix.value
+    """
     dims = [20,50,100,200]
 
-    standard_fn = output_folder + "rep/"
+    classes = p_corpus.classes.value
 
     for dim in dims:
-        # Get the PCA space
-        pca = pca.getPCA(pca, dim)
+        pca_save = SaveLoad()
+        pca_instance = pca.PCA(ppmi_unf_matrix, doc_amt, dim,  output_folder + "rep/" + file_name + "_" + str(dim) + "_", pca_save)
+        pca_instance.process_and_save()
+        pca_space = pca_instance.PCA.value
 
-        # Save the PCA space
-        np.save(pca, file_name + "_PCA_" + str(dim) + ".npy")
+        names.append("PCA" + str(dim))
 
-        # Get the AWV space
+    # Use 2-fold cross validation to find the best parameters for each class/space
 
-        # Save the AWV space
+
 
 
 

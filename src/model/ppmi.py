@@ -11,18 +11,22 @@ class PPMI(Method):
     ppmi_matrix = None
     file_name = None
 
-    def __init__(self, frequency_matrix, save_class, file_name):
+    def __init__(self, frequency_matrix, doc_amt, file_name, save_class):
 
         self.frequency_matrix = frequency_matrix
-        self.checkFrequencyMatrix()
+        self.checkFrequencyMatrix(doc_amt)
         self.file_name = file_name
 
         super().__init__(save_class)
 
-    def checkFrequencyMatrix(self):
+    def checkFrequencyMatrix(self, doc_amt):
+        if self.frequency_matrix.shape[0] != doc_amt and self.frequency_matrix.shape[1] != doc_amt:
+            raise ValueError("Incorrect number of documents")
         # Check if the words, typically the more frequent, are the rows or the columns, and transpose so they are the rows
-        if self.frequency_matrix.shape[0] < self.frequency_matrix.shape[1]:
+        if self.frequency_matrix.shape[0] == doc_amt:
             self.frequency_matrix = self.frequency_matrix.transpose()
+
+
 
     def makePopos(self):
         self.ppmi_matrix = SaveLoadPOPO(self.ppmi_matrix, self.file_name + "ppmi.npz", "scipy")

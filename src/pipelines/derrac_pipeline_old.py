@@ -11,7 +11,7 @@ from itertools import product
 import numpy as np
 
 import cluster
-from model import nnet, svm, tree, mean_shift as ms
+from model import nnet, __svm_old, tree, mean_shift as ms
 from project import finetune_outputs as fto, rank
 from score import ndcg
 from util import proj as dt
@@ -256,11 +256,11 @@ def main(data_type, classification_task_a, file_name, init_vector_path, hidden_a
                         if word_vectors is not "all":
                             #file_name += "only thesekappa"
                             #only_these_fn = "../data/sentiment/bow/names/top_kappa.txt"
-                            directions = svm.createSVM(vector_path, bow_path, property_names_fn, file_name, lowest_count=lowest_amt,
-                                          highest_count=highest_count, data_type=data_type, get_kappa=score_type,
-                                          get_f1=False, svm_type=svm_type, getting_directions=True, threads=threads, rewrite_files=rewrite_files,
-                                          classification=new_classification_task, lowest_amt=lowest_amt, chunk_amt=chunk_amt, chunk_id=chunk_id,
-                                          logistic_regression=logistic_regression, sparse_array_fn=bow_path)
+                            directions = __svm_old.createSVM(vector_path, bow_path, property_names_fn, file_name, lowest_count=lowest_amt,
+                                                             highest_count=highest_count, data_type=data_type, get_kappa=score_type,
+                                                             get_f1=False, svm_type=svm_type, getting_directions=True, threads=threads, rewrite_files=rewrite_files,
+                                                             classification=new_classification_task, lowest_amt=lowest_amt, chunk_amt=chunk_amt, chunk_id=chunk_id,
+                                                             logistic_regression=logistic_regression, sparse_array_fn=bow_path)
 
                             if chunk_amt > 0:
                                 if chunk_id == chunk_amt-1:
@@ -493,12 +493,12 @@ def main(data_type, classification_task_a, file_name, init_vector_path, hidden_a
                                                             False, data_type=data_type, rewrite_files=rewrite_files)
                                         class_rank_fn = loc+ data_type + "/rank/numeric/" + file_name + ".txt"
                                         class_p_fn = loc + data_type + "/classify/" +  classification_task + "/class-" + c
-                                        svm.createSVM(class_rank_fn, class_p_fn, class_n_fn, file_name, lowest_count=lowest_amt,
-                                                      highest_count=highest_count, data_type=data_type, get_kappa=False,
-                                                      get_f1=True, single_class=True, svm_type=svm_type, getting_directions=False, threads=1,
-                                                      rewrite_files=rewrite_files,
-                                                      classification=classification, lowest_amt=lowest_amt, chunk_amt=chunk_amt,
-                                                      chunk_id=chunk_id, logistic_regression=logistic_regression)
+                                        __svm_old.createSVM(class_rank_fn, class_p_fn, class_n_fn, file_name, lowest_count=lowest_amt,
+                                                            highest_count=highest_count, data_type=data_type, get_kappa=False,
+                                                            get_f1=True, single_class=True, svm_type=svm_type, getting_directions=False, threads=1,
+                                                            rewrite_files=rewrite_files,
+                                                            classification=classification, lowest_amt=lowest_amt, chunk_amt=chunk_amt,
+                                                            chunk_id=chunk_id, logistic_regression=logistic_regression)
 
 
                                 file_name = current_fn

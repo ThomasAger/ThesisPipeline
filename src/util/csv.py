@@ -2,20 +2,7 @@ import os
 import pandas as pd
 from sklearn.externals import joblib
 import numpy as np
-# If the parameters match, return (not sure how to handle if multiple paramaters match..)
-def exists(method, parameters, method_name, param_names, output_names):
-    pass
 
-def load_files(method, method_name, param_dict, output_names):
-    pass
-
-# Generate the full filename for the file relative to the current source file, including folder structure
-def generate_filename(method_name, param_names, output_names):
-    pass
-
-# Save the files in a folder structure, generate if it doesnt exist, use appropriate saving based on filetype
-def save_file(output_file, filename):
-    pass
 
 def load_manage_csv(method_name):
     # If rewrite column doesnt exist, add it

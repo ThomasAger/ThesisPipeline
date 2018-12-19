@@ -24,6 +24,25 @@ def get_name_dict(*params):
     print(*params)
 
 
+def get_doc_amt(data_type):
+    if data_type == "imdb" or data_type == "sentiment":
+        max_size = imdb_total
+    elif data_type == "newsgroups":
+        max_size = newsgroups_total
+    elif data_type == "reuters":
+        max_size = reuters_total
+    elif data_type == "yahoo" or data_type == "amazon":
+        max_size = yahoo_total
+    elif data_type == "movies":
+        max_size = movies_total
+    elif data_type == "placetypes":
+        max_size = placetypes_total
+    else:
+        print("No data type found")
+        raise ValueError("Data type not found", data_type)
+    return max_size
+
+
 def check_shape(features, data_type):
     print("Shape", len(features), len(features[0]))
     if data_type == "imdb" or data_type == "sentiment":
@@ -45,7 +64,7 @@ def check_shape(features, data_type):
         raise ValueError(print(len(features), "This is not the standard size, expected " + str(max_size)))
     return True
 
-def get_split_ids(data_type, dev_percent=0.2):
+def get_split_ids(data_type):
     # Multiple data-type names in-case im stupid
     if data_type == "imdb" or data_type == "sentiment":
         train_split = imdb_train
@@ -78,17 +97,11 @@ def get_split_ids(data_type, dev_percent=0.2):
     print(len(test),  "test")
     print(len(train), "train")
 
-    if dev_percent > 0:
-        test = train[int(len(train) * (1 - dev_percent)):]
-        train = train[:int(len(train) * (1 - dev_percent))]
 
-    print("after dev split")
-    print(len(test),  "test")
-    print(len(train), "train")
 
     return {"train":train, "test":test}
 
-def split_data(x, y, split_ids, dev_percent_of_train):
+def split_data(x, y, split_ids, dev_percent_of_train=0.2):
     x_len = len(x)
     y_len = len(y)
     x_train = x[split_ids["train"]]
