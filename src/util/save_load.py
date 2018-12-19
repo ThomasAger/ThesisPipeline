@@ -1,18 +1,18 @@
 from util import io as dt
-import numpy as np
-import scipy.sparse as sp
-from gensim.Corpora import Dictionary
 import os
 class SaveLoad:
 
     def load(self, popo_array):
         for i in range(len(popo_array)):
-            popo_array.value = dt.load_by_type(popo_array[i].type, popo_array[i].file_name)
+            if popo_array[i].file_name is None or popo_array[i].file_type is None:
+                raise ValueError("None type" + popo_array[i].value.file_name)
+            popo_array[i].value = dt.load_by_type(popo_array[i].file_type, popo_array[i].file_name)
         return popo_array
 
     def save(self, popo_array):
         for i in range(len(popo_array)):
-            popo_array.value = dt.save_by_type(popo_array[i].value, popo_array[i].type, popo_array[i].file_name)
+            if popo_array[i].value is None or popo_array[i].file_name is None or popo_array[i].file_type is None:
+                raise ValueError("None type" + popo_array[i].value.file_name)
 
     def exists(self, popo_array):
         all_exist = 0

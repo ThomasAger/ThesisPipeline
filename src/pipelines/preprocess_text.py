@@ -24,31 +24,31 @@ from collections import defaultdict
 #import nltk
 #nltk.download()
 from data import process_corpus
-
+from util.save_load import SaveLoad
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 def pipeline(corpus, classes, file_name, output_folder, bowmin, no_below, no_above, remove_stop_words=False):
 
     # Process and save corpus
-    p_corpus = process_corpus.Corpus(corpus, classes, file_name, output_folder, bowmin, no_below, no_above, remove_stop_words)
+    corpus_save = SaveLoad()
+    p_corpus = process_corpus.Corpus(corpus, classes, file_name, output_folder, bowmin, no_below, no_above, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
-    print("corpus done")
-
-    filtered_bow = p_corpus.filtered_bow.value
-    bow = p_corpus.bow.value
 
     # Get the PPMI values
-    filtered_bow = filtered_bow.transpose()
-    ppmi_matrix = ppmi.convertPPMISparse(filtered_bow)
-    filtered_ppmi_sparse = sp.csr_matrix(ppmi_matrix).transpose()
-    ppmi_matrix = ppmi.convertPPMISparse(bow)
-    ppmi_sparse = sp.csr_matrix(ppmi_matrix).transpose()
+    ppmi_save = SaveLoad()
+    ppmi_unfiltered = ppmi.PPMI(p_corpus.bow.value, ppmi_save, output_folder + "bow/" + file_name + "_")
+    ppmi_unfiltered.process_and_save()
+    ppmi_unf_matrix = ppmi_unfiltered.ppmi_matrix.values
 
-    # Save the PPMI values
-    sp.save_npz(output_folder + "bow/" + file_name + str(no_below) + "_" + str(no_above) + "_filtered_ppmi.npz", filtered_ppmi_sparse)
-    sp.save_npz(output_folder + "bow/" + file_name + "_ppmi.npz", ppmi_sparse)
+    # Get the PPMI values
+    ppmi_filtered_save = SaveLoad()
+    ppmi_filtered = ppmi.PPMI(p_corpus.filtered_bow.value, ppmi_filtered_save, output_folder + "bow/" + file_name + "_")
+    ppmi_filtered.process_and_save()
+    ppmi_filtered_matrix = ppmi_filtered.ppmi_matrix.values
 
+
+    
     dims = [20,50,100,200]
 
     standard_fn = output_folder + "rep/"

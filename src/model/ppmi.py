@@ -1,7 +1,40 @@
 import numpy as np
 import math
 import scipy.sparse as sp
+from common import Method
 
+from common.SaveLoadPOPO import SaveLoadPOPO
+from common.Method import Method
+class PPMI(Method):
+    popo_example = None
+    param_example = None
+    ppmi_matrix = None
+    file_name = None
+
+    def __init__(self, frequency_matrix, save_class, file_name):
+
+        self.frequency_matrix = frequency_matrix
+        self.checkFrequencyMatrix()
+        self.file_name = file_name
+
+        super().__init__(save_class)
+
+    def checkFrequencyMatrix(self):
+        # Check if the words, typically the more frequent, are the rows or the columns, and transpose so they are the rows
+        if self.frequency_matrix.shape[0] < self.frequency_matrix.shape[1]:
+            self.frequency_matrix = self.frequency_matrix.transpose()
+
+    def makePopos(self):
+        self.ppmi_matrix = SaveLoadPOPO(self.ppmi_matrix, self.file_name + "ppmi.npz", "scipy")
+
+    def makePopoArray(self):
+        self.popo_array = [self.ppmi_matrix]
+
+    def process(self):
+        print("Begin processing")
+        orig_ppmi_matrix = convertPPMISparse(self.frequency_matrix)
+        self.ppmi_matrix.value = sp.csr_matrix(orig_ppmi_matrix).transpose()
+        super().process()
 
 
 def convertPPMISparse(mat):

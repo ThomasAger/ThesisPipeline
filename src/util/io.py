@@ -399,13 +399,13 @@ def load_by_type(type, file_name):
     return file
 
 def save_by_type(file, type, file_name):
-    file = None
     if type == "npy":
-        file = np.save(file_name, file)
+        np.save(file_name, file)
     elif type == "scipy":
-        file = sp.save_npz(file_name, file)
+        sp.save_npz(file_name, file)
     elif type == "gensim":
-        file = file.save(file_name, file)
+        file.save(file_name)
     elif type == "1dtxts":
-        file = import1dArray(file, file_name)
-    return file
+        write1dArray(file, file_name)
+    else:
+        raise ValueError("File type not recognized")
