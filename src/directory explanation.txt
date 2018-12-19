@@ -1,0 +1,11 @@
+data: tools to get data
+features: tools to transform data into features
+model: machine learning models e.g. decision trees, neural networks
+manage_files: tools to manage the saving and retrieval of files 
+pipelines: various pipelines of data, features and models dependent on the task
+project: project-specific tasks or utilities
+score: tools to score the output of models
+temp: assorted junk code
+tests: all pytest unit tests for the other code
+util: various python code utilities for managing data, checking file-types, importing data, etc
+visualise: code for visualising or explaining output of models or results
