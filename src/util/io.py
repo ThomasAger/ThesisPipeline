@@ -4,6 +4,7 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 from scipy import sparse as sp
+from gensim.corpora import Dictionary
 
 def write2dCSV(array, name):
     file = open(name, "w")
@@ -21,6 +22,7 @@ def write2dCSV(array, name):
                 file.write(str(array[i][n]) + ",")
         file.write("\n")
     file.close()
+
 
 
 def writeCSV(features, classes, class_names, file_name, header=True):
@@ -382,3 +384,28 @@ def importNumpyVectors(numpy_vector_path=None):
     movie_vectors = list(reversed(zip(*movie_vectors)))
     movie_vectors = np.asarray(movie_vectors)
     return movie_vectors
+
+
+def load_by_type(type, file_name):
+    file = None
+    if type == "npy":
+        file = np.load(file_name)
+    elif type == "scipy":
+        file = sp.load_npz(file_name)
+    elif type == "gensim":
+        file = Dictionary.load(file_name)
+    elif type == "1dtxts":
+        file = import1dArray(file_name, "s")
+    return file
+
+def save_by_type(file, type, file_name):
+    file = None
+    if type == "npy":
+        file = np.save(file_name, file)
+    elif type == "scipy":
+        file = sp.save_npz(file_name, file)
+    elif type == "gensim":
+        file = file.save(file_name, file)
+    elif type == "1dtxts":
+        file = import1dArray(file, file_name)
+    return file

@@ -35,8 +35,8 @@ def pipeline(corpus, classes, file_name, output_folder, bowmin, no_below, no_abo
     p_corpus.process_and_save()
     print("corpus done")
 
-    filtered_bow = p_corpus.filtered_bow
-    bow = p_corpus.bow
+    filtered_bow = p_corpus.filtered_bow.value
+    bow = p_corpus.bow.value
 
     # Get the PPMI values
     filtered_bow = filtered_bow.transpose()
