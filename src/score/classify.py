@@ -2,18 +2,16 @@
 import math
 import os.path
 
+from score.functions import get_f1_score
 import numpy as np
 from sklearn.metrics import accuracy_score, roc_auc_score, cohen_kappa_score
 from sklearn.metrics import precision_recall_fscore_support
+from common import Method
+from util import io as dt
+from common.SaveLoadPOPO import SaveLoadPOPO
+from util import check
+from util import py
 
-from util import io
-
-
-def get_f1_score(prec, recall):
-    f1 = 2 * ((prec * recall) / (prec + recall))
-    if math.isnan(f1):
-        f1 = 0.0
-    return f1
 
 def all_scores(true_target, prediction):
 
@@ -37,10 +35,15 @@ def all_scores(true_target, prediction):
     kappa = cohen_kappa_score(true_target, prediction)
     return f1, prec, recall, accuracy, auroc, kappa
 
-class MultiClassScore():
+
+class MultiClassScore(Method.Method):
     
     true_targets = None
     predictions = None
+    pred_proba = None
+    output_folder = None
+    class_names = None
+    csv_data = None
 
     f1s = None
     precs = None
@@ -53,142 +56,199 @@ class MultiClassScore():
     avg_acc = None
     avg_auroc = None
     avg_kappa = None
+    avg_prec = None
+    avg_recall = None
+    verbose = None
 
+    auroc = False
+    fscore = False
+    kappa = False
+    acc = False
+    f1 = False
 
-    def __init__(self, true_targets, predictions, auroc=False, fscore=False, kappa=False, acc=False, verbose=True):
+    def __init__(self, true_targets, predictions, pred_proba,  file_name, output_folder, save_class, f1=True, auroc=True, fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+        if np.count_nonzero(true_targets) < 1:
+            auroc = False
+            print("Auroc has been automatically disabled as the true targets (len)", len(true_targets), "are all zero. (It causes an error)")
         self.true_targets = true_targets
         self.predictions = predictions
-        self.check()
-        self.f1s = np.full(len(predictions), math.nan)
-        self.precs = np.full(len(predictions), math.nan)
-        self.recalls = np.full(len(predictions), math.nan)
-        self.accs = np.full(len(predictions), math.nan)
-        self.aurocs = np.full(len(predictions), math.nan)
-        self.kappas = np.full(len(predictions), math.nan)
-        if auroc:
-            self.auroc()
-        if fscore:
-            self.fscore()
-        if kappa:
-            self.kappa()
-        if acc:
-            self.acc()
-        if verbose:
+        self.pred_proba = pred_proba
+
+        self.true_targets = py.transIfRowsLarger(self.true_targets)
+        self.predictions = py.transIfRowsLarger(self.predictions)
+        self.pred_proba = py.transIfRowsLarger(self.pred_proba)
+
+        print("Shape is:", len(self.predictions), len(self.predictions[0]))
+        self.output_folder = output_folder
+        self.class_names = class_names
+        self.f1s = np.full(len(self.predictions), math.nan)
+        self.precs = np.full(len(self.predictions), math.nan)
+        self.recalls = np.full(len(self.predictions), math.nan)
+        self.accs = np.full(len(self.predictions), math.nan)
+        self.aurocs = np.full(len(self.predictions), math.nan)
+        self.kappas = np.full(len(self.predictions), math.nan)
+        check.check_y(self.true_targets, self.predictions)
+        self.auroc = auroc
+        self.fscore = fscore
+        self.kappa = kappa
+        self.acc = acc
+        self.f1 = f1
+
+        self.verbose = verbose
+        super().__init__(file_name, save_class)
+
+    def process(self):
+        if self.auroc:
+            self.calc_auroc()
+        if self.f1:
+            self.calc_fscore()
+        if self.kappa:
+            self.calc_kappa()
+        if self.acc:
+            self.calc_acc()
+        self.checkScores()
+        self.csv_data = [self.get(), self.class_names]
+        if self.verbose:
             self.print()
+        super().process()
 
+    def checkScores(self):
+        if self.f1 and math.isnan(self.avg_f1.value) or self.f1 and math.isnan(self.f1s.value[0]):
+            raise ValueError("F1 is NaN, Array", self.f1s.value, "Average", self.avg_f1.value)
+        if self.auroc and math.isnan(self.avg_auroc.value) or self.auroc and math.isnan(self.aurocs.value[0]):
+            raise ValueError("Auroc is NaN, Array", self.aurocs.value, "Average", self.avg_auroc.value)
+        if self.kappa and math.isnan(self.avg_kappa.value) or self.kappa and math.isnan(self.kappas.value[0]):
+            raise ValueError("Kappa is NaN, Array", self.kappas.value, "Average", self.avg_kappa.value)
+        if self.acc and math.isnan(self.avg_acc.value) or self.acc and math.isnan(self.accs.value[0]):
+            raise ValueError("Acc is NaN, Array", self.accs.value, "Average", self.avg_acc.value)
 
+    def makePopos(self):
+        included_scores = ""
+        if self.f1:
+            self.f1s = SaveLoadPOPO(self.f1s, self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
+            self.avg_f1 = SaveLoadPOPO(self.avg_f1, self.output_folder + "f1/" + self.file_name + "_Avg_F1.txt", "txtf")
+            self.precs = SaveLoadPOPO(self.precs, self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
+            self.avg_prec = SaveLoadPOPO(self.avg_prec, self.output_folder + "prec/" + self.file_name + "_avg_prec.txt", "txtf")
+            self.recalls = SaveLoadPOPO(self.recalls, self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
+            self.avg_recall = SaveLoadPOPO(self.avg_recall, self.output_folder + "recall/" + self.file_name + "_avg_recall.txt", "txtf")
+            included_scores += "F1_"
+        if self.acc:
+            self.accs = SaveLoadPOPO(self.accs, self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
+            self.avg_acc = SaveLoadPOPO(self.avg_acc, self.output_folder + "acc/" + self.file_name + "_avg_acc.txt", "txtf")
+            included_scores += "ACC_"
+        if self.auroc:
+            self.aurocs = SaveLoadPOPO(self.aurocs, self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
+            self.avg_auroc = SaveLoadPOPO(self.avg_auroc, self.output_folder + "auroc/" + self.file_name + "_avg_auroc.txt", "txtf")
+            included_scores += "AUROC_"
+        if self.kappa:
+            self.kappas = SaveLoadPOPO(self.kappas, self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
+            self.avg_kappa = SaveLoadPOPO(self.avg_kappa, self.output_folder + "kappa/" + self.file_name + "_avg_kappa.txt", "txtf")
+            included_scores += "Kappa_"
+        self.csv_data = SaveLoadPOPO(self.csv_data, self.output_folder + "csv_details/" + self.file_name + "_"+included_scores+".csv", "scoredict")
+
+    def makePopoArray(self):
+        self.popo_array = []
+        if self.f1:
+            self.popo_array.append(self.f1s)
+            self.popo_array.append(self.precs)
+            self.popo_array.append(self.recalls)
+            self.popo_array.append(self.avg_f1)
+            self.popo_array.append(self.avg_prec)
+            self.popo_array.append(self.avg_recall)
+
+        if self.acc:
+            self.popo_array.append(self.accs)
+            self.popo_array.append(self.avg_acc)
+
+        if self.auroc:
+            self.popo_array.append(self.aurocs)
+            self.popo_array.append(self.avg_auroc)
+
+        if self.kappa:
+            self.popo_array.append(self.kappas)
+            self.popo_array.append(self.avg_kappa)
 
     def get(self):
         score_dict = {}
-        if not math.isnan(self.f1s[0]):
-            score_dict["f1"] = self.f1s
-            score_dict["avg_f1"] = self.avg_f1
+        if self.f1:
+            score_dict["f1"] = self.f1s.value
+            score_dict["avg_f1"] = self.avg_f1.value
+            score_dict["prec"] = self.precs.value
+            score_dict["avg_prec"] = self.avg_prec.value
+            score_dict["recall"] = self.recalls.value
+            score_dict["avg_recall"] = self.avg_recall.value
 
-        if not math.isnan(self.precs[0]):
-            score_dict["prec"] = self.precs
+        if self.acc:
+            score_dict["acc"] = self.accs.value
+            score_dict["avg_acc"] =  self.avg_acc.value
 
-        if not math.isnan(self.recalls[0]):
-            score_dict["recall"] = self.recalls
+        if self.auroc:
+            score_dict["auroc"] = self.aurocs.value
+            score_dict["avg_auroc"] = self.avg_auroc.value
 
-        if not math.isnan(self.accs[0]):
-            score_dict["acc"] = self.accs
-            score_dict["avg_acc"] =  self.avg_acc
-
-        if not math.isnan(self.aurocs[0]):
-            score_dict["auroc"] = self.aurocs
-            score_dict["avg_auroc"] = self.avg_auroc
-
-        if not math.isnan(self.kappas[0]):
-            score_dict["kappa"] = self.kappas
-            score_dict["avg_kappa"] = self.avg_kappa
+        if self.kappa:
+            score_dict["kappa"] = self.kappas.value
+            score_dict["avg_kappa"] = self.avg_kappa.value
         return score_dict
 
     def print(self, max_to_print=5):
         score_dict = {}
-        print("Amt", len(self.f1s))
+        print("Amt", len(self.f1s.value))
 
-        if not math.isnan(self.precs[0]):
-            print("prec", self.precs[:max_to_print])
+        if self.f1:
+            print("prec", self.precs.value[:max_to_print])
+            print("recall",  self.recalls.value[:max_to_print])
+            print("f1s",  self.f1s.value[:max_to_print], "| average", self.avg_f1.value)
 
-        if not math.isnan(self.recalls[0]):
-            print("recall",  self.recalls[:max_to_print])
+        if self.acc:
+            print("acc", self.accs.value[:max_to_print], "| average", self.avg_acc.value)
 
-        if not math.isnan(self.f1s[0]):
-            print("f1s",  self.f1s[:max_to_print], "| average", self.avg_f1)
+        if self.auroc:
+            print("auroc", self.aurocs.value[:max_to_print], "| average", self.avg_auroc.value)
 
-        if not math.isnan(self.accs[0]):
-            print("acc", self.accs[:max_to_print], "| average", self.avg_acc)
-
-        if not math.isnan(self.aurocs[0]):
-            print("auroc", self.aurocs[:max_to_print], "| average", self.avg_auroc)
-
-        if not math.isnan(self.kappas[0]):
-            print("kappa",  self.kappas[:max_to_print], "| average", self.avg_kappa)
+        if self.kappa:
+            print("kappa",  self.kappas.value[:max_to_print], "| average", self.avg_kappa.value)
         return score_dict
 
-    def fscore(self):
+    def calc_fscore(self):
         for i in range(len(self.predictions)):
-            self.precs[i], self.recalls[i], self.f1s[i], unused__ = precision_recall_fscore_support(self.true_targets[i], self.predictions[i], average="binary")
-        self.avg_f1 = get_f1_score(np.average(self.precs), np.average(self.recalls))
+            self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(self.true_targets[i], self.predictions[i], average="binary")
+        self.avg_prec.value = np.average(self.precs.value)
+        self.avg_recall.value = np.average(self.recalls.value)
+        self.avg_f1.value = get_f1_score(self.avg_prec.value, self.avg_recall.value)
 
     # Check different averages for auroc
-    def auroc(self):
+    def calc_auroc(self):
         for i in range(len(self.predictions)):
-            self.aurocs[i] = roc_auc_score(self.true_targets[i], self.predictions[i])
-        self.avg_auroc = np.average(self.aurocs)
+            self.aurocs.value[i] = roc_auc_score(self.true_targets[i], self.pred_proba[i])
+        self.avg_auroc.value = np.average(self.aurocs.value)
 
-    def acc(self):
+    def calc_acc(self):
         for i in range(len(self.predictions)):
-            self.accs[i] = accuracy_score(self.true_targets[i], self.predictions[i])
-        self.avg_acc = np.average(self.accs)
+            self.accs.value[i] = accuracy_score(self.true_targets[i], self.predictions[i])
+        self.avg_acc.value = np.average(self.accs.value)
 
-    def kappa(self):
+    def calc_kappa(self):
         for i in range(len(self.predictions)):
-            self.kappas[i] = cohen_kappa_score(self.true_targets[i], self.predictions[i])
-        self.avg_kappa = np.average(self.kappas)
+            self.kappas.value[i] = cohen_kappa_score(self.true_targets[i], self.predictions[i])
+        self.avg_kappa.value = np.average(self.kappas.value)
 
-    def save_csv(self, csv_fn):
+    def save(self):
+        self.save_class.save(self.popo_array)
 
-        csv_acc = self.all_acc
-        csv_f1 = self.all_f1
-        csv_auroc = self.all_auroc
+def average_scores(score_dicts):
+    new_dict = {}
+    for key, value in score_dicts[0].items():
+        print(key)
+        val_array = []
+        for i in range(len(score_dicts)):
+            val_array.append(score_dicts[i][key])
+        new_dict[key] = np.average(val_array, axis=0)
+    return new_dict
 
-        csv_acc.append(self.average_acc)
-        csv_f1.append(self.average_f1)
-        csv_auroc.append(self.average_auroc)
 
-        scores = [csv_acc, csv_f1, csv_auroc]
-        col_names = ["acc", "f1", "auroc"]
-        if os.path.exists(csv_fn):
-            print("File exists, writing to csv")
-            try:
-                dt.write_to_csv(csv_fn, col_names, scores)
-                return
-            except PermissionError:
-                print("CSV FILE WAS OPEN, SKIPPING")
-                return
-            except ValueError:
-                print("File does not exist, recreating csv")
-        print("File does not exist, recreating csv")
-        key = []
-        for l in self.class_names:
-            key.append(l)
-        key.append("AVERAGE")
-        key.append("MICRO AVERAGE")
-        io.write_csv(csv_fn, col_names, scores, key)
+
+
 
 if __name__ == '__main__':
-    r_true_targets = np.random.randint(2,size=(11, 40),dtype=np.int8)
-    r_predictions = np.random.randint(2,size=(11, 40),dtype=np.int8)
-    score = MultiClassScore(r_true_targets, r_predictions)
-    score.auroc()
-    score.fscore()
-    score.acc()
-    score.kappa()
-    score.print()
-    results = score.get()
-    print("--------------------------------------")
-    alternate_results = MultiClassScore(r_true_targets, r_predictions, auroc=True, fscore=True, acc=True, kappa=True, verbose=True).get()
-    new_score = MultiClassScore(r_true_targets, r_predictions, auroc=True, fscore=True, acc=True, kappa=True,
-                                        verbose=True)
-    alternate_results_2 = new_score.get()
+    print("k")

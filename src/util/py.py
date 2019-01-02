@@ -1,5 +1,30 @@
+from util import io as dt
+import cProfile
+import numpy as np
+import numbers
+
+
 # Data structure management tasks
 
+def transIfRowsLarger(mat):
+    print("Matrix in format", len(mat), len(mat[0]))
+    if len(mat) > len(mat[0]):
+        print("Rows larger than columns, transposing")
+        mat = mat.transpose()
+        print("Matrix now in format", len(mat), len(mat[0]))
+        if len(mat) > len(mat[0]):
+            raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
+    return mat
+
+def transIfColsLarger(mat):
+    print("Matrix in format", len(mat), len(mat[0]))
+    if len(mat) < len(mat[0]):
+        print("Columns larger than rows, transposing")
+        mat = mat.transpose()
+        print("Matrix now in format", len(mat), len(mat[0]))
+        if len(mat) > len(mat[0]):
+            raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
+    return mat
 
 def parameter_list_to_dict_str(parameter_list_string):#
     dict_str = ["param_dict = {"]
@@ -20,7 +45,6 @@ def isFloat(x):
     if isinstance(x, float):
         return True
     return False
-import numbers
 def isInt(x):
     if isinstance(x, numbers.Integral):
         return True
@@ -52,7 +76,7 @@ def isArray(N):
 
 
 def shorten2dFloats(floats_fn):
-    fa = import2dArray(floats_fn)
+    fa = dt.import2dArray(floats_fn)
     for a in range(len(fa)):
         fa[a] = np.around(fa[a], decimals=4)
     return fa
@@ -69,9 +93,9 @@ def deleteAllButIndexes(array, indexes):
 
 
 def remove_indexes(indexes, array_fn):
-    array = np.asarray(import1dArray(array_fn))
+    array = np.asarray(dt.import1dArray(array_fn))
     array = np.delete(array, indexes, axis=0)
-    write1dArray(array, array_fn)
+    dt.write1dArray(array, array_fn)
     print("wrote", array_fn)
 
 import re
@@ -81,7 +105,7 @@ def concatenateArrays(arrays, file_name):
     new_array = arrays[0]
     for a in range(1, len(arrays)):
         new_array = np.concatenate((new_array, arrays[a]), axis=0)
-    write2dArray(new_array, file_name)
+    dt.write2dArray(new_array, file_name)
 
 
 def getDifference(array1, array2):
@@ -99,8 +123,8 @@ def getDifference(array1, array2):
         break
 
 def getDifference(array1, array2):
-    file2 = import1dArray(array1)
-    file1 = import1dArray(array2)
+    file2 = dt.import1dArray(array1)
+    file1 = dt.import1dArray(array2)
     for line1 in file1:
         found = False
         for line2 in file2:
@@ -196,7 +220,6 @@ def reverseArrays(md_array):
 
 
 
-import cProfile
 if __name__ == '__main__':
     """
     parameter_list_string = io.import1dArray("../../data/parameter_list_string.txt")

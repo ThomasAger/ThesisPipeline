@@ -650,13 +650,13 @@ def countClassFrequences(data_type, class_name):
         print(class_names[i], count)
         counts.append(count)
 
-def removeInfrequent(classes, class_names):
+def removeInfrequent(classes, class_names, remove_all_classes_below):
     infrequent_classes = []
-    classes = np.asarray(classes).transpose()
+    if len(classes) > len(classes[0]):
+        classes = np.asarray(classes).transpose()
     for i in range(len(classes)):
         count = len(np.nonzero(classes[i])[0])
-        print(count)
-        if count < 20:
+        if count < remove_all_classes_below:
             infrequent_classes.append(i)
     classes = np.delete(classes, infrequent_classes, axis=0)
     class_names = np.delete(class_names, infrequent_classes, axis=0)

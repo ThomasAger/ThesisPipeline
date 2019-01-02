@@ -2,7 +2,7 @@
 # When classifying, e.g. with tree, limit entities according to those in the classification problem
 # Cross-validation on trees
 # Filename manager?
-from file_io import csv
+from io import csv
 from model import tree
 from score import classify
 from util import split, filename as fnm

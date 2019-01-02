@@ -8,7 +8,7 @@ class MethodName(Method):
 
         self.param_example = param_example
 
-        super().__init__(save_class)
+        super().__init__(file_name, save_class)
 
 
     def makePopos(self):

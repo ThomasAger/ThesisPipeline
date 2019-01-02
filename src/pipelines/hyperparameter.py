@@ -1,8 +1,8 @@
-import derrac_pipeline
+from pipelines import derrac
 from itertools import product
 
 
-if __name__ == '__main__':
+def main():
     ### GENERAL
     data_type="newsgroups"
     split_ids=None
@@ -57,12 +57,12 @@ if __name__ == '__main__':
     max_iter = [300]
 
     var_names = ["min_freq", "max_freq", "score_type", "epochs", "cluster_type", "word_vectors", "cluster_centers", "cluster_center_directions",
-            "cluster_directions", "bandwidth", "n_init", "max_iter", "all_x", "all_y", "property_names" ]
+            "cluster_directions", "bandwidth", "n_init", "max_iter"]
 
     all_params = list(
         product(
             min_freq, max_freq, score_type, epochs, cluster_type, word_vectors, cluster_centers, cluster_center_directions,
-            cluster_directions, bandwidth, n_init, max_iter, all_x, all_y, property_names
+            cluster_directions, bandwidth, n_init, max_iter
         )
     )
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     all_scores = {}
     for i in range(len(all_p)):
         p = all_p[i]
-        all_scores[i] = derrac_pipeline.pipeline(data_type=data_type, all_x=p["all_x"], all_y=p["all_y"], min_freq=p["min_freq"], max_freq=p["max_freq"], score_type=p["score_type"]
+        all_scores[i] = derrac.pipeline(data_type=data_type, all_x=p["all_x"], all_y=p["all_y"], min_freq=p["min_freq"], max_freq=p["max_freq"], score_type=p["score_type"]
                                                  , epochs=p["epochs"], cluster_type=p["cluster_type"], word_vectors=p["word_vectors"]
                                                  , cluster_center_directions=p["cluster_center_directions"], cluster_directions=["cluster_directions"],
                                                  bandwidth=p["bandwidth"], n_init=p["n_init"] , max_iter=p["max_iter"],
@@ -88,3 +88,5 @@ if __name__ == '__main__':
 
 
 
+if __name__ == '__main__':
+    main()

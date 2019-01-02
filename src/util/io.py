@@ -92,6 +92,10 @@ def write1dArray(array, name, encoding=None):
         file.write(str(array[i]) + "\n")
     file.close()
 
+def write(value, name, encoding=None):
+    file = open(name, "w", encoding=encoding)
+    file.write(str(value) + "\n")
+    file.close()
 
 def write1dLinux(array, name):
     file = io.open(name, "w", newline='\n')
@@ -352,6 +356,22 @@ def import1dArray(file_name, file_type="s"):
             array = [line.strip() for line in infile]
     return np.asarray(array)
 
+def importValue(file_name, file_type="s"):
+    with open(file_name, "r", encoding="cp1252") as infile:
+        if file_type == "f":
+            lines = infile.readlines()
+            for line in lines:
+                value = float(line.strip())
+        elif file_type == "i":
+            lines = infile.readlines()
+            for line in lines:
+                value = int(line.strip())
+        else:
+            lines = infile.readlines()
+            for line in lines:
+                value = line.strip()
+    return value
+
 def import2dArray(file_name, file_type="f", return_sparse=False):
     if file_name[-4:] == ".npz":
         print("Loading sparse array")
@@ -387,7 +407,6 @@ def importNumpyVectors(numpy_vector_path=None):
 
 
 def load_by_type(type, file_name):
-    file = None
     if type == "npy":
         file = np.load(file_name)
     elif type == "scipy":
@@ -396,6 +415,18 @@ def load_by_type(type, file_name):
         file = Dictionary.load(file_name)
     elif type == "1dtxts":
         file = import1dArray(file_name, "s")
+    elif type == "1dtxtf":
+        file = import1dArray(file_name, "f")
+    elif type == "txtf":
+        file = importValue(file_name, "f")
+    elif type == "scoredict":
+        print("Scoredict exists, but was not imported.")
+    elif type == "scoredictarray":
+        print("Scoredictarray exists, but was not imported.")
+    elif type == "csv":
+        print("csv exists, but was not imported")
+    else:
+        raise ValueError("File type not recognized")
     return file
 
 def save_by_type(file, type, file_name):
@@ -405,7 +436,131 @@ def save_by_type(file, type, file_name):
         sp.save_npz(file_name, file)
     elif type == "gensim":
         file.save(file_name)
-    elif type == "1dtxts":
+    elif type[0:5] == "1dtxt":
         write1dArray(file, file_name)
+    elif type[0:3] == "txt":
+        write(file, file_name)
+    elif type == "scoredict":
+        save_csv_from_dict(file[0], file[1], file_name)
+    elif type == "scoredictarray":
+        save_averages_and_final_csv(file[0], file[1], file[2], file[3], file_name)
+    elif type == "csv":
+        write_csv(file_name, file[0], file[1], file[2])
     else:
         raise ValueError("File type not recognized")
+
+
+def save_averages_and_final_csv(dict_array, class_names, average_file_names, output_folder, end_file_name):
+    for i in range(int(len(dict_array))):
+        save_csv_from_dict(dict_array[i], class_names, output_folder + average_file_names[i] + ".csv")
+    save_averages_from_dicts(dict_array, average_file_names, end_file_name)
+
+
+def save_averages_from_dicts(score_dicts, row_names, file_name):
+    rows = []
+    col_names = []
+    for sd in range(len(score_dicts)):
+        csv_acc = None
+        csv_aurocs = None
+        csv_recalls = None
+        csv_precs = None
+        csv_kappas = None
+        csv_f1s = None
+
+        if "avg_acc" in score_dicts[sd]:
+            csv_acc = score_dicts[sd]["avg_acc"]
+        if "avg_f1" in score_dicts[sd]:
+            csv_f1s = score_dicts[sd]["avg_f1"]
+        if "avg_auroc" in score_dicts[sd]:
+            csv_aurocs = score_dicts[sd]["avg_auroc"]
+        if "avg_recall" in score_dicts[sd]:
+            csv_recalls = score_dicts[sd]["avg_recall"]
+        if "avg_prec" in score_dicts[sd]:
+            csv_precs = score_dicts[sd]["avg_prec"]
+        if "avg_kappa" in score_dicts[sd]:
+            csv_kappas = score_dicts[sd]["avg_kappa"]
+
+        col_data = []
+
+        if csv_f1s is not None:
+            col_data.append(csv_f1s)
+        if csv_acc is not None:
+            col_data.append(csv_acc)
+        if csv_aurocs is not None:
+            col_data.append(csv_aurocs)
+        if csv_precs is not None:
+            col_data.append(csv_precs)
+        if csv_kappas is not None:
+            col_data.append(csv_kappas)
+        if csv_recalls is not None:
+            col_data.append(csv_recalls)
+
+        rows.append(col_data)
+
+        if sd == 0:
+            if csv_f1s is not None:
+                col_names.append("avg_f1")
+            if csv_acc is not None:
+                col_names.append("avg_acc")
+            if csv_aurocs is not None:
+                col_names.append("avg_auroc")
+            if csv_precs is not None:
+                col_names.append("avg_prec")
+            if csv_kappas is not None:
+                col_names.append("avg_kappa")
+            if csv_recalls is not None:
+                col_names.append("avg_recall")
+    rows = np.asarray(rows).transpose()
+    write_csv(file_name, col_names, rows, row_names)
+def save_csv_from_dict(score_dict, class_names, csv_fn):
+
+    csv_acc = None
+    csv_aurocs = None
+    csv_recalls = None
+    csv_precs = None
+    csv_kappas = None
+    csv_f1s = None
+
+    if "acc" in score_dict:
+        csv_acc = score_dict["acc"]
+        csv_acc = np.append(csv_acc, score_dict["avg_acc"])
+    if "f1" in score_dict:
+        csv_f1s = score_dict["f1"]
+        csv_f1s = np.append(csv_f1s, score_dict["avg_f1"])
+    if "auroc" in score_dict:
+        csv_aurocs = score_dict["auroc"]
+        csv_aurocs = np.append(csv_aurocs, score_dict["avg_auroc"])
+    if "recall" in score_dict:
+        csv_recalls = score_dict["recall"]
+        csv_recalls = np.append(csv_recalls, score_dict["avg_recall"])
+    if "prec" in score_dict:
+        csv_precs = score_dict["prec"]
+        csv_precs = np.append(csv_precs, score_dict["avg_prec"])
+    if "kappa" in score_dict:
+        csv_kappas = score_dict["kappa"]
+        csv_kappas = np.append(csv_kappas, score_dict["avg_kappa"])
+
+    col_data = []
+    col_names = []
+
+    if csv_f1s is not None:
+        col_data.append(csv_f1s)
+        col_names.append("f1")
+    if csv_acc is not None:
+        col_data.append(csv_acc)
+        col_names.append("acc")
+    if csv_aurocs is not None:
+        col_data.append(csv_aurocs)
+        col_names.append("auroc")
+    if csv_precs is not None:
+        col_data.append(csv_precs)
+        col_names.append("prec")
+    if csv_kappas is not None:
+        col_data.append(csv_kappas)
+        col_names.append("kappa")
+    if csv_recalls is not None:
+        col_data.append(csv_recalls)
+        col_names.append("recall")
+
+    class_names = np.append(class_names, "AVERAGE")
+    write_csv(csv_fn, col_names, col_data, class_names)

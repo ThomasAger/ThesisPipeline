@@ -17,7 +17,7 @@ class PPMI(Method):
         self.checkFrequencyMatrix(doc_amt)
         self.file_name = file_name
 
-        super().__init__(save_class)
+        super().__init__(file_name, save_class)
 
     def checkFrequencyMatrix(self, doc_amt):
         if self.frequency_matrix.shape[0] != doc_amt and self.frequency_matrix.shape[1] != doc_amt:

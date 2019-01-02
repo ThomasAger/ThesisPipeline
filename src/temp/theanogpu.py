@@ -2,6 +2,7 @@ from collections import defaultdict
 from functools import wraps
 saved_data = defaultdict(list)
 
+file = open("../../data/processed/reuters/rep/svm/pie.txt", "w")
 def save(func):
     @wraps(func)
     def wrapper(*args, **kwargs):

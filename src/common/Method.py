@@ -6,9 +6,12 @@ class Method:
 
     popo_array = None
     save_class = None
+    file_name = None
+    processed = False
 
-    def __init__(self, save_class):
+    def __init__(self, file_name, save_class):
         self.save_class = save_class
+        self.file_name = file_name
         self.makePopos()
         self.makePopoArray()
 
@@ -31,9 +34,13 @@ class Method:
 
     def process(self):
         self.makePopoArray()
+        self.process = True
 
     def save(self):
-        self.save_class.save(self.popo_array)
+        if self.process:
+            self.save_class.save(self.popo_array)
+        else:
+            print("Use process() first, or just use process_and_save()")
 
     def load(self):
         self.save_class.load(self.popo_array)
@@ -46,21 +53,28 @@ class ModelMethod(Method):
     x_test = None
     y_test = None
     test_predictions = None
+    test_proba = None
+    probability = None
 
-    def __init__(self, x_train, y_train, x_test, y_test, save_class):
+
+    def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, probability):
         self.x_train = x_train
         self.x_test = x_test
         self.y_train = y_train
         self.y_test = y_test
+        self.probability = probability
         check.check_x(x_train)
         check.check_x(x_test)
-        check.check_y(y_train)
-        check.check_y(y_test)
         check.check_splits(x_train, y_train, x_test, y_test)
-        super().__init__(save_class)
+        super().__init__(file_name, save_class)
 
     def makePopos(self):
-        self.test_predictions = SaveLoadPOPO(self.test_predictions, self.file_name, "npy")
+        self.test_predictions = SaveLoadPOPO(self.test_predictions, self.file_name + ".npy", "npy")
+        if self.probability:
+            self.test_proba = SaveLoadPOPO(self.test_proba, self.file_name + ".npy", "npy")
 
     def makePopoArray(self):
-        self.popo_array = [self.test_predictions]
+        if self.probability:
+            self.popo_array = [self.test_predictions, self.test_proba]
+        else:
+            self.popo_array = [self.test_predictions]

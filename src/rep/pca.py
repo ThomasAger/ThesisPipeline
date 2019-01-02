@@ -16,7 +16,7 @@ class PCA(Method):
         self.dim = dim
         self.file_name = file_name
 
-        super().__init__(save_class)
+        super().__init__(file_name, save_class)
 
     def checkWordDocMatrix(self, doc_amt):
         if self.word_doc_matrix.shape[1] != doc_amt and self.word_doc_matrix.shape[0] != doc_amt:
