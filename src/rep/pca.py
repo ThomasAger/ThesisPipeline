@@ -4,7 +4,7 @@ from sklearn.decomposition import TruncatedSVD
 from common.SaveLoadPOPO import SaveLoadPOPO
 from common.Method import Method
 class PCA(Method):
-    PCA = None
+    rep = None
     word_doc_matrix = None
     dim = None
     file_name = None
@@ -26,13 +26,13 @@ class PCA(Method):
             self.word_doc_matrix = self.word_doc_matrix.transpose()
 
     def makePopos(self):
-        self.PCA = SaveLoadPOPO(self.PCA, self.file_name + "PCA.npy", "npy")
+        self.rep = SaveLoadPOPO(self.rep, self.file_name + "PCA.npy", "npy")
 
     def makePopoArray(self):
-        self.popo_array = [self.PCA]
+        self.popo_array = [self.rep]
 
     def process(self):
         print("Begin processing")
         svd = TruncatedSVD(n_components=self.dim)  # use the scipy algorithm "arpack"
-        self.PCA.value = svd.fit_transform(self.word_doc_matrix)
+        self.rep.value = svd.fit_transform(self.word_doc_matrix)
         super().process()
