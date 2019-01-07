@@ -70,15 +70,18 @@ class MultiClassScore(Method.Method):
         if np.count_nonzero(true_targets) < 1:
             auroc = False
             print("Auroc has been automatically disabled as the true targets (len)", len(true_targets), "are all zero. (It causes an error)")
+        if pred_proba is None:
+            auroc = False
+            print("Auroc has been automatically disabled as probabilities were not provided")
         self.true_targets = true_targets
         self.predictions = predictions
         self.pred_proba = pred_proba
 
-        self.true_targets = py.transIfRowsLarger(self.true_targets)
-        self.predictions = py.transIfRowsLarger(self.predictions)
-        self.pred_proba = py.transIfRowsLarger(self.pred_proba)
-
-        print("Shape is:", len(self.predictions), len(self.predictions[0]))
+        if py.isArray(true_targets[0]):
+            self.true_targets = py.transIfRowsLarger(self.true_targets)
+            self.predictions = py.transIfRowsLarger(self.predictions)
+            self.pred_proba = py.transIfRowsLarger(self.pred_proba)
+            print("Shape is:", len(self.predictions), len(self.predictions[0]))
         self.output_folder = output_folder
         self.class_names = class_names
         self.f1s = np.full(len(self.predictions), math.nan)

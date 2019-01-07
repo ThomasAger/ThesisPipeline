@@ -63,9 +63,7 @@ class ModelMethod(Method):
         self.y_train = y_train
         self.y_test = y_test
         self.probability = probability
-        check.check_x(x_train)
-        check.check_x(x_test)
-        check.check_splits(x_train, y_train, x_test, y_test)
+        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
         super().__init__(file_name, save_class)
 
     def makePopos(self):
@@ -78,3 +76,20 @@ class ModelMethod(Method):
             self.popo_array = [self.test_predictions, self.test_proba]
         else:
             self.popo_array = [self.test_predictions]
+
+class RepMethod(Method):
+
+    rep = None
+    output_folder = None
+    dim = None
+
+    def __init__(self, file_name, output_folder, save_class, dim):
+        self.output_folder = output_folder
+        self.dim = dim
+        super().__init__(file_name, save_class)
+
+    def makePopos(self):
+        self.rep = SaveLoadPOPO(self.rep, self.output_folder + self.file_name + ".npy", "npy")
+
+    def makePopoArray(self):
+        self.popo_array = [self.rep]

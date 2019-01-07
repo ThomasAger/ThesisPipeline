@@ -7,23 +7,25 @@ import numbers
 # Data structure management tasks
 
 def transIfRowsLarger(mat):
-    print("Matrix in format", len(mat), len(mat[0]))
-    if len(mat) > len(mat[0]):
-        print("Rows larger than columns, transposing")
-        mat = mat.transpose()
-        print("Matrix now in format", len(mat), len(mat[0]))
+    if mat is not None:
+        print("Matrix in format", len(mat), len(mat[0]))
         if len(mat) > len(mat[0]):
-            raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
+            print("Rows larger than columns, transposing")
+            mat = mat.transpose()
+            print("Matrix now in format", len(mat), len(mat[0]))
+            if len(mat) > len(mat[0]):
+                raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
     return mat
 
 def transIfColsLarger(mat):
-    print("Matrix in format", len(mat), len(mat[0]))
-    if len(mat) < len(mat[0]):
-        print("Columns larger than rows, transposing")
-        mat = mat.transpose()
-        print("Matrix now in format", len(mat), len(mat[0]))
-        if len(mat) > len(mat[0]):
-            raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
+    if mat is not None:
+        print("Matrix in format", len(mat), len(mat[0]))
+        if len(mat) < len(mat[0]):
+            print("Columns larger than rows, transposing")
+            mat = mat.transpose()
+            print("Matrix now in format", len(mat), len(mat[0]))
+            if len(mat) > len(mat[0]):
+                raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
     return mat
 
 def parameter_list_to_dict_str(parameter_list_string):#
@@ -66,8 +68,6 @@ def isList(x):
     except AttributeError:
         return True
     return False
-
-
 
 def isArray(N):
     if hasattr(N, '__len__') and (not isinstance(N, str)):

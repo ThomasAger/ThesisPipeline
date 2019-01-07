@@ -29,7 +29,7 @@ class PPMI(Method):
 
 
     def makePopos(self):
-        self.ppmi_matrix = SaveLoadPOPO(self.ppmi_matrix, self.file_name + "ppmi.npz", "scipy")
+        self.ppmi_matrix = SaveLoadPOPO(self.ppmi_matrix, self.file_name + ".npz", "scipy")
 
     def makePopoArray(self):
         self.popo_array = [self.ppmi_matrix]

@@ -4,7 +4,6 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 from scipy import sparse as sp
-from gensim.corpora import Dictionary
 
 def write2dCSV(array, name):
     file = open(name, "w")
@@ -111,14 +110,6 @@ def write1dCSV(array, name):
         file.write(str(array[i]) + "\n")
     file.close()
 
-
-def write_to_csv(csv_fn, col_names, cols_to_add):
-    df = pd.read_csv(csv_fn, index_col=0)
-    for c in range(len(cols_to_add)):
-        df[col_names[c]] = cols_to_add[c]
-    df.to_csv(csv_fn)
-
-
 def write_to_csv_key(csv_fn, col_names, cols_to_add, keys):
     df = pd.read_csv(csv_fn, index_col=0)
     for c in range(len(cols_to_add)):
@@ -126,6 +117,12 @@ def write_to_csv_key(csv_fn, col_names, cols_to_add, keys):
             df[col_names[c]][k] = cols_to_add[c][k]
     df.to_csv(csv_fn)
 
+def write_csv(csv_fn, col_names, cols_to_add, key):
+    d = {}
+    for c in range(len(cols_to_add)):
+        d[col_names[c]] = cols_to_add[c]
+    df = pd.DataFrame(d, index=key)
+    df.to_csv(csv_fn)
 
 def read_csv(csv_fn):
     csv = pd.read_csv(csv_fn, index_col=0)
@@ -134,6 +131,10 @@ def read_csv(csv_fn):
             if np.isnan(csv.iloc[col][val] ):
                 print("!NAN!", col, val)
     return csv
+
+def csv_pd_to_array(csv_pd):
+    print("")
+    return [csv_pd._info_axis.values, csv_pd.values[0], csv_pd._stat_axis.values]
 """
 write_to_csv("../../data/newsgroups/rules/tree_csv/sns_ppmi3mdsnew200svmdualCV1S0 SFT0 allL03018836 LR acc KMeans CA400 MC1 MS0.4 ATS500 DS800 newsgroupsAVG.csv", "1", "1")
 for i in range(2147000000):
@@ -190,6 +191,24 @@ def toBool(string):
     else:
         return False
 
+
+
+
+def save_dict(dct, file_name):
+    file = open(file_name, "w")
+    for key, value in dct.items():
+        file.write(str(key) + " " + str(value) + "\n")
+    file.close()
+
+
+def load_dict(file_name):
+    dict = {}
+    with open(file_name, "r", encoding="cp1252") as infile:
+        lines = infile.readlines()
+        for l in lines:
+            split = l.split()
+            dict[int(split[0])] = split[1]
+    return dict
 
 def writeArrayDict(dict, name):
     file = open(name, "w")
@@ -343,6 +362,7 @@ def getFolder(folder_path):
     return two_d
 
 
+
 def import1dArray(file_name, file_type="s"):
     with open(file_name, "r", encoding="cp1252") as infile:
         if file_type == "f":
@@ -406,48 +426,6 @@ def importNumpyVectors(numpy_vector_path=None):
     return movie_vectors
 
 
-def load_by_type(type, file_name):
-    if type == "npy":
-        file = np.load(file_name)
-    elif type == "scipy":
-        file = sp.load_npz(file_name)
-    elif type == "gensim":
-        file = Dictionary.load(file_name)
-    elif type == "1dtxts":
-        file = import1dArray(file_name, "s")
-    elif type == "1dtxtf":
-        file = import1dArray(file_name, "f")
-    elif type == "txtf":
-        file = importValue(file_name, "f")
-    elif type == "scoredict":
-        print("Scoredict exists, but was not imported.")
-    elif type == "scoredictarray":
-        print("Scoredictarray exists, but was not imported.")
-    elif type == "csv":
-        print("csv exists, but was not imported")
-    else:
-        raise ValueError("File type not recognized")
-    return file
-
-def save_by_type(file, type, file_name):
-    if type == "npy":
-        np.save(file_name, file)
-    elif type == "scipy":
-        sp.save_npz(file_name, file)
-    elif type == "gensim":
-        file.save(file_name)
-    elif type[0:5] == "1dtxt":
-        write1dArray(file, file_name)
-    elif type[0:3] == "txt":
-        write(file, file_name)
-    elif type == "scoredict":
-        save_csv_from_dict(file[0], file[1], file_name)
-    elif type == "scoredictarray":
-        save_averages_and_final_csv(file[0], file[1], file[2], file[3], file_name)
-    elif type == "csv":
-        write_csv(file_name, file[0], file[1], file[2])
-    else:
-        raise ValueError("File type not recognized")
 
 
 def save_averages_and_final_csv(dict_array, class_names, average_file_names, output_folder, end_file_name):

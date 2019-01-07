@@ -1,28 +1,53 @@
-#python example to train doc2vec model (with or without pre-trained word embeddings)
-
-import logging
-import os
 
 import gensim.models as g
+from common.Method import RepMethod
+from common.SaveLoadPOPO import SaveLoadPOPO
+import logging
 import numpy as np
-
-import newsgroups
-import sentiment
-from svm import linearSVMScore, multiClassLinearSVM
-from util import proj as dt
-
-
-def doc2Vec(embedding_fn, corpus_fn, vector_size, window_size, min_count, sampling_threshold,
-                negative_size, train_epoch, dm, worker_count, train_wv, concatenate_wv, use_hierarchical_softmax):
+# Defaults set to the Q-Dup model
+def doc2Vec(embedding_fn, corpus_fn, vector_size=300, window_size=15, min_count=5, sampling_threshold=1e-5,
+                negative_size=5, train_epoch=20, dm=0, worker_count=1, train_wv=1, concatenate_wv=1):
 
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     docs = g.doc2vec.TaggedLineDocument(corpus_fn) #
     model = g.Doc2Vec(docs, size=vector_size,window=window_size, iter=train_epoch, min_count=min_count,
                         sample=sampling_threshold,negative=negative_size,
-                      workers=worker_count, hs=use_hierarchical_softmax, dm=dm, dbow_words=train_wv, dm_concat=concatenate_wv,
+                      workers=worker_count,  dm=dm, dbow_words=train_wv, dm_concat=concatenate_wv,
                       pretrained_emb=embedding_fn)
     return model
 
+class D2V(RepMethod):
+    embedding_fn = None
+    d2v_model = None
+    rep = None
+    corpus_fn = None
+    window_size = 0
+    train_epoch = 0
+    min_count = 0
+
+    def __init__(self, corpus_fn, embedding_fn, file_name, output_folder, save_class, dim, window_size=15, train_epoch=20, min_count=5):
+        self.embedding_fn = embedding_fn
+        self.corpus_fn = corpus_fn
+        self.window_size = window_size
+        self.train_epoch = train_epoch
+        self.min_count = min_count
+        super().__init__(file_name, output_folder, save_class, dim)
+
+    def makePopoArray(self):
+        self.popo_array = [self.d2v_model, self.rep]
+
+    def makePopos(self):
+        self.d2v_model = SaveLoadPOPO(self.d2v_model, self.output_folder + self.file_name + ".bin", "gensim_save_model")
+        super().makePopos()
+
+    def process(self):
+        self.d2v_model.value = doc2Vec(self.embedding_fn, vector_size=self.dim, corpus_fn=self.corpus_fn, worker_count=5, window_size=self.window_size, train_epoch=self.train_epoch, min_count=self.min_count)
+        self.rep.value = []
+        for d in range(len(self.d2v_model.value.docvecs)):
+            self.rep.value.append(self.d2v_model.value.docvecs[d])
+        self.rep.value = np.asarray(self.rep.value)
+
+""" OLD
 def main(data_type, vector_size, window_size, min_count, sampling_threshold, negative_size,
                                train_epoch, dm, worker_count, train_wv, concatenate_wv, use_hierarchical_softmax):
     file_name = "Doc2Vec" + " VS" + str(vector_size) + " WS" + str(window_size) + " MC" + str(min_count) + " ST" + str(
@@ -80,12 +105,15 @@ def main(data_type, vector_size, window_size, min_count, sampling_threshold, neg
         print(scores)
         dt.write1dArray(scores, score_fn)
 
-vector_size = 200
+#https://arxiv.org/pdf/1607.05368.pdf
+#Found that dbow is better than dmpv
+# Vector size 300, window size 15, min count 5, sub sampling 10-5, negative sample 5, epoch 20 are the "best" results for 4.3m training size
+vector_size = 300
 window_size = 15
-min_count = 1
+min_count = 5
 sampling_threshold = 1e-5
 negative_size = 5
-train_epoch = 400
+train_epoch = 20
 dm = 0
 worker_count = 10
 train_wv = 1
@@ -95,3 +123,4 @@ data_type = "newsgroups"
 
 if  __name__ =='__main__':main(data_type, vector_size, window_size, min_count, sampling_threshold, negative_size,
                                train_epoch, dm, worker_count, train_wv, concatenate_wv, use_hierarchical_softmax)
+"""

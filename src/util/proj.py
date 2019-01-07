@@ -661,7 +661,7 @@ def removeInfrequent(classes, class_names, remove_all_classes_below):
     classes = np.delete(classes, infrequent_classes, axis=0)
     class_names = np.delete(class_names, infrequent_classes, axis=0)
     print("deleted", len(infrequent_classes), "classes now", len(class_names), "classes")
-    return classes.transpose(), class_names
+    return np.asarray(classes.transpose(), dtype=np.int32), class_names
 
 
 
