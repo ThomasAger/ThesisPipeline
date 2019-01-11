@@ -2,23 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="32697eb9-8f33-42c2-8487-19c8a32c2934" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/model/randomforest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/common/Method.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/common/Method.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/svm.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/svm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pipelines/KFoldHyperParameter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipelines/KFoldHyperParameter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pipelines/preprocess_text.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipelines/preprocess_text.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rep/awv.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rep/awv.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rep/doc2vec.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rep/d2v.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rep/pca.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rep/pca.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rep/ppmi.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rep/ppmi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/score/classify.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/score/classify.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/unit_global.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/unit_global.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/check.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/check.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/io.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/io.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/proj.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/proj.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/py.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/py.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/save_load.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/save_load.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,11 +12,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/pipelines/preprocess_text.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-119">
-              <caret line="64" column="42" lean-forward="true" selection-start-line="64" selection-start-column="42" selection-end-line="64" selection-end-column="42" />
+            <state relative-caret-position="17">
+              <caret line="64" column="42" selection-start-line="64" selection-start-column="42" selection-end-line="64" selection-end-column="42" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -43,7 +27,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/common/Method.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
+            <state relative-caret-position="340">
               <caret line="21" selection-start-line="21" selection-end-line="21" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
@@ -55,8 +39,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rep/ppmi.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="373">
-              <caret line="30" column="24" lean-forward="true" selection-start-line="30" selection-start-column="24" selection-end-line="30" selection-end-column="24" />
+            <state relative-caret-position="408">
+              <caret line="30" column="24" selection-start-line="30" selection-start-column="24" selection-end-line="30" selection-end-column="24" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -67,8 +51,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/proj.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="444">
-              <caret line="664" lean-forward="true" selection-start-line="664" selection-end-line="664" />
+            <state relative-caret-position="11186">
+              <caret line="664" selection-start-line="664" selection-end-line="664" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -79,7 +63,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/check.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
+            <state relative-caret-position="1020">
               <caret line="62" selection-start-line="62" selection-end-line="62" />
               <folding>
                 <element signature="e#1#26#0" expanded="true" />
@@ -91,7 +75,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/pipelines/KFoldHyperParameter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-367">
+            <state relative-caret-position="2346">
               <caret line="150" column="30" selection-start-line="150" selection-start-column="23" selection-end-line="150" selection-end-column="30" />
               <folding>
                 <element signature="e#1#42#0" expanded="true" />
@@ -100,10 +84,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/data/process_corpus.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="608">
+            <state relative-caret-position="5491">
               <caret line="342" column="53" selection-start-line="342" selection-start-column="53" selection-end-line="342" selection-end-column="53" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
@@ -115,7 +99,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/py.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
+            <state relative-caret-position="102">
               <caret line="9" selection-start-line="9" selection-end-line="9" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
@@ -127,7 +111,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/score/classify.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
+            <state relative-caret-position="969">
               <caret line="68" column="8" selection-start-line="68" selection-start-column="8" selection-end-line="68" selection-end-column="8" />
               <folding>
                 <element signature="e#1#12#0" expanded="true" />
@@ -139,7 +123,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/sklearn/metrics/classification.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
+            <state relative-caret-position="884">
               <caret line="70" selection-start-line="70" selection-end-line="70" />
             </state>
           </provider>
@@ -240,11 +224,11 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="1" />
-    <option name="y" value="1" />
-    <option name="width" value="1918" />
-    <option name="height" value="1038" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-1928" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -517,10 +501,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="1" width="1918" height="1038" extended-state="0" />
-    <editor active="true" />
+    <frame x="-1928" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14148936" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14014752" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -1039,46 +1022,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/sklearn/metrics/classification.py">
+    <entry file="file://$PROJECT_DIR$/src/pipelines/preprocess_text.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="70" selection-start-line="70" selection-end-line="70" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rep/ppmi.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="30" column="24" lean-forward="true" selection-start-line="30" selection-start-column="24" selection-end-line="30" selection-end-column="24" />
+        <state relative-caret-position="17">
+          <caret line="64" column="42" selection-start-line="64" selection-start-column="42" selection-end-line="64" selection-end-column="42" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/check.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="62" selection-start-line="62" selection-end-line="62" />
-          <folding>
-            <element signature="e#1#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/proj.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="664" lean-forward="true" selection-start-line="664" selection-end-line="664" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#25#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/common/Method.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
+        <state relative-caret-position="340">
           <caret line="21" selection-start-line="21" selection-end-line="21" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
@@ -1086,39 +1042,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/py.py">
+    <entry file="file://$PROJECT_DIR$/src/rep/ppmi.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        <state relative-caret-position="408">
+          <caret line="30" column="24" selection-start-line="30" selection-start-column="24" selection-end-line="30" selection-end-column="24" />
           <folding>
-            <element signature="e#0#25#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/score/classify.py">
+    <entry file="file://$PROJECT_DIR$/src/util/proj.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="68" column="8" selection-start-line="68" selection-start-column="8" selection-end-line="68" selection-end-column="8" />
+        <state relative-caret-position="11186">
+          <caret line="664" selection-start-line="664" selection-end-line="664" />
           <folding>
-            <element signature="e#1#12#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/pipelines/preprocess_text.py">
+    <entry file="file://$PROJECT_DIR$/src/util/check.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-119">
-          <caret line="64" column="42" lean-forward="true" selection-start-line="64" selection-start-column="42" selection-end-line="64" selection-end-column="42" />
+        <state relative-caret-position="1020">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
           <folding>
-            <element signature="e#0#25#0" expanded="true" />
+            <element signature="e#1#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/pipelines/KFoldHyperParameter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-367">
+        <state relative-caret-position="2346">
           <caret line="150" column="30" selection-start-line="150" selection-start-column="23" selection-end-line="150" selection-end-column="30" />
           <folding>
             <element signature="e#1#42#0" expanded="true" />
@@ -1128,11 +1084,38 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/data/process_corpus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
+        <state relative-caret-position="5491">
           <caret line="342" column="53" selection-start-line="342" selection-start-column="53" selection-end-line="342" selection-end-column="53" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/py.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/score/classify.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="969">
+          <caret line="68" column="8" selection-start-line="68" selection-start-column="8" selection-end-line="68" selection-end-column="8" />
+          <folding>
+            <element signature="e#1#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/sklearn/metrics/classification.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="884">
+          <caret line="70" selection-start-line="70" selection-end-line="70" />
         </state>
       </provider>
     </entry>
