@@ -30,7 +30,7 @@ def get_grid_params(hpam_dict):
     return all_p
 
 
-class HyperParameter(Method):
+class RecHParam(Method):
 
     classes = None
     folds = None
@@ -117,8 +117,157 @@ class HyperParameter(Method):
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
         self.final_arrays.value.append(indexes)
 
+class HParam(Method):
 
+    classes = None
+    dev = None
+    file_name = None
+    space = None
+    output_folder = None
+    model_type = None
+    end_file_name = ""
+    class_names = None
+    probability = None
+    averaged_csv_data = None
+    file_names = None
+    all_p = None
+    auroc = False
+    fscore = False
+    acc = False
+    kappa = False
+    rewrite_model = False
+    hpam_dict = None
+    score_metric = None
+    x_dev = None
+    y_dev = None
+    p_score_dicts = None
+    # The CSV data that corresponds to the highest scoring row for the score_metric
+    top_scoring_row_data = None
 
+    def __init__(self, class_names, hpam_dict, model_type, file_name, output_folder, save_class, probability, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None):
+
+        self.rewrite_model = rewrite_model
+        # Metric that determines what will be returned to the overall hyper-parameter method
+        self.score_metric = score_metric
+        self.class_names = class_names
+        self.probability = probability
+        self.hpam_dict = hpam_dict
+        self.auroc = auroc
+        self.fscore = fscore
+        self.acc = acc
+        self.kappa = kappa
+        self.all_p = get_grid_params(hpam_dict)
+        self.x_train = x_train
+        self.x_test = x_test
+        self.y_train = y_train
+        self.y_test = y_test
+        self.x_dev = x_dev
+        self.y_dev = y_dev
+        self.file_name = file_name
+        self.output_folder = output_folder
+        self.model_type = model_type
+        self.file_names = []
+        self.end_file_name = self.file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + self.model_type
+        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
+        check.check_splits(self.x_train, self.y_train, self.x_dev, self.y_dev)
+        super().__init__(file_name, save_class)
+
+    def makePopos(self):
+        self.averaged_csv_data = SaveLoadPOPO(self.averaged_csv_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + ".csv", "scoredictarray")
+        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
+
+    def makePopoArray(self):
+        self.popo_array = [self.averaged_csv_data, self.top_scoring_row_data]
+
+    def process(self):
+        self.p_score_dicts = []
+        for i in range(len(self.all_p)):
+            model, model_fn = self.selectClassifier(self.all_p[i], self.x_train, self.y_train, self.x_dev, self.y_dev)
+            pred, prob = self.trainClassifier(model)
+            self.file_names.append(model_fn)
+            score_save = SaveLoad(rewrite=self.rewrite_model)
+            score = classify.MultiClassScore(self.y_dev, pred, prob, file_name=model_fn,
+                                             output_folder=self.output_folder + "rep/score/", save_class=score_save, verbose=True,
+                                             fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
+            score.process_and_save()
+
+            self.p_score_dicts.append(score.get())
+
+        self.averaged_csv_data.value = [self.p_score_dicts, self.class_names, self.file_names, self.output_folder + "rep/score/csv_details/"]
+        self.getTopScoringByMetric()
+
+    def trainClassifier(self, model):
+        model.process_and_save()
+        pred = model.test_predictions.value
+        prob = None
+        if self.probability:
+            prob = model.test_proba.value
+        return pred, prob
+
+    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test):
+        svm_save = SaveLoad(rewrite=self.rewrite_model)
+        model = None
+        model_fn = None
+        if self.model_type == "LinearSVM":
+            model_fn = self.file_name + "_Dev" + "_" + str(len(x_test)) + "_Balanced_" + str(all_p["class_weight"]) \
+                       + "_C_" + str(all_p["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
+            model = LinearSVM(x_train, y_train, x_test, y_test,
+                              self.output_folder + "rep/svm/" + model_fn, svm_save, C=all_p["C"],
+                              class_weight=all_p["class_weight"], probability=self.probability, verbose=False)
+
+        elif self.model_type == "GaussianSVM":
+            param_fn = "_Balanced_" + str(all_p["class_weight"]) \
+                       + "_C_" + str(all_p["C"]) + "_Gam_" + str(all_p["gamma"]) + "_Prob_" + str(
+                self.probability) + "_" + self.model_type
+
+            model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+
+            model = GaussianSVM(x_train, y_train, x_test, y_test,
+                                self.output_folder + "rep/svm/" + model_fn, svm_save, gamma=all_p["gamma"],
+                                C=all_p["C"],
+                                class_weight=all_p["class_weight"], probability=self.probability, verbose=False)
+        elif self.model_type == "RandomForest":
+            param_fn = "MClass_Balanced_" + str(all_p["class_weight"]) \
+                       + "_Estim_" + str(all_p["n_estimators"]) + "_Features_" + str(
+                all_p["max_features"]) + "_BS_" + str(all_p["bootstrap"]) + "_MD_" + str(
+                all_p["max_depth"]) + "_MSL_" + str(all_p["min_samples_leaf"]) + "_MSS_" + str(
+                all_p["min_samples_split"]) + "_" + self.model_type
+
+            model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            model = RandomForest(x_train, y_train, x_test, y_test,
+                                 self.output_folder + "rep/svm/" + model_fn, svm_save,
+                                 n_estimators=all_p["n_estimators"], bootstrap=all_p["bootstrap"],
+                                 max_depth=all_p["max_depth"],
+                                 min_samples_leaf=all_p["min_samples_leaf"],
+                                 min_samples_split=all_p["min_samples_split"],
+                                 class_weight=all_p["class_weight"], max_features=all_p["max_features"],
+                                 probability=self.probability, verbose=False)
+        return model, model_fn
+
+    def getTopScoringByMetric(self):
+        scores = []
+        for i in range(len(self.p_score_dicts)):
+            scores.append(self.p_score_dicts[i][self.score_metric])
+        index_sorted = np.flipud(np.argsort(scores))[0]
+        best_params = self.all_p[index_sorted]
+        print("Training best parameters on test data not dev data")
+        model, model_fn = self.selectClassifier(best_params, self.x_train, self.y_train, self.x_test, self.y_test)
+        pred, prob = self.trainClassifier(model)
+        score_save = SaveLoad(rewrite=self.rewrite_model)
+        score = classify.MultiClassScore(self.y_test, pred, prob, file_name=model_fn,
+                                         output_folder=self.output_folder + "rep/score/", save_class=score_save,
+                                         verbose=True,
+                                         fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
+        score.process_and_save()
+
+        score_dict = score.get()
+        col_names = ["avg_f1", "avg_acc", "avg_kappa", "avg_prec", "avg_recall"]
+        avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                     score_dict[col_names[2]], score_dict[col_names[3]],
+                     score_dict[col_names[4]]]
+        self.top_scoring_row_data.value = [col_names, avg_array, [model_fn]]
+
+#### NEEDS REWRITE TO RE-USE OVERALL HYPERPARAMTER THING
 class KFoldHyperParameter(Method):
 
     classes = None

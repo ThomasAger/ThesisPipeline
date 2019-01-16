@@ -8,12 +8,11 @@ from rep import pca, ppmi, awv
 from data import process_corpus
 from util.save_load import SaveLoad
 from util import split
-from pipelines.KFoldHyperParameter import KFoldHyperParameter
-from pipelines.KFoldHyperParameter import HyperParameter
+from pipelines.KFoldHyperParameter import HParam, RecHParam
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
-def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below_fraction, no_above, classes_freq_cutoff, model_type, rewrite_all=False, remove_stop_words=False,  auroc=False):
+def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=False,  auroc=False):
 
     probability = False
     if auroc is True:
@@ -24,7 +23,8 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     print("Filtering all words that do not appear in", no_below, "documents")
 
     # Process and save corpus
-    corpus_save = SaveLoad(rewrite=True)
+    corpus_save = SaveLoad(rewrite=rewrite_all
+                           )
     p_corpus = process_corpus.Corpus(corpus, classes, class_names, file_name, output_folder, bowmin, no_below, no_above, classes_freq_cutoff, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
 
@@ -35,18 +35,22 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     ppmi_unfiltered.process_and_save()
     ppmi_unf_matrix = ppmi_unfiltered.ppmi_matrix.value
 
-    """
+
     ppmi_save = SaveLoad(rewrite=rewrite_all)
     ppmi_filtered = ppmi.PPMI(p_corpus.filtered_bow.value, doc_amt, output_folder + "bow/NB_" + str(no_below) + "_NA_" + str(no_above) + ppmi_fn, ppmi_save)
     ppmi_filtered.process_and_save()
     ppmi_filtered_matrix = ppmi_filtered.ppmi_matrix.value
-    
+
+    # Get the dev splits
+    split_ids = split.get_split_ids(data_type)
+    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_corpus.classes.value, split_ids, dev_percent_of_train=dev_percent)
+
     hpam_save = SaveLoad(rewrite=rewrite_all)
-    hyper_param = KFoldHyperParameter(ppmi_filtered_matrix.toarray(), p_corpus.classes.value, p_corpus.filtered_class_names.value,
+    hyper_param = HParam(p_corpus.filtered_class_names.value,
                                       kfold_hpam_dict, model_type, ppmi_fn,
-                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all, folds=2)
+                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev)
     hyper_param.process_and_save()
-    """
+
     # Creating and testing spaces, MDS not included in the creation process
     for i in range(len(dims)):
         pca_save = SaveLoad(rewrite=rewrite_all)
@@ -56,10 +60,14 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         pca_instance.process_and_save()
         pca_space = pca_instance.rep.value
 
+        split_ids = split.get_split_ids(data_type)
+        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(pca_space,
+                                                                          p_corpus.classes.value, split_ids,
+                                                                          dev_percent_of_train=dev_percent)
         hpam_save = SaveLoad(rewrite=rewrite_all)
-        hyper_param = KFoldHyperParameter(pca_space, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,
+        hyper_param = HParam(p_corpus.filtered_class_names.value,
                                           kfold_hpam_dict, model_type, pca_fn,
-                                     output_folder, hpam_save, probability, rewrite_model=rewrite_all, folds=2)
+                                     output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev)
         hyper_param.process_and_save()
 
         wv_path = "D:/PhD/Code/ThesisPipeline/ThesisPipeline/data/raw/glove/glove.6B." + str(dims[i]) + 'd.txt'
@@ -75,10 +83,15 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             awv_instance.process_and_save()
             awv_space = awv_instance.rep.value
 
+            split_ids = split.get_split_ids(data_type)
+            x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(awv_space,
+                                                                              p_corpus.classes.value, split_ids,
+                                                                              dev_percent_of_train=dev_percent)
+
             hpam_save = SaveLoad(rewrite=rewrite_all)
-            hyper_param = KFoldHyperParameter(awv_space, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,
+            hyper_param = HParam(p_corpus.filtered_class_names.value,
                                               kfold_hpam_dict, model_type, awv_fn,
-                                         output_folder, hpam_save, probability, rewrite_model=rewrite_all, folds=2)
+                                         output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev)
             hyper_param.process_and_save()
             """
             awvW_save = SaveLoad(rewrite=rewrite_all)
@@ -106,7 +119,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         hpam_dict["wv_path"] = [wv_path_d2v]
 
         # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
-        hyper_param = HyperParameter(None, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
+        hyper_param = RecHParam(None, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
                                      doc2vec_fn, output_folder, hpam_save, probability, rewrite_model=rewrite_all)
         hyper_param.process_and_save()
 
@@ -118,7 +131,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
 
 
-def main(data_type, raw_folder, processed_folder,proj_folder,  grams, model_type, no_below, no_above, classes_freq_cutoff, bowmin):
+def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVM", no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2):
     if data_type == "newsgroups":
         newsgroups = fetch_20newsgroups(subset='all', shuffle=False, remove=("headers", "footers", "quotes"))
         corpus = newsgroups.data
@@ -178,10 +191,11 @@ def main(data_type, raw_folder, processed_folder,proj_folder,  grams, model_type
                 "min_count":min_count,
                 "train_epoch":train_epoch}
 
-    pipeline(corpus, classes, class_names, "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below, no_above, classes_freq_cutoff, model_type, rewrite_all=False, remove_stop_words=True)
+    pipeline(corpus, classes, class_names, "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True)
 
 
 
 
-data_type = "newsgroups"
-if __name__ == '__main__': main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", "../../data/proj/"+data_type+"/",  0, "LinearSVM", 0.01, 0.95, 100, 2)
+data_type = "reuters"
+if __name__ == '__main__': main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
+                                grams=0, model_type="LinearSVM", no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2)

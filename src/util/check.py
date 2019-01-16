@@ -36,7 +36,7 @@ def check_x(features):
         raise ValueError("X input is not 2d array, example", features[0])
     if isinstance(features[0][0], numbers.Integral):
         raise TypeError("X input is int not float, example", features[0])
-    if len(features) < len(features[0]):
+    if len(features) < len(features[0])  /100:
         raise ValueError("Very low X sample size compared to dimension size", len(features), "dimension size", len(features[0]))
 
 def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
@@ -63,7 +63,7 @@ def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
             raise TypeError("Y input is float not int", y_train[0])
         if isinstance(y_train[0][0], str) or isinstance(x_train[0][0], str):
             raise TypeError("Strings found", y_train[0][0], x_train[0][0])
-        if len(y_train) < len(y_train[0]):
+        if len(y_train) < len(y_train[0] /100):
             raise ValueError("Very low Y sample size compared to dimension size", len(y_train), "dimension size",
                              len(y_train[0]))
         if y_test is not None:
@@ -73,7 +73,7 @@ def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
         if isinstance(y_train[0], float):
             raise TypeError("Y input is float not int", y_train[0])
 
-    if len(x_train) < len(x_train[0]):
+    if len(x_train) < len(x_train[0]) /100:
         raise ValueError("Very low X sample size compared to dimension size", len(x_train), "dimension size", len(x_train[0]))
 
     if x_test is not None:
