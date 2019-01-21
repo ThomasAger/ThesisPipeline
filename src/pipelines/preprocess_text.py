@@ -112,7 +112,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         doc2vec_fn = file_name + "_" + str(dims[i]) + "_D2V"
 
 
-        hpam_save = SaveLoad(rewrite=rewrite_all)
+        hpam_save = SaveLoad(rewrite=True)
 
         hpam_dict["dim"] = [dims[i]]
         hpam_dict["corpus_fn"] = [p_corpus.processed_corpus.file_name]
@@ -120,7 +120,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
         hyper_param = RecHParam(None, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
-                                     doc2vec_fn, output_folder, hpam_save, probability, rewrite_model=rewrite_all)
+                                     doc2vec_fn, output_folder, hpam_save, probability, rewrite_model=True, dev_percent=dev_percent, data_type=data_type)
         hyper_param.process_and_save()
 
         # Include the MDS imports and test them in the same way
