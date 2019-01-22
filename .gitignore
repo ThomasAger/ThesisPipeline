@@ -4,3 +4,14 @@ data/
 data_request/
 
 data_manage/
+.idea/ThesisPipeline.iml
+.idea/misc.xml
+.idea/workspace.xml
+src/common/__pycache__/Method.cpython-36.pyc
+src/common/__pycache__/SaveLoadPOPO.cpython-36.pyc
+src/rep/__pycache__/awv.cpython-36.pyc
+src/rep/__pycache__/pca.cpython-36.pyc
+src/rep/__pycache__/ppmi.cpython-36.pyc
+src/util/__pycache__/check.cpython-36.pyc
+src/util/__pycache__/io.cpython-36.pyc
+src/util/__pycache__/py.cpython-36.pyc
