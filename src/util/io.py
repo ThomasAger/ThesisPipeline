@@ -1,8 +1,7 @@
 import os
 from collections import OrderedDict
-
-import numpy as np
 import pandas as pd
+import numpy as np
 from scipy import sparse as sp
 
 def write2dCSV(array, name):
@@ -142,14 +141,6 @@ for i in range(2147000000):
 """
 
 
-def write_csv(csv_fn, col_names, cols_to_add, key):
-    d = {}
-    for c in range(len(cols_to_add)):
-        d[col_names[c]] = cols_to_add[c]
-    df = pd.DataFrame(d, index=key)
-    df.to_csv(csv_fn)
-
-
 def write2dArray(array, name):
     try:
         file = open(name, "w")
@@ -207,7 +198,7 @@ def load_dict(file_name):
         lines = infile.readlines()
         for l in lines:
             split = l.split()
-            dict[int(split[0])] = split[1]
+            dict[split[0]] = split[1]
     return dict
 
 def writeArrayDict(dict, name):
@@ -400,7 +391,7 @@ def import2dArray(file_name, file_type="f", return_sparse=False):
             array = array.toarray()
     elif file_name[-4:] == ".npy":
         print("Loading numpy array")
-        array = np.load(file_name)#
+        array = np.load(file_name)
     else:
         with open(file_name, "r") as infile:
             if file_type == "i":

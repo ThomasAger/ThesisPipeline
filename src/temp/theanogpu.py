@@ -1,7 +1,25 @@
 from collections import defaultdict
 from functools import wraps
 saved_data = defaultdict(list)
+import numpy as np
+big_array = []
 
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+big_array.append([[0, 0],[0,0,0,0,0]])
+
+big_array = np.asarray(big_array).transpose()
+eval_array = np.asarray(big_array[1].tolist())
+print(eval_array)
+print(eval_array.shape)
+"""
 file = open("../../data/processed/reuters/rep/svm/pie.txt", "w")
 def save(func):
     @wraps(func)
@@ -75,3 +93,4 @@ class MainClass():
 
 test = MainClass()
 
+"""

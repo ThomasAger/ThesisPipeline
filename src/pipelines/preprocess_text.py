@@ -12,7 +12,9 @@ from pipelines.KFoldHyperParameter import HParam, RecHParam
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
-def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=False,  auroc=False):
+def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
+             no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False,
+             remove_stop_words=False,  auroc=False, score_metric="avg_f1"):
 
     probability = False
     if auroc is True:
@@ -45,11 +47,16 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     split_ids = split.get_split_ids(data_type)
     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_corpus.classes.value, split_ids, dev_percent_of_train=dev_percent)
 
+    all_test_result_rows = []
+
     hpam_save = SaveLoad(rewrite=rewrite_all)
     hyper_param = HParam(p_corpus.filtered_class_names.value,
                                       kfold_hpam_dict, model_type, ppmi_fn,
-                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev)
+                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                         y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
     hyper_param.process_and_save()
+
+    all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
 
     # Creating and testing spaces, MDS not included in the creation process
     for i in range(len(dims)):
@@ -67,8 +74,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(p_corpus.filtered_class_names.value,
                                           kfold_hpam_dict, model_type, pca_fn,
-                                     output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev)
+                                     output_folder, hpam_save, probability, rewrite_model=rewrite_all,
+                             x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
         hyper_param.process_and_save()
+
+        all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
 
         wv_path = "D:/PhD/Code/ThesisPipeline/ThesisPipeline/data/raw/glove/glove.6B." + str(dims[i]) + 'd.txt'
         wv_path_d2v = "D:/PhD/Code/ThesisPipeline/ThesisPipeline/data/raw/glove/glove.6B.300d.txt"
@@ -77,7 +87,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         # We only have word-vectors of size 50, 100, 200 and 300
         if dims[i] != 20:
             awv_save = SaveLoad(rewrite=rewrite_all)
-            awv_fn = file_name + "_" + str(dims[i]) + "_AWV"
+            awv_fn = file_name + "_" + str(dims[i]) + "_AWVEmp"
 
             awv_instance = awv.AWV(p_corpus.split_corpus.value, dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path)
             awv_instance.process_and_save()
@@ -91,8 +101,29 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hpam_save = SaveLoad(rewrite=rewrite_all)
             hyper_param = HParam(p_corpus.filtered_class_names.value,
                                               kfold_hpam_dict, model_type, awv_fn,
-                                         output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev)
+                                         output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                                 y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
             hyper_param.process_and_save()
+
+            all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
+
+            if data_type != "sentiment":
+                mds_fn = "num_stw_"+str(dims[i])+"_MDS"
+                import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
+                mds = dt.import2dArray(import_fn)
+
+                split_ids = split.get_split_ids(data_type)
+                x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(mds,
+                                                                                  p_corpus.classes.value, split_ids,
+                                                                                  dev_percent_of_train=dev_percent)
+
+                hpam_save = SaveLoad(rewrite=rewrite_all)
+                hyper_param = HParam(p_corpus.filtered_class_names.value,
+                                                  kfold_hpam_dict, model_type, mds_fn,
+                                             output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
+                hyper_param.process_and_save()
+                all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
             """
             awvW_save = SaveLoad(rewrite=rewrite_all)
             awvW_fn = file_name + "_" + str(dims[i]) + "_awvW"
@@ -112,7 +143,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         doc2vec_fn = file_name + "_" + str(dims[i]) + "_D2V"
 
 
-        hpam_save = SaveLoad(rewrite=True)
+        hpam_save = SaveLoad(rewrite=rewrite_all)
 
         hpam_dict["dim"] = [dims[i]]
         hpam_dict["corpus_fn"] = [p_corpus.processed_corpus.file_name]
@@ -120,18 +151,25 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
         hyper_param = RecHParam(None, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
-                                     doc2vec_fn, output_folder, hpam_save, probability, rewrite_model=True, dev_percent=dev_percent, data_type=data_type)
+                                     doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
+                                data_type=data_type, score_metric=score_metric)
         hyper_param.process_and_save()
-
-        # Include the MDS imports and test them in the same way
+        all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
 
 
         # Make the combined csv of all space types
     # Make the combined CSV of all the dims of all the space types
+    all_r = np.asarray(all_test_result_rows).transpose()
+    rows = all_r[1]
+    cols = np.asarray(rows.tolist()).transpose()
+    col_names = all_r[0][0]
+    key = all_r[2]
+    dt.write_csv(output_folder + "rep/score/csv_final/" +file_name+"reps"+model_type+".csv", col_names, cols, key)
+    print("a")
 
 
-
-def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVM", no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2):
+def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVM", no_below=0.001,
+         no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2, score_metric="avg_f1", max_depth=None):
     if data_type == "newsgroups":
         newsgroups = fetch_20newsgroups(subset='all', shuffle=False, remove=("headers", "footers", "quotes"))
         corpus = newsgroups.data
@@ -144,7 +182,17 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         corpus = process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index())
         class_names = ["sentiment"]
         classes_freq_cutoff = 0
-    else:
+    elif data_type == "movies":
+        corpus = dt.import1dArray(raw_folder + "corpus.txt")
+        genres = np.load(raw_folder + "/genres/class-all.npy")
+        genre_names = dt.import1dArray(raw_folder + "/genres/names.txt")
+        keywords = np.load(raw_folder + "/keywords/class-all.npy")
+        keyword_names = dt.import1dArray(raw_folder + "/keywords/names.txt")
+        ratings = np.load(raw_folder + "/ratings/class-all.npy")
+        rating_names = dt.import1dArray(raw_folder + "/ratings/names.txt")
+        classes = [genres, keywords, ratings]
+        class_names = [genre_names, keyword_names, rating_names]
+    elif data_type == "reuters":
         classes_freq_cutoff = 100
         corpus = dt.import1dArray(raw_folder + "duplicate_removed_docs.txt")
         classes = dt.import2dArray(raw_folder + "unique_classes.txt", "i")
@@ -160,9 +208,9 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
     gamma_params = [1.0, 0.01, 0.001, 0.0001]
 
     n_estimators = [ 1000, 2000]
-    max_features = ['auto', 'log2']
-    criterion = ["gini"]
-    max_depth = [None]
+    max_features = [None, 'auto', 'log2']
+    criterion = ["gini", "entropy"]
+    max_depth = [max_depth]
     bootstrap = [True, False]
     min_samples_leaf = [1]
     min_samples_split = [2]
@@ -185,17 +233,30 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                            "bootstrap":bootstrap,
                            "min_samples_leaf":min_samples_leaf,
                            "min_samples_split":min_samples_split}
+    elif model_type[:12] == "DecisionTree":
+        kfold_hpam_dict = {"max_features":max_features,
+                    "class_weight":balance_params,
+                           "criterion":criterion,
+                           "max_depth":max_depth}
 
 
     hpam_dict = { "window_size":window_size,
                 "min_count":min_count,
                 "train_epoch":train_epoch}
-
-    pipeline(corpus, classes, class_names, "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True)
-
-
-
-
-data_type = "reuters"
-if __name__ == '__main__': main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
-                                grams=0, model_type="LinearSVM", no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2)
+    if data_type == "movies" or data_type == "placetypes":
+        for i in range(len(classes)):
+            pipeline(corpus, classes[i], class_names[i], "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
+                 no_below,
+                 no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True,
+                 score_metric=score_metric)
+    else:
+        pipeline(corpus, classes, class_names, "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
+             no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric)
+max_depths = [None, None, 3, 2, 1]
+classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
+data_type = "movies"
+if __name__ == '__main__':
+    for i in range(len(classifiers)):
+        main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
+                                grams=0, model_type=classifiers[i], no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
+                                score_metric="avg_f1", max_depth=max_depths[i])

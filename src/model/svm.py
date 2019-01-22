@@ -37,6 +37,7 @@ class SVM(Method.ModelMethod):
             self.test_predictions.value = ovr.predict(self.x_test)
         super().process()
 
+
 # Get SVM predictions based on one data split/parameter combination, and save them
 class LinearSVM(SVM):
 

@@ -36,7 +36,7 @@ def all_scores(true_target, prediction):
     return f1, prec, recall, accuracy, auroc, kappa
 
 
-class MultiClassScore(Method.Method):
+class MasterScore(Method.Method):
     
     true_targets = None
     predictions = None
@@ -67,37 +67,7 @@ class MultiClassScore(Method.Method):
     f1 = False
 
     def __init__(self, true_targets, predictions, pred_proba,  file_name, output_folder, save_class, f1=True, auroc=True, fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
-        if np.count_nonzero(true_targets) < 1:
-            auroc = False
-            print("Auroc has been automatically disabled as the true targets (len)", len(true_targets), "are all zero. (It causes an error)")
-        if pred_proba is None:
-            auroc = False
-            print("Auroc has been automatically disabled as probabilities were not provided")
-        self.true_targets = true_targets
-        self.predictions = predictions
-        self.pred_proba = pred_proba
-
-        if py.isArray(true_targets[0]):
-            self.true_targets = py.transIfRowsLarger(self.true_targets)
-            self.predictions = py.transIfRowsLarger(self.predictions)
-            self.pred_proba = py.transIfRowsLarger(self.pred_proba)
-            print("Shape is:", len(self.predictions), len(self.predictions[0]))
-        self.output_folder = output_folder
-        self.class_names = class_names
-        self.f1s = np.full(len(self.predictions), math.nan)
-        self.precs = np.full(len(self.predictions), math.nan)
-        self.recalls = np.full(len(self.predictions), math.nan)
-        self.accs = np.full(len(self.predictions), math.nan)
-        self.aurocs = np.full(len(self.predictions), math.nan)
-        self.kappas = np.full(len(self.predictions), math.nan)
         check.check_y(self.true_targets, self.predictions)
-        self.auroc = auroc
-        self.fscore = fscore
-        self.kappa = kappa
-        self.acc = acc
-        self.f1 = f1
-
-        self.verbose = verbose
         super().__init__(file_name, save_class)
 
     def process(self):
@@ -213,9 +183,59 @@ class MultiClassScore(Method.Method):
             print("kappa",  self.kappas.value[:max_to_print], "| average", self.avg_kappa.value)
         return score_dict
 
+    def save(self):
+        self.save_class.save(self.popo_array)
+
+def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+    if py.isArray(true_targets[0]):
+        return MultiClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+    else:
+        return SingleClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+
+class MultiClassScore(MasterScore):
+    def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+        if np.count_nonzero(true_targets) < 1:
+            auroc = False
+            print("Auroc has been automatically disabled as the true targets (len)", len(true_targets), "are all zero. (It causes an error)")
+        if pred_proba is None:
+            auroc = False
+            print("Auroc has been automatically disabled as probabilities were not provided")
+        self.true_targets = true_targets
+        self.predictions = predictions
+        self.pred_proba = pred_proba
+        self.output_folder = output_folder
+        self.class_names = class_names
+
+        self.auroc = auroc
+        self.fscore = fscore
+        self.kappa = kappa
+        self.acc = acc
+        self.f1 = f1
+
+        self.verbose = verbose
+        self.true_targets = py.transIfRowsLarger(self.true_targets)
+        self.predictions = py.transIfRowsLarger(self.predictions)
+        self.pred_proba = py.transIfRowsLarger(self.pred_proba)
+        print("Shape is:", len(self.predictions), len(self.predictions[0]))
+        self.f1s = np.full(len(self.predictions), math.nan)
+        self.precs = np.full(len(self.predictions), math.nan)
+        self.recalls = np.full(len(self.predictions), math.nan)
+        self.accs = np.full(len(self.predictions), math.nan)
+        self.aurocs = np.full(len(self.predictions), math.nan)
+        self.kappas = np.full(len(self.predictions), math.nan)
+        super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1,
+                         auroc=auroc,
+                         fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+
+
     def calc_fscore(self):
         for i in range(len(self.predictions)):
-            self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(self.true_targets[i], self.predictions[i], average="binary")
+            self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(
+                self.true_targets[i], self.predictions[i], average="binary")
         self.avg_prec.value = np.average(self.precs.value)
         self.avg_recall.value = np.average(self.recalls.value)
         self.avg_f1.value = get_f1_score(self.avg_prec.value, self.avg_recall.value)
@@ -235,6 +255,45 @@ class MultiClassScore(Method.Method):
         for i in range(len(self.predictions)):
             self.kappas.value[i] = cohen_kappa_score(self.true_targets[i], self.predictions[i])
         self.avg_kappa.value = np.average(self.kappas.value)
+
+    def save(self):
+        self.save_class.save(self.popo_array)
+
+class SingleClassScore(MasterScore):
+
+
+    def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+
+        print("Shape is:", len(predictions))
+        self.f1s = [0.0]
+        self.precs = [0.0]
+        self.recalls = [0.0]
+        self.accs = [0.0]
+        self.aurocs = [0.0]
+        self.kappas = [0.0]
+
+        super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+
+    def calc_fscore(self):
+        self.precs.value[0], self.recalls.value[0], self.f1s.value[0], unused__ = precision_recall_fscore_support(self.true_targets, self.predictions, average="binary")
+        self.avg_prec.value = self.precs.value[0]
+        self.avg_recall.value = self.recalls.value[0]
+        self.avg_f1.value = self.f1s.value[0]
+
+    # Check different averages for auroc
+    def calc_auroc(self):
+        self.aurocs.value[0] = roc_auc_score(self.true_targets, self.pred_proba)
+        self.avg_auroc.value = self.aurocs.value[0]
+
+    def calc_acc(self):
+        self.accs.value[0] = accuracy_score(self.true_targets, self.predictions)
+        self.avg_acc.value = self.accs.value[0]
+
+    def calc_kappa(self):
+        self.kappas.value[0] = cohen_kappa_score(self.true_targets, self.predictions)
+        self.avg_kappa.value = self.kappas.value[0]
 
     def save(self):
         self.save_class.save(self.popo_array)

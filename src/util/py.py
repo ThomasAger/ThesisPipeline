@@ -2,7 +2,7 @@ from util import io as dt
 import cProfile
 import numpy as np
 import numbers
-
+import scipy.sparse as sp
 
 # Data structure management tasks
 
@@ -225,7 +225,6 @@ if __name__ == '__main__':
     parameter_list_string = io.import1dArray("../../data/parameter_list_string.txt")
     parameter_dict = parameter_list_to_dict_str(parameter_list_string)
     io.write1dArray(parameter_dict, "../../data/parameter_dict.txt")
-    """
     print(isInt(0.0), isInt(1.0), isInt(1.5), isInt(-1), isInt(None))
     print(isFloat(0.0), isFloat(1.0), isFloat(1.5), isFloat(-1), isFloat(None))
     print("------------------COO")
@@ -234,4 +233,16 @@ if __name__ == '__main__':
     cProfile.run('sp.rand(m=50000, n=40000, format="csr", dtype=np.float32)')
     print("------------------COO converted to CSR")
     cProfile.run('sp.csr_matrix(sp.rand(m=50000, n=40000, format="coo", dtype=np.float32))')
+    """
+    orig_fn = "../../data/processed/reuters/rep/mds/"
+    dim = 200
+    t_a = dt.import2dArray(orig_fn + "num_stw_"+str(dim)+"_MDS.txt")
+    np.save(orig_fn + "num_stw_"+str(dim)+"_MDS.npy", t_a)
+    dim = 100
+    t_a = dt.import2dArray(orig_fn + "num_stw_"+str(dim)+"_MDS.txt")
+    np.save(orig_fn + "num_stw_"+str(dim)+"_MDS.npy", t_a)
+    dim = 50
+    t_a = dt.import2dArray(orig_fn + "num_stw_"+str(dim)+"_MDS.txt")
+    np.save(orig_fn + "num_stw_"+str(dim)+"_MDS.npy", t_a)
+
     #print(isList([1,2,3]), isList(np.zeros(shape=(3,4))), isList("fartr"), isList(5), isList(sparse_m))

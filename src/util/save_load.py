@@ -68,6 +68,8 @@ def load_by_type(type, file_name):
         file = dt.csv_pd_to_array(dt.read_csv(file_name))
     elif type == "gensim_save_model":
         file = g.utils.SaveLoad.load(file_name)
+    elif type == "dct":
+        dt.load_dict(file_name)
     else:
         raise ValueError("File type not recognized")
     return file
@@ -93,5 +95,7 @@ def save_by_type(file, type, file_name):
         dt.write_csv(file_name, file[0], file[1], file[2])
     elif type == "gensim_save_model":
         file.save(file_name)
+    elif type == "dct":
+        dt.save_dict(file, file_name)
     else:
         raise ValueError("File type not recognized")

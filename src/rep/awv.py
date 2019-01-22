@@ -85,11 +85,11 @@ def getAWV(word_lists, word_vectors):
                 print("keyerror", word_lists[i][j])
         if len(to_average) == 0:
             # Just chose a random word-vector here that I was sure will exist
-            #to_average = [np.zeros(shape=len(word_vectors["dog"]))]
-            print("No words found", i, "words:", len(to_average), "dim", len(to_average[0]))
+            to_average = [np.zeros(shape=len(word_vectors["dog"]))]
+            print("No words found", i, "words:", len(to_average))
         else:
             print(i, "orig words", len(word_lists[i]), "words:", len(to_average), "dim", len(to_average[0]))
-            vectors.append(np.average(to_average, axis=0))
+        vectors.append(np.average(to_average, axis=0))
 
     return np.asarray(vectors)
 
