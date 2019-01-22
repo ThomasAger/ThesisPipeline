@@ -53,7 +53,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     hyper_param = HParam(p_corpus.filtered_class_names.value,
                                       kfold_hpam_dict, model_type, ppmi_fn,
                                       output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
-                         y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
+                         y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
     hyper_param.process_and_save()
 
     all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
@@ -71,11 +71,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(pca_space,
                                                                           p_corpus.classes.value, split_ids,
                                                                           dev_percent_of_train=dev_percent)
-        hpam_save = SaveLoad(rewrite=rewrite_all)
+        hpam_save = SaveLoad(rewrite=True)
         hyper_param = HParam(p_corpus.filtered_class_names.value,
                                           kfold_hpam_dict, model_type, pca_fn,
                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all,
-                             x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
+                             x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
         hyper_param.process_and_save()
 
         all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
@@ -102,7 +102,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hyper_param = HParam(p_corpus.filtered_class_names.value,
                                               kfold_hpam_dict, model_type, awv_fn,
                                          output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
-                                 y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
+                                 y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
             hyper_param.process_and_save()
 
             all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
@@ -121,7 +121,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 hyper_param = HParam(p_corpus.filtered_class_names.value,
                                                   kfold_hpam_dict, model_type, mds_fn,
                                              output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
-                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric)
+                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
             """
@@ -152,7 +152,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
         hyper_param = RecHParam(None, p_corpus.filtered_classes.value, p_corpus.filtered_class_names.value,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
                                      doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
-                                data_type=data_type, score_metric=score_metric)
+                                data_type=data_type, score_metric=score_metric, auroc=auroc)
         hyper_param.process_and_save()
         all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
 
@@ -177,9 +177,9 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         class_names = dt.import1dArray(raw_folder + "class_names.txt")
     elif data_type == "sentiment":
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
-        corpus = np.concatenate((x_train, x_test), axis=0)
-        classes = np.concatenate((y_train, y_test), axis=0)
-        corpus = process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index())
+        corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
+        classes = np.asarray(np.concatenate((y_train, y_test), axis=0))
+        corpus = np.asarray(process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index()))
         class_names = ["sentiment"]
         classes_freq_cutoff = 0
     elif data_type == "movies":
@@ -248,13 +248,13 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             pipeline(corpus, classes[i], class_names[i], "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
                  no_below,
                  no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True,
-                 score_metric=score_metric)
+                 score_metric=score_metric, auroc=False)
     else:
         pipeline(corpus, classes, class_names, "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
-             no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric)
+             no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "movies"
+data_type = "newsgroups"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

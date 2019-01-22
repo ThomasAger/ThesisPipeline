@@ -59,7 +59,7 @@ class MasterHParam(Method):
     final_score_on_dev = None
     top_scoring_params = None
 
-    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True):
+    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True, acc=True, kappa=True):
 
         self.rewrite_model = rewrite_model
         # Metric that determines what will be returned to the overall hyper-parameter method
@@ -211,7 +211,7 @@ class RecHParam(MasterHParam):
                 hyper_param = HParam(self.class_names,
                                      self.kfold_hpam_dict, self.model_type, doc2vec_fn,
                                      self.output_folder, hpam_save, self.probability, rewrite_model=self.rewrite_model, x_train=x_train,
-                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True)
+                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc)
                 hyper_param.process_and_save()
                 self.top_scoring_params.value.append(hyper_param.top_scoring_params.value)
                 averaged_csv_data.append(hyper_param.top_scoring_row_data.value[1])
