@@ -4,6 +4,10 @@ import numbers
 import numpy as np
 
 def check_y(true_targets, predictions):
+    if true_targets is None:
+        raise ValueError("true_targets is None")
+    if predictions is None:
+        raise ValueError("predictions is None")
     if type(true_targets) is not np.ndarray:
         raise ValueError("true_targets is not numpy array")
     if type(predictions) is not np.ndarray:

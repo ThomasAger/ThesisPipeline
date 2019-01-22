@@ -67,7 +67,7 @@ class MasterScore(Method.Method):
     f1 = False
 
     def __init__(self, true_targets, predictions, pred_proba,  file_name, output_folder, save_class, f1=True, auroc=True, fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
-        check.check_y(self.true_targets, self.predictions)
+        check.check_y(true_targets, predictions)
         super().__init__(file_name, save_class)
 
     def process(self):
@@ -186,7 +186,7 @@ class MasterScore(Method.Method):
     def save(self):
         self.save_class.save(self.popo_array)
 
-def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
+def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
                  fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
     if py.isArray(true_targets[0]):
         return MultiClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
@@ -262,9 +262,21 @@ class MultiClassScore(MasterScore):
 class SingleClassScore(MasterScore):
 
 
-    def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
+    def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
                  fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+        self.true_targets = true_targets
+        self.predictions = predictions
+        self.pred_proba = pred_proba
+        self.output_folder = output_folder
+        self.class_names = class_names
 
+        self.auroc = auroc
+        self.fscore = fscore
+        self.kappa = kappa
+        self.acc = acc
+        self.f1 = f1
+
+        self.verbose = verbose
         print("Shape is:", len(predictions))
         self.f1s = [0.0]
         self.precs = [0.0]
