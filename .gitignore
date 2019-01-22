@@ -15,3 +15,9 @@ src/rep/__pycache__/ppmi.cpython-36.pyc
 src/util/__pycache__/check.cpython-36.pyc
 src/util/__pycache__/io.cpython-36.pyc
 src/util/__pycache__/py.cpython-36.pyc
+src/data/__pycache__/
+src/model/__pycache__/
+src/score/__pycache__/
+src/rep/__pycache__/
+src/util/__pycache__/
+src/pipelines/__pycache__/

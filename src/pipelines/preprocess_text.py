@@ -254,7 +254,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
              no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "newsgroups"
+data_type = "movies"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
