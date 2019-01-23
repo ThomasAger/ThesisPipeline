@@ -20,6 +20,8 @@ class Method:
         if self.save_class.exists(popo_array) is False:
             print(self.__class__.__name__, "Doesn't exist, creating")
             self.process()
+            self.makePopoArray()
+            self.processed = True
             self.save_class.save(popo_array)
             print("corpus done")
         else:
@@ -33,8 +35,7 @@ class Method:
         print("Creating popo array")
 
     def process(self):
-        self.makePopoArray()
-        self.process = True
+        print("Process complete")
 
     def save(self):
         if self.process:

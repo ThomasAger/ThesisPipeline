@@ -54,4 +54,4 @@ def processPlacetypes():
         text_corpus.append(corpus_string)
     dt.write1dArray(text_corpus, "../../data/raw/placetypes/corpus.txt")
 
-processPlacetypes()
+#processPlacetypes()

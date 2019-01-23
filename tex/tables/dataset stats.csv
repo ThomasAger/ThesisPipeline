@@ -1,0 +1,7 @@
+,Data as received,,Preprocessed for vector spaces,
+Dataset,Vocabulary size,Amt of entities,Vocabulary size,Amt of entities
+IMDB Movies,"100,000","15,000","100,000",
+Sentiment,,"50,000",,
+Placetypes,,1383,,
+Newsgroups,,18846,,
+Reuters,,,,
