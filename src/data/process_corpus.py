@@ -408,7 +408,9 @@ class ProcessClasses(MasterCorpus):
     def __init__(self, orig_classes, orig_class_names, file_name, output_folder, bowmin, no_below,
                  no_above, classes_freq_cutoff, remove_stop_words, save_class):
         print("classes", len(orig_classes))
-        orig_classes = py.transIfRowsLarger(orig_classes)
+        # If it's a multi class array
+        if py.isArray(orig_classes[0]) is True:
+            orig_classes = py.transIfRowsLarger(orig_classes)
         print("classes", len(orig_classes))
         self.classes_freq_cutoff = classes_freq_cutoff
         self.orig_class_names = orig_class_names

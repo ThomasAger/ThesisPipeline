@@ -185,7 +185,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         newsgroups = fetch_20newsgroups(subset='all', shuffle=False, remove=("headers", "footers", "quotes"))
         corpus = newsgroups.data
         classes = newsgroups.target
-        class_names = dt.import1dArray(raw_folder + "class_names.txt")
+        class_names = newsgroups.target_names
     elif data_type == "sentiment":
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
@@ -280,7 +280,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                  corpus_fn=corpus_fn)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "sentiment"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
