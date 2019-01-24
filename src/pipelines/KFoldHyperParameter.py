@@ -156,15 +156,16 @@ class RecHParam(MasterHParam):
     folds = None
     hyperparam_names = None
     hyperparams_array = None
-    average_file_names = []
+    average_file_names = None
     hpam_model_type = None
     final_arrays = None
     kfold_hpam_dict = None
     dev_percent = None
     data_type = None
+    classify_fn = None
     matched_ids = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None):
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -173,6 +174,7 @@ class RecHParam(MasterHParam):
         self.all_p = get_grid_params(hpam_dict)
         self.space = space
         self.classes = classes
+        self.classify_fn = classify_fn
         self.average_file_names = []
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
@@ -196,8 +198,10 @@ class RecHParam(MasterHParam):
         for i in range(len(self.all_p)):
             if self.hpam_model_type == "d2v":
                 doc2vec_save = SaveLoad(rewrite=self.rewrite_model)
-
-                doc2vec_fn = self.file_name + "_WS_" + str(self.all_p[i]["window_size"]) + "_MC_" + str(self.all_p[i]["min_count"]) + "_TE_" + str(self.all_p[i]["train_epoch"]) + "_D_"+str(self.all_p[i]["dim"]) + "_D2V"
+                identifier = "_WS_" + str(self.all_p[i]["window_size"]) + "_MC_" + \
+                             str(self.all_p[i]["min_count"]) + "_TE_" + str(self.all_p[i]["train_epoch"]) + "_D_"+str(self.all_p[i]["dim"]) + "_D2V"
+                doc2vec_fn = self.file_name + identifier
+                d2v_classify_fn = self.classify_fn + identifier
                 doc2vec_instance = d2v.D2V(self.all_p[i]["corpus_fn"], self.all_p[i]["wv_path"], doc2vec_fn,
                                            self.output_folder + "rep/d2v/", doc2vec_save, self.all_p[i]["dim"], window_size=self.all_p[i]["window_size"],
                                            min_count=self.all_p[i]["min_count"], train_epoch=self.all_p[i]["train_epoch"]
@@ -211,7 +215,7 @@ class RecHParam(MasterHParam):
                                                                                   dev_percent_of_train=self.dev_percent)
                 hpam_save = SaveLoad(rewrite=self.rewrite_model)
                 hyper_param = HParam(self.class_names,
-                                     self.kfold_hpam_dict, self.model_type, doc2vec_fn,
+                                     self.kfold_hpam_dict, self.model_type, d2v_classify_fn,
                                      self.output_folder, hpam_save, self.probability, rewrite_model=self.rewrite_model, x_train=x_train,
                                      y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc)
                 hyper_param.process_and_save()
