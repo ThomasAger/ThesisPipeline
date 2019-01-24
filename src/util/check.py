@@ -41,7 +41,7 @@ def check_x(features):
     if isinstance(features[0][0], numbers.Integral):
         raise TypeError("X input is int not float, example", features[0])
     if len(features) < len(features[0])  /100:
-        raise ValueError("Very low X sample size compared to dimension size", len(features), "dimension size", len(features[0]))
+        print("WARNING", "Very low X sample size compared to dimension size", len(features), "dimension size", len(features[0]))
 
 def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
     if type(x_train) is not np.ndarray:
@@ -78,7 +78,7 @@ def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
             raise TypeError("Y input is float not int", y_train[0])
 
     if len(x_train) < len(x_train[0]) /100:
-        raise ValueError("Very low X sample size compared to dimension size", len(x_train), "dimension size", len(x_train[0]))
+        print("WARNING", "Very low X sample size compared to dimension size", len(x_train), "dimension size", len(x_train[0]))
 
     if x_test is not None:
         if len(x_test[0]) != len(x_train[0]):

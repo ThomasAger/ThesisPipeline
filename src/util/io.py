@@ -353,8 +353,8 @@ def getFolder(folder_path):
     return two_d
 
 
-
-def import1dArray(file_name, file_type="s"):
+"""
+def importLargeTextFile(file_name, file_type="s"):
     if file_type == "s":
         # Setting to something other than np.object results in a memory error. Could be because of something weird?
         array = np.loadtxt(file_name, dtype=np.object, delimiter="\n")
@@ -363,6 +363,7 @@ def import1dArray(file_name, file_type="s"):
         # Attempt to convert it into an array. So, this ends up being
         # The most memory efficient way to get this into a manageable numpy string
         # Simply because its loaded directly into a numpy array.
+
         if 'b\\' in array[0][:1]:
             for i in range(len(array)):
                 array[i] = array[i][3:]
@@ -378,6 +379,19 @@ def import1dArray(file_name, file_type="s"):
                 array = [int(float(line.strip())) for line in infile]
         np.asarray(array)
     return array
+"""
+def import1dArray(file_name, file_type="s"):
+    with open(file_name, "r", encoding="cp1252") as infile:
+        if file_type == "f":
+            array = []
+            lines = infile.readlines()
+            for line in lines:
+                array.append(float(line.strip()))
+        elif file_type == "i":
+            array = [int(float(line.strip())) for line in infile]
+        else:
+            array = [line.strip() for line in infile]
+    return np.asarray(array)
 
 def importValue(file_name, file_type="s"):
     with open(file_name, "r", encoding="cp1252") as infile:

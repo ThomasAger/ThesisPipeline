@@ -221,6 +221,7 @@ def split_all(corpus):
 
 class MasterCorpus(Method.Method):
     orig_classes = None
+    name_of_class = None
     tokenized_corpus = None
     tokenized_ids = None
     id2token = None
@@ -247,13 +248,14 @@ class MasterCorpus(Method.Method):
     filtered_classes = None
     split_corpus = None
 
-    def __init__(self, orig_classes, file_name, output_folder, bowmin, no_below,
+    def __init__(self, orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above, remove_stop_words, save_class):
         print("Original classes len", len(orig_classes))
         self.orig_classes = orig_classes
         self.output_folder = output_folder
         self.bowmin = bowmin
         self.no_below = no_below
+        self.name_of_class = name_of_class
         self.no_above = no_above
         self.remove_stop_words = remove_stop_words
         self.output_folder = output_folder
@@ -265,11 +267,11 @@ class MasterCorpus(Method.Method):
 class Corpus(MasterCorpus):
     orig_corpus = None
 
-    def __init__(self, orig_corpus, orig_classes, file_name, output_folder, bowmin, no_below, no_above,
+    def __init__(self, orig_corpus, orig_classes, name_of_class, file_name, output_folder, bowmin, no_below, no_above,
                  remove_stop_words, save_class):
         self.orig_corpus = orig_corpus
         print("Original doc len", len(orig_corpus))
-        super().__init__(orig_classes, file_name, output_folder, bowmin, no_below,
+        super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above,  remove_stop_words, save_class)
 
 
@@ -292,7 +294,8 @@ class Corpus(MasterCorpus):
                                              output_folder + "corpus/" + file_name + "_corpus_processed.txt", "1dtxts")
         self.split_corpus = SaveLoadPOPO(self.split_corpus,
                                              output_folder + "corpus/" + file_name + "_corpus_processed_split.npy", "npy")
-        self.classes = SaveLoadPOPO(self.classes, output_folder + "classes/" + file_name + "_classes.npy", "npy")
+        print(self.name_of_class )
+        self.classes = SaveLoadPOPO(self.classes, output_folder + "classes/" + file_name + self.name_of_class +"_classes.npy", "npy")
 
         self.bow = SaveLoadPOPO(self.bow, standard_fn + file_name + "_sparse_corpus.npz", "scipy")
         self.filtered_bow = SaveLoadPOPO(self.filtered_bow,
@@ -335,12 +338,11 @@ class Corpus(MasterCorpus):
 # Does not support basic tokenization or clean up methods yet, only gensim methods
 class StreamedCorpus(MasterCorpus):
     corpus_fn_to_stream = None
-
-    def __init__(self,  orig_classes,  file_name, output_folder, bowmin, no_below,
+    def __init__(self,  orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above,
                  remove_stop_words, save_class, corpus_fn_to_stream=None):
         self.corpus_fn_to_stream = corpus_fn_to_stream
-        super().__init__(orig_classes, file_name, output_folder, bowmin, no_below,
+        super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above,remove_stop_words, save_class)
 
 
@@ -362,13 +364,13 @@ class StreamedCorpus(MasterCorpus):
                                              output_folder + "corpus/" + file_name + "_corpus_processed.txt", "1dtxts")
         self.split_corpus = SaveLoadPOPO(self.split_corpus,
                                              output_folder + "corpus/" + file_name + "_corpus_processed_split.npy", "npy")
-        self.classes = SaveLoadPOPO(self.classes, output_folder + "classes/" + file_name + "_classes.npy", "npy")
-        self.filtered_classes = SaveLoadPOPO(self.filtered_classes, output_folder + "classes/" + file_name + "_fil_classes.npy", "npy")
+        self.classes = SaveLoadPOPO(self.classes, output_folder + "classes/" + file_name +self.name_of_class +  "_classes.npy", "npy")
+        self.filtered_classes = SaveLoadPOPO(self.filtered_classes, output_folder + "classes/" + file_name +self.name_of_class +  "_fil_classes.npy", "npy")
         self.classes_categorical = SaveLoadPOPO(self.classes_categorical,
-                                                output_folder + "classes/" + file_name + "_classes_categorical.npy",
+                                                output_folder + "classes/" + file_name + self.name_of_class + "_classes_categorical.npy",
                                                 "npy")
         self.filtered_class_names = SaveLoadPOPO(self.filtered_class_names,
-                                                output_folder + "classes/" + file_name + "_class_names.txt",
+                                                output_folder + "classes/" + file_name +self.name_of_class +  "_class_names.txt",
                                                 "1dtxts")
         self.bow = SaveLoadPOPO(self.bow, standard_fn + file_name + "_sparse_corpus.npz", "scipy")
         self.filtered_bow = SaveLoadPOPO(self.filtered_bow,
@@ -406,7 +408,7 @@ class ProcessClasses(MasterCorpus):
     classes_freq_cutoff = None
     orig_class_names = None
     def __init__(self, orig_classes, orig_class_names, file_name, output_folder, bowmin, no_below,
-                 no_above, classes_freq_cutoff, remove_stop_words, save_class):
+                 no_above, classes_freq_cutoff, remove_stop_words, save_class, name_of_class):
         print("classes", len(orig_classes))
         # If it's a multi class array
         if py.isArray(orig_classes[0]) is True:
@@ -414,19 +416,19 @@ class ProcessClasses(MasterCorpus):
         print("classes", len(orig_classes))
         self.classes_freq_cutoff = classes_freq_cutoff
         self.orig_class_names = orig_class_names
-        super().__init__(orig_classes, file_name, output_folder, bowmin, no_below,no_above, remove_stop_words, save_class)
+        super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,no_above, remove_stop_words, save_class)
 
     def makePopos(self):
         output_folder = self.output_folder
         file_name = self.file_name
         standard_fn = output_folder + "bow/"
 
-        self.filtered_classes = SaveLoadPOPO(self.filtered_classes, output_folder + "classes/" + file_name + "_fil_classes.npy", "npy")
+        self.filtered_classes = SaveLoadPOPO(self.filtered_classes, output_folder + "classes/" + file_name + self.name_of_class + "_fil_classes.npy", "npy")
         self.classes_categorical = SaveLoadPOPO(self.classes_categorical,
-                                                output_folder + "classes/" + file_name + "_classes_categorical.npy",
+                                                output_folder + "classes/" + file_name + self.name_of_class + "_classes_categorical.npy",
                                                 "npy")
         self.filtered_class_names = SaveLoadPOPO(self.filtered_class_names,
-                                                output_folder + "classes/" + file_name + "_class_names.txt",
+                                                output_folder + "classes/" + file_name + self.name_of_class + "_class_names.txt",
                                                 "1dtxts")
 
 

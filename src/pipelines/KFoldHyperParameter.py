@@ -162,10 +162,12 @@ class RecHParam(MasterHParam):
     kfold_hpam_dict = None
     dev_percent = None
     data_type = None
+    matched_ids = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None):
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
+        self.matched_ids = matched_ids
         self.dev_percent=dev_percent
         self.data_type = data_type
         self.all_p = get_grid_params(hpam_dict)
@@ -203,7 +205,7 @@ class RecHParam(MasterHParam):
                 doc2vec_instance.process_and_save()
                 doc2vec_space = doc2vec_instance.rep.value
 
-                split_ids = split.get_split_ids(self.data_type)
+                split_ids = split.get_split_ids(self.data_type, self.matched_ids)
                 x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
                                                                                   self.classes, split_ids,
                                                                                   dev_percent_of_train=self.dev_percent)
@@ -430,8 +432,9 @@ class KFoldHyperParameter(Method):
                                + "_C_" + str(self.all_p[i]["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
                     average_fn = self.file_name + "_Kfold" + str(self.folds) + "_Balanced_" + str(self.all_p[i]["class_weight"])\
                                + "_C_" + str(self.all_p[i]["C"])  + "_Prob_" + str(self.probability) +  self.model_type
+                    # Added float here because weirdly, sometimes the input for C is a string
                     model = LinearSVM(x_train, y_train, x_test, y_test,
-                                    self.output_folder + "rep/svm/" + model_fn, svm_save, C=self.all_p[i]["C"],
+                                    self.output_folder + "rep/svm/" + model_fn, svm_save, C=float(self.all_p[i]["C"]),
                                     class_weight=self.all_p[i]["class_weight"], probability=self.probability, verbose=False)
 
                 elif self.model_type == "GaussianSVM":

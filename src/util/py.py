@@ -24,7 +24,7 @@ def transIfColsLarger(mat):
             print("Columns larger than rows, transposing")
             mat = mat.transpose()
             print("Matrix now in format", len(mat), len(mat[0]))
-            if len(mat) > len(mat[0]):
+            if len(mat) < len(mat[0]):
                 raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
     return mat
 

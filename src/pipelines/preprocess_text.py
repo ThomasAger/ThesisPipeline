@@ -14,7 +14,8 @@ from pipelines.KFoldHyperParameter import HParam, RecHParam
 # Todo: Better standaradize the saving/loading
 def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
              no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False,
-             remove_stop_words=False,  auroc=False, score_metric="avg_f1", corpus_fn=""):
+             remove_stop_words=False,  auroc=False, score_metric="avg_f1", corpus_fn="", name_of_class=""):
+
 
     probability = False
     if auroc is True:
@@ -23,22 +24,36 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     doc_amt = split.get_doc_amt(data_type)
     no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
-    classes_save = SaveLoad(rewrite=True)
+    classes_save = SaveLoad(rewrite=rewrite_all)
     classes_process = process_corpus.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
-                                         no_above, classes_freq_cutoff, remove_stop_words, classes_save)
+                                         no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
     classes_process.process_and_save()
     classes = classes_process.filtered_classes.value
     class_names = classes_process.filtered_class_names.value
 
+
+
     # Process and save corpus
     corpus_save = SaveLoad(rewrite=rewrite_all)
     if data_type == "placetypes" or data_type == "movies":
-        p_corpus = process_corpus.StreamedCorpus(classes,  file_name, output_folder, bowmin, no_below,
+        p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
     else:
-        p_corpus = process_corpus.Corpus(corpus, classes, file_name, output_folder, bowmin, no_below,
+        p_corpus = process_corpus.Corpus(corpus,  classes,name_of_class, file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
+
+    matched_ids = []
+    try:
+        class_entities = dt.import1dArray(output_folder + "classes/" + name_of_class + "_entities.txt")
+        entity_names = dt.import1dArray(output_folder + "corpus/entity_names.txt")
+        for i in range(len(class_entities)):
+            for j in range(len(entity_names)):
+                if class_entities[i] == entity_names[j]:
+                    matched_ids.append(j)
+                    break
+    except FileNotFoundError:
+        matched_ids = None
 
     # Get the PPMI values
     ppmi_save = SaveLoad(rewrite=rewrite_all)
@@ -54,7 +69,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     ppmi_filtered_matrix = ppmi_filtered.ppmi_matrix.value
 
     # Get the dev splits
-    split_ids = split.get_split_ids(data_type)
+    split_ids = split.get_split_ids(data_type, matched_ids)
     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_corpus.classes.value, split_ids, dev_percent_of_train=dev_percent)
 
     all_test_result_rows = []
@@ -77,7 +92,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         pca_instance.process_and_save()
         pca_space = pca_instance.rep.value
 
-        split_ids = split.get_split_ids(data_type)
+        split_ids = split.get_split_ids(data_type, matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(pca_space,
                                                                           p_corpus.classes.value, split_ids,
                                                                           dev_percent_of_train=dev_percent)
@@ -103,7 +118,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             awv_instance.process_and_save()
             awv_space = awv_instance.rep.value
 
-            split_ids = split.get_split_ids(data_type)
+            split_ids = split.get_split_ids(data_type, matched_ids)
             x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(awv_space,
                                                                               p_corpus.classes.value, split_ids,
                                                                               dev_percent_of_train=dev_percent)
@@ -122,7 +137,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
                 mds = dt.import2dArray(import_fn)
 
-                split_ids = split.get_split_ids(data_type)
+                split_ids = split.get_split_ids(data_type, matched_ids)
                 x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(mds,
                                                                                   p_corpus.classes.value, split_ids,
                                                                                   dev_percent_of_train=dev_percent)
@@ -162,7 +177,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
         hyper_param = RecHParam(None, p_corpus.classes.value, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
                                      doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
-                                data_type=data_type, score_metric=score_metric, auroc=auroc)
+                                data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids)
         hyper_param.process_and_save()
         all_test_result_rows.append(hyper_param.top_scoring_row_data.value)
 
@@ -186,6 +201,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         corpus = newsgroups.data
         classes = newsgroups.target
         class_names = newsgroups.target_names
+        name_of_class = "Newsgroups"
     elif data_type == "sentiment":
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
@@ -193,6 +209,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         corpus = np.asarray(process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index()))
         class_names = ["sentiment"]
         classes_freq_cutoff = 0
+        name_of_class = "Sentiment"
     elif data_type == "movies":
         corpus_fn = raw_folder + "corpus.txt"
         corpus = None
@@ -204,6 +221,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         rating_names = dt.import1dArray(raw_folder + "/ratings/names.txt")
         classes = [genres, keywords, ratings]
         class_names = [genre_names, keyword_names, rating_names]
+        name_of_class = ["Genres", "Keywords", "Ratings"]
     elif data_type == "placetypes":
         corpus_fn = raw_folder + "corpus.txt"
         corpus = None
@@ -215,6 +233,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         opencyc_names = dt.import1dArray(raw_folder + "/OpenCYC/names.txt", "s")
         classes = [foursquare, geonames, opencyc]
         class_names = [foursquare_names, geonames_names, opencyc_names]
+        name_of_class = ["Foursquare", "Geonames", "OpenCYC"]
         classes_freq_cutoff = 0
 
     elif data_type == "reuters":
@@ -222,6 +241,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         corpus = dt.import1dArray(raw_folder + "duplicate_removed_docs.txt")
         classes = dt.import2dArray(raw_folder + "unique_classes.txt", "i")
         class_names = dt.import1dArray(raw_folder + "class_names.txt")
+        name_of_class = "Reuters"
 
     window_size = [1, 5, 15]
     min_count = [1, 5, 20]
@@ -273,14 +293,14 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             pipeline(corpus, classes[i], class_names[i], "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
                  no_below,
                  no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True,
-                 score_metric=score_metric, auroc=False, corpus_fn=corpus_fn)
+                 score_metric=score_metric, auroc=False, corpus_fn=corpus_fn, name_of_class=name_of_class[i])
     else:
         pipeline(corpus, classes, class_names, "num_stw", processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
              no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
-                 corpus_fn=corpus_fn)
+                 corpus_fn=corpus_fn, name_of_class=name_of_class)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "sentiment"
+data_type = "placetypes"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

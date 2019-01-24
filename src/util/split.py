@@ -18,6 +18,7 @@ placetypes_total = 1383
 from sklearn.model_selection import KFold
 import numbers
 from util import py as pu
+from util import py
 
 
 def get_name_dict(*params):
@@ -64,7 +65,7 @@ def check_shape(features, data_type):
         raise ValueError(print(len(features), "This is not the standard size, expected " + str(max_size)))
     return True
 
-def get_split_ids(data_type):
+def get_split_ids(data_type, matched_ids):
     # Multiple data-type names in-case im stupid
     if data_type == "imdb" or data_type == "sentiment":
         train_split = imdb_train
@@ -87,45 +88,58 @@ def get_split_ids(data_type):
     else:
         print("No data type found")
         return False
-
-    ids = list(range(total))
-
-    train = ids[:train_split]
-    test = ids[train_split:]
+    if matched_ids is None:
+        ids = list(range(total))
+        x_train_split = train_split
+        y_train = ids[:x_train_split]
+        y_test = ids[x_train_split:]
+    else:
+        print("Matched ids of len", len(matched_ids), "instead of", total)
+        ids = matched_ids
+        x_train_split = int(len(ids) * 0.66)
+        y_ids = list(range(len(ids)))
+        y_train_split = int(len(ids) * 0.66)
+        y_train = y_ids[:y_train_split]
+        y_test = y_ids[y_train_split:]
+    x_train = ids[:x_train_split]
+    x_test = ids[x_train_split:]
 
     print("before dev split")
-    print(len(test),  "test")
-    print(len(train), "train")
+    print(len(x_train),  "test")
+    print(len(x_test), "train")
 
+    if len(x_train) != len(y_train) or len(x_test) != len(y_test):
+        raise ValueError("Ids not same length.")
 
+    return {"x_train":x_train, "x_test":x_test, "y_train":y_train, "y_test":y_test}
 
-    return {"train":train, "test":test}
-
-
-
-
+import numpy as np
 
 def split_data(x, y, split_ids, dev_percent_of_train=0.2):
+    y = py.transIfColsLarger(y)
     x_len = len(x)
     y_len = len(y)
-    x_train = x[split_ids["train"]]
-    y_train = y[split_ids["train"]]
-    x_test = x[split_ids["test"]]
-    y_test = y[split_ids["test"]]
+    x_train = x[split_ids["x_train"]]
+    y_train = y[split_ids["y_train"]]
+    x_test = x[split_ids["x_test"]]
+    y_test = y[split_ids["y_test"]]
     if dev_percent_of_train > 0:
         x_dev = x_train[int(len(x_train) * (1 - dev_percent_of_train)):]
         y_dev = y_train[int(len(y_train) * (1 - dev_percent_of_train)):]
         x_train = x_train[:int(len(x_train) * (1 - dev_percent_of_train))]
         y_train = y_train[:int(len(y_train) * (1 - dev_percent_of_train))]
-        if (len(x_train) + len(x_test) + len(x_dev)) != x_len:
-            raise ValueError(str(x_len) + "does not equal its components")
-        if (len(y_train) + len(y_test) + len(y_dev)) != y_len:
-            raise ValueError(str(y_len)+ "does not equal its components")
+        if np.amax(x_train) == np.amax(y_train) and np.amax(x_test) == np.amax(y_test):
+            if (len(x_train) + len(x_test) + len(x_dev)) != x_len:
+                raise ValueError(str(x_len) + "does not equal its components")
+            if (len(y_train) + len(y_test) + len(y_dev)) != y_len:
+                raise ValueError(str(y_len)+ "does not equal its components")
+
     else:
-        if (len(x_train) + len(x_test)) != x_len:
-            raise ValueError(str(x_len) + "does not equal its components")
-        if (len(y_train) + len(y_test)) != y_len:
-            raise ValueError(str(y_len)+ "does not equal its components")
+        if np.amax(x_train) == np.amax(y_train) and np.amax(x_test) == np.amax(y_test):
+            if (len(x_train) + len(x_test)) != x_len:
+                raise ValueError(str(x_len) + "does not equal its components")
+            if (len(y_train) + len(y_test)) != y_len:
+                raise ValueError(str(y_len)+ "does not equal its components")
     if len(x_dev) > len(x_train) and dev_percent_of_train <= 0.5:
         raise ValueError("Dev split is larger than train split")
     return x_train, y_train, x_test, y_test, x_dev, y_dev

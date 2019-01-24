@@ -236,6 +236,16 @@ class MultiClassScore(MasterScore):
         for i in range(len(self.predictions)):
             self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(
                 self.true_targets[i], self.predictions[i], average="binary")
+
+            if math.isnan(self.precs.value[i]):
+                print("!!! WARNING !!!! precs is NaN")
+                self.precs.value[i] = 0.0
+            if math.isnan(self.recalls.value[i]):
+                print("!!! WARNING !!!! recalls is NaN")
+                self.recalls.value[i] = 0.0
+            if math.isnan(self.f1s.value[i]):
+                print("!!! WARNING !!!! f1s is NaN")
+                self.f1s.value[i] = 0.0
         self.avg_prec.value = np.average(self.precs.value)
         self.avg_recall.value = np.average(self.recalls.value)
         self.avg_f1.value = get_f1_score(self.avg_prec.value, self.avg_recall.value)
@@ -244,16 +254,25 @@ class MultiClassScore(MasterScore):
     def calc_auroc(self):
         for i in range(len(self.predictions)):
             self.aurocs.value[i] = roc_auc_score(self.true_targets[i], self.pred_proba[i])
+            if math.isnan(self.aurocs.value[i]):
+                print("!!! WARNING !!!! aurocs is NaN")
+                self.aurocs.value[i] = 0.0
         self.avg_auroc.value = np.average(self.aurocs.value)
 
     def calc_acc(self):
         for i in range(len(self.predictions)):
             self.accs.value[i] = accuracy_score(self.true_targets[i], self.predictions[i])
+            if math.isnan(self.accs.value[i]):
+                print("!!! WARNING !!!! accs is NaN")
+                self.accs.value[i] = 0.0
         self.avg_acc.value = np.average(self.accs.value)
 
     def calc_kappa(self):
         for i in range(len(self.predictions)):
             self.kappas.value[i] = cohen_kappa_score(self.true_targets[i], self.predictions[i])
+            if math.isnan(self.kappas.value[i]):
+                print("!!! WARNING !!!! kappas is NaN")
+                self.kappas.value[i] = 0.0
         self.avg_kappa.value = np.average(self.kappas.value)
 
     def save(self):
