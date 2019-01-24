@@ -2,30 +2,33 @@ from util import io as dt
 import cProfile
 import numpy as np
 import numbers
+from util import py
 import scipy.sparse as sp
 
 # Data structure management tasks
 
 def transIfRowsLarger(mat):
     if mat is not None:
-        print("Matrix in format", len(mat), len(mat[0]))
-        if len(mat) > len(mat[0]):
-            print("Rows larger than columns, transposing")
-            mat = mat.transpose()
-            print("Matrix now in format", len(mat), len(mat[0]))
+        if py.isArray(mat[0]) is True:
+            print("Matrix in format", len(mat), len(mat[0]))
             if len(mat) > len(mat[0]):
-                raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
+                print("Rows larger than columns, transposing")
+                mat = mat.transpose()
+                print("Matrix now in format", len(mat), len(mat[0]))
+                if len(mat) > len(mat[0]):
+                    raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
     return mat
 
 def transIfColsLarger(mat):
     if mat is not None:
-        print("Matrix in format", len(mat), len(mat[0]))
-        if len(mat) < len(mat[0]):
-            print("Columns larger than rows, transposing")
-            mat = mat.transpose()
-            print("Matrix now in format", len(mat), len(mat[0]))
+        if py.isArray(mat[0]) is True:
+            print("Matrix in format", len(mat), len(mat[0]))
             if len(mat) < len(mat[0]):
-                raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
+                print("Columns larger than rows, transposing")
+                mat = mat.transpose()
+                print("Matrix now in format", len(mat), len(mat[0]))
+                if len(mat) < len(mat[0]):
+                    raise ValueError("Matrix transposed but did not change shape, error in input (One/some arrays in mat are probably larger or smaller than the others)")
     return mat
 
 def parameter_list_to_dict_str(parameter_list_string):#

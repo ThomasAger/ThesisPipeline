@@ -15,7 +15,10 @@ from pipelines.KFoldHyperParameter import HParam, RecHParam
 def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
              no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False,
              remove_stop_words=False,  auroc=False, score_metric="avg_f1", corpus_fn="", name_of_class=""):
+    streamed = False
 
+    if data_type == "placetypes" or data_type == "movies":
+        streamed = True
 
     probability = False
     if auroc is True:
@@ -35,7 +38,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
     # Process and save corpus
     corpus_save = SaveLoad(rewrite=rewrite_all)
-    if data_type == "placetypes" or data_type == "movies":
+    if streamed:
         p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
     else:
@@ -96,7 +99,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(pca_space,
                                                                           p_corpus.classes.value, split_ids,
                                                                           dev_percent_of_train=dev_percent)
-        hpam_save = SaveLoad(rewrite=True)
+        hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(class_names,
                                           kfold_hpam_dict, model_type, pca_fn,
                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all,
@@ -110,11 +113,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
 
         # We only have word-vectors of size 50, 100, 200 and 300
-        if dims[i] != 20:
+        if dims[i] != 20 and False:
             awv_save = SaveLoad(rewrite=rewrite_all)
             awv_fn = file_name + "_" + str(dims[i]) + "_AWVEmp"
 
-            awv_instance = awv.AWV(p_corpus.split_corpus.value, dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path)
+            awv_instance = awv.AWV(p_corpus.split_corpus.value, dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path, corpus_fn_to_stream=corpus_fn)
             awv_instance.process_and_save()
             awv_space = awv_instance.rep.value
 
@@ -164,14 +167,13 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                          output_folder, hpam_save, probability, rewrite_model=rewrite_all, folds=2)
             hyper_param.process_and_save()
             """
-
         doc2vec_fn = file_name + "_" + str(dims[i]) + "_D2V"
 
 
         hpam_save = SaveLoad(rewrite=rewrite_all)
 
         hpam_dict["dim"] = [dims[i]]
-        hpam_dict["corpus_fn"] = [p_corpus.processed_corpus.file_name]
+        hpam_dict["corpus_fn"] = [corpus_fn]
         hpam_dict["wv_path"] = [wv_path_d2v]
 
         # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked

@@ -93,6 +93,30 @@ def getAWV(word_lists, word_vectors):
 
     return np.asarray(vectors)
 
+def getAWVStreamed(corpus_fn, word_vectors):
+    vectors = []
+    i = 0
+    with open(corpus_fn) as infile:
+        print("Creating vectors")
+        for line in infile:
+            word_list = line.split()
+            to_average = []
+            for j in range(len(word_list)):
+                try:
+                    to_average.append(word_vectors.get_vector(word_list[j]))
+                except KeyError:
+                    print("keyerror", word_list[j])
+            if len(to_average) == 0:
+                # Just chose a random word-vector here that I was sure will exist
+                to_average = [np.zeros(shape=len(word_vectors["dog"]))]
+                print("No words found", i, "words:", len(to_average))
+            else:
+                print(i, "orig words", len(word_list), "words:", len(to_average), "dim", len(to_average[0]))
+            vectors.append(np.average(to_average, axis=0))
+            i += 1
+
+    return np.asarray(vectors)
+
 import scipy.sparse as sp
 import math
 def getAWVw(ppmi, id2word, word_vectors):
@@ -167,15 +191,21 @@ class AWV(RepMethod):
 
     word_lists = None
     wv_path = None
+    corpus_fn_to_stream = ""
 
-    def __init__(self, word_lists, dim, file_name, output_folder, save_class,  wv_path=None):
+    def __init__(self, word_lists, dim, file_name, output_folder, save_class,  wv_path=None, corpus_fn_to_stream=""):
         self.word_lists = word_lists
         self.wv_path = wv_path
+        self.corpus_fn_to_stream = corpus_fn_to_stream
         super().__init__(file_name, output_folder, save_class, dim)
 
     def process(self):
         word_vectors = get_word_vectors(self.dim, self.wv_path)
-        awv = getAWV(self.word_lists, word_vectors)  # use the scipy algorithm "arpack"
+        if self.corpus_fn_to_stream == "":
+            awv = getAWV(self.word_lists, word_vectors)  # use the scipy algorithm "arpack"
+        else:
+            awv = getAWVStreamed(self.corpus_fn_to_stream, word_vectors)  # use the scipy algorithm "arpack"
+
         self.rep.value = awv
         super().process()
 
