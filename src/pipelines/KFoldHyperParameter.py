@@ -249,7 +249,7 @@ class RecHParam(MasterHParam):
         doc2vec_instance.process_and_save()
         doc2vec_space = doc2vec_instance.rep.value
 
-        split_ids = split.get_split_ids(self.data_type)
+        split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
