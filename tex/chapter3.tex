@@ -172,7 +172,35 @@ Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtai
 \subsection{Quantitative Results}
 % Basic explanation of why quantitative results are interesting, valuable, good etc
 
-We want to measure how well our interpretable representation represents domain knowledge. We can understand that an accurate representation of domain knowledge will be able to classify key domain knowledge. For example, a good representation like a Principal Component Analysis vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, horror movies would be spatially distant from romance movies, and movies that are romantic horrors would be somewhere inbetween. We can see an example in Figure \ref{ExampleGenreSplit} As another example, movies that contain similar themes we could expect to have similar Positive Pointwise Mutual Information vectors - as they would both contain unique terms to that theme.
+We want to measure how well our interpretable representation represents domain knowledge. We can understand that an accurate representation of domain knowledge will be able to classify key domain knowledge. For example, a good representation like a Principal Component Analysis vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, horror movies would be spatially distant from romance movies, and movies that are romantic horrors would be somewhere inbetween. We can see an example in Figure \ref{ExampleGenreSplit} As another example, movies that contain similar themes we could expect to have similar Positive Pointwise Mutual Information vectors - as they would both contain unique terms to that theme, see Table \ref{PPMI example}.
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/genres_separated.png}
+	\centering
+	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{ConceptualSpace}
+\end{figure}
+
+\subsubsection{Results for vector spaces and bag-of-words}
+\begin{table}[]
+	\begin{tabular}{llllll}
+		& SVM   & DT (N) & DT (3) & DT (2) & DT (1) \\
+		PPMI           & 0.594 & \textbf{0.441}  & \textbf{0.44}   & \textbf{0.441}  & \textbf{0.315}  \\
+		PCA 50         & 0.509 & 0.418  & 0.308  & 0.418  & 0.229  \\
+		PCA 100        & 0.577 & 0.412  & 0.36   & 0.412  & 0.238  \\
+		PCA 200        & 0.597 & 0.409  & 0.342  & 0.409  & 0.24   \\
+		D2V 50         & 0.592 & 0.308  & 0.308  & 0.308  & 0.244  \\
+		D2V 100        & 0.613 & 0.335  & 0.324  & 0.335  & 0.234  \\
+		D2V 200        & \textbf{0.619} & 0.369  & 0.369  & 0.369  & 0.251  \\
+		AWV 50         & 0.348 & 0.233  & 0.233  & 0.233  & 0.213  \\
+		AWV 100        & 0.378 & 0.236  & 0.236  & 0.236  & 0.208  \\
+		AWV 200        & 0.451 & 0.236  & 0.236  & 0.236  & 0.22   \\
+		MDS 50         & 0.381 & 0.242  & 0.242  & 0.242  & 0.191  \\
+		MDS 100        & 0.432 & 0.238  & 0.238  & 0.238  & 0.148  \\
+		MDS 200        & 0.481 & 0.243  & 0.243  & 0.243  & 0.188 
+	\end{tabular}
+	\caption{Results for 20 newsgroups.}
+	\label{table:Newsgroups}
+\end{table}
 
 % Deeper explanation of our methodology and approach
 

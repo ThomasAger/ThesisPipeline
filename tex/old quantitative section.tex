@@ -56,26 +56,7 @@ Place-types and IMDB Movies are both already limited to 100,000 vocabulary terms
 \label{table:ClassStats}
 \end{table}
 
-\begin{table}[]
-	\begin{tabular}{llllll}
-		& SVM   & DT (N) & DT (3) & DT (2) & DT (1) \\
-		PPMI           & 0.594 & \textbf{0.441}  & \textbf{0.44}   & \textbf{0.441}  & \textbf{0.315}  \\
-		PCA 50         & 0.509 & 0.418  & 0.308  & 0.418  & 0.229  \\
-		PCA 100        & 0.577 & 0.412  & 0.36   & 0.412  & 0.238  \\
-		PCA 200        & 0.597 & 0.409  & 0.342  & 0.409  & 0.24   \\
-		D2V 50         & 0.592 & 0.308  & 0.308  & 0.308  & 0.244  \\
-		D2V 100        & 0.613 & 0.335  & 0.324  & 0.335  & 0.234  \\
-		D2V 200        & \textbf{0.619} & 0.369  & 0.369  & 0.369  & 0.251  \\
-		AWV 50         & 0.348 & 0.233  & 0.233  & 0.233  & 0.213  \\
-		AWV 100        & 0.378 & 0.236  & 0.236  & 0.236  & 0.208  \\
-		AWV 200        & 0.451 & 0.236  & 0.236  & 0.236  & 0.22   \\
-		MDS 50         & 0.381 & 0.242  & 0.242  & 0.242  & 0.191  \\
-		MDS 100        & 0.432 & 0.238  & 0.238  & 0.238  & 0.148  \\
-		MDS 200        & 0.481 & 0.243  & 0.243  & 0.243  & 0.188 
-	\end{tabular}
-\caption{Results for 20 newsgroups.}
-\label{table:Newsgroups}
-\end{table}
+
 
 \subsection{Results for vector space's and bag-of-words}
 We use Decision Trees (DT) of size (3, 2, 1, N), where N means that the tree was unbounded and SVM's to classify on a Positive-Pointwise Mutual Information (PPMI) Bag-Of-Words (BOW), Principal Component Analysis (PCA), Averaged Word Vectors (AWV), Multi-Dimensional Scaling (MDS) and Doc2Vec (D2V) \cite{Le2014}. 
