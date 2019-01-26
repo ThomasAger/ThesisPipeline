@@ -49,32 +49,36 @@ class SaveLoad:
 
 
 def load_by_type(type, file_name):
-    if type == "npy":
-        file = np.load(file_name)
-    elif type == "scipy":
-        file = sp.load_npz(file_name)
-    elif type == "dct":
-        file = dt.load_dict(file_name)
-    elif type == "gensim":
-        file = Dictionary.load(file_name)
-    elif type == "1dtxts":
-        file = dt.import1dArray(file_name, "s")
-    elif type == "1dtxtf":
-        file = dt.import1dArray(file_name, "f")
-    elif type == "txtf":
-        file = dt.importValue(file_name, "f")
-    elif type == "scoredict":
-        file = dt.read_csv(file_name)
-    elif type == "scoredictarray":
-        file = dt.read_csv(file_name)
-    elif type == "csv":
-        file = dt.csv_pd_to_array(dt.read_csv(file_name))
-    elif type == "gensim_save_model":
-        file = g.utils.SaveLoad.load(file_name)
-    elif type == "dct":
-        dt.load_dict(file_name)
-    else:
-        raise ValueError("File type not recognized")
+    try:
+        if type == "npy":
+            file = np.load(file_name)
+        elif type == "scipy":
+            file = sp.load_npz(file_name)
+        elif type == "dct":
+            file = dt.load_dict(file_name)
+        elif type == "gensim":
+            file = Dictionary.load(file_name)
+        elif type == "1dtxts":
+            file = dt.import1dArray(file_name, "s")
+        elif type == "1dtxtf":
+            file = dt.import1dArray(file_name, "f")
+        elif type == "txtf":
+            file = dt.importValue(file_name, "f")
+        elif type == "scoredict":
+            file = dt.read_csv(file_name)
+        elif type == "scoredictarray":
+            file = dt.read_csv(file_name)
+        elif type == "csv":
+            file = dt.csv_pd_to_array(dt.read_csv(file_name))
+        elif type == "gensim_save_model":
+            file = g.utils.SaveLoad.load(file_name)
+        elif type == "dct":
+            dt.load_dict(file_name)
+        else:
+            raise ValueError("File type not recognized")
+    except FileNotFoundError:
+        print("File was not found.", file_name)
+        return None
     return file
 
 def save_by_type(file, type, file_name):

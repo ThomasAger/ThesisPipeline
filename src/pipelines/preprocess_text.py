@@ -71,25 +71,20 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     ppmi_fn = file_name + ppmi_identifier
     classify_ppmi_fn = classifier_fn + ppmi_identifier
 
-    hpam_save = SaveLoad(rewrite=rewrite_all)
-    hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_ppmi_fn,
-                         output_folder=output_folder, save_class=hpam_save, rewrite_model=rewrite_all,
-                         score_metric=score_metric)
-    if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
-        ppmi_unfiltered = ppmi.PPMI(p_corpus.getBow(), doc_amt, output_folder + "bow/" + ppmi_fn, ppmi_save)
-        ppmi_unfiltered.process_and_save()
-        ppmi_unf_matrix = ppmi_unfiltered.getMatrix()
+    ppmi_unfiltered = ppmi.PPMI(p_corpus.getBow(), doc_amt, output_folder + "bow/" + ppmi_fn, ppmi_save)
+    ppmi_unfiltered.process_and_save()
+    ppmi_unf_matrix = ppmi_unfiltered.getMatrix()
 
 
-        ppmi_save = SaveLoad(rewrite=rewrite_all)
-        ppmi_filtered = ppmi.PPMI(p_corpus.getFilteredBow(), doc_amt, output_folder + "bow/NB_" + str(no_below) + "_NA_" + str(no_above) + ppmi_fn, ppmi_save)
-        ppmi_filtered.process_and_save()
-        ppmi_filtered_matrix = ppmi_filtered.getMatrix()
+    ppmi_save = SaveLoad(rewrite=rewrite_all)
+    ppmi_filtered = ppmi.PPMI(p_corpus.getFilteredBow(), doc_amt, output_folder + "bow/NB_" + str(no_below) + "_NA_" + str(no_above) + ppmi_fn, ppmi_save)
+    ppmi_filtered.process_and_save()
+    ppmi_filtered_matrix = ppmi_filtered.getMatrix()
 
-        # Get the dev splits
-        split_ids = split.get_split_ids(data_type, matched_ids)
-        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_classes, split_ids, dev_percent_of_train=dev_percent)
+    # Get the dev splits
+    split_ids = split.get_split_ids(data_type, matched_ids)
+    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_classes, split_ids, dev_percent_of_train=dev_percent)
 
     all_test_result_rows = []
 
@@ -190,7 +185,6 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())
-
         doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
         doc2vec_fn = file_name + doc2vec_identifier
         classify_doc2vec_fn = classifier_fn + doc2vec_identifier
@@ -271,9 +265,9 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         class_names = dt.import1dArray(raw_folder + "class_names.txt")
         name_of_class = "Reuters"
 
-    window_size = [1, 5, 15]
-    min_count = [1, 5, 20]
-    train_epoch = [20, 40, 100]
+    window_size = [5, 10, 15]
+    min_count = [1, 5, 10]
+    train_epoch = [50, 100, 200]
 
     dims = [50, 100, 200]
     balance_params = ["balanced", None]
@@ -327,9 +321,17 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         pipeline(corpus, classes, class_names, pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
              no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
                  corpus_fn=corpus_fn, name_of_class=name_of_class)
+"""
+fifty = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.txt")
+hundy = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.txt")
+two_hundy = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
+np.save("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.npy", fifty)
+np.save("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.npy", hundy)
+np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy)
+"""
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "placetypes"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
