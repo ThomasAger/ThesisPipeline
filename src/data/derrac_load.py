@@ -15,14 +15,15 @@ def cleanIds(ids):
 
 def processMovies():
     data_type = "movies"
-    orig_fn = "../../data/raw/derrac/" + data_type + "/"
+    orig_fn = "../../data/raw/" + data_type + "/"
+    raw_fn = "../../data/raw/derrac/"+ data_type + "/"
     ids = dt.import1dArray(orig_fn + "filmIdsClean.txt", "i")
     names = dt.import1dArray(orig_fn + "filmNamesClean.txt", "s")
     text_corpus = []
     for i in range(len(ids)):
         print(names[i], i, "/", len(ids))
         corpus_string = ""
-        lines = dt.import1dArray(orig_fn + "tokens/" + str(ids[i]) + ".film")
+        lines = dt.import1dArray(raw_fn + "tokens/" + str(ids[i]) + ".film")
         for z in range(len(lines)):
             to_add_string = ""
             if "#" in lines[z]:
@@ -32,7 +33,7 @@ def processMovies():
                 to_add_string += split_line[0] + " "
             corpus_string += to_add_string
         text_corpus.append(corpus_string)
-    dt.write1dArray(text_corpus, "../../data/raw/placetypes/corpus.txt")
+    dt.write1dArray(text_corpus, "../../data/raw/movies/corpus.txt")
 
 def processPlacetypes():
     data_type = "placetypes"
@@ -55,3 +56,5 @@ def processPlacetypes():
     dt.write1dArray(text_corpus, "../../data/raw/placetypes/corpus.txt")
 
 #processPlacetypes()
+if __name__ == '__main__':
+    processMovies()

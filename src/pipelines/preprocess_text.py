@@ -134,18 +134,18 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         # We only have word-vectors of size 50, 100, 200 and 300
         if dims[i] != 20:
-            awv_save = SaveLoad(rewrite=rewrite_all)
+            awv_save = SaveLoad(rewrite=True)
             awv_identifier =  "_" + str(dims[i]) + "_AWVEmp"
             awv_fn = file_name + awv_identifier
             classify_awv_fn = classifier_fn + awv_identifier
 
-            hpam_save = SaveLoad(rewrite=rewrite_all)
+            hpam_save = SaveLoad(rewrite=True)
             hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_awv_fn,
                                  output_folder=output_folder, save_class=hpam_save, rewrite_model=rewrite_all,
                                  score_metric=score_metric)
             if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
-                awv_instance = awv.AWV(p_corpus.getSplitCorpus(), dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path)
+                awv_instance = awv.AWV(p_corpus.getSplitCorpus(), dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path, corpus_fn_to_stream=corpus_fn)
                 awv_instance.process_and_save()
                 awv_space = awv_instance.getRep()
 
@@ -154,7 +154,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                                                                   p_classes, split_ids,
                                                                                   dev_percent_of_train=dev_percent)
 
-            hpam_save = SaveLoad(rewrite=rewrite_all)
+            hpam_save = SaveLoad(rewrite=True)
             hyper_param = HParam(class_names,
                                               kfold_hpam_dict, model_type, classify_awv_fn,
                                          output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
@@ -186,23 +186,25 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())
-        doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
-        doc2vec_fn = file_name + doc2vec_identifier
-        classify_doc2vec_fn = classifier_fn + doc2vec_identifier
+
+        if data_type != "placetypes" and data_type != "movies":
+            doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
+            doc2vec_fn = file_name + doc2vec_identifier
+            classify_doc2vec_fn = classifier_fn + doc2vec_identifier
 
 
-        hpam_save = SaveLoad(rewrite=rewrite_all)
+            hpam_save = SaveLoad(rewrite=rewrite_all)
 
-        hpam_dict["dim"] = [dims[i]]
-        hpam_dict["corpus_fn"] = [corpus_fn]
-        hpam_dict["wv_path"] = [wv_path_d2v]
+            hpam_dict["dim"] = [dims[i]]
+            hpam_dict["corpus_fn"] = [p_corpus.getCorpus()]
+            hpam_dict["wv_path"] = [wv_path_d2v]
 
-        # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
-        hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
-                                     doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
-                                data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids)
-        hyper_param.process_and_save()
-        all_test_result_rows.append(hyper_param.getTopScoringRowData())
+            # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
+            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
+                                         doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
+                                    data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids)
+            hyper_param.process_and_save()
+            all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
 
         # Make the combined csv of all space types
@@ -220,14 +222,14 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
          no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2, score_metric="avg_f1", max_depth=None):
     corpus_fn = ""
     if data_type == "newsgroups":
-        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        corpus_fn = ""
         newsgroups = fetch_20newsgroups(subset='all', shuffle=False, remove=("headers", "footers", "quotes"))
         corpus = newsgroups.data
         classes = newsgroups.target
         class_names = newsgroups.target_names
         name_of_class = "Newsgroups"
     elif data_type == "sentiment":
-        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        corpus_fn = ""
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
         classes = np.asarray(np.concatenate((y_train, y_test), axis=0))
@@ -236,6 +238,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         classes_freq_cutoff = 0
         name_of_class = "Sentiment"
     elif data_type == "movies":
+        # corpus_fn is used as an indicator to stream in AWV instead of using the preprocessed corpus part
         corpus_fn = raw_folder + "corpus.txt"
         corpus = None
         genres = np.load(raw_folder + "/genres/class-all.npy")
@@ -262,7 +265,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         classes_freq_cutoff = 0
 
     elif data_type == "reuters":
-        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        corpus_fn = ""
         classes_freq_cutoff = 100
         corpus = dt.import1dArray(raw_folder + "duplicate_removed_docs.txt")
         classes = dt.import2dArray(raw_folder + "unique_classes.txt", "i")
@@ -335,7 +338,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "movies"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
