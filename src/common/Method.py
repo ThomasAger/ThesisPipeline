@@ -25,8 +25,8 @@ class Method:
             self.save_class.save(popo_array)
             print("corpus done")
         else:
-            self.save_class.load(popo_array)
-            print(self.__class__.__name__, "Already exists")
+            #self.save_class.loadAll(popo_array)
+            print(self.__class__.__name__, "Already exists (lazy loading enabled)")
 
     def makePopos(self):
         print("Creating popos")
@@ -78,6 +78,12 @@ class ModelMethod(Method):
         else:
             self.popo_array = [self.test_predictions]
 
+    def getPred(self):
+        return self.save_class.load(self.test_predictions)
+
+    def getProba(self):
+        return self.save_class.load(self.test_proba)
+
 class RepMethod(Method):
 
     rep = None
@@ -94,3 +100,6 @@ class RepMethod(Method):
 
     def makePopoArray(self):
         self.popo_array = [self.rep]
+
+    def getRep(self):
+        return self.save_class.load(self.rep)

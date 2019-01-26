@@ -262,7 +262,14 @@ class MasterCorpus(Method.Method):
         self.file_name = file_name
         super().__init__(file_name, save_class)
 
-
+    def getSplitCorpus(self):
+        return self.save_class.load(self.split_corpus)
+    def getClasses(self):
+        return self.save_class.load(self.classes)
+    def getBow(self):
+        return self.save_class.load(self.bow)
+    def getFilteredBow(self):
+        return self.save_class.load(self.filtered_bow)
 
 class Corpus(MasterCorpus):
     orig_corpus = None
@@ -273,7 +280,6 @@ class Corpus(MasterCorpus):
         print("Original doc len", len(orig_corpus))
         super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above,  remove_stop_words, save_class)
-
 
     def makePopos(self):
         output_folder = self.output_folder
@@ -344,7 +350,6 @@ class StreamedCorpus(MasterCorpus):
         self.corpus_fn_to_stream = corpus_fn_to_stream
         super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above,remove_stop_words, save_class)
-
 
     def makePopos(self):
         output_folder = self.output_folder
@@ -458,6 +463,11 @@ class ProcessClasses(MasterCorpus):
         print("Final class amt", len(self.filtered_classes.value))
         super().process()
 
+    def getClasses(self):
+        return self.save_class.load(self.filtered_classes)
+
+    def getClassNames(self):
+        return self.save_class.load(self.filtered_class_names)
 
 def getVocabStreamed(text_corpus_fn):
 

@@ -13,12 +13,15 @@ class SaveLoad:
         self.rewrite = rewrite
         self.no_save = no_save
 
-    def load(self, popo_array):
+    def loadAll(self, popo_array):
         for i in range(len(popo_array)):
             if popo_array[i].file_name is None or popo_array[i].file_type is None:
                 raise ValueError("None type" + popo_array[i].value.file_name)
-            popo_array[i].value = load_by_type(popo_array[i].file_type, popo_array[i].file_name)
+            popo_array[i].value = self.load(popo_array[i])
         return popo_array
+
+    def load(self, popo):
+        return load_by_type(popo.file_type, popo.file_name)
 
     def save(self, popo_array):
         if self.no_save is False:

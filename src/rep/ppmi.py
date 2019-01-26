@@ -40,6 +40,9 @@ class PPMI(Method):
         self.ppmi_matrix.value = sp.csr_matrix(orig_ppmi_matrix).transpose()
         super().process()
 
+    def getMatrix(self):
+        return self.save_class.load(self.ppmi_matrix)
+
 
 def convertPPMISparse(mat):
     """

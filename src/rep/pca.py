@@ -20,6 +20,7 @@ class PCA(RepMethod):
         if self.word_doc_matrix.shape[1] == doc_amt:
             self.word_doc_matrix = self.word_doc_matrix.transpose()
 
+
     def process(self):
         svd = TruncatedSVD(n_components=self.dim)  # use the scipy algorithm "arpack"
         self.rep.value = svd.fit_transform(self.word_doc_matrix)

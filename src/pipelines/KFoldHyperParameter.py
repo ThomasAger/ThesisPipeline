@@ -81,10 +81,10 @@ class MasterHParam(Method):
 
     def trainClassifier(self, model):
         model.process_and_save()
-        pred = model.test_predictions.value
+        pred = model.getPred()
         prob = None
         if self.probability:
-            prob = model.test_proba.value
+            prob = model.getProba()
         return pred, prob
 
     def process(self):
@@ -181,6 +181,8 @@ class RecHParam(MasterHParam):
                          score_metric=score_metric)
         self.end_file_name = self.file_name + "_Kfold" + str(self.folds) + str(
             generateNumber(hpam_dict)) + self.model_type
+    def getTopScoringRowData(self):
+        return self.save_class.load(self.top_scoring_row_data)
 
     def makePopos(self):
         self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + ".csv", "csv")
@@ -207,7 +209,7 @@ class RecHParam(MasterHParam):
                                            min_count=self.all_p[i]["min_count"], train_epoch=self.all_p[i]["train_epoch"]
                                            )
                 doc2vec_instance.process_and_save()
-                doc2vec_space = doc2vec_instance.rep.value
+                doc2vec_space = doc2vec_instance.getRep()
 
                 split_ids = split.get_split_ids(self.data_type, self.matched_ids)
                 x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
@@ -219,10 +221,11 @@ class RecHParam(MasterHParam):
                                      self.output_folder, hpam_save, self.probability, rewrite_model=self.rewrite_model, x_train=x_train,
                                      y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc)
                 hyper_param.process_and_save()
-                self.top_scoring_params.value.append(hyper_param.top_scoring_params.value)
-                averaged_csv_data.append(hyper_param.top_scoring_row_data.value[1])
-                col_names = hyper_param.top_scoring_row_data.value[0]
-                indexes.append(hyper_param.top_scoring_row_data.value[2][0])
+                self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
+                top_scoring_row_data = hyper_param.getTopScoringRowData()
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
@@ -276,7 +279,7 @@ class HParam(MasterHParam):
 
     # The CSV data that corresponds to the highest scoring row for the score_metric
 
-    def __init__(self, class_names, hpam_dict, model_type, file_name, output_folder, save_class, probability, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None, final_score_on_dev=False):
+    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None, final_score_on_dev=False):
 
         # Metric that determines what will be returned to the overall hyper-parameter method
         self.all_p = get_grid_params(hpam_dict)
@@ -289,8 +292,6 @@ class HParam(MasterHParam):
         self.y_dev = y_dev
         self.file_names = []
 
-        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
-        check.check_splits(self.x_train, self.y_train, self.x_dev, self.y_dev)
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa,
                          model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names, save_class=save_class,
@@ -305,10 +306,21 @@ class HParam(MasterHParam):
         self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
         self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "rep/score/csv_averages/top_params/" + self.end_file_name + "Top"+self.score_metric+".txt", "dct")
 
+    def getTopScoringRowData(self):
+        self.top_scoring_row_data.value = self.save_class.load(self.top_scoring_row_data)
+        return self.top_scoring_row_data.value
+
+    def getTopScoringParams(self):
+        self.top_scoring_params.value = self.save_class.load(self.top_scoring_params)
+        return self.top_scoring_params.value
+
+
     def makePopoArray(self):
         self.popo_array = [self.averaged_csv_data, self.top_scoring_row_data, self.top_scoring_params]
 
     def process(self):
+        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
+        check.check_splits(self.x_train, self.y_train, self.x_dev, self.y_dev)
         self.p_score_dicts = []
         for i in range(len(self.all_p)):
             model, model_fn = self.selectClassifier(self.all_p[i], self.x_train, self.y_train, self.x_dev, self.y_dev)
