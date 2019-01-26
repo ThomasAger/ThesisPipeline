@@ -250,7 +250,7 @@ class RecHParam(MasterHParam):
                                    )
 
         doc2vec_instance.process_and_save()
-        doc2vec_space = doc2vec_instance.rep.value
+        doc2vec_space = doc2vec_instance.getRep()
 
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
@@ -474,10 +474,10 @@ class KFoldHyperParameter(Method):
                                          min_samples_leaf=self.all_p[i]["min_samples_leaf"], min_samples_split=self.all_p[i]["min_samples_split"],
                                     class_weight=self.all_p[i]["class_weight"], max_features=self.all_p[i]["max_features"], probability=self.probability, verbose=False)
                 model.process_and_save()
-                pred = model.test_predictions.value
+                pred = model.getPred()
                 prob = None
                 if self.probability:
-                    prob = model.test_proba.value
+                    prob = model.getProba()
                 if fold_num == 0:
                     self.average_file_names.append(average_fn)
                 score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)

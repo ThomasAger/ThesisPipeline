@@ -172,13 +172,26 @@ Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtai
 \subsection{Quantitative Results}
 % Basic explanation of why quantitative results are interesting, valuable, good etc
 
-We want to measure how well our interpretable representation represents domain knowledge. We can understand that an accurate representation of domain knowledge will be able to classify key domain knowledge. For example, a good representation like a Principal Component Analysis vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, horror movies would be spatially distant from romance movies, and movies that are romantic horrors would be somewhere inbetween. We can see an example in Figure \ref{ExampleGenreSplit} As another example, movies that contain similar themes we could expect to have similar Positive Pointwise Mutual Information vectors - as they would both contain unique terms to that theme, see Table \ref{PPMI example}.
+We want to measure how well our interpretable representation represents domain knowledge. We can understand that an accurate representation of domain knowledge will be able to classify key domain knowledge. For example, a good representation like a Principal Component Analysis vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, horror movies would be spatially distant from romance movies, and movies that are romantic horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated} As another example, movies that contain similar themes we could expect to have similar Positive Pointwise Mutual Information vectors - as they would both contain unique terms to that theme, see Table \ref{PPMI table:PPMI_example}.
 
 \begin{figure}[t]
 	\includegraphics[width=\textwidth]{images/genres_separated.png}
 	\centering
-	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{ConceptualSpace}
+	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{figure:genres_separated}
 \end{figure}
+
+\begin{table}[]
+	\begin{tabular}{ll}
+		& Top PPMI scoring terms                                                \\
+		Example Horror Entity      & Term term term term term term term term term term term term term term \\
+		Similar Horror Entity      & Term term term term term term term term term term term term term term \\
+		Somewhere Inbetween Entity & Term term term term term term term term term term term term term term \\
+		Romance Movie              & Term term term term term term term term term term term term term term \\
+		Similar Romance movie      & Term term term term term term term term term term term term term term
+	\end{tabular}
+\caption{Two of the following entities: Those classified as horror, those classified as horror and romance, and those classified as romance with their associated highest value PPMI terms.}
+\label{table:PPMI_example}
+\end{table}
 
 \subsubsection{Results for vector spaces and bag-of-words}
 \begin{table}[]
