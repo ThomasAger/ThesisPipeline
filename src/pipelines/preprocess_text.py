@@ -219,12 +219,14 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
          no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2, score_metric="avg_f1", max_depth=None):
     corpus_fn = ""
     if data_type == "newsgroups":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
         newsgroups = fetch_20newsgroups(subset='all', shuffle=False, remove=("headers", "footers", "quotes"))
         corpus = newsgroups.data
         classes = newsgroups.target
         class_names = newsgroups.target_names
         name_of_class = "Newsgroups"
     elif data_type == "sentiment":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
         classes = np.asarray(np.concatenate((y_train, y_test), axis=0))
@@ -259,6 +261,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         classes_freq_cutoff = 0
 
     elif data_type == "reuters":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
         classes_freq_cutoff = 100
         corpus = dt.import1dArray(raw_folder + "duplicate_removed_docs.txt")
         classes = dt.import2dArray(raw_folder + "unique_classes.txt", "i")
@@ -331,7 +334,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "newsgroups"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

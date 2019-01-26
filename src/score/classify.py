@@ -164,6 +164,9 @@ class MasterScore(Method.Method):
             score_dict["avg_kappa"] = self.avg_kappa.value
         return score_dict
 
+    def loadScores(self):
+        self.popo_array = self.save_class.loadAll(self.popo_array)
+
     def print(self, max_to_print=5):
         score_dict = {}
         print("Amt", len(self.f1s.value))

@@ -258,7 +258,7 @@ class RecHParam(MasterHParam):
                                                                           dev_percent_of_train=self.dev_percent)
         model, model_fn = self.selectClassifier(self.top_scoring_params.value[index_sorted], x_train, y_train, x_test, y_test)
         pred, prob = self.trainClassifier(model)
-        score_save = SaveLoad(rewrite=self.rewrite_model)
+        score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
         score = classify.selectScore(y_test, pred, prob, file_name=model_fn,
                                          output_folder=self.output_folder + "rep/score/", save_class=score_save,
                                          verbose=True,
@@ -326,7 +326,7 @@ class HParam(MasterHParam):
             model, model_fn = self.selectClassifier(self.all_p[i], self.x_train, self.y_train, self.x_dev, self.y_dev)
             pred, prob = self.trainClassifier(model)
             self.file_names.append(model_fn)
-            score_save = SaveLoad(rewrite=self.rewrite_model)
+            score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
                                              output_folder=self.output_folder + "rep/score/", save_class=score_save, verbose=True,
                                              fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
@@ -351,7 +351,7 @@ class HParam(MasterHParam):
             model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train,
                                                     self.x_test, self.y_test)
         pred, prob = self.trainClassifier(model)
-        score_save = SaveLoad(rewrite=self.rewrite_model)
+        score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
         if self.final_score_on_dev:
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
                                              output_folder=self.output_folder + "rep/score/", save_class=score_save,
@@ -480,7 +480,7 @@ class KFoldHyperParameter(Method):
                     prob = model.test_proba.value
                 if fold_num == 0:
                     self.average_file_names.append(average_fn)
-                score_save = SaveLoad(rewrite=self.rewrite_model)
+                score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
                 score = classify.selectScore(y_test, pred, prob, file_name=model_fn,
                                                  output_folder=self.output_folder + "rep/score/", save_class=score_save, verbose=True,
                                                  fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
@@ -509,7 +509,7 @@ class KFoldHyperParameter(Method):
                      self.averaged_param_score_dicts[index_sorted][col_names[2]], self.averaged_param_score_dicts[index_sorted][col_names[3]],
                      self.averaged_param_score_dicts[index_sorted][col_names[4]]]
         self.top_scoring_row_data.value = [col_names, avg_array, [self.average_file_names[index_sorted]]]
-
+from util import py
 
 def generateNumber(hpam_dict):
     hyperparams_array = list(hpam_dict.values())
@@ -520,6 +520,14 @@ def generateNumber(hpam_dict):
         names_val = np.sum([ord(c) for c in hyperparam_names[i]])
         unique_number += names_val
         all_names += hyperparam_names[i]
+        for j in range(len(hyperparams_array[i])):
+            if py.isFloat(hyperparams_array[i][j]):
+                unique_number += float(hyperparams_array[i][j])
+            elif hyperparams_array[i][j] == None:
+                unique_number += 3
+            elif type(hyperparams_array[i][j]) is str:
+                val = np.sum([ord(c) for c in hyperparams_array[i][j]])
+                unique_number += val
     unique_number = unique_number * (len(hyperparam_names) / 10)
     while (float(unique_number)).is_integer() is False:
         unique_number *= 10

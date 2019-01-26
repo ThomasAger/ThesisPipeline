@@ -8,10 +8,12 @@ import gensim.models as g
 class SaveLoad:
     rewrite = None
     no_save = None
+    load_all = None
 
-    def __init__(self, rewrite=False, no_save=False):
+    def __init__(self, rewrite=False, no_save=False, load_all=False):
         self.rewrite = rewrite
         self.no_save = no_save
+        self.load_all = load_all
 
     def loadAll(self, popo_array):
         for i in range(len(popo_array)):

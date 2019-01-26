@@ -25,7 +25,8 @@ class Method:
             self.save_class.save(popo_array)
             print("corpus done")
         else:
-            #self.save_class.loadAll(popo_array)
+            if self.save_class.load_all:
+                self.save_class.loadAll(popo_array)
             print(self.__class__.__name__, "Already exists (lazy loading enabled)")
 
     def makePopos(self):
