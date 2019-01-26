@@ -127,8 +127,8 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
-        wv_path = "D:/PhD/Code/ThesisPipeline/ThesisPipeline/data/raw/glove/glove.6B." + str(dims[i]) + 'd.txt'
-        wv_path_d2v = "D:/PhD/Code/ThesisPipeline/ThesisPipeline/data/raw/glove/glove.6B.300d.txt"
+        wv_path = "../../data/raw/glove/" + "glove.6B." + str(dims[i]) + 'd.txt'
+        wv_path_d2v = "../../data/raw/glove/" + "glove.6B.300d.txt"
 
 
         # We only have word-vectors of size 50, 100, 200 and 300
