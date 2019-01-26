@@ -310,7 +310,9 @@ class Corpus(MasterCorpus):
         self.word_list = SaveLoadPOPO(self.word_list, standard_fn + "metadata/" + file_name + "_words.txt", "1dtxts")
         self.all_words = SaveLoadPOPO(self.all_words, standard_fn + "metadata/" + file_name + "_all_words_2.txt",
                                       "1dtxts")
-
+    def getCorpus(self):
+        self.processed_corpus = self.save_class.load(self.processed_corpus)
+        return self.processed_corpus
     def makePopoArray(self):
         self.popo_array = [self.dct, self.remove_ind, self.tokenized_corpus, self.tokenized_ids,
                            self.id2token,
