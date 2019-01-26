@@ -9,6 +9,7 @@ from data import process_corpus
 from util.save_load import SaveLoad
 from util import split
 from pipelines.KFoldHyperParameter import HParam, RecHParam
+import os
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
@@ -127,8 +128,8 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
-        wv_path = "../../data/raw/glove/" + "glove.6B." + str(dims[i]) + 'd.txt'
-        wv_path_d2v = "../../data/raw/glove/" + "glove.6B.300d.txt"
+        wv_path =  os.path.abspath("../../data/raw/glove/" + "glove.6B." + str(dims[i]) + 'd.txt')
+        wv_path_d2v =  os.path.abspath("../../data/raw/glove/" + "glove.6B.300d.txt")
 
 
         # We only have word-vectors of size 50, 100, 200 and 300
@@ -334,7 +335,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "movies"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
