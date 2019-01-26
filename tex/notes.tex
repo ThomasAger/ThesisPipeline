@@ -37,3 +37,29 @@ One limitation of this basic strategy is that the interpretable directions are e
 
 When learning vector space representations, there can be a trade-off between preserving similarity structure and having directions which faithfully model salient properties. Since standard methods for learning vector space representations are essentially based on preserving the similarity structure, we argue that a post-processing step is needed to obtain high-quality directions. To this end, we propose a simple neural network model which is aimed at fine-tuning the initial vector space representation w.r.t.\ the chosen interpretable directions. Importantly, the whole process of identifying interpretable directions and fine-tuning the vector space remains completely unsupervised, with the neural network being trained based on statistics collected from the bag-of-words representations of the documents. 
 
+%% Disentangling the factors of variation and unsupervised learning
+
+A fundamental challenge in understanding sensory data is learning to disentangle the underlying
+factors of variation that give rise to the observations [1]. For instance, the factors of variation involved
+in generating a speech recording include the speaker’s attributes, such as gender, age, or accent, as
+well as the intonation and words being spoken. Similarly, the factors of variation underlying the image
+of an object include the object’s physical representation and the viewing conditions. The difficulty
+of disentangling these hidden factors is that, in most real-world situations, each can influence the
+observation in a different and unpredictable way. It is seldom the case that one has access to rich
+forms of labeled data in which the nature of these influences is given explicitly.\cite{Mathieu2016}
+Often times, the purpose for which a dataset is collected is to further progress in solving a certain
+supervised learning task. This type of learning is driven completely by the labels. The goal is for
+the learned representation to be invariant to factors of variation that are uninformative to the task
+at hand. While recent approaches for supervised learning have enjoyed tremendous success, their
+performance comes at the cost of discarding sources of variation that may be important for solving
+30th Conference on Neural Information Processing Systems (NIPS 2016), Barcelona, Spain.
+arXiv:1611.03383v1 [cs.LG] 10 Nov 2016\cite{Mathieu2016}
+other, closely-related tasks. Ideally, we would like to be able to learn representations in which the
+uninformative factors of variation are separated from the informative ones, instead of being discarded.
+Many other exciting applications require the use of generative models that are capable of synthesizing
+novel instances where certain key factors of variation are held fixed. Unlike classification, generative
+modeling requires preserving all factors of variation. But merely preserving these factors is not
+sufficient for many tasks of interest, making the disentanglement process necessary. For example,
+in speech synthesis, one may wish to transfer one person’s dialog to another person’s voice. Inverse
+problems in image processing, such as denoising and super-resolution, require generating images that
+are perceptually consistent with corrupted or incomplete observations.\cite{Mathieu2016}

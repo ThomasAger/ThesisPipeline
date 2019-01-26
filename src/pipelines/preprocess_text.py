@@ -145,7 +145,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                  score_metric=score_metric)
             if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
-                awv_instance = awv.AWV(p_corpus.getSplitCorpus(), dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path)
+                awv_instance = awv.AWV(p_corpus.getSplitCorpus(), dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path, corpus_fn_to_stream=corpus_fn)
                 awv_instance.process_and_save()
                 awv_space = awv_instance.getRep()
 
@@ -186,23 +186,24 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())
-        doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
-        doc2vec_fn = file_name + doc2vec_identifier
-        classify_doc2vec_fn = classifier_fn + doc2vec_identifier
+        if data_type != "placetypes" and data_type != "movies":
+            doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
+            doc2vec_fn = file_name + doc2vec_identifier
+            classify_doc2vec_fn = classifier_fn + doc2vec_identifier
 
 
-        hpam_save = SaveLoad(rewrite=rewrite_all)
+            hpam_save = SaveLoad(rewrite=rewrite_all)
 
-        hpam_dict["dim"] = [dims[i]]
-        hpam_dict["corpus_fn"] = [corpus_fn]
-        hpam_dict["wv_path"] = [wv_path_d2v]
+            hpam_dict["dim"] = [dims[i]]
+            hpam_dict["corpus_fn"] = [corpus_fn]
+            hpam_dict["wv_path"] = [wv_path_d2v]
 
-        # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
-        hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
-                                     doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
-                                data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids)
-        hyper_param.process_and_save()
-        all_test_result_rows.append(hyper_param.getTopScoringRowData())
+            # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
+            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
+                                         doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
+                                    data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids)
+            hyper_param.process_and_save()
+            all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
 
         # Make the combined csv of all space types
@@ -335,7 +336,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "placetypes"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

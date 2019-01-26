@@ -22,3 +22,4 @@ src/rep/__pycache__/
 src/util/__pycache__/
 src/pipelines/__pycache__/
 .idea/
+papers/

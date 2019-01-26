@@ -172,7 +172,7 @@ Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtai
 \subsection{Quantitative Results}
 % Basic explanation of why quantitative results are interesting, valuable, good etc
 
-We want to measure how well our interpretable representation represents domain knowledge. We can understand that an accurate representation of domain knowledge will be able to classify key domain knowledge. For example, a good representation like a Principal Component Analysis vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, horror movies would be spatially distant from romance movies, and movies that are romantic horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated} As another example, movies that contain similar themes we could expect to have similar Positive Pointwise Mutual Information vectors - as they would both contain unique terms to that theme, see Table \ref{PPMI table:PPMI_example}.
+This section focuses on using linear classifiers to determine how good at representing domain knowledge our method is compared to standard baselines. We can understand that an accurate representation of domain knowledge will be one that ensures semantically distinct entities are separated, and semantically similar entities are close together. Put another way, we want to 'disentangle the main factors of variation that give rise to the observations' \cite{Bengio2012, Mathieu2016}. By this understanding, we can expect that the space should be linearly separable for some key semantics of the space. For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, Horror movies should be spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
 
 \begin{figure}[t]
 	\includegraphics[width=\textwidth]{images/genres_separated.png}
@@ -189,9 +189,11 @@ We want to measure how well our interpretable representation represents domain k
 		Romance Movie              & Term term term term term term term term term term term term term term \\
 		Similar Romance movie      & Term term term term term term term term term term term term term term
 	\end{tabular}
-\caption{Two of the following entities: Those classified as horror, those classified as horror and romance, and those classified as romance with their associated highest value PPMI terms.}
+\caption{Two of the following entities: Those classified as horror, those classified as horror and romance, and those classified as romance with their associated highest value PPMI terms. We show the highest positive instances here as the representation is sparse, even though we can also expect the terms that are low scoring to be similar too.}
 \label{table:PPMI_example}
 \end{table}
+
+
 
 \subsubsection{Results for vector spaces and bag-of-words}
 \begin{table}[]
