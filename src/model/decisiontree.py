@@ -10,6 +10,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
+from util import py
 
 class DecisionTree(Method.ModelMethod):
     max_features = None
@@ -32,6 +33,13 @@ class DecisionTree(Method.ModelMethod):
 
 
     def process(self):
+        # Before we didnt save dictionaries with their types so this is necessary to convert those dicts
+        if self.max_features == "None":
+            self.max_features = None
+        if self.max_depth == "None":
+            self.max_depth = None
+        elif py.isStr(self.max_depth):
+            self.max_depth = int(self.max_depth)
         tree = DecisionTreeClassifier(max_features = self.max_features, max_depth=self.max_depth, min_samples_leaf=self.min_samples_leaf,
                                      min_samples_split=self.min_samples_split, class_weight=self.class_weight)
         ovr = OneVsRestClassifier(tree)

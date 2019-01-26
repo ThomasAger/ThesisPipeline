@@ -188,7 +188,8 @@ def toBool(string):
 def save_dict(dct, file_name):
     file = open(file_name, "w")
     for key, value in dct.items():
-        file.write(str(key) + " " + str(value) + "\n")
+        file.write(str(key) + " " + str(value) + " " + str(type(value)) + "\n")
+        print(str(key) + " " + str(value) + " " + str(type(value)) + "\n")
     file.close()
 
 
@@ -198,8 +199,32 @@ def load_dict(file_name):
         lines = infile.readlines()
         for l in lines:
             split = l.split()
-            dict[split[0]] = split[1]
+            new_type = False
+            if split[1] == "None":
+                dict[split[0]] = None
+            try:
+                type = split[3]
+                new_type = True
+                if 'float' in type:
+                    dict[split[0]] = float(split[1])
+
+                if "str" in type:
+                    dict[split[0]] = str(split[1])
+
+                if "int" in type:
+                    dict[split[0]] = int(split[1])
+
+                if "None" in type:
+                    dict[split[0]] = None
+
+                if "bool" in type:
+                    dict[split[0]] = bool(split[1])
+            except IndexError:
+                print("No type in dict")
+            if not new_type:
+                dict[split[0]] = split[1]
     return dict
+
 
 def writeArrayDict(dict, name):
     file = open(name, "w")

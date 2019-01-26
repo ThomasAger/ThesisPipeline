@@ -54,6 +54,9 @@ class LinearSVM(SVM):
 
     def process(self):
         print("Begin processing")
+        # For old dicts without types
+        if self.class_weight == "None":
+            self.class_weight = None
         # For some reason, sklearn uses the dual formulation by default for linear SVM's.
         self.svm = LinearSVC(C = float(self.C), class_weight=self.class_weight, dual=False, verbose=self.verbose)
         super().process()
