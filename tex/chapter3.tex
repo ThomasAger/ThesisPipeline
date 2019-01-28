@@ -2,11 +2,21 @@
 \section{Introduction}
 
 %Why do this work? What is the value of this work?  How is this relevant to the readers interests?
-%%Generally, what niche of interpretability are we trying to fill? Why? What's our motivation for this chapter? Why interpretable classifiers?
+
+% What is a semantic space? Why is a semantic space valuable?
+
+Distributional representations of semantics, known as 'semantic spaces' are well-recognized for their ability to represent semantic information spatially. These representations have been widely adopted for Natural Language Processing (NLP) tasks %Tasks here
+thanks to their ability to represent complex information in a dense representation. In particular, entity-embeddings have been applied  to represent items in recommender systems \cite{Vasile:2016:MPE:2959100.2959160,liang2016factorization,van2016learning}, to represent entities in semantic search engines \cite{DBLP:conf/sigir/JameelBS17,van2017structural}, or to represent examples in classification tasks \cite{DBLP:conf/iccv/DemirelCI17}. %Copied from CONLL paper. Shift this to talk more about applications and tasks rather than specific stuff related to our ideas.
+
+The success of these semantic spaces similarity-based structure has lead many to investigate how to obtain formal relationships from them. One such striking example is in that of linear analogies in word-vectors (see Section \ref{WordVectors}, where it was found that the vector XXXX[]King queen blah blah[]XXXXXXX, formally justified in \cite{Ethayarajh2018}. %Vector example
+These relationships have been expanded on, for example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, while \cite{Mitchell2015} discovered that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, \cite{Garg2017} found that word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. %Copy pasted from this 
+
+This brings up an essential point: When using a semantic space, are we taking advantage of relationships that are discriminative or incorrect? The danger of relying on these spaces and the models that use them has greatly affected their adoption in critical application areas like medicine, %Citation needed
+and has raised legal concerns about their application in e.g. determining if someone is suitable for a loan. 
+% 
 
 
-%What are some other interpretable representations? What are their advantages or disadvantages?
-Distributional representations like vector spaces have the ability to represent semantic information spatially. Vector spaces built from a domain-specific corpus of text that represent this kind of information, also known as 'semantic spaces', are used, for instance, to represent items in recommender systems \cite{Vasile:2016:MPE:2959100.2959160,liang2016factorization,van2016learning}, to represent entities in semantic search engines \cite{DBLP:conf/sigir/JameelBS17,van2017structural}, or to represent examples in classification tasks \cite{DBLP:conf/iccv/DemirelCI17}. %Copied from CONLL paper.
+Distributional representations like vector spaces have the ability to represent semantic information spatially. Vector spaces built from a domain-specific corpus of text that represent this kind of information, also known as 'semantic spaces', are used, for instance,
 One way to understand how a semantic space represents information is as a conceptual space \cite{Gardenfors2014}. In this space, we can understand domain entities, e.g. movies in a domain of IMDB movie reviews, to be represented as points, and domain properties to be in regions around these points. In figure \ref{ConceptualSpace}, we show an example conceptual space for movies. 
 
 
@@ -16,7 +26,7 @@ One way to understand how a semantic space represents information is as a concep
 	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{ConceptualSpace}
 \end{figure}
 
-The success of these semantic spaces has lead many to investigate how the similarity-based structure can be converted into formal relationships. For example, in word-vectors (see Section \ref{WordVectors} for more) \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parralel vector differences" \cite{Mitchell2015}, while \cite{Mitchell2015} discovered that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks.  %Copy pasted from this 
+
 
 %%What is the previous work?
 The semantic relation that we focus in on this paper are directions that correspond to salient features from the considered domain. %What is a direction
@@ -193,7 +203,9 @@ This section focuses on using linear classifiers to determine how good at repres
 \label{table:PPMI_example}
 \end{table}
 
-
+When selecting the parameters to use for the doc2vec space when obtaining directions, we choose the one that scored the highest for its class on a Linear SVM, rather than tuning the entire process around the doc2vecs vectors.
+We use the kind of multiclass strategy as a hyper-parameter for each class-type in the grid search. We test the OneVsOne classifier method, treating each as binary problems, the OneVsRest method and the OutputCode method.
+We are not able to obtain an MDS space for sentiment or doc2vec spaces for placetypes/movies.
 
 \subsubsection{Results for vector spaces and bag-of-words}
 \begin{table}[]

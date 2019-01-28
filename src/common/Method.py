@@ -56,15 +56,17 @@ class ModelMethod(Method):
     y_test = None
     test_predictions = None
     test_proba = None
+    mcm = None
     probability = None
 
-
-    def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, probability):
+    def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, probability,mcm ):
         self.x_train = x_train
         self.x_test = x_test
         self.y_train = y_train
         self.y_test = y_test
         self.probability = probability
+        self.mcm = mcm
+
         check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
         super().__init__(file_name, save_class)
 

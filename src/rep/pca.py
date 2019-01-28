@@ -5,12 +5,11 @@ from common.SaveLoadPOPO import SaveLoadPOPO
 from common.Method import RepMethod
 class PCA(RepMethod):
     word_doc_matrix = None
-
+    doc_amt = None
     def __init__(self, word_doc_matrix, doc_amt, dim, file_name, output_folder, save_class):
 
         self.word_doc_matrix = word_doc_matrix
-        self.checkWordDocMatrix(doc_amt)
-
+        self.doc_amt = doc_amt
         super().__init__(file_name, output_folder, save_class, dim)
 
     def checkWordDocMatrix(self, doc_amt):
@@ -22,6 +21,7 @@ class PCA(RepMethod):
 
 
     def process(self):
+        self.checkWordDocMatrix(self.doc_amt)
         svd = TruncatedSVD(n_components=self.dim)  # use the scipy algorithm "arpack"
         self.rep.value = svd.fit_transform(self.word_doc_matrix)
         super().process()

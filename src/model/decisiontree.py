@@ -22,14 +22,14 @@ class DecisionTree(Method.ModelMethod):
     min_samples_split = None
 
     def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, probability=True,  max_depth =None,
-                                         min_samples_leaf=1, min_samples_split=2, class_weight=None, max_features=None, verbose=False):
+                                         min_samples_leaf=1, min_samples_split=2, class_weight=None, max_features=None, verbose=False, mcm=None):
         self.max_features = max_features
         self.verbose = verbose
         self.class_weight = class_weight
         self.max_depth = max_depth
         self.min_samples_leaf = min_samples_leaf
         self.min_samples_split=min_samples_split
-        super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability)
+        super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability, mcm)
 
 
     def process(self):
@@ -42,7 +42,7 @@ class DecisionTree(Method.ModelMethod):
             self.max_depth = int(self.max_depth)
         tree = DecisionTreeClassifier(max_features = self.max_features, max_depth=self.max_depth, min_samples_leaf=self.min_samples_leaf,
                                      min_samples_split=self.min_samples_split, class_weight=self.class_weight)
-        ovr = OneVsRestClassifier(tree)
+        ovr = self.mcm(tree)
         ovr.fit(self.x_train, self.y_train)
         self.test_predictions.value = ovr.predict(self.x_test)
         if self.probability:

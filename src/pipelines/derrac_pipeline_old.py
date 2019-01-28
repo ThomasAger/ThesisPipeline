@@ -11,7 +11,7 @@ from itertools import product
 import numpy as np
 
 import cluster
-from model import nnet, __svm_old, tree, mean_shift as ms
+from model import nnet, __svm_old, tree_old, mean_shift as ms
 from project import finetune_outputs as fto, rank
 from score import ndcg
 from util import proj as dt
@@ -416,33 +416,33 @@ def main(data_type, classification_task_a, file_name, init_vector_path, hidden_a
                             if dt_dev is False:
                                 save_details = True
 
-                            tree.DecisionTree(ranking_fn, classification_path, label_names_fn, cluster_dict_fn,
-                                              file_name + " " + classification_task, 10000,
-                                              max_depth=1, balance="balanced", criterion="entropy",
-                                              save_details=save_details, cv_splits=cv_splits, split_to_use=splits,
-                                              data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
-                                              development=dt_dev, limit_entities=limit_entities,
-                                              limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn,
-                                              clusters_fn=clusters_fn,
-                                              cluster_duplicates=cluster_duplicates,
-                                              save_results_so_far=save_results_so_far,
-                                              multi_label=multi_label)
+                            tree_old.DecisionTree(ranking_fn, classification_path, label_names_fn, cluster_dict_fn,
+                                                  file_name + " " + classification_task, 10000,
+                                                  max_depth=1, balance="balanced", criterion="entropy",
+                                                  save_details=save_details, cv_splits=cv_splits, split_to_use=splits,
+                                                  data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
+                                                  development=dt_dev, limit_entities=limit_entities,
+                                                  limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn,
+                                                  clusters_fn=clusters_fn,
+                                                  cluster_duplicates=cluster_duplicates,
+                                                  save_results_so_far=save_results_so_far,
+                                                  multi_label=multi_label)
 
-                            tree.DecisionTree(ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task, 10000,
-                                              max_depth=max_depth, balance="balanced", criterion="entropy", save_details=save_details, cv_splits=cv_splits, split_to_use=splits,
-                                              data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files, development=dt_dev, limit_entities=limit_entities,
-                                              limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn = clusters_fn,
-                                              cluster_duplicates = cluster_duplicates, save_results_so_far=save_results_so_far,
-                                              multi_label=multi_label)
+                            tree_old.DecisionTree(ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task, 10000,
+                                                  max_depth=max_depth, balance="balanced", criterion="entropy", save_details=save_details, cv_splits=cv_splits, split_to_use=splits,
+                                                  data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files, development=dt_dev, limit_entities=limit_entities,
+                                                  limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn = clusters_fn,
+                                                  cluster_duplicates = cluster_duplicates, save_results_so_far=save_results_so_far,
+                                                  multi_label=multi_label)
 
 
-                            tree.DecisionTree(ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task + "None", 10000,
-                                              max_depth=None, balance="balanced", criterion="entropy", save_details=False,
-                                              data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
-                                              cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
-                                              limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn = clusters_fn,
-                                              cluster_duplicates=cluster_duplicates, save_results_so_far=save_results_so_far,
-                                              multi_label=multi_label)
+                            tree_old.DecisionTree(ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task + "None", 10000,
+                                                  max_depth=None, balance="balanced", criterion="entropy", save_details=False,
+                                                  data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
+                                                  cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
+                                                  limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn = clusters_fn,
+                                                  cluster_duplicates=cluster_duplicates, save_results_so_far=save_results_so_far,
+                                                  multi_label=multi_label)
 
                             variables_to_execute_a = list(
                                 product(learn_rate_a, ft_loss_a, ft_optimizer_a, is_identity_a,
@@ -686,26 +686,26 @@ def main(data_type, classification_task_a, file_name, init_vector_path, hidden_a
 
                                         print("got to trees, who dis?")
 
-                                        tree.DecisionTree(nnet_ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task, 10000,
-                                                          max_depth=1, balance="balanced", criterion="entropy", save_details=save_details,
-                                                          data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
-                                                          cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
-                                                          limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn=clusters_fn,
-                                                          cluster_duplicates=cluster_duplicates)
+                                        tree_old.DecisionTree(nnet_ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task, 10000,
+                                                              max_depth=1, balance="balanced", criterion="entropy", save_details=save_details,
+                                                              data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
+                                                              cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
+                                                              limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn=clusters_fn,
+                                                              cluster_duplicates=cluster_duplicates)
 
-                                        tree.DecisionTree(nnet_ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task, 10000,
-                                                          max_depth=max_depth, balance="balanced", criterion="entropy", save_details=save_details,
-                                                          data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
-                                                          cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
-                                                          limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn=clusters_fn,
-                                                          cluster_duplicates=cluster_duplicates)
+                                        tree_old.DecisionTree(nnet_ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task, 10000,
+                                                              max_depth=max_depth, balance="balanced", criterion="entropy", save_details=save_details,
+                                                              data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
+                                                              cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
+                                                              limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn=clusters_fn,
+                                                              cluster_duplicates=cluster_duplicates)
 
-                                        tree.DecisionTree(nnet_ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task + "None", 10000,
-                                                          max_depth=None, balance="balanced", criterion="entropy", save_details=False,
-                                                          data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
-                                                          cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
-                                                          limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn=clusters_fn,
-                                                          cluster_duplicates=cluster_duplicates, multi_label=multi_label)
+                                        tree_old.DecisionTree(nnet_ranking_fn, classification_path, label_names_fn, cluster_dict_fn, file_name + " " + classification_task + "None", 10000,
+                                                              max_depth=None, balance="balanced", criterion="entropy", save_details=False,
+                                                              data_type=data_type, csv_fn=csv_name, rewrite_files=rewrite_files,
+                                                              cv_splits=cv_splits, split_to_use=splits, development=dt_dev, limit_entities=limit_entities,
+                                                              limited_label_fn=limited_label_fn, vector_names_fn=vector_names_fn, clusters_fn=clusters_fn,
+                                                              cluster_duplicates=cluster_duplicates, multi_label=multi_label)
                                         """
                                         
                                         ft_directions_fn = "../data/"+data_type+"/nnet/weights/" + file_name + "L1.txt"

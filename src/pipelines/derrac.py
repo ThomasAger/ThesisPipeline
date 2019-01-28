@@ -3,7 +3,7 @@
 # Cross-validation on trees
 # Filename manager?
 from io import csv
-from model import tree
+from model import tree_old
 from score import classify
 from util import split, filename as fnm
 
@@ -22,8 +22,8 @@ def pipeline(data_type=None, all_x=None, all_y=None, split_ids=None, property_na
     x_train, y_train, x_test, y_test = split.split_data(all_x, all_y, split_ids)
 
     # Initialize a tree
-    d3_tree = tree.DecisionTree(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test,
-                                criterion="entropy",  max_depth=3, class_weight="balanced")
+    d3_tree = tree_old.DecisionTree(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test,
+                                    criterion="entropy", max_depth=3, class_weight="balanced")
 
     # Train the tree and get predictions
     predictions = d3_tree.get_predictions()

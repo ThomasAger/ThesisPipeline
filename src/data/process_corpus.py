@@ -250,7 +250,6 @@ class MasterCorpus(Method.Method):
 
     def __init__(self, orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above, remove_stop_words, save_class):
-        print("Original classes len", len(orig_classes))
         self.orig_classes = orig_classes
         self.output_folder = output_folder
         self.bowmin = bowmin
@@ -387,6 +386,23 @@ class StreamedCorpus(MasterCorpus):
         self.all_words = SaveLoadPOPO(self.all_words, standard_fn + "metadata/" + file_name + "_all_words_2.txt",
                                       "1dtxts")
 
+    def getBow(self):
+        self.bow.value = self.save_class.load(self.bow)
+        return self.bow.value
+
+    def getWordList(self):
+        self.all_words.value = self.save_class.load(self.all_words)
+        return self.all_words.value
+
+    def getFilteredBow(self):
+        self.filtered_bow.value = self.save_class.load(self.filtered_bow)
+        return self.filtered_bow.value
+
+    def getFilteredWordList(self):
+        self.word_list.value = self.save_class.load(self.word_list)
+        return self.word_list.value
+
+
     def makePopoArray(self):
         self.popo_array = [self.dct,
                            self.id2token,
@@ -416,11 +432,9 @@ class ProcessClasses(MasterCorpus):
     orig_class_names = None
     def __init__(self, orig_classes, orig_class_names, file_name, output_folder, bowmin, no_below,
                  no_above, classes_freq_cutoff, remove_stop_words, save_class, name_of_class):
-        print("classes", len(orig_classes))
         # If it's a multi class array
-        if py.isArray(orig_classes[0]) is True:
+        if orig_classes is not None and py.isArray(orig_classes[0]) is True:
             orig_classes = py.transIfRowsLarger(orig_classes)
-        print("classes", len(orig_classes))
         self.classes_freq_cutoff = classes_freq_cutoff
         self.orig_class_names = orig_class_names
         super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,no_above, remove_stop_words, save_class)
@@ -444,6 +458,7 @@ class ProcessClasses(MasterCorpus):
 
     def process(self):
 
+        print("classes", len(self.orig_classes))
         self.classes_categorical.value = self.orig_classes
         for i in range(int(len(self.orig_classes) / 100)):
             if self.orig_classes[i].max() > 1:

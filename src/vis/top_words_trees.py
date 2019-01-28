@@ -4,7 +4,7 @@ import numpy as np
 import scipy.sparse as sp
 from spearman_difference import get_spearman
 
-import model.tree as tree
+import model.tree_old as tree
 from score import classify
 from util import split
 
