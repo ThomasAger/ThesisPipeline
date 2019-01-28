@@ -169,7 +169,7 @@ class RecHParam(MasterHParam):
     classify_fn = None
     matched_ids = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None):
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -186,7 +186,7 @@ class RecHParam(MasterHParam):
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
-                         score_metric=score_metric)
+                         score_metric=score_metric, mcm=mcm)
 
     def getTopScoringRowData(self):
         return self.save_class.load(self.top_scoring_row_data)
@@ -227,7 +227,7 @@ class RecHParam(MasterHParam):
                 hyper_param = HParam(self.class_names,
                                      self.kfold_hpam_dict, self.model_type, d2v_classify_fn,
                                      self.output_folder, hpam_save, self.probability, rewrite_model=self.rewrite_model, x_train=x_train,
-                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc)
+                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc, mcm=self.mcm)
                 hyper_param.process_and_save()
                 self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
                 top_scoring_row_data = hyper_param.getTopScoringRowData()

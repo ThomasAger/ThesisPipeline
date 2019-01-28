@@ -330,16 +330,16 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
     pipeline_fn = "num_stw"
     if data_type == "movies" or data_type == "placetypes":
         for i in range(len(classes)):
-            classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass + "_"
+            classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
             pipeline(corpus, classes[i], class_names[i], pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
                  no_below,
                  no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True,
-                 score_metric=score_metric, auroc=False, corpus_fn=corpus_fn, name_of_class=name_of_class[i], classifier_fn=classifier_fn)
+                 score_metric=score_metric, auroc=False, corpus_fn=corpus_fn, name_of_class=name_of_class[i], classifier_fn=classifier_fn, mcm=multi_class_method)
     else:
-        classifier_fn = pipeline_fn + "_" + multiclass + "_"
+        classifier_fn = pipeline_fn + "_" + multiclass
         pipeline(corpus, classes, class_names, pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
              no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
-                 corpus_fn=corpus_fn, name_of_class=name_of_class, classifier_fn=classifier_fn)
+                 corpus_fn=corpus_fn, name_of_class=name_of_class, classifier_fn=classifier_fn, mcm=multi_class_method)
 """
 fifty = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.txt")
 hundy = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.txt")
@@ -348,13 +348,13 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.npy", fifty)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.npy", hundy)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy)
 """
-mds = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
-np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
+#mds = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
+#np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "reuters"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
                                 grams=0, model_type=classifiers[i], no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
-                                score_metric="avg_f1", max_depth=max_depths[i])
+                                score_metric="avg_f1", max_depth=max_depths[i], multiclass="OVR")
