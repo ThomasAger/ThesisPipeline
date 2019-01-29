@@ -226,7 +226,7 @@ class LimitWords(Method.Method):
     no_below = None
     no_above = None
     output_folder = None
-    filtered_word_dict = None
+    bow_word_dict = None
     dct = None
     bow = None
 
@@ -239,24 +239,31 @@ class LimitWords(Method.Method):
         self.bow = bow
         super().__init__(file_name, save_class)
 
-    def getFilteredWordDct(self):
-        if self.filtered_word_dict.value is None:
-            self.filtered_word_dict.value = self.save_class.load(self.filtered_word_dict)
-        return self.filtered_word_dict.value
+    def getBowWordDct(self):
+        if self.bow_word_dict.value is None:
+            self.bow_word_dict.value = self.save_class.load(self.bow_word_dict)
+        return self.bow_word_dict.value
+
+    def getNewWordDict(self):
+        if self.new_word_dict.value is None:
+            self.new_word_dict.value = self.save_class.load(self.new_word_dict)
+        return self.new_word_dict.value
 
     def makePopos(self):
-        self.filtered_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_wldct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above), "npy_dict")
+        self.bow_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_wldct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above), "npy_dict")
+        self.new_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_new_wdct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above), "npy_dict")
 
 
     def makePopoArray(self):
-        self.popo_array = [self.filtered_word_dict]
+        self.popo_array = [self.bow_word_dict, self.new_word_dict]
 
     def process(self):
         orig_dct = self.dct.token2id
         self.dct.filter_extremes(no_below=self.no_below, no_above=self.no_above)
-        self.filtered_word_dict.value = self.dct.token2id
-        for key, value in self.filtered_word_dict.value.items():
-            self.filtered_word_dict.value[key] = orig_dct[key]
+        self.bow_word_dict.value = dict(self.dct.token2id)
+        self.new_word_dict.value = dict(self.dct.token2id)
+        for key, value in self.bow_word_dict.value.items():
+            self.bow_word_dict.value[key] = orig_dct[key]
         super().process()
 
 class MasterCorpus(Method.Method):

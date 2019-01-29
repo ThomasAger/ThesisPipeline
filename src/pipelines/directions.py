@@ -1,19 +1,18 @@
 from util import io as dt
 import numpy as np
-from sklearn.datasets import fetch_20newsgroups
-from keras.datasets import imdb
-from rep import pca, ppmi, awv
+from rep import pca, awv
 #import nltk
 #nltk.download()
 from data import process_corpus
 from util.save_load import SaveLoad
 from util import split
-from pipelines.KFoldHyperParameter import HParam, RecHParam
+from pipelines.KFoldHyperParameter import RecHParam
 import os
 from data.process_corpus import LimitWords
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
-from pipelines.get_directions import GetDirections
+from project.get_directions import GetDirections
+from score.classify import MultiClassScore
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
@@ -27,18 +26,22 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     no_above = int(doc_amt * dir_max_freq)
     print("(For directions) Filtering all words that do not appear in", no_below, "documents")
 
-    wl_save = SaveLoad(rewrite=rewrite_all)
+    wl_save = SaveLoad(rewrite=True)
     dir = LimitWords(file_name, wl_save, dct, bow, processed_folder +"directions/words/", words_to_get, no_below, no_above)
     dir.process_and_save()
-    words_to_get = dir.getFilteredWordDct()
+    words_to_get = dir.getBowWordDct()
+    new_word_dict = dir.getNewWordDict()
 
     # Rewrite is always true for this as loading is handled internally
-    dir_save = SaveLoad(rewrite=rewrite_all)
-    dir = GetDirections(bow, space, words_to_get, dir_save, no_below, no_above, file_name , processed_folder + "directions/")
+    dir_save = SaveLoad(rewrite=True)
+    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/")
     dir.process_and_save()
     all_dir = dir.getDirections()
+    new_bow = dir.getNewBow().todense()
 
-
+    score_save = SaveLoad(rewrite=True)
+    core = MultiClassScore(pred_proba, predictions, pred_proba, file_name, processed_folder, save_class, f1=True, auroc=False,
+                    fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False)
 
 
 
