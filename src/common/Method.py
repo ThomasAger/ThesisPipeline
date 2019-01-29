@@ -18,25 +18,26 @@ class Method:
     def process_and_save(self):
         popo_array = self.popo_array
         if self.save_class.exists(popo_array) is False:
-            print(self.__class__.__name__, "Doesn't exist, creating")
+            if self.save_class.verbose:
+                print(self.__class__.__name__, "Doesn't exist, creating")
             self.process()
             self.makePopoArray()
             self.processed = True
             self.save_class.save(popo_array)
-            print("corpus done")
         else:
             if self.save_class.load_all:
                 self.save_class.loadAll(popo_array)
-            print(self.__class__.__name__, "Already exists (lazy loading enabled)")
+            if self.save_class.verbose:
+                print(self.__class__.__name__, "Already exists (lazy loading enabled)")
 
     def makePopos(self):
-        print("Creating popos")
+        __empty = 0
 
     def makePopoArray(self):
-        print("Creating popo array")
+        __empty = 0
 
     def process(self):
-        print("Process complete")
+        __empty = 0
 
     def save(self):
         if self.process:

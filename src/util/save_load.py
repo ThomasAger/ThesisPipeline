@@ -9,11 +9,13 @@ class SaveLoad:
     rewrite = None
     no_save = None
     load_all = None
+    verbose = None
 
-    def __init__(self, rewrite=False, no_save=False, load_all=False):
+    def __init__(self, rewrite=False, no_save=False, load_all=False, verbose=True):
         self.rewrite = rewrite
         self.no_save = no_save
         self.load_all = load_all
+        self.verbose = verbose
 
     def loadAll(self, popo_array):
         for i in range(len(popo_array)):
@@ -36,15 +38,18 @@ class SaveLoad:
 
     def exists(self, popo_array):
         if self.rewrite:
-            print(popo_array[0].file_name, "Rewriting...")
+            if self.verbose:
+                print(popo_array[0].file_name, "Rewriting...")
             return False
         all_exist = 0
         for i in range(len(popo_array)):
             if os.path.exists(popo_array[i].file_name):
-                print(popo_array[i].file_name, "Already exists")
+                if self.verbose:
+                    print(popo_array[i].file_name, "Already exists")
                 all_exist += 1
             else:
-                print(popo_array[i].file_name, "Doesn't exist")
+                if self.verbose:
+                    print(popo_array[i].file_name, "Doesn't exist")
         if all_exist == len(popo_array):
             return True
         return False
@@ -58,6 +63,8 @@ def load_by_type(type, file_name):
             file = sp.load_npz(file_name)
         elif type == "dct":
             file = dt.load_dict(file_name)
+        elif type == "npy_dict":
+            file = dt.loadNpyDict(file_name)
         elif type == "gensim":
             file = Dictionary.load(file_name)
         elif type == "1dtxts":
@@ -92,6 +99,8 @@ def save_by_type(file, type, file_name):
         file.save(file_name)
     elif type == "dct":
         dt.save_dict(file, file_name)
+    elif type == "npy_dict":
+        np.save(file_name, file)
     elif type[0:5] == "1dtxt":
         dt.write1dArray(file, file_name)
     elif type[0:3] == "txt":

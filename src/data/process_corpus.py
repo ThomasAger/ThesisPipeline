@@ -118,6 +118,7 @@ def filterBow(tokenized_corpus, dct, no_below, no_above):
     return filtered_bow, list(dct.token2id.keys()), filtered_vocab
 
 
+
 def removeEmpty(processed_corpus, tokenized_corpus, classes):
     remove_ind = []
     for i in range(len(processed_corpus)):
@@ -219,6 +220,45 @@ def split_all(corpus):
         split_corpus.append(corpus[i].split())
     return split_corpus
 
+class LimitWords(Method.Method):
+
+    word_list = None
+    no_below = None
+    no_above = None
+    output_folder = None
+    filtered_word_dict = None
+    dct = None
+    bow = None
+
+    def __init__(self, file_name, save_class, dct, bow, output_folder, word_list, no_below, no_above):
+        self.word_list = word_list
+        self.no_above = no_above
+        self.no_below = no_below
+        self.output_folder = output_folder
+        self.dct = dct
+        self.bow = bow
+        super().__init__(file_name, save_class)
+
+    def getFilteredWordDct(self):
+        if self.filtered_word_dict.value is None:
+            self.filtered_word_dict.value = self.save_class.load(self.filtered_word_dict)
+        return self.filtered_word_dict.value
+
+    def makePopos(self):
+        self.filtered_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_wldct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above), "npy_dict")
+
+
+    def makePopoArray(self):
+        self.popo_array = [self.filtered_word_dict]
+
+    def process(self):
+        orig_dct = self.dct.token2id
+        self.dct.filter_extremes(no_below=self.no_below, no_above=self.no_above)
+        self.filtered_word_dict.value = self.dct.token2id
+        for key, value in self.filtered_word_dict.value.items():
+            self.filtered_word_dict.value[key] = orig_dct[key]
+        super().process()
+
 class MasterCorpus(Method.Method):
     orig_classes = None
     name_of_class = None
@@ -270,13 +310,20 @@ class MasterCorpus(Method.Method):
     def getFilteredBow(self):
         return self.save_class.load(self.filtered_bow)
 
+    def getDct(self):
+        self.dct =  self.save_class.load(self.dct)
+        return self.dct
+
+    def getAllWords(self):
+        self.all_words =  self.save_class.load(self.all_words)
+        return self.all_words
+
 class Corpus(MasterCorpus):
     orig_corpus = None
 
     def __init__(self, orig_corpus, orig_classes, name_of_class, file_name, output_folder, bowmin, no_below, no_above,
                  remove_stop_words, save_class):
         self.orig_corpus = orig_corpus
-        print("Original doc len", len(orig_corpus))
         super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above,  remove_stop_words, save_class)
 
@@ -312,6 +359,8 @@ class Corpus(MasterCorpus):
     def getCorpus(self):
         self.processed_corpus = self.save_class.load(self.processed_corpus)
         return self.processed_corpus
+
+
     def makePopoArray(self):
         self.popo_array = [self.dct, self.remove_ind, self.tokenized_corpus, self.tokenized_ids,
                            self.id2token,
@@ -320,7 +369,7 @@ class Corpus(MasterCorpus):
                            self.word_list, self.all_words,  self.split_corpus]
 
     def process(self):
-
+        print("Original doc len", len(self.orig_corpus))
         self.processed_corpus.value = preprocess(self.orig_corpus)
         self.tokenized_corpus.value = naiveTokenizer(self.processed_corpus.value)
         if self.remove_stop_words:

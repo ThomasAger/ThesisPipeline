@@ -285,7 +285,7 @@ class RecHParam(MasterHParam):
 
         doc2vec_instance.process_and_save()
         doc2vec_space = doc2vec_instance.getRep()
-        return doc2vec_space
+        return doc2vec_space, index_sorted
 
 
 

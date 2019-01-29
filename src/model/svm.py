@@ -18,13 +18,16 @@ class SVM(Method.ModelMethod):
     verbose = None
     svm = None
     mcm = None
-
+    direction = None
     # C is default 1.0 in the sklearn library, class_weight is balanced as that is the most common for this project
     def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, probability=False,  class_weight="balanced", verbose=False, mcm=None):
         self.class_weight = class_weight
         self.verbose = verbose
         super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability, mcm)
 
+
+    def getDirection(self):
+        return self.direction
 
     def process(self):
         if self.probability:
@@ -33,10 +36,16 @@ class SVM(Method.ModelMethod):
             self.test_proba.value = clf.predict_proba(self.x_test)
             self.test_predictions.value = clf.predict(self.x_test)
         else:
-            ovr = self.mcm(self.svm)
+            if py.isArray(self.y_test[0]) is True:
+                ovr = self.mcm(self.svm)
+            else:
+                ovr = self.svm
             ovr.fit(self.x_train, self.y_train)
             self.test_predictions.value = ovr.predict(self.x_test)
-
+            # As we didn't use OVR, have to put this into multi-class setting even though its single class
+            if py.isArray(self.y_test[0]) is False:
+                self.test_predictions.value = [self.test_predictions.value]
+            self.direction = ovr.coef_.tolist()[0]
         super().process()
 
 
@@ -56,7 +65,6 @@ class LinearSVM(SVM):
         super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability,  class_weight, verbose, mcm)
 
     def process(self):
-        print("Begin processing")
         # For old dicts without types
         if self.class_weight == "None":
             self.class_weight = None
@@ -80,15 +88,10 @@ from util import split
 # SVM just for getting directions
 class DirectionSVM(SVM):
 
-    class_weight = None
-    verbose = None
-
     # C is default 1.0 in the sklearn library, class_weight is balanced as that is the most common for this project
-    def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, class_weight="balanced", verbose=False, mcm=None):
-        self.class_weight = class_weight
-        self.verbose = verbose
+    def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, verbose=False, mcm=None):
         # Probability filled in as false as we are getting directions
-        super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, False, class_weight, verbose, mcm)
+        super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, False, "balanced", verbose, mcm)
 
     def process(self):
         print("Begin processing")
@@ -98,6 +101,7 @@ class DirectionSVM(SVM):
         # For some reason, sklearn uses the dual formulation by default for linear SVM's.
         self.svm = LinearSVC(class_weight="balanced", dual=False, verbose=self.verbose)
         super().process()
+
 
 # RBF kernel SVM for getting predictions
 class GaussianSVM(Method.ModelMethod):

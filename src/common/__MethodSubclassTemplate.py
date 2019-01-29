@@ -18,6 +18,5 @@ class MethodName(Method):
         self.popo_array = []
 
     def process(self):
-        print("Begin processing")
         # Process
         super().process()

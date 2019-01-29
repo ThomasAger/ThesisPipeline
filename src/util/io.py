@@ -225,6 +225,8 @@ def load_dict(file_name):
                 dict[split[0]] = split[1]
     return dict
 
+def loadNpyDict(fn):
+    return np.load(fn).item()
 
 def writeArrayDict(dict, name):
     file = open(name, "w")

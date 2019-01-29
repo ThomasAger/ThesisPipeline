@@ -10,44 +10,42 @@ from util.save_load import SaveLoad
 from util import split
 from pipelines.KFoldHyperParameter import HParam, RecHParam
 import os
-
+from data.process_corpus import LimitWords
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
+from pipelines.get_directions import GetDirections
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
-def pipeline(file_name, space, bow, classes, class_names, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
-                     score_metric="avg_f1", auroc=False, dir_min_freq=None, dir_max_freq=None, name_of_class):
-    if data_type == "movies" or data_type == "placetypes":
-        classifier_fn = file_name + "_" + name_of_class + "_"
-    else:
-        classifier_fn = file_name
-
-    x_train = None
-    y_train = None
-    x_test = None
-    y_test = None
-    x_dev = None
-    y_dev = None
-
-    probability = False
-    if auroc is True:
-        probability = True
+def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                     model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
+                     score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="",
+             classifier_fn="", mcm=None):
 
     doc_amt = split.get_doc_amt(data_type)
 
     no_below = int(doc_amt * dir_min_freq)
     no_above = int(doc_amt * dir_max_freq)
-    print("Filtering all words that do not appear in", no_below, "documents")
-    classes_save = SaveLoad(rewrite=rewrite_all)
-    classes_process = process_corpus.getDirections(space, class_names, file_name, processed_folder,no_below,
-                                         no_above, remove_stop_words, classes_save, name_of_class)
-    classes_process.process_and_save()
-    classes = classes_process.getClasses()
-    class_names = classes_process.getClassNames()
+    print("(For directions) Filtering all words that do not appear in", no_below, "documents")
+
+    wl_save = SaveLoad(rewrite=rewrite_all)
+    dir = LimitWords(file_name, wl_save, dct, bow, processed_folder +"directions/words/", words_to_get, no_below, no_above)
+    dir.process_and_save()
+    words_to_get = dir.getFilteredWordDct()
+
+    # Rewrite is always true for this as loading is handled internally
+    dir_save = SaveLoad(rewrite=rewrite_all)
+    dir = GetDirections(bow, space, words_to_get, dir_save, no_below, no_above, file_name , processed_folder + "directions/")
+    dir.process_and_save()
+    all_dir = dir.getDirections()
+
+
+
+
 
 
 
 def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVM", dir_min_freq=0.001,
-         dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None):
+         dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR"):
     pipeline_fn = "num_stw"
     if data_type == "newsgroups":
         name_of_class = ["Newsgroups"]
@@ -104,6 +102,16 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                 "min_count":min_count,
                 "train_epoch":train_epoch}
 
+    multi_class_method = None
+    if multiclass == "MOP":
+        multi_class_method = MultiOutputClassifier
+    elif multiclass == "OVR":
+        multi_class_method = OneVsRestClassifier
+    elif multiclass == "OVO":
+        multi_class_method = OneVsOneClassifier
+    elif multiclass == "OCC":
+        multi_class_method = OutputCodeClassifier
+
     for ci in range(len(name_of_class)):
         classes_save = SaveLoad(rewrite=False)
         # These were the parameters used for the previous experiments
@@ -111,11 +119,19 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         no_above = 0.95
         bowmin = 2
         classes_freq_cutoff = 100
+        # The True here and below is to remove stop words
         classes_process = process_corpus.ProcessClasses(None, None, pipeline_fn, processed_folder, bowmin, no_below,
                                                         no_above, classes_freq_cutoff, True, classes_save, name_of_class[ci])
-        bow = process_corpus.getBow()
+
         classes = classes_process.getClasses()
         class_names = classes_process.getClassNames()
+
+        corp_save = SaveLoad(rewrite=False)
+        p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder, bowmin,
+                                         no_below, no_above, True, corp_save)
+        bow = p_corpus.getBow()
+        dct = p_corpus.getDct()
+        word_list = p_corpus.getAllWords()
         for i in range(len(dims)):
             spaces = []
             space_names = []
@@ -161,10 +177,22 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                 spaces.append(d2v_space)
                 space_names.append(doc2vec_fn)
 
+
             for s in range(len(spaces)):
-                pipeline(pipeline_fn, spaces[s], bow, classes, class_names, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                if data_type == "movies" or data_type == "placetypes":
+                    for j in range(len(classes)):
+                        classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
+                        pipeline(pipeline_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
-                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[i])
+                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[j], classifier_fn = classifier_fn,
+                                 mcm=multi_class_method)
+                else:
+                    classifier_fn = pipeline_fn + "_" + multiclass
+                    pipeline(pipeline_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                     model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
+                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class, classifier_fn = classifier_fn,
+                             mcm=multi_class_method)
+
 
 """
 fifty = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.txt")
@@ -179,8 +207,9 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
 data_type = "reuters"
+multi_class_method = "OVR"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
-                                grams=0, model_type=classifiers[i], dir_min_freq=0.001, dir_max_freq=0.95, dev_percent=0.2,
-                                score_metric="avg_f1", max_depth=max_depths[i])
+                                grams=0, model_type=classifiers[i], dir_min_freq=0.085, dir_max_freq=0.95, dev_percent=0.2,
+                                score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method)

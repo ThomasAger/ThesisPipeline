@@ -85,7 +85,6 @@ def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
             raise ValueError("X test dim != X train dim", len(x_test[0]), "train", len(x_train[0]))
     check_x(x_train)
     check_x(x_test)
-    print("All checked, seems good.")
 
 if __name__ == '__main__':
     check_x(np.asarray([[0,0], [0,0], [0,0], [0]]))
