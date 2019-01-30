@@ -41,13 +41,13 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
-
+    """
     score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False)
     score.process_and_save()
     score.print()
-
+    """
 
 
 
@@ -187,7 +187,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
             for s in range(len(spaces)):
-                final_fn = pipeline_fn + "_"+ str(len(spaces[s][0]))
+                final_fn = pipeline_fn + "_"+ space_names[s]
                 if data_type == "movies" or data_type == "placetypes":
                     for j in range(len(classes)):
                         classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
@@ -213,7 +213,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "reuters"
 if data_type == "placetypes":
     dminf = 0.05
 else:
