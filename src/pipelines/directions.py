@@ -211,8 +211,6 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.npy", fifty)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.npy", hundy)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy)
 """
-mds = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
-np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
 data_type = "placetypes"
