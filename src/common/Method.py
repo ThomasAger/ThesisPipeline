@@ -81,12 +81,16 @@ class ModelMethod(Method):
             self.popo_array = [self.test_predictions, self.test_proba]
         else:
             self.popo_array = [self.test_predictions]
-
     def getPred(self):
-        return self.save_class.load(self.test_predictions)
+        if self.processed is False:
+            self.test_predictions.value = self.save_class.load(self.test_predictions)
+        return self.test_predictions.value
 
     def getProba(self):
-        return self.save_class.load(self.test_proba)
+        if self.processed is False:
+            self.test_proba.value = self.save_class.load(self.test_proba)
+        return self.test_proba.value
+
 
 class RepMethod(Method):
 

@@ -4,7 +4,7 @@ from util.save_load import SaveLoad
 import numpy as np
 from model import svm
 
-
+import scipy.sparse as sp
 class GetDirections(Method.Method):
     word_dir = None
     words_to_get = None
@@ -34,15 +34,19 @@ class GetDirections(Method.Method):
             print("word_dir loaded successfully")
 
         self.directions = SaveLoadPOPO(np.empty(len(list(self.words_to_get.keys())), dtype=object), self.output_folder
-                                       + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_""_dir.npy", "npy")
+                                     + "dir/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_dir.npy", "npy")
 
         self.predictions = SaveLoadPOPO(np.empty(len(list(self.words_to_get.keys())), dtype=object), self.output_folder
-                                       + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_""_pred.npy", "npy")
-        self.new_bow = SaveLoadPOPO(np.empty(len(list(self.words_to_get.keys())), dtype=object), self.output_folder
-                                       + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_""_bow.npz", "scipy")
+                                        + "pred/"
+                                        + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npy", "npy")
+        shape = (len(self.words_to_get.keys()), self.bow.shape[1])
+        empty_data = np.empty([shape[0], shape[1]])
+        self.new_bow = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=(len(self.words_to_get.keys()), self.bow.shape[1])) , self.output_folder
+                                    + "bow/"
+                                    + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
 
     def makePopoArray(self):
-        self.popo_array = [self.word_dir, self.directions, self.new_bow]
+        self.popo_array = [self.word_dir, self.directions, self.predictions, self.new_bow]
 
     def process(self):
         i = 0
@@ -58,7 +62,7 @@ class GetDirections(Method.Method):
                 dir_svm = svm.LinearSVM(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
                 dir_svm.process_and_save()
                 self.directions.value[self.new_word_dict[key]] = dir_svm.getDirection()
-                self.predictions.value[self.new_word_dict[key]] = dir_svm.getPred()
+                self.predictions.value[self.new_word_dict[key]] = dir_svm.getPred()[0]
                 self.word_dir.value[key] = self.directions.value[self.new_word_dict[key]]
                 self.new_bow.value[self.new_word_dict[key]] = freq_word_freq
             i += 1
@@ -66,12 +70,17 @@ class GetDirections(Method.Method):
         super().process()
 
     def getDirections(self):
-        if self.save_class.exists([self.directions]) is True and self.directions.value is None:
+        if self.processed is False:
             self.directions.value = self.save_class.load(self.directions)
         return self.directions.value
 
+    def getPreds(self):
+        if self.processed is False:
+            self.predictions.value = self.save_class.load(self.predictions)
+        return self.predictions.value
+
     def getNewBow(self):
-        if self.save_class.exists([self.new_bow]) is True and self.new_bow.value is None:
+        if self.processed is False:
             self.new_bow.value = self.save_class.load(self.new_bow)
         return self.new_bow.value
 
