@@ -189,12 +189,11 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             for s in range(len(spaces)):
                 final_fn = pipeline_fn + "_"+ space_names[s]
                 if data_type == "movies" or data_type == "placetypes":
-                    for j in range(len(classes)):
-                        classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
-                        pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
-                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[j], classifier_fn = classifier_fn,
-                                 mcm=multi_class_method)
+                    classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
+                    pipeline(final_fn, spaces[s], bow, dct, classes[ci], class_names[ci], word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                 model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
+                 score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
+                             mcm=multi_class_method)
                 else:
                     classifier_fn = pipeline_fn + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
@@ -213,7 +212,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "placetypes"
 if data_type == "placetypes":
     dminf = 0.05
 else:
