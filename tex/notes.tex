@@ -63,3 +63,10 @@ sufficient for many tasks of interest, making the disentanglement process necess
 in speech synthesis, one may wish to transfer one person’s dialog to another person’s voice. Inverse
 problems in image processing, such as denoising and super-resolution, require generating images that
 are perceptually consistent with corrupted or incomplete observations.\cite{Mathieu2016}
+
+% Why start from a vector space? What are the advantages/disadvantages?
+Vector space representations of entities can be constructed in many different ways, e.g. through cosine similarity [ref pca?], matrix factorization [ref mds], distributional approaches [doc2vec], and a variety of neural networks [ref old workshop paper? needs more explanation?]. These methods can make-sense of large volumes of unstructured data, %ref
+as well as having the potential to leverage supervised data. %ref
+They have applications as... %List appplications
+Although these representations differ in methodology, their common goal is to construct a space wherein spatial relationships correspond to semantics. The degree to which these vector spaces are able to linearly separate entities according to domain knowledge varies. % Expand on with specific notes
+For example, a doc2vec space that takes into account the order of words and entities will produce a different representation than PCA, which only considers frequency statistics. Further, a vector space obtained from a neural network with a supervised objective to classify entities for one binary class would split the space into one main linearly seperable property: the class.

@@ -37,7 +37,7 @@ def all_scores(true_target, prediction):
 
 
 class MasterScore(Method.Method):
-    
+
     true_targets = None
     predictions = None
     pred_proba = None
@@ -67,10 +67,19 @@ class MasterScore(Method.Method):
     f1 = False
 
     def __init__(self, true_targets, predictions, pred_proba,  file_name, output_folder, save_class, f1=True, auroc=True, fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
-        check.check_y(true_targets, predictions)
         super().__init__(file_name, save_class)
 
     def process(self):
+        check.check_y(self.true_targets, self.predictions)
+        if np.count_nonzero(self.true_targets) < 1:
+            auroc = False
+            print("Auroc has been automatically disabled as the true targets (len)", len(self.true_targets),
+                  "are all zero. (It causes an error)")
+        if self.pred_proba is None:
+            self.auroc = False
+            print("Auroc has been automatically disabled as probabilities were not provided")
+
+        print("Shape is:", len(self.predictions), len(self.predictions[0]))
         if self.auroc:
             self.calc_auroc()
         if self.f1:
@@ -98,23 +107,23 @@ class MasterScore(Method.Method):
     def makePopos(self):
         included_scores = ""
         if self.f1:
-            self.f1s = SaveLoadPOPO(self.f1s, self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
+            self.f1s = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
             self.avg_f1 = SaveLoadPOPO(self.avg_f1, self.output_folder + "f1/" + self.file_name + "_Avg_F1.txt", "txtf")
-            self.precs = SaveLoadPOPO(self.precs, self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
+            self.precs = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
             self.avg_prec = SaveLoadPOPO(self.avg_prec, self.output_folder + "prec/" + self.file_name + "_avg_prec.txt", "txtf")
-            self.recalls = SaveLoadPOPO(self.recalls, self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
+            self.recalls = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
             self.avg_recall = SaveLoadPOPO(self.avg_recall, self.output_folder + "recall/" + self.file_name + "_avg_recall.txt", "txtf")
             included_scores += "F1_"
         if self.acc:
-            self.accs = SaveLoadPOPO(self.accs, self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
+            self.accs = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
             self.avg_acc = SaveLoadPOPO(self.avg_acc, self.output_folder + "acc/" + self.file_name + "_avg_acc.txt", "txtf")
             included_scores += "ACC_"
         if self.auroc:
-            self.aurocs = SaveLoadPOPO(self.aurocs, self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
+            self.aurocs = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
             self.avg_auroc = SaveLoadPOPO(self.avg_auroc, self.output_folder + "auroc/" + self.file_name + "_avg_auroc.txt", "txtf")
             included_scores += "AUROC_"
         if self.kappa:
-            self.kappas = SaveLoadPOPO(self.kappas, self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
+            self.kappas = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
             self.avg_kappa = SaveLoadPOPO(self.avg_kappa, self.output_folder + "kappa/" + self.file_name + "_avg_kappa.txt", "txtf")
             included_scores += "Kappa_"
         self.csv_data = SaveLoadPOPO(self.csv_data, self.output_folder + "csv_details/" + self.file_name + "_"+included_scores+".csv", "scoredict")
@@ -191,7 +200,7 @@ class MasterScore(Method.Method):
 
 def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
                  fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
-    if py.isArray(true_targets[0]):
+    if true_targets is None or py.isArray(true_targets[0]):
         return MultiClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
                  fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
     else:
@@ -201,17 +210,13 @@ def selectScore(true_targets, predictions, pred_proba, file_name, output_folder,
 class MultiClassScore(MasterScore):
     def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
                  fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
-        if np.count_nonzero(true_targets) < 1:
-            auroc = False
-            print("Auroc has been automatically disabled as the true targets (len)", len(true_targets), "are all zero. (It causes an error)")
-        if pred_proba is None:
-            auroc = False
-            print("Auroc has been automatically disabled as probabilities were not provided")
+
         self.true_targets = true_targets
         self.predictions = predictions
         self.pred_proba = pred_proba
         self.output_folder = output_folder
         self.class_names = class_names
+
 
         self.auroc = auroc
         self.fscore = fscore
@@ -223,13 +228,13 @@ class MultiClassScore(MasterScore):
         self.true_targets = py.transIfRowsLarger(self.true_targets)
         self.predictions = py.transIfRowsLarger(self.predictions)
         self.pred_proba = py.transIfRowsLarger(self.pred_proba)
-        print("Shape is:", len(self.predictions), len(self.predictions[0]))
-        self.f1s = np.full(len(self.predictions), math.nan)
-        self.precs = np.full(len(self.predictions), math.nan)
-        self.recalls = np.full(len(self.predictions), math.nan)
-        self.accs = np.full(len(self.predictions), math.nan)
-        self.aurocs = np.full(len(self.predictions), math.nan)
-        self.kappas = np.full(len(self.predictions), math.nan)
+
+        if self.predictions is None:
+            self.predictions = []
+        if self.true_targets is None:
+            self.true_targets = []
+        if self.pred_proba is None:
+            self.pred_proba = []
         super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1,
                          auroc=auroc,
                          fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)

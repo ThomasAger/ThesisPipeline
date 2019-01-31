@@ -1,7 +1,11 @@
 \chapter{Converting Vector Spaces into Interpretable Representations}\label{Chapter3}
-\section{Introduction}
+\section{Introduction}\label{chapter3:Introduction}
 
 %Why do this work? What is the value of this work?  How is this relevant to the readers interests?
+
+A "direction" refers in this case to the orthogonal direction to a hyper plane that separates a term in a vector space. As the hyper plane separates entities, this means that the entities furthest along the hyper plane, at the end classified positively, are the entities we are most sure have the term we found the hyper plane for. To see an example of this, see \ref {LRHyperPlane} With this understanding, it becomes possible to induce a ranking of entities on the properties by finding the dot product of the entity points on the direction vector. 
+
+Topic models such as Latent Dirichlet Allocation (LDA) represent documents as multinomial distributions over latent topics, where each of these topics corresponds to a multinomial distribution over words \cite{Blei2003}. These topics tend to correspond to semantically meaningful concepts, hence topic models tend to be rather interpretable \cite{Chang2009}. To characterize the semantic concepts associated with the learned topics, topics are typically labelled with the most probable words according to the corresponding distribution. 
 
 % What is a semantic space? Why is a semantic space valuable?
 
@@ -30,7 +34,7 @@ One way to understand how a semantic space represents information is as a concep
 
 %%What is the previous work?
 The semantic relation that we focus in on this paper are directions that correspond to salient features from the considered domain. %What is a direction
-A direction is the orthogonal direction to a hyper plane that separates a term in a vector space. As the hyper plane separates entities, this means that the entities furthest along the hyper plane, at the end classified positively, are the entities we are most sure have the term we found the hyper plane for. To see an example of this, see \ref {LRHyperPlane} With this understanding, it becomes possible to induce a ranking of entities on the properties by finding the dot product of the entity points on the direction vector. 
+
 
 These kind-of directions have been used in many different ways for different domains, For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model. Similarly, in \cite{kim2013deriving} directions in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{DBLP:conf/acl/RotheS16} found directions indicating lexical features such as the frequency of occurrence and polarity of words. 
 
@@ -45,7 +49,6 @@ By finding the dot product between entity points in the space and direction vect
 	\caption{This figure shows a 2d toy space where entities are shapes and directions are properties. We demonstrate on the right the method to induce a ranking from the directions, in particular by using the dot-product of the entity point on the directions vector. In the same way for a more complex space, we can understand each entity point to be ranked on thousands of property directions, and the space to be much higher dimensionality.}\label{ToyDirection}
 \end{figure}
 
- Such properties are useful in a wide variety of applications. The most immediate example is perhaps that they allow for a natural way to implement critique-based recommendation systems, where users can specify how their desired result should relate to a given set of suggestions \cite{viappiani2006preference}. For instance, \cite{Vig:2012:TGE:2362394.2362395} propose a movie recommendation system in which the user can specify that they want to see suggestions for movies that are ``similar to this one, but scarier''. If the property of being scary is adequately modelled as a direction in a semantic space of movies, such critiques can be addressed in a straightforward way. Similarly, in \cite{kovashka2012whittlesearch} a system was developed that can find ``shoes like these but shinier'', based on a semantic space representation that was derived from visual features. Semantic search systems can use such directions to interpret queries involving gradual and possibly ill-defined features, such as ``\emph{popular} holiday destinations in Europe'' \cite{DBLP:conf/sigir/JameelBS17}. While features such as popularity are typically not encoded in traditional knowledge bases, they can often be represented as semantic space directions.  %Copied from CONLL
 
 %%What are the advantages, disadvantages of the previous work?
 
@@ -116,10 +119,28 @@ Broadly speaking, in the context of document classification, the main advantage 
 
 \section{Method}
 
+In this section, we describe how we go from an unstructured text representation of a domain to an interpretable representation composed of distinct properties. 
 
 
-The goal of this method is to obtain a representation composed of salient properties, starting with a domain-specific vector space $S_e$ and its associated bag-of-words (BOW) representation $B_w$. To obtain these properties, we use a variant of the unsupervised method proposed in \cite{derracAIJ}, which we explain in this section. 
-\subsubsection{Rankings entities on words}
+
+% What does a vector space have that other representations do not?
+
+
+Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
+They also vary in how they linearly separate entities. %How?
+However, their commonality is that they are able to represent semantic relationships spatially. %ref
+See Section \ref{background:WhySpace}
+Our method can use any vector space that linearly separates entities, and so it has potential longevity.  This means that our method is relying on structure in the space that does not directly correspond to our desired representation -  we can view our approach as a linear transformation of the space. We address this problem in Chapter \ref{chapter:finetuning}. However, we have the capability to leverage many different methods to construct a vector space for our representation, so as long as dense representations of entities exist it will be possible to use our method, and as they are improved the results that our method can achieve will be improved too. This kind of flexibility also gives us the potential to combine the resultant representations from different vector spaces for classification, e.g. concatenating the vectors from different spaces.
+
+% Why obtain directions for terms? What's the value of a direction for a term?
+Our process is generally in three parts, first we obtain directions for terms from the domain $T_d$ see \ref{intro:directions, chapter3:introduction}, then we filter these terms to remove those that will not result in good properties. Finally, we cluster the remaining terms to obtain property directions $P_d$ and an associated label $l = [t_1, ..., t_n]$. 
+
+
+
+
+
+We start with a domain-specific vector space $S_e$ and its associated bag-of-words (BOW) representation $B_w$. To obtain these properties, we use a variant of the unsupervised method proposed in \cite{derracAIJ}, which we explain in this section. 
+\subsubsection{Obtaining Term Directions}
 We can understand that only some words will be properties, as only some correspond to domain knowledge, e.g. in a domain of IMDB movies, the word "the" does not correspond to a property of the domain, but the word "horror" does. Initially, we obtain rankings of entities for each word in the space. 
 
 As an initial filtering step, we remove words that do not meet a frequency threshold, with the understanding that words that do not occur in a minimum amount of documents are unlikely to correspond to properties as they are too specific to a subset of movies, which would make them difficult to learn. This leaves us with $w_n$ words. We show the kind of words that would be poorly represented  in \ref{Table2}.%Table of most frequent words compared with words that are low frequency
@@ -129,7 +150,7 @@ The vector $v_w$ perpendicular to this hyperplane is then taken as a direction t
 %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity.  %Provide graphical intuition
 To rank the objects on the entity, if $e$ is the representation of an entity in the given vector space $S_e$ then we can think of the dot product $v_w \cdot e$ as the value $r_ew$ of object $e$ for vector $v_w$, and in particular, we take $r_e1 < r_e2$ to mean that $e_2$ has the property labelled with the word $w$ to a greater extent than $e_1$. The result of this is shown in \ref{}. Example entities, with their associated highest and lowest ranking properties, are shown in \ref{}. %Graphical representation of entities being ranked on a direction vector
 
-\subsubsection{Filtering directions to obtain salient properties}
+\subsubsection{Filtering Directions}
 With the rankings $R_r$, we could create a representation of each entity $Se$,   composed of $w_n$ dimensions, where each dimension is a ranking of the entity $e$ on that word $w_re$. However, many of the words do not  properties. In-order to filter these words out, we evaluate them using a scoring metric, and remove the words that are not sufficiently well scored. We use three different metrics:
 
 \noindent \textbf{Classification accuracy}. Evaluating the quality in terms of the accuracy of the logistic regression classifier: if this classifier is sufficiently accurate, it must mean that whether word $w$ relates to object $o$ (i.e.\ whether it is used in the description of $o$) is important enough to affect the semantic space representation of $o$. In such a case, it seems reasonable to assume that $w$ describes a salient property for the given domain.%This is basically copy pasted.
@@ -149,7 +170,7 @@ where $n(w,e)$ is the number of occurrences of $w$ in the BoW representation of 
 
 In principle, we may expect that accuracy and Kappa are best suited for binary features, as they rely on a hard separation in the space between objects that have the word in their BoW representation and those that do not, while NDCG should be better suited for gradual features. In practice, however, we could not find such a clear pattern in the differences between the words chosen by these metrics despite often finding different words. In Table \ref{Table4}, we show examples of properties scored highly for each domain.
 
-\subsubsection{Clustering salient properties}
+\subsubsection{Obtaining Salient Properties}
 
 %What are we doing with clustering
 If we consider two directions, "Blood" and "Gore", we can understand both of these to be approximating a property of films; How much blood they contain. Because of this, we can expect their directions to be very similar to each other. Averaging these directions together would result in a direction inbetween them. Similarly, obtaining a hyper plane using a Logistic Regression classifier that uses occurences of both and either of these terms as positive would be similar to this averaged direction. As some entities would have the property of being bloody films, but did not necessarily use the term gore in their reviews, same as some entities having the property but using the term gore not bloody, we can understand that this new hyper plane and associayed direction more accurately represents the property of a bloody film more than either of the terms individually. This is the principle behind our clustering method - going from term directions to property directiona.
@@ -182,7 +203,7 @@ Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtai
 \subsection{Quantitative Results}
 % Basic explanation of why quantitative results are interesting, valuable, good etc
 
-This section focuses on using linear classifiers to determine how good at representing domain knowledge our method is compared to standard baselines. We can understand that an accurate representation of domain knowledge will be one that ensures semantically distinct entities are separated, and semantically similar entities are close together. Put another way, we want to 'disentangle the main factors of variation that give rise to the observations' \cite{Bengio2012, Mathieu2016}. By this understanding, we can expect that the space should be linearly separable for some key semantics of the space. For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, Horror movies should be spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
+This section focuses on using linear classifiers to determine how well our method represents domain knowledge compared to standard baselines. We can understand that an accurate representation of domain knowledge will be one that ensures semantically distinct entities are separated, and semantically similar entities are close together. Put another way, if the space is representing domain knowledge well we can expect that the space should be linearly separable for key semantics of the domain. For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, where Horror movies are spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
 
 \begin{figure}[t]
 	\includegraphics[width=\textwidth]{images/genres_separated.png}
@@ -206,6 +227,8 @@ This section focuses on using linear classifiers to determine how good at repres
 When selecting the parameters to use for the doc2vec space when obtaining directions, we choose the one that scored the highest for its class on a Linear SVM, rather than tuning the entire process around the doc2vecs vectors.
 We use the kind of multiclass strategy as a hyper-parameter for each class-type in the grid search. We test the OneVsOne classifier method, treating each as binary problems, the OneVsRest method and the OutputCode method.
 We are not able to obtain an MDS space for sentiment or doc2vec spaces for placetypes/movies.
+
+As our work performs well even at lower-depth trees, this gives potential users more flexibility in how they want to present the information, e.g. to a potential client. Compared to bag-of-words, which loses its representation capabilities the lower the depth.
 
 \subsubsection{Results for vector spaces and bag-of-words}
 \begin{table}[]
