@@ -66,7 +66,12 @@ class MasterScore(Method.Method):
     acc = False
     f1 = False
 
-    def __init__(self, true_targets, predictions, pred_proba,  file_name, output_folder, save_class, f1=True, auroc=True, fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+    score_dict = None
+    save_csv = None
+
+    def __init__(self, true_targets, predictions, pred_proba,  file_name, output_folder, save_class, f1=True,
+                 auroc=True, fscore=True, kappa=True, acc=True, class_names=None, verbose=True, save_csv=False):
+        self.save_csv = save_csv
         check.check_y(true_targets, predictions)
         super().__init__(file_name, save_class)
 
@@ -117,7 +122,7 @@ class MasterScore(Method.Method):
             self.kappas = SaveLoadPOPO(self.kappas, self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
             self.avg_kappa = SaveLoadPOPO(self.avg_kappa, self.output_folder + "kappa/" + self.file_name + "_avg_kappa.txt", "txtf")
             included_scores += "Kappa_"
-        self.csv_data = SaveLoadPOPO(self.csv_data, self.output_folder + "csv_details/" + self.file_name + "_"+included_scores+".csv", "scoredict")
+        self.score_dict = SaveLoadPOPO(self.score_dict, self.output_folder + "csv_details/" + self.file_name + "_"+included_scores+".csv", "scoredict")
 
     def makePopoArray(self):
         self.popo_array = []
@@ -140,7 +145,8 @@ class MasterScore(Method.Method):
         if self.kappa:
             self.popo_array.append(self.kappas)
             self.popo_array.append(self.avg_kappa)
-
+        if self.save_csv:
+            self.popo_array.append(self.score_dict)
     def get(self):
         score_dict = {}
         if self.f1:
@@ -162,7 +168,8 @@ class MasterScore(Method.Method):
         if self.kappa:
             score_dict["kappa"] = self.kappas.value
             score_dict["avg_kappa"] = self.avg_kappa.value
-        return score_dict
+        self.score_dict = score_dict
+        return self.score_dict
 
     def loadScores(self):
         self.popo_array = self.save_class.loadAll(self.popo_array)
@@ -189,18 +196,19 @@ class MasterScore(Method.Method):
     def save(self):
         self.save_class.save(self.popo_array)
 
+
 def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
                  fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
     if py.isArray(true_targets[0]):
         return MultiClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
-                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
     else:
         return SingleClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
-                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
 
 class MultiClassScore(MasterScore):
     def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
-                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True, directions=False, save_csv=False):
         if np.count_nonzero(true_targets) < 1:
             auroc = False
             print("Auroc has been automatically disabled as the true targets (len)", len(true_targets), "are all zero. (It causes an error)")
@@ -220,9 +228,10 @@ class MultiClassScore(MasterScore):
         self.f1 = f1
 
         self.verbose = verbose
-        self.true_targets = py.transIfRowsLarger(self.true_targets)
-        self.predictions = py.transIfRowsLarger(self.predictions)
-        self.pred_proba = py.transIfRowsLarger(self.pred_proba)
+        if directions is False:
+            self.true_targets = py.transIfRowsLarger(self.true_targets)
+            self.predictions = py.transIfRowsLarger(self.predictions)
+            self.pred_proba = py.transIfRowsLarger(self.pred_proba)
         print("Shape is:", len(self.predictions), len(self.predictions[0]))
         self.f1s = np.full(len(self.predictions), math.nan)
         self.precs = np.full(len(self.predictions), math.nan)
@@ -232,7 +241,7 @@ class MultiClassScore(MasterScore):
         self.kappas = np.full(len(self.predictions), math.nan)
         super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1,
                          auroc=auroc,
-                         fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+                         fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
 
 
     def calc_fscore(self):
@@ -281,11 +290,12 @@ class MultiClassScore(MasterScore):
     def save(self):
         self.save_class.save(self.popo_array)
 
+
 class SingleClassScore(MasterScore):
 
 
     def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
-                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True, save_csv=False):
         self.true_targets = true_targets
         self.predictions = predictions
         self.pred_proba = pred_proba
@@ -308,7 +318,7 @@ class SingleClassScore(MasterScore):
         self.kappas = [0.0]
 
         super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
-                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
 
     def calc_fscore(self):
         self.precs.value[0], self.recalls.value[0], self.f1s.value[0], unused__ = precision_recall_fscore_support(self.true_targets, self.predictions, average="binary")

@@ -41,13 +41,13 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
-    """
+
     score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
-                    fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False)
+                    fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
     score.print()
-    """
+
 
 
 
@@ -212,11 +212,11 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "movies"
 if data_type == "placetypes":
     dminf = 0.05
 else:
-    dminf = 0.001
+    dminf = 0.2
 multi_class_method = "OVR"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
