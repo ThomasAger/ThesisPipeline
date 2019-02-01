@@ -23,3 +23,4 @@ src/util/__pycache__/
 src/pipelines/__pycache__/
 .idea/
 papers/
+src/project/__pycache__/

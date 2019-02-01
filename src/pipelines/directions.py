@@ -41,13 +41,13 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
-    """
+
     score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
-                    fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False)
+                    fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
     score.print()
-    """
+
 
 
 
