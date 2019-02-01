@@ -2,8 +2,11 @@
 from util import py as pu
 import numbers
 import numpy as np
-
+import scipy.sparse as sp
 def check_y(true_targets, predictions):
+    if sp.issparse(true_targets) or sp.issparse(predictions):
+        print("One or two of the y's are sparse")
+        return
     if true_targets is None:
         raise ValueError("true_targets is None")
     if predictions is None:
@@ -11,7 +14,7 @@ def check_y(true_targets, predictions):
     if type(true_targets) is not np.ndarray:
         raise ValueError("true_targets is not numpy array")
     if type(predictions) is not np.ndarray:
-        raise ValueError("predictions is not numpy array")
+        print("WARNING: predictions is not numpy array")
     if len(true_targets) != len(predictions):
         raise ValueError("True targets do not equal length of self.predictions, True targets:", len(true_targets),
                          "self.predictions", len(predictions))

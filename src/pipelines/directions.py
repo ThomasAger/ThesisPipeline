@@ -41,10 +41,11 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
+    words = dir.getWords()
 
     score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
-                    fscore=True, kappa=True, acc=True, class_names=class_names, verbose=False, directions=True, save_csv=True)
+                    fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
     score.print()
 
@@ -214,7 +215,7 @@ max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
 data_type = "placetypes"
 if data_type == "placetypes":
-    dminf = 0.05
+    dminf = 0.46
 else:
     dminf = 0.001
 multi_class_method = "OVR"

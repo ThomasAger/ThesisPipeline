@@ -11,7 +11,7 @@ from util import io as dt
 from common.SaveLoadPOPO import SaveLoadPOPO
 from util import check
 from util import py
-
+import scipy.sparse as sp
 
 def all_scores(true_target, prediction):
 
@@ -82,7 +82,10 @@ class MasterScore(Method.Method):
             self.auroc = False
             print("Auroc has been automatically disabled as probabilities were not provided")
 
-        print("Shape is:", len(self.predictions), len(self.predictions[0]))
+        if sp.issparse(self.predictions):
+            print("Shape is:", self.predictions.shape)
+        else:
+            print("Shape is:", len(self.predictions), len(self.predictions[0]))
         if self.auroc:
             self.calc_auroc()
         if self.f1:
@@ -92,7 +95,7 @@ class MasterScore(Method.Method):
         if self.acc:
             self.calc_acc()
         self.checkScores()
-        self.csv_data = [self.get(), self.class_names]
+        self.csv_data.value = [self.get(), self.class_names]
         if self.verbose:
             self.print()
         super().process()
@@ -110,26 +113,27 @@ class MasterScore(Method.Method):
     def makePopos(self):
         included_scores = ""
         if self.f1:
-            self.f1s = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
+            self.f1s = SaveLoadPOPO(np.full(len(self.class_names), math.nan), self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
             self.avg_f1 = SaveLoadPOPO(self.avg_f1, self.output_folder + "f1/" + self.file_name + "_Avg_F1.txt", "txtf")
-            self.precs = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
+            self.precs = SaveLoadPOPO(np.full(len(self.class_names), math.nan), self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
             self.avg_prec = SaveLoadPOPO(self.avg_prec, self.output_folder + "prec/" + self.file_name + "_avg_prec.txt", "txtf")
-            self.recalls = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
+            self.recalls = SaveLoadPOPO(np.full(len(self.class_names), math.nan), self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
             self.avg_recall = SaveLoadPOPO(self.avg_recall, self.output_folder + "recall/" + self.file_name + "_avg_recall.txt", "txtf")
             included_scores += "F1_"
         if self.acc:
-            self.accs = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
+            self.accs = SaveLoadPOPO(np.full(len(self.class_names), math.nan), self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
             self.avg_acc = SaveLoadPOPO(self.avg_acc, self.output_folder + "acc/" + self.file_name + "_avg_acc.txt", "txtf")
             included_scores += "ACC_"
         if self.auroc:
-            self.aurocs = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
+            self.aurocs = SaveLoadPOPO(np.full(len(self.class_names), math.nan), self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
             self.avg_auroc = SaveLoadPOPO(self.avg_auroc, self.output_folder + "auroc/" + self.file_name + "_avg_auroc.txt", "txtf")
             included_scores += "AUROC_"
         if self.kappa:
-            self.kappas = SaveLoadPOPO(np.full(len(self.predictions), math.nan), self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
+            self.kappas = SaveLoadPOPO(np.full(len(self.class_names), math.nan), self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
             self.avg_kappa = SaveLoadPOPO(self.avg_kappa, self.output_folder + "kappa/" + self.file_name + "_avg_kappa.txt", "txtf")
             included_scores += "Kappa_"
-        self.score_dict = SaveLoadPOPO(self.score_dict , self.output_folder + "csv_details/" + self.file_name + "_"+included_scores+".csv", "scoredict")
+        if self.save_csv:
+            self.csv_data = SaveLoadPOPO(self.csv_data , self.output_folder + "csv_details/" + self.file_name + "_"+included_scores+".csv", "scoredict")
 
     def makePopoArray(self):
         self.popo_array = []
@@ -153,6 +157,9 @@ class MasterScore(Method.Method):
             self.popo_array.append(self.kappas)
             self.popo_array.append(self.avg_kappa)
 
+        if self.save_csv:
+            self.popo_array.append(self.csv_data)
+
     def get(self):
         score_dict = {}
         if self.f1:
@@ -174,7 +181,8 @@ class MasterScore(Method.Method):
         if self.kappa:
             score_dict["kappa"] = self.kappas.value
             score_dict["avg_kappa"] = self.avg_kappa.value
-        self.score_dict = score_dict
+        if self.save_csv:
+            self.score_dict = score_dict
         return self.score_dict
 
     def loadScores(self):
@@ -246,19 +254,30 @@ class MultiClassScore(MasterScore):
 
 
     def calc_fscore(self):
-        for i in range(len(self.predictions)):
-            self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(
-                self.true_targets[i], self.predictions[i], average="binary")
+        len = 0
 
-            if math.isnan(self.precs.value[i]):
-                print("!!! WARNING !!!! precs is NaN")
-                self.precs.value[i] = 0.0
-            if math.isnan(self.recalls.value[i]):
-                print("!!! WARNING !!!! recalls is NaN")
-                self.recalls.value[i] = 0.0
-            if math.isnan(self.f1s.value[i]):
-                print("!!! WARNING !!!! f1s is NaN")
-                self.f1s.value[i] = 0.0
+        if sp.issparse(self.predictions[0]):
+            len = self.predictions.shape[0]
+        else:
+            len = len(self.predictions)
+
+        for i in range(len):
+            if sp.issparse(self.predictions[i]):
+                predict = np.asarray(self.predictions[i].todense())[0]
+            else:
+                predict = self.predictions[i]
+            self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(
+                self.true_targets[i], predict, average="binary")
+
+        if math.isnan(self.precs.value[i]):
+            print("!!! WARNING !!!! precs is NaN")
+            self.precs.value[i] = 0.0
+        if math.isnan(self.recalls.value[i]):
+            print("!!! WARNING !!!! recalls is NaN")
+            self.recalls.value[i] = 0.0
+        if math.isnan(self.f1s.value[i]):
+            print("!!! WARNING !!!! f1s is NaN")
+            self.f1s.value[i] = 0.0
         self.avg_prec.value = np.average(self.precs.value)
         self.avg_recall.value = np.average(self.recalls.value)
         self.avg_f1.value = get_f1_score(self.avg_prec.value, self.avg_recall.value)
@@ -266,6 +285,8 @@ class MultiClassScore(MasterScore):
     # Check different averages for auroc
     def calc_auroc(self):
         for i in range(len(self.predictions)):
+            if sp.issparse(self.predictions[i]):
+                self.predictions[i] = np.asarray(self.predictions[i].todense())
             self.aurocs.value[i] = roc_auc_score(self.true_targets[i], self.pred_proba[i])
             if math.isnan(self.aurocs.value[i]):
                 print("!!! WARNING !!!! aurocs is NaN")
@@ -273,16 +294,38 @@ class MultiClassScore(MasterScore):
         self.avg_auroc.value = np.average(self.aurocs.value)
 
     def calc_acc(self):
-        for i in range(len(self.predictions)):
-            self.accs.value[i] = accuracy_score(self.true_targets[i], self.predictions[i])
+        len = 0
+
+        if sp.issparse(self.predictions[0]):
+            len = self.predictions.shape[0]
+        else:
+            len = len(self.predictions)
+
+        for i in range(len):
+            if sp.issparse(self.predictions[i]):
+                predict = np.asarray(self.predictions[i].todense())[0]
+            else:
+                predict = self.predictions[i]
+            self.accs.value[i] = accuracy_score(self.true_targets[i], predict)
             if math.isnan(self.accs.value[i]):
                 print("!!! WARNING !!!! accs is NaN")
                 self.accs.value[i] = 0.0
         self.avg_acc.value = np.average(self.accs.value)
 
     def calc_kappa(self):
-        for i in range(len(self.predictions)):
-            self.kappas.value[i] = cohen_kappa_score(self.true_targets[i], self.predictions[i])
+        len = 0
+
+        if sp.issparse(self.predictions[0]):
+            len = self.predictions.shape[0]
+        else:
+            len = len(self.predictions)
+
+        for i in range(len):
+            if sp.issparse(self.predictions[i]):
+                predict = np.asarray(self.predictions[i].todense())[0]
+            else:
+                predict = self.predictions[i]
+            self.kappas.value[i] = cohen_kappa_score(self.true_targets[i], predict)
             if math.isnan(self.kappas.value[i]):
                 print("!!! WARNING !!!! kappas is NaN")
                 self.kappas.value[i] = 0.0
