@@ -188,7 +188,10 @@ def toBool(string):
 def save_dict(dct, file_name):
     file = open(file_name, "w")
     for key, value in dct.items():
-        file.write(str(key) + " " + str(value) + " " + str(type(value)) + "\n")
+        try:
+            file.write(str(key) + " " + str(value) + " " + str(type(value)) + "\n")
+        except UnicodeEncodeError:
+            print("Unicode error")
         print(str(key) + " " + str(value) + " " + str(type(value)) + "\n")
     file.close()
 
@@ -230,7 +233,7 @@ def loadNpyDict(fn):
 
 def writeArrayDict(dict, name):
     file = open(name, "w")
-    for key, value in dict.items():
+    for key, value in dict.itsems():
         file.write(str(key) + ": ")
         for v in value:
             file.write(str(v) + " ")

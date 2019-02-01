@@ -1,6 +1,6 @@
 from scipy import spatial
 from util import proj as dt
-
+import numpy as np
 
 def getSimilarity(vector1, vector2):
     return 1 - spatial.distance.cosine(vector1, vector2)
@@ -47,6 +47,9 @@ def getNextClusterTerm(cluster_terms, terms_to_match, terms_to_ignore, amt):
                 min_value = max_value
                 min_index = t
     return min_index
+
+if __name__ == '__main__':
+    print("")
 
 """
 i = 1644

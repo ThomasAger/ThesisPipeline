@@ -87,16 +87,16 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_classes, split_ids, dev_percent_of_train=dev_percent)
 
     all_test_result_rows = []
-
+    """
     hpam_save = SaveLoad(rewrite=rewrite_all)
     hyper_param = HParam(class_names,  kfold_hpam_dict, model_type, classify_ppmi_fn,
                                       output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
                          y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
                          mcm=mcm)
     hyper_param.process_and_save()
-
+    
     all_test_result_rows.append(hyper_param.getTopScoringRowData())
-
+    """
     # Creating and testing spaces, MDS not included in the creation process
     for i in range(len(dims)):
         pca_save = SaveLoad(rewrite=rewrite_all)
@@ -273,6 +273,16 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         class_names = dt.import1dArray(raw_folder + "class_names.txt")
         name_of_class = "Reuters"
 
+    elif data_type == "anime":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        classes_freq_cutoff = 10
+        corpus = np.load(raw_folder + "corpus.npy")
+        classes = np.load(raw_folder + "classes.npy")
+        class_names = list(range(len(classes[0])))
+        for i in range(len(class_names)):
+            class_names[i] = str(class_names[i])
+        name_of_class = "Genres"
+
     window_size = [5, 10, 15]
     min_count = [1, 5, 10]
     train_epoch = [50, 100, 200]
@@ -352,7 +362,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "newsgroups"
+data_type = "anime"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

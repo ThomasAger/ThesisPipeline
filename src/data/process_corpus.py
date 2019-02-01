@@ -342,15 +342,15 @@ class Corpus(MasterCorpus):
         self.remove_ind = SaveLoadPOPO(self.remove_ind, standard_fn + "metadata/" + file_name + "_remove.npy", "npy")
         self.tokenized_corpus = SaveLoadPOPO(self.tokenized_corpus, standard_fn + file_name + "_tokenized_corpus.npy", "npy")
         self.tokenized_ids = SaveLoadPOPO(self.tokenized_ids, standard_fn + file_name + "_tokenized_ids.npy", "npy")
-        self.id2token = SaveLoadPOPO(self.id2token, standard_fn + "metadata/" + file_name + "id2token.dct", "dct")
-        self.all_vocab = SaveLoadPOPO(self.all_vocab, standard_fn + "metadata/" + file_name + "_all_vocab.dct", "dct")
+        self.id2token = SaveLoadPOPO(self.id2token, standard_fn + "metadata/" + file_name + "id2token.npy", "npy_dict")
+        self.all_vocab = SaveLoadPOPO(self.all_vocab, standard_fn + "metadata/" + file_name + "_all_vocab.npy", "npy_dict")
         self.bow_vocab = SaveLoadPOPO(self.bow_vocab,
                                       standard_fn + "metadata/" + file_name + "_vocab_" + str(self.bowmin) + ".npy",
                                       "npy")
         self.filtered_vocab = SaveLoadPOPO(self.filtered_vocab,
                                            standard_fn + "metadata/" + file_name + "_filtered_vocab.npy", "npy")
         self.processed_corpus = SaveLoadPOPO(self.processed_corpus,
-                                             output_folder + "corpus/" + file_name + "_corpus_processed.txt", "1dtxts")
+                                             output_folder + "corpus/" + file_name + "_corpus_processed.npy", "npy")
         self.split_corpus = SaveLoadPOPO(self.split_corpus,
                                              output_folder + "corpus/" + file_name + "_corpus_processed_split.npy", "npy")
         print(self.name_of_class )
@@ -360,9 +360,9 @@ class Corpus(MasterCorpus):
         self.filtered_bow = SaveLoadPOPO(self.filtered_bow,
                                          standard_fn + file_name + "_" + str(self.no_below) + "_" + str(
                                              self.no_above) + "_filtered.npz", "scipy")
-        self.word_list = SaveLoadPOPO(self.word_list, standard_fn + "metadata/" + file_name + "_words.txt", "1dtxts")
-        self.all_words = SaveLoadPOPO(self.all_words, standard_fn + "metadata/" + file_name + "_all_words_2.txt",
-                                      "1dtxts")
+        self.word_list = SaveLoadPOPO(self.word_list, standard_fn + "metadata/" + file_name + "_words.npy", "npy")
+        self.all_words = SaveLoadPOPO(self.all_words, standard_fn + "metadata/" + file_name + "_all_words_2.npy",
+                                      "npy")
     def getCorpus(self):
         self.processed_corpus = self.save_class.load(self.processed_corpus)
         return self.processed_corpus
@@ -489,7 +489,7 @@ class ProcessClasses(MasterCorpus):
     def __init__(self, orig_classes, orig_class_names, file_name, output_folder, bowmin, no_below,
                  no_above, classes_freq_cutoff, remove_stop_words, save_class, name_of_class):
         # If it's a multi class array
-        if orig_classes is not None and py.isArray(orig_classes[0]) is True:
+        if orig_classes is not None and py.isArray(orig_classes[0]) is True and np.amax(orig_classes[0]) == 1:
             orig_classes = py.transIfRowsLarger(orig_classes)
         self.classes_freq_cutoff = classes_freq_cutoff
         self.orig_class_names = orig_class_names
@@ -517,9 +517,9 @@ class ProcessClasses(MasterCorpus):
         print("classes", len(self.orig_classes))
         self.classes_categorical.value = self.orig_classes
         for i in range(int(len(self.orig_classes) / 100)):
-            if self.orig_classes[i].max() > 1:
+            if np.amax(self.orig_classes[i]) > 1:
                 print("Converting classes to categorical")
-                self.classes_categorical.value = to_categorical(self.orig_classes)
+                self.classes_categorical.value = to_categorical(np.asarray(self.orig_classes))
                 break
 
         print("Original class amt", len(self.classes_categorical.value))

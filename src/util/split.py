@@ -5,14 +5,14 @@ reuters_train = 7656
 yahoo_train = 25000
 movies_train = 9225
 placetypes_train = 913
-
+anime_train = 700
 imdb_total = 50000
 newsgroups_total = 18846
 reuters_total = 10655
 yahoo_total = 50000
 movies_total = 13978
 placetypes_total = 1383
-
+anime_total = 959
 
 
 from sklearn.model_selection import KFold
@@ -38,6 +38,8 @@ def get_doc_amt(data_type):
         max_size = movies_total
     elif data_type == "placetypes":
         max_size = placetypes_total
+    elif data_type == "anime":
+        max_size = anime_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
@@ -58,6 +60,8 @@ def check_shape(features, data_type):
         max_size = movies_total
     elif data_type == "placetypes":
         max_size = placetypes_total
+    elif data_type == "anime":
+        max_size = anime_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
@@ -85,6 +89,9 @@ def get_split_ids(data_type, matched_ids):
     elif data_type == "placetypes":
         train_split = placetypes_train
         total = placetypes_total
+    elif data_type == "anime":
+        train_split = anime_train
+        total = anime_total
     else:
         print("No data type found")
         return False
