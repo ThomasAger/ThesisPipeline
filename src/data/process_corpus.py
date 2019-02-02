@@ -490,7 +490,7 @@ class StreamedCorpus(MasterCorpus):
         self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bowStreamed(self.corpus_fn_to_stream, self.bowmin)
         self.all_words.value = list(self.bowdict.value.keys())
         print(self.bowmin, len(self.all_words.value), "|||", self.bow.value.shape)
-        self.filtered_bow.value, self.word_list.value, self.filtered_vocab.value = filterBowStreamed(
+        self.filtered_bow.value, self.word_list.value, self.filtered_vocab.value, self.filtered_dict.value = filterBowStreamed(
             self.corpus_fn_to_stream,
             self.no_below, self.no_above)
         super().process()
@@ -603,4 +603,4 @@ def filterBowStreamed(text_corpus_fn,  no_below, no_above):
             i += 1
     filtered_bow = corpus2csc(f_bow)
     filtered_vocab = dct.token2id
-    return filtered_bow, list(dct.token2id.keys()), filtered_vocab
+    return filtered_bow, list(dct.token2id.keys()), filtered_vocab, dct

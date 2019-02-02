@@ -76,11 +76,6 @@ class GetDirections(Method.Method):
                     else:
                         dir_svm = svm.LogisticRegression(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
 
-
-                    if self.LR is False:
-                        dir_svm = svm.LinearSVM(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
-                    else:
-                        dir_svm = svm.LogisticRegression(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
                     """
                     pool = ThreadPool(threads)
 

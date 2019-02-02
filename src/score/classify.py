@@ -251,19 +251,24 @@ class MultiClassScore(MasterScore):
         super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1,
                          auroc=auroc,
                          fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
+    def getPred(self, predict):
+        if sp.issparse(predict):
+            pred = np.asarray(predict.todense(), dtype=np.int32)[0]
+        else:
+            pred = predict
+        return pred
 
-
-    def calc_fscore(self):
+    def getPredLen(self):
         if sp.issparse(self.predictions[0]):
             length = self.predictions.shape[0]
         else:
             length = len(self.predictions)
+        return length
 
-        for i in range(length):
-            if sp.issparse(self.predictions[i]):
-                predict = np.asarray(self.predictions[i].todense())[0]
-            else:
-                predict = self.predictions[i]
+    def calc_fscore(self):
+
+        for i in range(self.getPredLen()):
+            predict = self.getPred(self.predictions[i])
             self.precs.value[i], self.recalls.value[i], self.f1s.value[i], unused__ = precision_recall_fscore_support(
                 self.true_targets[i], predict, average="binary")
 
@@ -292,16 +297,8 @@ class MultiClassScore(MasterScore):
         self.avg_auroc.value = np.average(self.aurocs.value)
 
     def calc_acc(self):
-        if sp.issparse(self.predictions[0]):
-            length = self.predictions.shape[0]
-        else:
-            length = len(self.predictions)
-
-        for i in range(length):
-            if sp.issparse(self.predictions[i]):
-                predict = np.asarray(self.predictions[i].todense())[0]
-            else:
-                predict = self.predictions[i]
+        for i in range(self.getPredLen()):
+            predict = self.getPred(self.predictions[i])
             self.accs.value[i] = accuracy_score(self.true_targets[i], predict)
             if math.isnan(self.accs.value[i]):
                 print("!!! WARNING !!!! accs is NaN")
@@ -309,16 +306,8 @@ class MultiClassScore(MasterScore):
         self.avg_acc.value = np.average(self.accs.value)
 
     def calc_kappa(self):
-        if sp.issparse(self.predictions[0]):
-            length = self.predictions.shape[0]
-        else:
-            length = len(self.predictions)
-
-        for i in range(length):
-            if sp.issparse(self.predictions[i]):
-                predict = np.asarray(self.predictions[i].todense())[0]
-            else:
-                predict = self.predictions[i]
+        for i in range(self.getPredLen()):
+            predict = self.getPred(self.predictions[i])
             self.kappas.value[i] = cohen_kappa_score(self.true_targets[i], predict)
             if math.isnan(self.kappas.value[i]):
                 print("!!! WARNING !!!! kappas is NaN")
