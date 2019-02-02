@@ -7,7 +7,7 @@ from common.SaveLoadPOPO import SaveLoadPOPO
 # Tune C parameters for linear, gammas and C parameters for rbf
 from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
-
+from sklearn import linear_model
 from sklearn.svm import SVC
 from util import py
 from util.save_load import SaveLoad
@@ -72,7 +72,28 @@ class LinearSVM(SVM):
         self.svm = LinearSVC(C = float(self.C), class_weight=self.class_weight, dual=False, verbose=self.verbose)
         super().process()
 
+# Get SVM predictions based on one data split/parameter combination, and save them
+class LogisticRegression(SVM):
 
+    C = None
+    class_weight = None
+    verbose = None
+
+    # C is default 1.0 in the sklearn library, class_weight is balanced as that is the most common for this project
+    def __init__(self, x_train, y_train, x_test, y_test, file_name, save_class, C=1.0, probability=False,  class_weight="balanced", verbose=False, mcm=None):
+        self.C = C
+        self.class_weight = class_weight
+        self.verbose = verbose
+
+        super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability,  class_weight, verbose, mcm)
+
+    def process(self):
+        # For old dicts without types
+        if self.class_weight == "None":
+            self.class_weight = None
+        # For some reason, sklearn uses the dual formulation by default for linear SVM's.
+        self.svm = linear_model.LogisticRegression(class_weight=self.class_weight, dual=False)
+        super().process()
 
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier, OutputCodeClassifier
