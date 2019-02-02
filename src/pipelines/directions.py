@@ -33,11 +33,11 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     new_word_dict = dir.getNewWordDict()
 
     # Rewrite is always true for this as loading is handled internally
-    dir_save = SaveLoad(rewrite=rewrite_all)
+    dir_save = SaveLoad(rewrite=True)
     dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/")
     dir.process_and_save()
     all_dir = dir.getDirections()
-    binary_bow = np.asarray(dir.getNewBow().todense())
+    binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
@@ -213,11 +213,11 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "reuters"
 if data_type == "placetypes":
     dminf = 0.46
 else:
-    dminf = 0.001
+    dminf = 0.2
 multi_class_method = "OVR"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
