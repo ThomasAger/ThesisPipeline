@@ -23,6 +23,9 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="",
              classifier_fn="", mcm=None):
 
+    if bow.shape[0] != len(dct.dfs.keys()):
+        raise ValueError("Size of vocab and dict do not match")
+
     doc_amt = split.get_doc_amt(data_type)
 
     no_below = int(doc_amt * dir_min_freq)
@@ -47,7 +50,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     preds = dir.getPreds()
     words = dir.getWords()
 
-    score_save = SaveLoad(rewrite=True)
+    score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
@@ -235,15 +238,15 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "movies"
+data_type = "placetypes"
 doLR = False
 if data_type == "placetypes":
-    dminf = 0.46
-else:
     dminf = 0.05
+else:
+    dminf = 0.001
 multi_class_method = "OVR"
 bonus_fn = ""
-rewrite_all=True
+rewrite_all=False
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
