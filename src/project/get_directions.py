@@ -16,13 +16,13 @@ class GetDirections(Method.Method):
     bowmin = None
     bowmax = None
     new_word_dict = None
-    corpus = None
+    space = None
     LR = None
 
-    def __init__(self, bow, corpus,  words_to_get, new_word_dict, save_class, bowmin, bowmax, file_name, output_folder, LR=False):
+    def __init__(self, bow, space,  words_to_get, new_word_dict, save_class, bowmin, bowmax, file_name, output_folder, LR=False):
         self.words_to_get = words_to_get
         self.output_folder = output_folder
-        self.corpus = corpus
+        self.space = space
         self.bow = bow
         self.bowmin = bowmin
         self.new_word_dict = new_word_dict
@@ -69,12 +69,12 @@ class GetDirections(Method.Method):
 
                 if self.directions.value[self.new_word_dict[key]] is None or len(self.predictions.value[self.new_word_dict[key]].data) == 0:
                     word_freq = np.asarray(freq_word_freq.todense(), dtype=np.int32)[0]
-                    word_freq[word_freq > 1] = 1
+                    word_freq[word_freq >= 1] = 1
 
                     if self.LR is False:
-                        dir_svm = svm.LinearSVM(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+                        dir_svm = svm.LinearSVM(self.space, word_freq, self.space, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
                     else:
-                        dir_svm = svm.LogisticRegression(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+                        dir_svm = svm.LogisticRegression(self.space, word_freq, self.space, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
 
                     """
                     pool = ThreadPool(threads)

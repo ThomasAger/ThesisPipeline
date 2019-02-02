@@ -17,6 +17,7 @@ from sklearn import linear_model
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
+last_dct = []
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="",
@@ -34,21 +35,20 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     dir.process_and_save()
     words_to_get = dir.getBowWordDct()
     new_word_dict = dir.getNewWordDict()
-
+    """
     words_to_check = "gore"
     new_wtg = {}
     new_wtg[words_to_check] = words_to_get[words_to_check]
     new_wtd = {}
     new_wtd[words_to_check] = 0
-
+    """
     # Rewrite is always true for this as loading is handled internally
     dir_save = SaveLoad(rewrite=rewrite_all)
-    dir = GetDirections(bow, space, new_wtg, new_wtd, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
+    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
     all_dir = dir.getDirections()
     binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
-    freq_bow = binary_bow
-    binary_bow[binary_bow > 1] = 1
+    binary_bow[binary_bow >= 1] = 1
     preds = dir.getPreds()
     words = dir.getWords()
 
@@ -57,6 +57,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
     score.print()
+
 
 
 
@@ -146,10 +147,10 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         class_names = classes_process.getClassNames()
 
         corp_save = SaveLoad(rewrite=False)
-        p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder, bowmin,
+        p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder,
+                                         bowmin,
                                          no_below, no_above, True, corp_save)
         bow = p_corpus.getBow()
-        dct = p_corpus.getBowDct()
         word_list = p_corpus.getAllWords()
 
         for i in range(len(dims)):
@@ -208,6 +209,13 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
                 final_fn += bonus_fn
 
+                corp_save = SaveLoad(rewrite=False)
+                p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder,
+                                                 bowmin,
+                                                 no_below, no_above, True, corp_save)
+                # Reload the dict because gensim is persistent otherwise
+                dct = p_corpus.getBowDct()
+
                 if data_type == "movies" or data_type == "placetypes":
                     classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes[ci], class_names[ci], word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
@@ -232,14 +240,14 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "movies"
+data_type = "reuters"
 doLR = False
 if data_type == "placetypes":
     dminf = 0.46
 else:
-    dminf = 0.001
+    dminf = 0.2
 multi_class_method = "OVR"
-bonus_fn = "gore"
+bonus_fn = ""
 rewrite_all=True
 if __name__ == '__main__':
     for i in range(len(classifiers)):
