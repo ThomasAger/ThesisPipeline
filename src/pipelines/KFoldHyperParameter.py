@@ -477,7 +477,7 @@ class HParam(MasterHParam):
             score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
                                              output_folder=self.output_folder + "rep/score/", save_class=score_save, verbose=True,
-                                             fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
+                                             fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc, class_names = self.class_names)
             score.process_and_save()
 
             self.p_score_dicts.append(score.get())
@@ -503,12 +503,12 @@ class HParam(MasterHParam):
         if self.final_score_on_dev:
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
                                              output_folder=self.output_folder + "rep/score/", save_class=score_save,
-                                             verbose=True,
+                                             verbose=True, class_names=self.class_names,
                                              fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
         else:
             score = classify.selectScore(self.y_test, pred, prob, file_name=model_fn,
                                              output_folder=self.output_folder + "rep/score/", save_class=score_save,
-                                             verbose=True,
+                                             verbose=True, class_names = self.class_names,
                                              fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
 
         score.process_and_save()

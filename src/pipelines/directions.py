@@ -12,7 +12,7 @@ from data.process_corpus import LimitWords
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
 from project.get_directions import GetDirections
-from score.classify import selectScore
+from score.classify import MultiClassScore
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
@@ -33,21 +33,18 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     new_word_dict = dir.getNewWordDict()
 
     # Rewrite is always true for this as loading is handled internally
-    dir_save = SaveLoad(rewrite=rewrite_all)
+    dir_save = SaveLoad(rewrite=True)
     dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/")
     dir.process_and_save()
     all_dir = dir.getDirections()
-    binary_bow = np.asarray(dir.getNewBow().todense())
-    if len(binary_bow) == 1:
-        binary_bow = binary_bow[0]
+    binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
     words = dir.getWords()
 
     score_save = SaveLoad(rewrite=rewrite_all)
-
-    score = selectScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
+    score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
     score.print()
@@ -216,11 +213,11 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "sentiment"
+data_type = "reuters"
 if data_type == "placetypes":
     dminf = 0.46
 else:
-    dminf = 0.4
+    dminf = 0.2
 multi_class_method = "OVR"
 if __name__ == '__main__':
     for i in range(len(classifiers)):

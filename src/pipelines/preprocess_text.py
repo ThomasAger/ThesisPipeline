@@ -34,7 +34,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     doc_amt = split.get_doc_amt(data_type)
     no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
-    classes_save = SaveLoad(rewrite=rewrite_all)
+    classes_save = SaveLoad(rewrite=True)
     classes_process = process_corpus.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
                                          no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
     classes_process.process_and_save()
@@ -171,9 +171,9 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 classify_mds_fn = classifier_fn + mds_identifier
                 import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
 
-                hpam_save = SaveLoad(rewrite=rewrite_all)
+                hpam_save = SaveLoad(rewrite=True)
                 hyper_param = HParam( hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_mds_fn,
-                                      output_folder=output_folder, save_class=hpam_save,rewrite_model=rewrite_all, score_metric=score_metric,
+                                      output_folder=output_folder, save_class=hpam_save,rewrite_model=True, score_metric=score_metric,
                                       mcm=mcm)
                 if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
                     mds = dt.import2dArray(import_fn)
@@ -183,9 +183,9 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                                                                       p_classes, split_ids,
                                                                                       dev_percent_of_train=dev_percent)
 
-                hpam_save = SaveLoad(rewrite=rewrite_all)
+                hpam_save = SaveLoad(rewrite=True)
                 hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder, hpam_save,
-                                     probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
+                                     probability, rewrite_model=True, x_train=x_train, y_train=y_train, x_test=x_test,
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())
@@ -216,7 +216,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     cols = np.asarray(rows.tolist()).transpose()
     col_names = all_r[0][0]
     key = all_r[2]
-    dt.write_csv(output_folder + "rep/score/csv_final/" +file_name+"reps"+model_type+".csv", col_names, cols, key)
+    dt.write_csv(output_folder + "rep/score/csv_final/" +file_name+"reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
     print("a")
 
 
@@ -362,7 +362,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "anime"
+data_type = "reuters"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

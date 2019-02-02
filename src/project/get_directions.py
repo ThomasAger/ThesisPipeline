@@ -45,8 +45,8 @@ class GetDirections(Method.Method):
         self.directions = SaveLoadPOPO(np.empty(len(list(self.words_to_get.keys())), dtype=object), self.output_folder
                                      + "dir/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_dir.npy", "npy")
 
-        self.predictions = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape), self.output_folder + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npz", "scipy")
-        self.new_bow = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape), self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
+        self.predictions = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape, dtype=np.int32), self.output_folder + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npz", "scipy")
+        self.new_bow = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape, dtype=np.int32), self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
         self.words = SaveLoadPOPO(self.words, self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_words.npy", "npy")
 
     def makePopoArray(self):

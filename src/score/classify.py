@@ -44,6 +44,7 @@ class MasterScore(Method.Method):
     output_folder = None
     class_names = None
     csv_data = None
+    score_dict = None
 
     f1s = None
     precs = None
@@ -95,7 +96,8 @@ class MasterScore(Method.Method):
         if self.acc:
             self.calc_acc()
         self.checkScores()
-        self.csv_data.value = [self.get(), self.class_names]
+        if self.save_csv:
+            self.csv_data.value = [self.get(), self.class_names]
         if self.verbose:
             self.print()
         super().process()
@@ -181,9 +183,7 @@ class MasterScore(Method.Method):
         if self.kappa:
             score_dict["kappa"] = self.kappas.value
             score_dict["avg_kappa"] = self.avg_kappa.value
-        if self.save_csv:
-            self.score_dict = score_dict
-        return self.score_dict
+        return score_dict
 
     def loadScores(self):
         self.popo_array = self.save_class.loadAll(self.popo_array)
@@ -254,14 +254,12 @@ class MultiClassScore(MasterScore):
 
 
     def calc_fscore(self):
-        len = 0
-
         if sp.issparse(self.predictions[0]):
-            len = self.predictions.shape[0]
+            length = self.predictions.shape[0]
         else:
-            len = len(self.predictions)
+            length = len(self.predictions)
 
-        for i in range(len):
+        for i in range(length):
             if sp.issparse(self.predictions[i]):
                 predict = np.asarray(self.predictions[i].todense())[0]
             else:
@@ -294,14 +292,12 @@ class MultiClassScore(MasterScore):
         self.avg_auroc.value = np.average(self.aurocs.value)
 
     def calc_acc(self):
-        len = 0
-
         if sp.issparse(self.predictions[0]):
-            len = self.predictions.shape[0]
+            length = self.predictions.shape[0]
         else:
-            len = len(self.predictions)
+            length = len(self.predictions)
 
-        for i in range(len):
+        for i in range(length):
             if sp.issparse(self.predictions[i]):
                 predict = np.asarray(self.predictions[i].todense())[0]
             else:
@@ -313,14 +309,12 @@ class MultiClassScore(MasterScore):
         self.avg_acc.value = np.average(self.accs.value)
 
     def calc_kappa(self):
-        len = 0
-
         if sp.issparse(self.predictions[0]):
-            len = self.predictions.shape[0]
+            length = self.predictions.shape[0]
         else:
-            len = len(self.predictions)
+            length = len(self.predictions)
 
-        for i in range(len):
+        for i in range(length):
             if sp.issparse(self.predictions[i]):
                 predict = np.asarray(self.predictions[i].todense())[0]
             else:
