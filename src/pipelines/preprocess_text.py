@@ -20,13 +20,6 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
              remove_stop_words=False,  auroc=False, score_metric="avg_f1", corpus_fn="", name_of_class="", mcm=MultiOutputClassifier, classifier_fn=""):
 
 
-    x_train = None
-    y_train = None
-    x_test = None
-    y_test = None
-    x_dev = None
-    y_dev = None
-
     probability = False
     if auroc is True:
         probability = True
@@ -44,7 +37,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
 
     # Process and save corpus
-    corpus_save = SaveLoad(rewrite=rewrite_all)
+    corpus_save = SaveLoad(rewrite=True)
     if data_type == "placetypes" or data_type == "movies":
         p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
@@ -362,7 +355,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "movies"
+data_type = "reuters"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

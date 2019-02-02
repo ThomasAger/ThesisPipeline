@@ -93,7 +93,8 @@ def getVocab(tokenized_corpus):
 
 
 
-def doc2bow(tokenized_corpus, dct, bowmin):
+def doc2bow(tokenized_corpus, bowmin):
+    dct = Dictionary(tokenized_corpus)
     dct.filter_extremes(no_below=bowmin)  # Most occur in at least 2 documents
     bow = [dct.doc2bow(text) for text in tokenized_corpus]
     bow = corpus2csc(bow)
@@ -110,12 +111,13 @@ def filterBow_sklearn(processed_corpus, no_below, no_above):  # sklearn is sligh
     return tf.transpose(), feature_names
 
 
-def filterBow(tokenized_corpus, dct, no_below, no_above):
+def filterBow(tokenized_corpus, no_below, no_above):
+    dct = Dictionary(tokenized_corpus)
     dct.filter_extremes(no_below=no_below, no_above=no_above)
     filtered_bow = [dct.doc2bow(text) for text in tokenized_corpus]
     filtered_bow = corpus2csc(filtered_bow)
     filtered_vocab = dct.token2id
-    return filtered_bow, list(dct.token2id.keys()), filtered_vocab
+    return filtered_bow, list(dct.token2id.keys()), filtered_vocab, dct
 
 
 
@@ -294,7 +296,8 @@ class MasterCorpus(Method.Method):
     filtered_class_names = None
     filtered_classes = None
     split_corpus = None
-    bow_dict = None
+    bowdict = None
+    filtered_dict = None
 
     def __init__(self, orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above, remove_stop_words, save_class):
@@ -322,6 +325,12 @@ class MasterCorpus(Method.Method):
         self.dct =  self.save_class.load(self.dct)
         return self.dct
 
+
+    def getBowDct(self):
+        return self.save_class.load(self.bowdict)
+    def getFilteredDct(self):
+        return self.save_class.load(self.filtered_dict)
+
     def getAllWords(self):
         self.all_words =  self.save_class.load(self.all_words)
         return self.all_words
@@ -341,6 +350,7 @@ class Corpus(MasterCorpus):
         standard_fn = output_folder + "bow/"
         self.dct = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + ".pkl", "gensim")
         self.bowdict = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + "_bowdict.pkl", "gensim")
+        self.filtered_dict = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + "_filtered_dict.pkl", "gensim")
         self.remove_ind = SaveLoadPOPO(self.remove_ind, standard_fn + "metadata/" + file_name + "_remove.npy", "npy")
         self.tokenized_corpus = SaveLoadPOPO(self.tokenized_corpus, standard_fn + file_name + "_tokenized_corpus.npy", "npy")
         self.tokenized_ids = SaveLoadPOPO(self.tokenized_ids, standard_fn + file_name + "_tokenized_ids.npy", "npy")
@@ -365,6 +375,7 @@ class Corpus(MasterCorpus):
         self.word_list = SaveLoadPOPO(self.word_list, standard_fn + "metadata/" + file_name + "_words.npy", "npy")
         self.all_words = SaveLoadPOPO(self.all_words, standard_fn + "metadata/" + file_name + "_all_words_2.npy",
                                       "npy")
+
     def getCorpus(self):
         self.processed_corpus = self.save_class.load(self.processed_corpus)
         return self.processed_corpus
@@ -375,7 +386,7 @@ class Corpus(MasterCorpus):
                            self.id2token,
                            self.bow_vocab, self.filtered_vocab,
                            self.processed_corpus, self.classes,  self.bow, self.filtered_bow,
-                           self.word_list, self.all_words,  self.split_corpus, self.bowdict]
+                           self.word_list, self.all_words,  self.split_corpus, self.bowdict, self.filtered_dict]
 
     def process(self):
         print("Original doc len", len(self.orig_corpus))
@@ -389,10 +400,12 @@ class Corpus(MasterCorpus):
         self.split_corpus.value = split_all(self.processed_corpus.value)
 
         self.all_vocab.value, self.dct.value, self.id2token.value = getVocab(self.tokenized_corpus.value)
-        self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bow(self.tokenized_corpus.value, self.dct.value, self.bowmin)
+
+        self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bow(self.tokenized_corpus.value, self.bowmin)
+
         self.all_words.value = list(self.bow_vocab.value.keys())
         print(self.bowmin, len(self.all_words.value), "|||", self.bow.value.shape)
-        self.filtered_bow.value, self.word_list.value, self.filtered_vocab.value = filterBow(self.tokenized_corpus.value, self.bowdict.value,
+        self.filtered_bow.value, self.word_list.value, self.filtered_vocab.value, self.filtered_dict.value = filterBow(self.tokenized_corpus.value,
                                                                            self.no_below, self.no_above)
         # The idea here was to clear out anything empty after the big filtering, but it's probably fine.
         #self.filtered_bow.value, self.filtered_classes.value = removeEmptyBow(self.filtered_bow.value, self.classes.value,self.orig_classes)
@@ -416,6 +429,7 @@ class StreamedCorpus(MasterCorpus):
         standard_fn = output_folder + "bow/"
         self.dct = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + ".pkl", "gensim")
         self.bowdict = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + "_bowdict.pkl", "gensim")
+        self.filtered_dict = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + "_filtered_dict.pkl", "gensim")
         self.tokenized_corpus = SaveLoadPOPO(self.tokenized_corpus, standard_fn + file_name + "_tokenized_corpus.npy", "npy")
         self.tokenized_ids = SaveLoadPOPO(self.tokenized_ids, standard_fn + file_name + "_tokenized_ids.npy", "npy")
         self.id2token = SaveLoadPOPO(self.id2token, standard_fn + "metadata/" + file_name + "id2token.dct", "dct")
@@ -467,21 +481,17 @@ class StreamedCorpus(MasterCorpus):
                            self.id2token,
                            self.bow_vocab, self.filtered_vocab,
                             self.classes,  self.bow, self.filtered_bow,
-                           self.word_list, self.all_words, self.bowdict]
-        if self.classes_categorical.value is None:
-            self.popo_array = [self.dct,
-                               self.id2token,
-                               self.bow_vocab, self.filtered_vocab,
-                                self.classes, self.bow, self.filtered_bow,
-                               self.word_list, self.all_words, self.bowdict]
+                           self.word_list, self.all_words, self.bowdict, self.filtered_dict]
     def process(self):
         self.classes.value = self.orig_classes
+
         self.all_vocab.value, self.dct.value, self.id2token.value = getVocabStreamed(self.corpus_fn_to_stream)
-        self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bowStreamed(self.corpus_fn_to_stream, self.dct.value, self.bowmin)
+
+        self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bowStreamed(self.corpus_fn_to_stream, self.bowmin)
         self.all_words.value = list(self.bowdict.value.keys())
         print(self.bowmin, len(self.all_words.value), "|||", self.bow.value.shape)
         self.filtered_bow.value, self.word_list.value, self.filtered_vocab.value = filterBowStreamed(
-            self.corpus_fn_to_stream, self.bowdict.value,
+            self.corpus_fn_to_stream,
             self.no_below, self.no_above)
         super().process()
         # We are not doing any changes to the classes/documents
@@ -545,8 +555,7 @@ class ProcessClasses(MasterCorpus):
     def getClassNames(self):
         return self.save_class.load(self.filtered_class_names)
 
-def getVocabStreamed(text_corpus_fn):
-
+def makeDictStreamed(text_corpus_fn):
     dct = Dictionary()
     # Get X lines
     i = 0
@@ -556,14 +565,18 @@ def getVocabStreamed(text_corpus_fn):
             dct.add_documents([tokenized_doc])
             print(i)
             i += 1
+    return dct
 
+def getVocabStreamed(text_corpus_fn):
+    dct = makeDictStreamed(text_corpus_fn)
     vocab = dct.token2id
     # id2token needs to be used before it can be obtained, so here we use it arbitrarily
     _ = dct[0]
     id2token = dct.id2token
     return vocab, dct, id2token
 
-def doc2bowStreamed(text_corpus_fn, dct, bowmin):
+def doc2bowStreamed(text_corpus_fn, bowmin):
+    dct = makeDictStreamed(text_corpus_fn)
     dct.filter_extremes(no_below=bowmin)  # Most occur in at least 2 documents
     bow = []
     i = 0
@@ -577,7 +590,8 @@ def doc2bowStreamed(text_corpus_fn, dct, bowmin):
     vocab = dct.token2id
     return dct, bow, vocab
 
-def filterBowStreamed(text_corpus_fn, dct, no_below, no_above):
+def filterBowStreamed(text_corpus_fn,  no_below, no_above):
+    dct = makeDictStreamed(text_corpus_fn)
     dct.filter_extremes(no_below=no_below, no_above=no_above)
     f_bow = []
     i = 0

@@ -30,33 +30,14 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
 
     wl_save = SaveLoad(rewrite=rewrite_all)
 
-    gore_id = dct.token2id["gore"]
-    before_limit_gore = np.asarray(bow[gore_id].todense())
-
     dir = LimitWords(file_name, wl_save, dct, bow, processed_folder +"directions/words/", words_to_get, no_below, no_above)
     dir.process_and_save()
     words_to_get = dir.getBowWordDct()
     new_word_dict = dir.getNewWordDict()
 
-    after_limit_gore = np.asarray(bow[words_to_get["gore"]].todense())
-
-    print(before_limit_gore)
-    print(after_limit_gore)
-    print()
-
-    if np.equal(before_limit_gore, after_limit_gore) is False:
-        raise ValueError("Limit words did not work")
-    print("success")
-    get_words = ["gore"]
-    words_to_get_new = {}
-    new_word_dict_new = {}
-    for i in range(len(get_words)):
-        words_to_get_new[get_words[i]] = words_to_get[get_words[i]]
-        new_word_dict_new[get_words[i]] = i
-
     # Rewrite is always true for this as loading is handled internally
     dir_save = SaveLoad(rewrite=rewrite_all)
-    dir = GetDirections(bow, space, words_to_get_new, new_word_dict_new, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
+    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
     all_dir = dir.getDirections()
     binary_bow = np.asarray(dir.getNewBow().todense())
@@ -162,12 +143,9 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder, bowmin,
                                          no_below, no_above, True, corp_save)
         bow = p_corpus.getBow()
-        dct = p_corpus.getDct()
+        dct = p_corpus.getBowDct()
         word_list = p_corpus.getAllWords()
 
-        gore_id = dct.token2id["gore"]
-        before_limit_gore = np.asarray(bow[gore_id].todense())
-        print("")
         for i in range(len(dims)):
             spaces = []
             space_names = []
@@ -248,14 +226,14 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "movies"
+data_type = "reuters"
 doLR = False
 if data_type == "placetypes":
     dminf = 0.46
 else:
-    dminf = 0.01
+    dminf = 0.2
 multi_class_method = "OVR"
-bonus_fn = "testinggore"
+bonus_fn = "testingreut"
 rewrite_all=True
 if __name__ == '__main__':
     for i in range(len(classifiers)):
