@@ -13,6 +13,8 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
 from project.get_directions import GetDirections
 from score.classify import MultiClassScore
+from sklearn import linear_model
+
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
@@ -27,23 +29,43 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     print("(For directions) Filtering all words that do not appear in", no_below, "documents")
 
     wl_save = SaveLoad(rewrite=rewrite_all)
+
+    gore_id = dct.token2id["gore"]
+    before_limit_gore = np.asarray(bow[gore_id].todense())
+
     dir = LimitWords(file_name, wl_save, dct, bow, processed_folder +"directions/words/", words_to_get, no_below, no_above)
     dir.process_and_save()
     words_to_get = dir.getBowWordDct()
     new_word_dict = dir.getNewWordDict()
 
+    after_limit_gore = np.asarray(bow[words_to_get["gore"]].todense())
+
+    print(before_limit_gore)
+    print(after_limit_gore)
+    print()
+
+    if np.equal(before_limit_gore, after_limit_gore) is False:
+        raise ValueError("Limit words did not work")
+    print("success")
+    get_words = ["gore"]
+    words_to_get_new = {}
+    new_word_dict_new = {}
+    for i in range(len(get_words)):
+        words_to_get_new[get_words[i]] = words_to_get[get_words[i]]
+        new_word_dict_new[get_words[i]] = i
+
     # Rewrite is always true for this as loading is handled internally
-    dir_save = SaveLoad(rewrite=True)
-    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/")
+    dir_save = SaveLoad(rewrite=rewrite_all)
+    dir = GetDirections(bow, space, words_to_get_new, new_word_dict_new, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
     all_dir = dir.getDirections()
-    binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
+    binary_bow = np.asarray(dir.getNewBow().todense())
     freq_bow = binary_bow
     binary_bow[binary_bow > 1] = 1
     preds = dir.getPreds()
     words = dir.getWords()
 
-    score_save = SaveLoad(rewrite=rewrite_all)
+    score_save = SaveLoad(rewrite=True)
     score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
@@ -54,7 +76,8 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
 
 
 def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVM", dir_min_freq=0.001,
-         dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR"):
+         dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False, bonus_fn="",
+         rewrite_all = False):
     pipeline_fn = "num_stw"
     if data_type == "newsgroups":
         name_of_class = ["Newsgroups"]
@@ -141,6 +164,10 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         bow = p_corpus.getBow()
         dct = p_corpus.getDct()
         word_list = p_corpus.getAllWords()
+
+        gore_id = dct.token2id["gore"]
+        before_limit_gore = np.asarray(bow[gore_id].todense())
+        print("")
         for i in range(len(dims)):
             spaces = []
             space_names = []
@@ -188,17 +215,25 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
             for s in range(len(spaces)):
-                final_fn = pipeline_fn + "_"+ space_names[s]
+                if len(bonus_fn) != 0:
+                    print("WARNING, bonus fn active")
+                if LR:
+                    final_fn = pipeline_fn + "_LR_"+ space_names[s]
+                else:
+                    final_fn = pipeline_fn + "_"+ space_names[s]
+
+                final_fn += bonus_fn
+
                 if data_type == "movies" or data_type == "placetypes":
                     classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes[ci], class_names[ci], word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                 model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
+                 model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                  score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
                              mcm=multi_class_method)
                 else:
                     classifier_fn = pipeline_fn + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type=model_type, dev_percent=dev_percent, rewrite_all=False, remove_stop_words=True,
+                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                      score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class, classifier_fn = classifier_fn,
                              mcm=multi_class_method)
 
@@ -213,14 +248,17 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "movies"
+doLR = False
 if data_type == "placetypes":
     dminf = 0.46
 else:
-    dminf = 0.2
+    dminf = 0.01
 multi_class_method = "OVR"
+bonus_fn = "testinggore"
+rewrite_all=True
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
                                 grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=0.95, dev_percent=0.2,
-                                score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method)
+                                score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn, rewrite_all=rewrite_all)

@@ -17,8 +17,9 @@ class GetDirections(Method.Method):
     bowmax = None
     new_word_dict = None
     corpus = None
+    LR = None
 
-    def __init__(self, bow, corpus,  words_to_get, new_word_dict, save_class, bowmin, bowmax, file_name, output_folder):
+    def __init__(self, bow, corpus,  words_to_get, new_word_dict, save_class, bowmin, bowmax, file_name, output_folder, LR=False):
         self.words_to_get = words_to_get
         self.output_folder = output_folder
         self.corpus = corpus
@@ -26,6 +27,7 @@ class GetDirections(Method.Method):
         self.bowmin = bowmin
         self.new_word_dict = new_word_dict
         self.bowmax = bowmax
+        self.LR = LR
         super().__init__(file_name, save_class)
 
     def makePopos(self):
@@ -45,8 +47,8 @@ class GetDirections(Method.Method):
         self.directions = SaveLoadPOPO(np.empty(len(list(self.words_to_get.keys())), dtype=object), self.output_folder
                                      + "dir/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_dir.npy", "npy")
 
-        self.predictions = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape, dtype=np.int32), self.output_folder + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npz", "scipy")
-        self.new_bow = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape, dtype=np.int32), self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
+        self.predictions = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape), self.output_folder + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npz", "scipy")
+        self.new_bow = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape), self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
         self.words = SaveLoadPOPO(self.words, self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_words.npy", "npy")
 
     def makePopoArray(self):
@@ -68,7 +70,25 @@ class GetDirections(Method.Method):
                 if self.directions.value[self.new_word_dict[key]] is None or len(self.predictions.value[self.new_word_dict[key]].data) == 0:
                     word_freq = np.asarray(freq_word_freq.todense(), dtype=np.int32)[0]
                     word_freq[word_freq > 1] = 1
-                    dir_svm = svm.LinearSVM(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+
+                    if self.LR is False:
+                        dir_svm = svm.LinearSVM(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+                    else:
+                        dir_svm = svm.LogisticRegression(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+
+
+                    if self.LR is False:
+                        dir_svm = svm.LinearSVM(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+                    else:
+                        dir_svm = svm.LogisticRegression(self.corpus, word_freq, self.corpus, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+                    """
+                    pool = ThreadPool(threads)
+
+                    kappa = pool.starmap(self.runSVM, zip(property_names_a, zip(sparse_selection)))
+
+                    pool.close()
+                    pool.join()
+                    """
                     dir_svm.process_and_save()
                     self.directions.value[self.new_word_dict[key]] = dir_svm.getDirection()
                     self.predictions.value[self.new_word_dict[key]] = dir_svm.getPred()[0]
