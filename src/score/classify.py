@@ -211,13 +211,13 @@ class MasterScore(Method.Method):
         self.save_class.save(self.popo_array)
 
 def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
-                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True, save_csv=False):
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True, save_csv=False, directions=False):
     if true_targets is None or py.isArray(true_targets[0]):
         return MultiClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
-                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, directions=directions, save_csv=save_csv)
     else:
         return SingleClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
-                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, directions=directions, save_csv=save_csv)
 
 class MultiClassScore(MasterScore):
     def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=True,
@@ -338,12 +338,15 @@ class SingleClassScore(MasterScore):
 
 
     def __init__(self, true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
-                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True):
+                 fscore=True, kappa=True, acc=True, class_names=None, verbose=True, directions=False, save_csv=False):
         self.true_targets = true_targets
         self.predictions = predictions
         self.pred_proba = pred_proba
         self.output_folder = output_folder
         self.class_names = class_names
+
+        if sp.issparse(self.predictions):
+            self.predictions = np.asarray(self.predictions.todense())[0]
 
         self.auroc = auroc
         self.fscore = fscore
@@ -352,7 +355,6 @@ class SingleClassScore(MasterScore):
         self.f1 = f1
 
         self.verbose = verbose
-        print("Shape is:", len(predictions))
         self.f1s = [0.0]
         self.precs = [0.0]
         self.recalls = [0.0]
@@ -361,7 +363,7 @@ class SingleClassScore(MasterScore):
         self.kappas = [0.0]
 
         super().__init__(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
-                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose)
+                 fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, save_csv=save_csv)
 
     def calc_fscore(self):
         self.precs.value[0], self.recalls.value[0], self.f1s.value[0], unused__ = precision_recall_fscore_support(self.true_targets, self.predictions, average="binary")
