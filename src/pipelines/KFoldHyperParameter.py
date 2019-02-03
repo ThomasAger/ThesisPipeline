@@ -253,7 +253,7 @@ class RecHParam(MasterHParam):
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(None, None, None, file_name=model_fn,
                                          output_folder=self.output_folder + "rep/score/", save_class=score_save,
-                                         verbose=True,
+                                         verbose=True, class_names=self.class_names,
                                          fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
         score.process_and_save()
 

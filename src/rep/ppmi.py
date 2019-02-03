@@ -10,11 +10,10 @@ class PPMI(Method):
     param_example = None
     ppmi_matrix = None
     file_name = None
-
+    doc_amt = None
     def __init__(self, frequency_matrix, doc_amt, file_name, save_class):
-
+        self.doc_amt = doc_amt
         self.frequency_matrix = frequency_matrix
-        self.checkFrequencyMatrix(doc_amt)
         self.file_name = file_name
 
         super().__init__(file_name, save_class)
@@ -36,6 +35,7 @@ class PPMI(Method):
 
     def process(self):
         print("Begin processing")
+        self.checkFrequencyMatrix(self.doc_amt)
         orig_ppmi_matrix = convertPPMISparse(self.frequency_matrix)
         self.ppmi_matrix.value = sp.csr_matrix(orig_ppmi_matrix).transpose()
         super().process()

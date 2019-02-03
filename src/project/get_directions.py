@@ -97,7 +97,7 @@ class GetDirections(Method.Method):
         words = np.empty(len(list(self.new_word_dict.keys())), dtype=object)
         for key, value in self.new_word_dict.items():
             words[value] = key
-        self.words.value = words
+        self.words.value = list(self.new_word_dict.keys())
         super().process()
 
     def getDirections(self):

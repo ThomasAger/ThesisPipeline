@@ -12,6 +12,12 @@ Topic models such as Latent Dirichlet Allocation (LDA) represent documents as mu
 Distributional representations of semantics, known as 'semantic spaces' are well-recognized for their ability to represent semantic information spatially. These representations have been widely adopted for Natural Language Processing (NLP) tasks %Tasks here
 thanks to their ability to represent complex information in a dense representation. In particular, entity-embeddings have been applied  to represent items in recommender systems \cite{Vasile:2016:MPE:2959100.2959160,liang2016factorization,van2016learning}, to represent entities in semantic search engines \cite{DBLP:conf/sigir/JameelBS17,van2017structural}, or to represent examples in classification tasks \cite{DBLP:conf/iccv/DemirelCI17}. %Copied from CONLL paper. Shift this to talk more about applications and tasks rather than specific stuff related to our ideas.
 
+Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
+They also vary in how they linearly separate entities. %How?
+However, their commonality is that they are able to represent semantic relationships spatially. %ref
+See Section \ref{background:WhySpace}
+Our method can use any vector space that linearly separates entities, and so it has potential longevity.  This means that our method is relying on structure in the space that does not directly correspond to our desired representation -  we can view our approach as a linear transformation of the space. We address this problem in Chapter \ref{chapter:finetuning}. However, we have the capability to leverage many different methods to construct a vector space for our representation, so as long as dense representations of entities exist it will be possible to use our method, and as they are improved the results that our method can achieve will be improved too. This kind of flexibility also gives us the potential to combine the resultant representations from different vector spaces for classification, e.g. concatenating the vectors from different spaces.
+
 The success of these semantic spaces similarity-based structure has lead many to investigate how to obtain formal relationships from them. One such striking example is in that of linear analogies in word-vectors (see Section \ref{WordVectors}, where it was found that the vector XXXX[]King queen blah blah[]XXXXXXX, formally justified in \cite{Ethayarajh2018}. %Vector example
 These relationships have been expanded on, for example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, while \cite{Mitchell2015} discovered that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, \cite{Garg2017} found that word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. %Copy pasted from this 
 
@@ -80,7 +86,7 @@ In a case study by  \cite{Veale2017}, giving the business users the option betwe
 
 %How is the chapter going to play out? Whats going to happen?
 
-This chapter continues as follows: We begin by describing the work related to this method, giving valuable context for the utility and potential of our approach. This is followed by an explanation of the method, including the variations we have adopted for our experimental work. We follow this with our qualitative experimentation, explaining how these variations affect the results, as well as the interpretability of the method, and we end with a quantitative analysis on how well we can represent domain knowledge using decision trees constrained to a limited depth.
+This chapter continues as follows: We begin by describing the work related to this , giving valuable context for the utility and potential of our approach. This is followed by an explanation of the method, including the variations we have adopted for our experimental work. We follow this with our qualitative experimentation, explaining how these variations affect the results, as well as the interpretability of the method, and we end with a quantitative analysis on how well we can represent domain knowledge using decision trees constrained to a limited depth.
 
 
 
@@ -118,19 +124,21 @@ Broadly speaking, in the context of document classification, the main advantage 
 
 
 \section{Method}
+% Assumed understanding at this point
+% Chapter 1: Why interpretability is important. The value of a good interpretable representation. What directions are and what they mean.
+% Chapter 2: The background and literature review for interpretable representations.
+% Chapter 3: An introduction on the value of a good interpretable classifier, and the position of our work in that domain and how it can be applied there. What entities, properties are. What a conceptual space is. A literature review on relevant interpretable classifiers.
 
-In this section, we describe how we go from an unstructured text representation of a domain to an interpretable representation composed of distinct properties. 
+ Starting with a Bag-Of-Words \ref{background:BOW} and Conceptual Space we obtain a representation of entities composed of properties. Then, we cover the additional methods we propose to improve this process.
+
+
 
 
 
 % What does a vector space have that other representations do not?
 
 
-Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
-They also vary in how they linearly separate entities. %How?
-However, their commonality is that they are able to represent semantic relationships spatially. %ref
-See Section \ref{background:WhySpace}
-Our method can use any vector space that linearly separates entities, and so it has potential longevity.  This means that our method is relying on structure in the space that does not directly correspond to our desired representation -  we can view our approach as a linear transformation of the space. We address this problem in Chapter \ref{chapter:finetuning}. However, we have the capability to leverage many different methods to construct a vector space for our representation, so as long as dense representations of entities exist it will be possible to use our method, and as they are improved the results that our method can achieve will be improved too. This kind of flexibility also gives us the potential to combine the resultant representations from different vector spaces for classification, e.g. concatenating the vectors from different spaces.
+
 
 % Why obtain directions for terms? What's the value of a direction for a term?
 Our process is generally in three parts, first we obtain directions for terms from the domain $T_d$ see \ref{intro:directions, chapter3:introduction}, then we filter these terms to remove those that will not result in good properties. Finally, we cluster the remaining terms to obtain property directions $P_d$ and an associated label $l = [t_1, ..., t_n]$. 

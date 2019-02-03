@@ -13,6 +13,9 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
 from project.get_directions import GetDirections
 from score.classify import MultiClassScore
+from project.get_rankings import GetRankings
+from project.get_ndcg import GetNDCG
+from rep import pca, ppmi, awv
 from sklearn import linear_model
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
@@ -21,15 +24,24 @@ last_dct = []
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="",
-             classifier_fn="", mcm=None):
+             classifier_fn="", mcm=None, top_scoring_dirs=2000, score_type="kappa", ppmi=None, dct_unchanged=None):
 
-    if bow.shape[0] != len(dct.dfs.keys()):
+    # Convert to hyper-parameter method, where hyper-parameters are:
+    ##### dir_min_freq, dir_max freq
+    ##### Scoring filters, aka top 200, top 400, etc, score-type
+    dct_len_start = len(dct_unchanged.dfs.keys())
+    if bow.shape[0] != len(dct.dfs.keys()) or len(dct.dfs.keys()) != ppmi.shape[0]:
+        print("bow", bow.shape[0], "dct", len(dct.dfs.keys()), "ppmi", ppmi.shape[0])
         raise ValueError("Size of vocab and dict do not match")
+
 
     doc_amt = split.get_doc_amt(data_type)
 
     no_below = int(doc_amt * dir_min_freq)
     no_above = int(doc_amt * dir_max_freq)
+
+
+
     print("(For directions) Filtering all words that do not appear in", no_below, "documents")
 
     wl_save = SaveLoad(rewrite=rewrite_all)
@@ -44,17 +56,40 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     dir_save = SaveLoad(rewrite=rewrite_all)
     dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
-    all_dir = dir.getDirections()
     binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     binary_bow[binary_bow >= 1] = 1
     preds = dir.getPreds()
     words = dir.getWords()
 
     score_save = SaveLoad(rewrite=rewrite_all)
-    score = MultiClassScore(binary_bow, preds, None, file_name, processed_folder + "directions/score/", score_save, f1=True, auroc=False,
+    score = MultiClassScore(binary_bow, preds, None, file_name + "_" + str(no_below) + "_" + str(no_above) , processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
     score.print()
+
+    # Get rankings on directions save all of them in a word:ranking on entities format, and retrieve if already saved
+    dirs = dir.getDirections()
+
+    rank_save = SaveLoad(rewrite=True)
+    rank = GetRankings(dirs, space, words,  rank_save,  file_name, processed_folder, no_below, no_above)
+    rank.process_and_save()
+    rankings = rank.getRankings()
+
+    dct_len_end =  len(dct_unchanged.dfs.keys())
+    if dct_len_start != dct_len_end:
+        raise ValueError("Dct has changed shape")
+
+    # Get NDCG scores
+    ndcg_save = SaveLoad(rewrite=True)
+    ndcg = GetNDCG(rankings, ppmi, words, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
+    ndcg.process_and_save()
+    ndcg_scores = ndcg.getNDCG()
+
+    # Filter directions based on the amount to filter in params and the score type to filter in params
+
+    # Convert to entity representation from words
+
+    # Score rankings on directions (SVM, Decision tree, etc)
 
 
 
@@ -151,6 +186,14 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         bow = p_corpus.getBow()
         word_list = p_corpus.getAllWords()
 
+        ppmi_save = SaveLoad(rewrite=rewrite_all)
+        ppmi_identifier = "_ppmi"
+        ppmi_fn = pipeline_fn + ppmi_identifier
+
+        ppmi_unfiltered = ppmi.PPMI(p_corpus.getBow(), None, processed_folder + "bow/" + ppmi_fn, ppmi_save)
+        ppmi_unfiltered.process_and_save()
+        ppmi_unf_matrix = ppmi_unfiltered.getMatrix().transpose()
+
         for i in range(len(dims)):
             spaces = []
             space_names = []
@@ -213,19 +256,20 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                                                  no_below, no_above, True, corp_save)
                 # Reload the dict because gensim is persistent otherwise
                 dct = p_corpus.getBowDct()
+                dct_unchanged = p_corpus.getBowDct()
 
                 if data_type == "movies" or data_type == "placetypes":
                     classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes[ci], class_names[ci], word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                  model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                  score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
-                             mcm=multi_class_method)
+                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged)
                 else:
                     classifier_fn = pipeline_fn + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                      score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class, classifier_fn = classifier_fn,
-                             mcm=multi_class_method)
+                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged)
 
 
 """

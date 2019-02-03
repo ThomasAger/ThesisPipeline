@@ -27,17 +27,15 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     doc_amt = split.get_doc_amt(data_type)
     no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
-    classes_save = SaveLoad(rewrite=True)
+    classes_save = SaveLoad(rewrite=rewrite_all)
     classes_process = process_corpus.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
                                          no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
     classes_process.process_and_save()
     classes = classes_process.getClasses()
     class_names = classes_process.getClassNames()
 
-
-
     # Process and save corpus
-    corpus_save = SaveLoad(rewrite=True)
+    corpus_save = SaveLoad(rewrite=rewrite_all)
     if data_type == "placetypes" or data_type == "movies":
         p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
@@ -355,7 +353,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "newsgroups"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

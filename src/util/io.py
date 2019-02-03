@@ -119,6 +119,7 @@ def write_to_csv_key(csv_fn, col_names, cols_to_add, keys):
 def write_csv(csv_fn, col_names, cols_to_add, key):
     d = {}
     for c in range(len(cols_to_add)):
+        print(c, "/", len(cols_to_add))
         d[col_names[c]] = cols_to_add[c]
     df = pd.DataFrame(d, index=key)
     df.to_csv(csv_fn)
