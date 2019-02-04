@@ -308,7 +308,7 @@ class GetNDCG(Method.Method):
     def process(self):
         for i in range(len(self.words)):
             if self.words[i] not in self.ndcg_dir.value:
-                sorted_indices = np.argsort(self.ranks[i])
+                sorted_indices = np.flipud(np.argsort(self.ranks[i]))
                 # Get the NDCG score for the PPMI score, which is a valuation, compared to the indice of the rank
                 ndcg = ndcg_from_ranking(np.asarray(self.ppmi[self.ppmi_id_dct[self.words[i]]].todense())[0], sorted_indices)
                 self.ndcg_dir.value[self.words[i]] = ndcg

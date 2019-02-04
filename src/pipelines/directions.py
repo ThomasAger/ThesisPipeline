@@ -70,7 +70,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     # Get rankings on directions save all of them in a word:ranking on entities format, and retrieve if already saved
     dirs = dir.getDirections()
 
-    rank_save = SaveLoad(rewrite=True)
+    rank_save = SaveLoad(rewrite=rewrite_all)
     rank = GetRankings(dirs, space, words,  rank_save,  file_name, processed_folder, no_below, no_above)
     rank.process_and_save()
     rankings = rank.getRankings()
@@ -282,12 +282,12 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "movies"
 doLR = False
 if data_type == "placetypes":
     dminf = 0.05
 else:
-    dminf = 0.001
+    dminf = 0.1
 multi_class_method = "OVR"
 bonus_fn = ""
 rewrite_all=False
