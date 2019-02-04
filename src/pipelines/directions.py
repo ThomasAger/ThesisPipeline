@@ -61,6 +61,10 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     preds = dir.getPreds()
     words = dir.getWords()
 
+    new_word2id_dict = {}
+    for i in range(len(words)):
+        new_word2id_dict[words[i]] = i
+
     score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name + "_" + str(no_below) + "_" + str(no_above) , processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
@@ -71,7 +75,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     dirs = dir.getDirections()
 
     rank_save = SaveLoad(rewrite=rewrite_all)
-    rank = GetRankings(dirs, space, words,  rank_save,  file_name, processed_folder, no_below, no_above)
+    rank = GetRankings(dirs, space, new_word2id_dict,  rank_save,  file_name, processed_folder, no_below, no_above)
     rank.process_and_save()
     rankings = rank.getRankings()
 
@@ -81,7 +85,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
 
     # Get NDCG scores
     ndcg_save = SaveLoad(rewrite=True)
-    ndcg = GetNDCG(rankings, ppmi, words, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
+    ndcg = GetNDCG(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
     ndcg.process_and_save()
     ndcg_scores = ndcg.getNDCG()
 

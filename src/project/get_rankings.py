@@ -29,7 +29,7 @@ class GetRankings(Method.Method):
 
     def makePopos(self):
 
-        self.rankings = SaveLoadPOPO(np.empty(len(self.words), dtype=object), self.output_folder + "rank/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_rank.npy", "npy")
+        self.rankings = SaveLoadPOPO(np.empty(len(self.words.keys()), dtype=object), self.output_folder + "rank/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_rank.npy", "npy")
         # If the rankings for this situation exists, then dont load the overall.
         self.rank_dir = SaveLoadPOPO({}, self.output_folder + "rank/" + self.file_name + "_rank_dir.npy", "npy_dict")
         if self.save_class.exists([self.rank_dir]) and self.save_class.exists([self.rankings]) is False:
@@ -46,11 +46,13 @@ class GetRankings(Method.Method):
         return ranking
 
     def process(self):
-        for i in range(len(self.words)):
-            if self.words[i] not in self.rank_dir.value:
-                self.rank_dir.value[self.words[i]] = self.get_dp(self.dirs[i])
-            self.rankings.value[i] = self.rank_dir.value[self.words[i]]
-            print(i, "/", len(self.words), self.words[i])
+        i = 0
+        for key, value in self.words.items():
+            if value not in self.rank_dir.value:
+                self.rank_dir.value[key] = self.get_dp(self.dirs[value])
+            self.rankings.value[value] = self.rank_dir.value[key]
+            print(i, "/", len(self.words.keys()), key)
+            i += 1
         super().process()
 
     def getRankings(self):
