@@ -252,8 +252,8 @@ class LimitWords(Method.Method):
         return self.new_word_dict.value
 
     def makePopos(self):
-        self.bow_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_wldct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above), "npy_dict")
-        self.new_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_new_wdct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above), "npy_dict")
+        self.bow_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_wldct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above) + ".npy", "npy_dict")
+        self.new_word_dict = SaveLoadPOPO(None, self.output_folder + self.file_name + "_new_wdct_NB_" + str(self.no_below) + "_NA_" + str(self.no_above) + ".npy", "npy_dict")
 
 
     def makePopoArray(self):
