@@ -297,7 +297,7 @@ class GetNDCG(Method.Method):
         if self.save_class.exists([self.ndcg_dir]) and self.save_class.exists([self.ndcg_scores]) is False:
             self.ndcg_dir.value = self.save_class.load(self.ndcg_dir)
             print("pred_dir loaded successfully")
-        self.csv_data = SaveLoadPOPO([["ndcg"],[],[self.words]],
+        self.csv_data = SaveLoadPOPO([["ndcg"],[],[list(self.words.keys())]],
                                         self.output_folder + "csv/"+ self.file_name + "_" + str(
                                             self.bowmin) + "_" + str(self.bowmax) + "_ndcg.csv","csv")
 
@@ -306,6 +306,7 @@ class GetNDCG(Method.Method):
         self.popo_array = [self.ndcg_scores, self.ndcg_dir, self.csv_data]
 
     def process(self):
+        """
         for i in range(len(self.words)):
             if self.words[i] not in self.ndcg_dir.value:
                 sorted_indices = np.flipud(np.argsort(self.ranks[i]))
@@ -314,6 +315,19 @@ class GetNDCG(Method.Method):
                 self.ndcg_dir.value[self.words[i]] = ndcg
             self.ndcg_scores.value[i] = self.ndcg_dir.value[self.words[i]]
             print(i, "/", len(self.words), self.words[i], self.ndcg_dir.value[self.words[i]])#
+        """
+        i = 0
+        for key, value in self.words.items():
+            if value not in self.ndcg_dir.value:
+                sorted_indices = np.flipud(np.argsort(self.ranks[value]))
+                # Get the NDCG score for the PPMI score, which is a valuation, compared to the indice of the rank
+                ndcg = ndcg_from_ranking(np.asarray(self.ppmi[self.ppmi_id_dct[key]].todense())[0],
+                                         sorted_indices)
+                self.ndcg_dir.value[key] = ndcg
+            self.ndcg_scores.value[value] = self.ndcg_dir.value[key]
+            print(i, "/", len(self.words.keys()), key, self.ndcg_dir.value[key])
+            i += 1
+
         self.csv_data.value[1] = [self.ndcg_scores.value]
         super().process()
 
