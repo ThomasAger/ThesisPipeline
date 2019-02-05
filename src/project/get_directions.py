@@ -44,11 +44,11 @@ class GetDirections(Method.Method):
             self.pred_dir.value = self.save_class.load(self.pred_dir)
             print("pred_dir loaded successfully")
 
-        self.directions = SaveLoadPOPO(np.empty(len(list(self.words_to_get.keys())), dtype=object), self.output_folder
+        self.directions = SaveLoadPOPO(np.empty(shape=(len(list(self.words_to_get.keys())), len(self.space[0])), dtype=np.float64), self.output_folder
                                      + "dir/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_dir.npy", "npy")
 
-        self.predictions = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape), self.output_folder + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npz", "scipy")
-        self.new_bow = SaveLoadPOPO(sp.csr_matrix(empty_data, shape=shape), self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
+        self.predictions = SaveLoadPOPO(sp.lil_matrix(empty_data, shape=shape), self.output_folder + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_pred.npz", "scipy")
+        self.new_bow = SaveLoadPOPO(sp.lil_matrix(empty_data, shape=shape), self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_new_bow.npz", "scipy")
         self.words = SaveLoadPOPO(self.words, self.output_folder + "bow/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_words.npy", "npy")
 
     def makePopoArray(self):
@@ -57,13 +57,18 @@ class GetDirections(Method.Method):
     def process(self):
         i = 0
         len_of_list = len(list(self.words_to_get.keys()))
+        """
+        np_pred = np.empty(shape=(len(list(self.words_to_get.keys()))), dtype=object)
+        np_new_bow = np.empty(shape=(len(list(self.words_to_get.keys()))), dtype=object)
+        """
         for key, value in self.words_to_get.items():
-            try:
+            if key in self.word_dir.value and key in self.pred_dir.value:
                 self.directions.value[self.new_word_dict[key]] = self.word_dir.value[key]
                 self.predictions.value[self.new_word_dict[key]] = self.pred_dir.value[key]
-                freq_word_freq = self.bow[value]
-                self.new_bow.value[self.new_word_dict[key]] = freq_word_freq
-            except KeyError:
+                self.new_bow.value[self.new_word_dict[key]] = self.bow[value]
+                loaded = True
+            else:
+                loaded = False
                 # Get the bow line for the word
                 freq_word_freq = self.bow[value]
 
@@ -76,24 +81,24 @@ class GetDirections(Method.Method):
                     else:
                         dir_svm = svm.LogisticRegression(self.space, word_freq, self.space, word_freq, self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
 
-                    """
-                    pool = ThreadPool(threads)
-
-                    kappa = pool.starmap(self.runSVM, zip(property_names_a, zip(sparse_selection)))
-
-                    pool.close()
-                    pool.join()
-                    """
                     dir_svm.process_and_save()
                     self.directions.value[self.new_word_dict[key]] = dir_svm.getDirection()
+
+                    # Sparse
                     self.predictions.value[self.new_word_dict[key]] = dir_svm.getPred()[0]
+
+                # Sparse
+                self.new_bow.value[self.new_word_dict[key]] = freq_word_freq
 
                 self.word_dir.value[key] = self.directions.value[self.new_word_dict[key]]
                 self.pred_dir.value[key] = self.predictions.value[self.new_word_dict[key]]
-
-                self.new_bow.value[self.new_word_dict[key]] = freq_word_freq
             i += 1
-            print(i, "/", len_of_list, key)
+            print(i, "/", len_of_list, key, "loaded", loaded)
+
+        self.predictions.value = sp.csr_matrix(self.predictions.value)
+        self.new_bow.value = sp.csr_matrix(self.new_bow.value)
+
+
         words = np.empty(len(list(self.new_word_dict.keys())), dtype=object)
         for key, value in self.new_word_dict.items():
             words[value] = key

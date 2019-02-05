@@ -17,7 +17,7 @@ from project.get_rankings import GetRankings
 from project.get_ndcg import GetNDCG
 from rep import pca, ppmi, awv
 from sklearn import linear_model
-
+import cProfile
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 last_dct = []
@@ -84,7 +84,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
         raise ValueError("Dct has changed shape")
 
     # Get NDCG scores
-    ndcg_save = SaveLoad(rewrite=True)
+    ndcg_save = SaveLoad(rewrite=rewrite_all)
     ndcg = GetNDCG(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
     ndcg.process_and_save()
     ndcg_scores = ndcg.getNDCG()
@@ -190,7 +190,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         bow = p_corpus.getBow()
         word_list = p_corpus.getAllWords()
 
-        ppmi_save = SaveLoad(rewrite=rewrite_all)
+        ppmi_save = SaveLoad(rewrite=False)
         ppmi_identifier = "_ppmi"
         ppmi_fn = pipeline_fn + ppmi_identifier
 
@@ -286,12 +286,12 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "movies"
+data_type = "newsgroups"
 doLR = False
 if data_type == "placetypes":
-    dminf = 0.05
+    dminf = 0.2
 else:
-    dminf = 0.1
+    dminf = 0.01
 multi_class_method = "OVR"
 bonus_fn = ""
 rewrite_all=False

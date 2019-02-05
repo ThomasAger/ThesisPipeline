@@ -289,7 +289,7 @@ class GetNDCG(Method.Method):
         super().__init__(file_name, save_class)
 
     def makePopos(self):
-        self.ndcg_scores = SaveLoadPOPO(np.empty(len(self.ranks), dtype=object),
+        self.ndcg_scores = SaveLoadPOPO(np.empty(len(self.ranks), dtype=np.float64),
                                         self.output_folder  + self.file_name + "_" + str(
                                             self.bowmin) + "_" + str(self.bowmax) + "_ndcg.npy", "npy")
         # If the rankings for this situation exists, then dont load the overall.
@@ -318,7 +318,7 @@ class GetNDCG(Method.Method):
         """
         i = 0
         for key, value in self.words.items():
-            if value not in self.ndcg_dir.value:
+            if key not in self.ndcg_dir.value:
                 sorted_indices = np.flipud(np.argsort(self.ranks[value]))
                 # Get the NDCG score for the PPMI score, which is a valuation, compared to the indice of the rank
                 ndcg = ndcg_from_ranking(np.asarray(self.ppmi[self.ppmi_id_dct[key]].todense())[0],
