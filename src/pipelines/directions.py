@@ -291,7 +291,7 @@ doLR = False
 if data_type == "placetypes":
     dminf = 0.2
 else:
-    dminf = 0.01
+    dminf = 0.001
 multi_class_method = "OVR"
 bonus_fn = ""
 rewrite_all=False

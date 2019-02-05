@@ -72,7 +72,7 @@ class GetDirections(Method.Method):
                 # Get the bow line for the word
                 freq_word_freq = self.bow[value]
 
-                if self.directions.value[self.new_word_dict[key]] is None or len(self.predictions.value[self.new_word_dict[key]].data) == 0:
+                if np.amax(self.directions.value[self.new_word_dict[key]]) == 0.0 or len(self.predictions.value[self.new_word_dict[key]].data) == 1:
                     word_freq = np.asarray(freq_word_freq.todense(), dtype=np.int32)[0]
                     word_freq[word_freq >= 1] = 1
 
