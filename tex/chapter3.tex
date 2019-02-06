@@ -1,40 +1,48 @@
 \chapter{Converting Vector Spaces into Interpretable Representations}\label{Chapter3}
+
+
 \section{Introduction}\label{chapter3:Introduction}
+
+% What is this chapter? What can I expect from this chapter?
+This chapter describes how to go from a domain-specific Semantic Space (see Section \ref{bg:SemanticSpaces}) to producing linear classifiers driven by features where each dimension is a ranking on a distinct labelled property in the domain. We show an example representation and classifier that were obtained from a Semantic Space constructed from IMDB movie reviews in figure \ref{ch3:TreeAndRep}.  We find that these representations are more interpretable than standard baseline interpretable representations (e.g. Topic Models), and also find that they outperform baseline harder to understand classifiers (Linear SVM's) in F1-score for some tasks, even when constrained to a very simple linear classifier. 
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/tree and rep.png}
+	\centering
+	\caption{Movies and selected associated dimensions, and their use in a linear classifier.}\label{ch3:TreeAndRep}
+\end{figure}
+
+\subsection{Semantic Relations}
+
+%Semantic spaces encode semantic relationships
+
+%What are the applications of semantic relationships? What is the power of a semantic relationship? Why are semantic relationships important in a space?
+
+%What are directions? Why are directions important? What have they been used for? What is a property?
+
+\subsection{Producing an Interpretable Property Representation}
+
+% How can I apply directions to produce an interpretable space? Why is this valuable? What makes this interesting?
 
 %Why do this work? What is the value of this work?  How is this relevant to the readers interests?
 
-A "direction" refers in this case to the orthogonal direction to a hyper plane that separates a term in a vector space. As the hyper plane separates entities, this means that the entities furthest along the hyper plane, at the end classified positively, are the entities we are most sure have the term we found the hyper plane for. To see an example of this, see \ref {LRHyperPlane} With this understanding, it becomes possible to induce a ranking of entities on the properties by finding the dot product of the entity points on the direction vector. 
+
+\subsection{Using a Property Representation in a Linear Classifier}
+
+
 
 Topic models such as Latent Dirichlet Allocation (LDA) represent documents as multinomial distributions over latent topics, where each of these topics corresponds to a multinomial distribution over words \cite{Blei2003}. These topics tend to correspond to semantically meaningful concepts, hence topic models tend to be rather interpretable \cite{Chang2009}. To characterize the semantic concepts associated with the learned topics, topics are typically labelled with the most probable words according to the corresponding distribution. 
 
 % What is a semantic space? Why is a semantic space valuable?
 
-Distributional representations of semantics, known as 'semantic spaces' are well-recognized for their ability to represent semantic information spatially. These representations have been widely adopted for Natural Language Processing (NLP) tasks %Tasks here
-thanks to their ability to represent complex information in a dense representation. In particular, entity-embeddings have been applied  to represent items in recommender systems \cite{Vasile:2016:MPE:2959100.2959160,liang2016factorization,van2016learning}, to represent entities in semantic search engines \cite{DBLP:conf/sigir/JameelBS17,van2017structural}, or to represent examples in classification tasks \cite{DBLP:conf/iccv/DemirelCI17}. %Copied from CONLL paper. Shift this to talk more about applications and tasks rather than specific stuff related to our ideas.
-
-Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
-They also vary in how they linearly separate entities. %How?
-However, their commonality is that they are able to represent semantic relationships spatially. %ref
-See Section \ref{background:WhySpace}
-Our method can use any vector space that linearly separates entities, and so it has potential longevity.  This means that our method is relying on structure in the space that does not directly correspond to our desired representation -  we can view our approach as a linear transformation of the space. We address this problem in Chapter \ref{chapter:finetuning}. However, we have the capability to leverage many different methods to construct a vector space for our representation, so as long as dense representations of entities exist it will be possible to use our method, and as they are improved the results that our method can achieve will be improved too. This kind of flexibility also gives us the potential to combine the resultant representations from different vector spaces for classification, e.g. concatenating the vectors from different spaces.
 
 The success of these semantic spaces similarity-based structure has lead many to investigate how to obtain formal relationships from them. One such striking example is in that of linear analogies in word-vectors (see Section \ref{WordVectors}, where it was found that the vector XXXX[]King queen blah blah[]XXXXXXX, formally justified in \cite{Ethayarajh2018}. %Vector example
 These relationships have been expanded on, for example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, while \cite{Mitchell2015} discovered that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, \cite{Garg2017} found that word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. %Copy pasted from this 
 
-This brings up an essential point: When using a semantic space, are we taking advantage of relationships that are discriminative or incorrect? The danger of relying on these spaces and the models that use them has greatly affected their adoption in critical application areas like medicine, %Citation needed
-and has raised legal concerns about their application in e.g. determining if someone is suitable for a loan. 
+
 % 
+A "direction" refers in this case to the orthogonal direction to a hyper plane that separates a term in a vector space. As the hyper plane separates entities, this means that the entities furthest along the hyper plane, at the end classified positively, are the entities we are most sure have the term we found the hyper plane for. To see an example of this, see \ref {LRHyperPlane} With this understanding, it becomes possible to induce a ranking of entities on the properties by finding the dot product of the entity points on the direction vector. 
 
-
-Distributional representations like vector spaces have the ability to represent semantic information spatially. Vector spaces built from a domain-specific corpus of text that represent this kind of information, also known as 'semantic spaces', are used, for instance,
-One way to understand how a semantic space represents information is as a conceptual space \cite{Gardenfors2014}. In this space, we can understand domain entities, e.g. movies in a domain of IMDB movie reviews, to be represented as points, and domain properties to be in regions around these points. In figure \ref{ConceptualSpace}, we show an example conceptual space for movies. 
-
-
-\begin{figure}[t]
-	\includegraphics[width=\textwidth]{images/conceptualspace.png}
-	\centering
-	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{ConceptualSpace}
-\end{figure}
 
 
 
@@ -72,7 +80,7 @@ We demonstrate the effect of different filtering methods to find properties, the
 
 
 %%What are some real world scenarios that you could see our work taking effect in?
-In a case study by  \cite{Veale2017}, giving the business users the option between a model with higher classification score but more input variables and a lower classification score but less input variables resulted in more buy-in for system designers. By accurately representing salient concepts in the domain, we are also able to offer a similar option; less nodes in the decision tree in exchange for more accuracy. % Potentially this citation sucks
+%In a case study by  \cite{Veale2017}, giving the business users the option between a model with higher classification score but more input variables and a lower classification score but less input variables resulted in more buy-in for system designers. By accurately representing salient concepts in the domain, we are also able to offer a similar option; less nodes in the decision tree in exchange for more accuracy. % Potentially this citation sucks
 
 
 %How is the work evaluated? How can you justify the evaluation? 
@@ -84,6 +92,10 @@ In a case study by  \cite{Veale2017}, giving the business users the option betwe
 
 %%How does our evaluation of interpretability play into our idea of interpretability outlined in Chapter 1?
 
+
+
+Our method can use any vector space that linearly separates entities, and so it has potential longevity.  This means that our method is relying on structure in the space that does not directly correspond to our desired representation -  we can view our approach as a linear transformation of the space. We address this problem in Chapter \ref{chapter:finetuning}. However, we have the capability to leverage many different methods to construct a vector space for our representation, so as long as dense representations of entities exist it will be possible to use our method, and as they are improved the results that our method can achieve will be improved too. This kind of flexibility also gives us the potential to combine the resultant representations from different vector spaces for classification, e.g. concatenating the vectors from different spaces.
+
 %How is the chapter going to play out? Whats going to happen?
 
 This chapter continues as follows: We begin by describing the work related to this , giving valuable context for the utility and potential of our approach. This is followed by an explanation of the method, including the variations we have adopted for our experimental work. We follow this with our qualitative experimentation, explaining how these variations affect the results, as well as the interpretability of the method, and we end with a quantitative analysis on how well we can represent domain knowledge using decision trees constrained to a limited depth.
@@ -93,7 +105,7 @@ This chapter continues as follows: We begin by describing the work related to th
 \section{Related Work}
 %Sparse word vectors
 %Adapted to composition \cite{Fyshe2015}
-
+\subsection{Semantic Relations \& Their Applications}
 %[ENTIRE SECTION COPY PASTED FROM PREVIOUS PAPER]
 \textbf{Linear Classifiers}
 Decision trees, linear SVM's, logistic regression, decision tables, IF Then rules.
@@ -129,10 +141,7 @@ Broadly speaking, in the context of document classification, the main advantage 
 % Chapter 2: The background and literature review for interpretable representations.
 % Chapter 3: An introduction on the value of a good interpretable classifier, and the position of our work in that domain and how it can be applied there. What entities, properties are. What a conceptual space is. A literature review on relevant interpretable classifiers.
 
- Starting with a Bag-Of-Words \ref{background:BOW} and Conceptual Space we obtain a representation of entities composed of properties. Then, we cover the additional methods we propose to improve this process.
-
-
-
+Starting with a Bag-Of-Words \ref{background:BOW} and Conceptual Space we obtain a representation of entities composed of properties. Then, we cover the additional methods we propose to improve this process.
 
 
 % What does a vector space have that other representations do not?

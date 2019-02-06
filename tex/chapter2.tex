@@ -1,4 +1,11 @@
 \chapter{Background}
+% What text representations actually are
+% Why text representations are useful, what they are used for, how do they relate to our work, how do they relate to interpretability
+% Classification, what classification is, example with Decision Tree
+% What semantic spaces actually are
+% Examples of classification with SVM's 
+% What interpretable representations actually are, desiradata/features of interpretable representations
+% Examples with Decision trees, examples of classifiers that produce an interpretable result automatically
 \section{Text}
 \subsection{Bag-of-words}\label{background:BOW}
 We begin by processing an unstructured text corpus, composed of documents $C_D$. We then remove all punctuation, convert any accented characters to non-accented characters, and lowercase the documents to obtain word tokens for each document $D_W$. From here, we can assume that any $W \approx W$ will now $W = W$, if a word varied in format but not alphanumeric characters. 
@@ -23,10 +30,21 @@ Then, we count the occurrences of each word
 \begin{itemize}
 	\item Difference between SVM and Nnet
 \end{itemize}
-\subsection{Vector Spaces}
+\subsection{Semantic Spaces}\label{bg:SemanticSpaces}
+
+% What representations are semantic spaces? What is not a semantic space?
 \subsubsection{How do vector spaces represent semantics? Why do we use them to represent semantics?}\label{background:WhySpace}
-\subsection{Word Representations}
-\begin{itemize}
+Distributional representations of semantics, known as 'semantic spaces' are well-recognized for their ability to represent semantic information spatially. These representations have been widely adopted for Natural Language Processing (NLP) tasks %Tasks here
+thanks to their ability to represent complex information in a dense representation. In particular, entity-embeddings have been applied  to represent items in recommender systems \cite{Vasile:2016:MPE:2959100.2959160,liang2016factorization,van2016learning}, to represent entities in semantic search engines \cite{DBLP:conf/sigir/JameelBS17,van2017structural}, or to represent examples in classification tasks \cite{DBLP:conf/iccv/DemirelCI17}. %Copied from CONLL paper. Shift this to talk more about applications and tasks rather than specific stuff related to our ideas.
+
+Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
+They also vary in how they linearly separate entities. %How?
+However, their commonality is that they are able to represent semantic relationships spatially. %ref
+See Section \ref{background:WhySpace}
+This brings up an essential point: When using a semantic space, are we taking advantage of relationships that are discriminative or incorrect? The danger of relying on these spaces and the models that use them has greatly affected their adoption in critical application areas like medicine, %Citation needed
+and has raised legal concerns about their application in e.g. determining if someone is suitable for a loan. 
+
+See Section \ref{background:WhySpace}\begin{itemize}
 	\item Word-vectors
 \end{itemize}
 \subsection{Document Representations}

@@ -286,10 +286,10 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "newsgroups"
+data_type = "placetypes"
 doLR = False
 if data_type == "placetypes":
-    dminf = 0.2
+    dminf = 0.04
 else:
     dminf = 0.001
 multi_class_method = "OVR"
