@@ -222,6 +222,41 @@ def split_all(corpus):
         split_corpus.append(corpus[i].split())
     return split_corpus
 
+
+
+def cleanLargeCorpus(corpus_fn_to_stream, corpus_fn_to_save):
+    space_table = str.maketrans(dict.fromkeys("\n\r", " "))
+    punc_table = str.maketrans(dict.fromkeys(string.punctuation))
+    stop_words = set(stopwords.words('english'))
+    with open(corpus_fn_to_save, 'a') as write_file:
+        with open(corpus_fn_to_stream) as infile:
+            for line in infile:
+                processed_line = line.translate(space_table)
+                # Lowercase
+                processed_line = processed_line.lower()
+                # Remove all punctuation
+                processed_line = processed_line.translate(punc_table)
+                # Replace all whitespace with single whitespace
+                processed_line = re.sub(r'\s+', ' ', processed_line)
+                # Deaccent
+                processed_line = deaccent(processed_line)
+                # Strip trailing whitespace
+                processed_line = processed_line.strip()
+                processed_line = list(tokenize(processed_line))
+                for j in reversed(range(len(processed_line))):
+                    if len(processed_line[j]) == 1:
+                        del processed_line[j]
+
+                processed_line = [w for w in processed_line if w not in stop_words]
+                processed_line = " ".join(processed_line)
+
+                if len(processed_line) > 0:
+                    write_file.write(processed_line + "\n")
+                    print(processed_line)
+
+
+
+
 class LimitWords(Method.Method):
 
     word_list = None
@@ -486,6 +521,92 @@ class StreamedCorpus(MasterCorpus):
         self.classes.value = self.orig_classes
 
         self.all_vocab.value, self.dct.value, self.id2token.value = getVocabStreamed(self.corpus_fn_to_stream)
+
+        self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bowStreamed(self.corpus_fn_to_stream, self.bowmin)
+        self.all_words.value = list(self.bowdict.value.keys())
+        print(self.bowmin, len(self.all_words.value), "|||", self.bow.value.shape)
+        self.filtered_bow.value, self.word_list.value, self.filtered_vocab.value, self.filtered_dict.value = filterBowStreamed(
+            self.corpus_fn_to_stream,
+            self.no_below, self.no_above)
+        super().process()
+        # We are not doing any changes to the classes/documents
+
+# Does not support basic tokenization or clean up methods yet, only gensim methods
+class LargeCorpus(MasterCorpus):
+    corpus_fn_to_stream = None
+    def __init__(self,  orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
+                 no_above,
+                 remove_stop_words, save_class, corpus_fn_to_stream=None):
+        self.corpus_fn_to_stream = corpus_fn_to_stream
+        super().__init__(orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
+                 no_above,remove_stop_words, save_class)
+
+    def makePopos(self):
+        output_folder = self.output_folder
+        file_name = self.file_name
+        standard_fn = output_folder + "bow/"
+        self.dct = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + ".pkl", "gensim")
+        self.bowdict = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + "_bowdict.pkl", "gensim")
+        self.filtered_dict = SaveLoadPOPO(self.dct, standard_fn + "metadata/" + file_name + "_filtered_dict.pkl", "gensim")
+        self.tokenized_corpus = SaveLoadPOPO(self.tokenized_corpus, standard_fn + file_name + "_tokenized_corpus.npy", "npy")
+        self.tokenized_ids = SaveLoadPOPO(self.tokenized_ids, standard_fn + file_name + "_tokenized_ids.npy", "npy")
+        self.id2token = SaveLoadPOPO(self.id2token, standard_fn + "metadata/" + file_name + "id2token.dct", "dct")
+        self.all_vocab = SaveLoadPOPO(self.all_vocab, standard_fn + "metadata/" + file_name + "_all_vocab.dct", "dct")
+        self.bow_vocab = SaveLoadPOPO(self.bow_vocab,
+                                      standard_fn + "metadata/" + file_name + "_vocab_" + str(self.bowmin) + ".npy",
+                                      "npy")
+        self.filtered_vocab = SaveLoadPOPO(self.filtered_vocab,
+                                           standard_fn + "metadata/" + file_name + "_filtered_vocab.npy", "npy")
+        self.processed_corpus = SaveLoadPOPO(self.processed_corpus,
+                                             output_folder + "corpus/" + file_name + "_corpus_processed.txt", "1dtxts")
+        self.split_corpus = SaveLoadPOPO(self.split_corpus,
+                                             output_folder + "corpus/" + file_name + "_corpus_processed_split.npy", "npy")
+        self.classes = SaveLoadPOPO(self.classes, output_folder + "classes/" + file_name +self.name_of_class +  "_classes.npy", "npy")
+        self.filtered_classes = SaveLoadPOPO(self.filtered_classes, output_folder + "classes/" + file_name +self.name_of_class +  "_fil_classes.npy", "npy")
+        self.classes_categorical = SaveLoadPOPO(self.classes_categorical,
+                                                output_folder + "classes/" + file_name + self.name_of_class + "_classes_categorical.npy",
+                                                "npy")
+        self.filtered_class_names = SaveLoadPOPO(self.filtered_class_names,
+                                                output_folder + "classes/" + file_name +self.name_of_class +  "_class_names.txt",
+                                                "1dtxts")
+        self.bow = SaveLoadPOPO(self.bow, standard_fn + file_name + "_sparse_corpus.npz", "scipy")
+        self.filtered_bow = SaveLoadPOPO(self.filtered_bow,
+                                         standard_fn + file_name + "_" + str(self.no_below) + "_" + str(
+                                             self.no_above) + "_filtered.npz", "scipy")
+        self.word_list = SaveLoadPOPO(self.word_list, standard_fn + "metadata/" + file_name + "_words.txt", "1dtxts")
+        self.all_words = SaveLoadPOPO(self.all_words, standard_fn + "metadata/" + file_name + "_all_words_2.txt",
+                                      "1dtxts")
+
+    def getBow(self):
+        self.bow.value = self.save_class.load(self.bow)
+        return self.bow.value
+
+    def getWordList(self):
+        self.all_words.value = self.save_class.load(self.all_words)
+        return self.all_words.value
+
+    def getFilteredBow(self):
+        self.filtered_bow.value = self.save_class.load(self.filtered_bow)
+        return self.filtered_bow.value
+
+    def getFilteredWordList(self):
+        self.word_list.value = self.save_class.load(self.word_list)
+        return self.word_list.value
+
+
+    def makePopoArray(self):
+        self.popo_array = [self.dct,
+                           self.id2token,
+                           self.bow_vocab, self.filtered_vocab,
+                            self.classes,  self.bow, self.filtered_bow,
+                           self.word_list, self.all_words, self.bowdict, self.filtered_dict]
+    def process(self):
+        self.classes.value = self.orig_classes
+
+        cleaned_corpus_fn = self.output_folder + "corpus/" + self.file_name + "_corpus_processed.txt"
+        cleanLargeCorpus(self.corpus_fn_to_stream, cleaned_corpus_fn)
+
+        self.all_vocab.value, self.dct.value, self.id2token.value = getVocabStreamed(cleaned_corpus_fn)
 
         self.bowdict.value, self.bow.value, self.bow_vocab.value = doc2bowStreamed(self.corpus_fn_to_stream, self.bowmin)
         self.all_words.value = list(self.bowdict.value.keys())
