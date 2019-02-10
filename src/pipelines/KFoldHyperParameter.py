@@ -32,6 +32,7 @@ def get_grid_params(hpam_dict):
     return all_p
 
 class MasterHParam(Method):
+    dim_names = None
     classes = None
     dev = None
     file_name = None
@@ -60,7 +61,7 @@ class MasterHParam(Method):
     top_scoring_params = None
     mcm = None
 
-    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True, acc=True, kappa=True, mcm=None):
+    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True, acc=True, kappa=True, mcm=None, dim_names = None):
 
         self.rewrite_model = rewrite_model
         # Metric that determines what will be returned to the overall hyper-parameter method
@@ -78,6 +79,7 @@ class MasterHParam(Method):
         self.model_type = model_type
         self.mcm = mcm
         self.file_names = []
+        self.dim_names = dim_names
         self.end_file_name = self.file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + self.model_type
         super().__init__(file_name, save_class)
 
@@ -169,7 +171,7 @@ class RecHParam(MasterHParam):
     classify_fn = None
     matched_ids = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None):
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -180,13 +182,13 @@ class RecHParam(MasterHParam):
         self.classify_fn = classify_fn
         self.average_file_names = []
         self.all_p = get_grid_params(hpam_dict)
-
+        self.dim_names = dim_names
         self.end_file_name = file_name + "_Kfold" + str(None) + str(
             generateNumber(hpam_dict)) + model_type
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
-                         score_metric=score_metric, mcm=mcm)
+                         score_metric=score_metric, mcm=mcm, dim_names=dim_names)
 
     def getTopScoringRowData(self):
         return self.save_class.load(self.top_scoring_row_data)
@@ -427,7 +429,7 @@ class HParam(MasterHParam):
     # The CSV data that corresponds to the highest scoring row for the score_metric
 
     def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None, final_score_on_dev=False,
-                 mcm=None):
+                 mcm=None, dim_names=None):
 
         # Metric that determines what will be returned to the overall hyper-parameter method
         self.all_p = get_grid_params(hpam_dict)
@@ -439,12 +441,13 @@ class HParam(MasterHParam):
         self.final_score_on_dev = final_score_on_dev
         self.y_dev = y_dev
         self.file_names = []
+        self.dim_names = dim_names
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa,
                          model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names, save_class=save_class,
                          hpam_dict=hpam_dict,
-                         score_metric=score_metric, mcm=mcm)
+                         score_metric=score_metric, mcm=mcm, dim_names=dim_names)
         self.end_file_name = self.file_name + "_Kfold" + str(self.dev) + str(
             generateNumber(hpam_dict)) + self.model_type
 

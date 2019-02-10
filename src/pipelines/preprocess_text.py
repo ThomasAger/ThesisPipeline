@@ -1,3 +1,5 @@
+import util.classify
+import util.text_utils
 from util import io as dt
 import numpy as np
 from sklearn.datasets import fetch_20newsgroups
@@ -28,8 +30,8 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
     classes_save = SaveLoad(rewrite=rewrite_all)
-    classes_process = process_corpus.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
-                                         no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
+    classes_process = util.classify.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
+                                                   no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
     classes_process.process_and_save()
     classes = classes_process.getClasses()
     class_names = classes_process.getClassNames()
@@ -226,7 +228,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
         classes = np.asarray(np.concatenate((y_train, y_test), axis=0))
-        corpus = np.asarray(process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index()))
+        corpus = np.asarray(util.text_utils.makeCorpusFromIds(corpus, imdb.get_word_index()))
         class_names = ["sentiment"]
         classes_freq_cutoff = 0
         name_of_class = "Sentiment"
