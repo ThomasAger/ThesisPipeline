@@ -13,8 +13,8 @@ class PCA(RepMethod):
         super().__init__(file_name, output_folder, save_class, dim)
 
     def checkWordDocMatrix(self, doc_amt):
-        if self.word_doc_matrix.shape[1] != doc_amt and self.word_doc_matrix.shape[0] != doc_amt:
-            raise ValueError("Incorrect number of documents")
+        if self.word_doc_matrix.shape[1] != doc_amt and self.word_doc_matrix.shape[0] != doc_amt and doc_amt > 0:
+            raise ValueError("Incorrect number of documents", doc_amt,self.word_doc_matrix.shape[1] )
         # Check if the words, typically the more frequent, are the rows or the columns, and transpose so they are the columns
         if self.word_doc_matrix.shape[1] == doc_amt:
             self.word_doc_matrix = self.word_doc_matrix.transpose()

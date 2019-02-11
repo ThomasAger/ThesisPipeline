@@ -39,7 +39,7 @@ def get_doc_amt(data_type):
     elif data_type == "placetypes":
         max_size = placetypes_total
     elif data_type == "anime":
-        max_size = anime_total
+        max_size = -1
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)

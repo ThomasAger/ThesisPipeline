@@ -114,6 +114,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         name_of_class = ["Foursquare", "Geonames", "OpenCYC"]
     elif data_type == "reuters":
         name_of_class = ["Reuters"]
+    elif data_type == "anime":
+        name_of_class = ["Anime"]
 
     window_size = [5, 10, 15]
     min_count = [1, 5, 10]
@@ -216,14 +218,14 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             spaces.append(awv_instance.getRep())
             space_names.append(awv_fn)
 
-            if data_type != "sentiment":
+            if data_type != "sentiment" and data_type != "anime":
                 mds_identifier = "_" + str(dims[i]) + "_MDS"
                 mds_fn = pipeline_fn + mds_identifier
                 import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
                 spaces.append(dt.import2dArray(import_fn))
                 space_names.append(mds_fn)
 
-            if data_type != "movies" and data_type != "placetypes":
+            if data_type != "movies" and data_type != "placetypes" and data_type != "anime":
                 doc2vec_identifier = "_" + str(dims[i]) + "_D2V"
                 doc2vec_fn = pipeline_fn + doc2vec_identifier
                 classifier_fn = pipeline_fn + "_" + name_of_class[ci] + "_"
@@ -286,12 +288,12 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "sentiment"
+data_type = "movies"
 doLR = False
 if data_type == "placetypes":
     dminf = 0.04
 else:
-    dminf = 0.003
+    dminf = 0.0001
 multi_class_method = "OVR"
 bonus_fn = ""
 rewrite_all=False

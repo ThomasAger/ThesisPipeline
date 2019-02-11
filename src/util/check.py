@@ -12,7 +12,7 @@ def check_y(true_targets, predictions):
     if predictions is None:
         raise ValueError("predictions is None")
     if type(true_targets) is not np.ndarray:
-        raise ValueError("true_targets is not numpy array")
+        print("true_targets is not numpy array")
     if type(predictions) is not np.ndarray:
         print("WARNING: predictions is not numpy array")
     if len(true_targets) != len(predictions):
