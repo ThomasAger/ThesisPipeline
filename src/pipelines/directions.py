@@ -16,6 +16,7 @@ from score.classify import MultiClassScore
 from project.get_rankings import GetRankings
 from project.get_ndcg import GetNDCG
 from rep import pca, ppmi, awv
+from project.get_tsr import GetTopScoringRanks
 
 import KFoldHyperParameter
 
@@ -71,7 +72,6 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     new_word_dict = dir.getNewWordDict()
 
 
-    # Rewrite is always true for this as loading is handled internally
     dir_save = SaveLoad(rewrite=rewrite_all)
     dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
@@ -126,8 +126,9 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
     for i in range(len(score_array)):
         gtr_save = SaveLoad(rewrite=rewrite_all)
-        gtr = project.get_tsr.GetTopScoringRanks(file_name, gtr_save, processed_folder, score_array[i], top_scoring_dir, rankings, new_word2id_dict)
-        fil_rank = gtr.getRankings()
+        gtr = GetTopScoringRanks(file_name, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
+        gtr.process_and_save()
+        fil_rank = gtr.getRank()
 
 
         split_ids = split.get_split_ids(data_type, matched_ids)
@@ -140,7 +141,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
         hyper_param.process_and_save()
-        return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), gtr.rank[1]
+        return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), gtr.rank.file_name
 
 
 
@@ -332,7 +333,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "sentiment"
+data_type = "newsgroups"
 doLR = False
 dminf = -1
 dmanf = -1

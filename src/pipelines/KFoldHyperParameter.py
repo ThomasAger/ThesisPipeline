@@ -99,8 +99,9 @@ class MasterHParam(Method):
         svm_save = SaveLoad(rewrite=self.rewrite_model)
         model = None
         model_fn = None
+        file_name = self.file_name
         if self.model_type == "LinearSVM":
-            model_fn = self.file_name + "_Dev" + "_" + str(len(x_test)) + "_Balanced_" + str(all_p["class_weight"]) \
+            model_fn = file_name + "_Dev" + "_" + str(len(x_test)) + "_Balanced_" + str(all_p["class_weight"]) \
                        + "_C_" + str(all_p["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
             model = LinearSVM(x_train, y_train, x_test, y_test,
                               self.output_folder + "svm/" + model_fn, svm_save, C=all_p["C"],
@@ -112,7 +113,7 @@ class MasterHParam(Method):
                        + "_C_" + str(all_p["C"]) + "_Gam_" + str(all_p["gamma"]) + "_Prob_" + str(
                 self.probability) + "_" + self.model_type
 
-            model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
 
             model = GaussianSVM(x_train, y_train, x_test, y_test,
                                 self.output_folder + "svm/" + model_fn, svm_save, gamma=all_p["gamma"],
@@ -126,7 +127,7 @@ class MasterHParam(Method):
                 all_p["max_depth"]) + "_MSL_" + str(all_p["min_samples_leaf"]) + "_MSS_" + str(
                 all_p["min_samples_split"]) + "_" + self.model_type
 
-            model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             model = RandomForest(x_train, y_train, x_test, y_test,
                                  self.output_folder + "rf/" + model_fn, svm_save,
                                  n_estimators=all_p["n_estimators"], bootstrap=all_p["bootstrap"],
@@ -141,7 +142,7 @@ class MasterHParam(Method):
                 all_p["max_features"]) + "_MD_" + str(
                 all_p["max_depth"]) + "_" + self.model_type
 
-            model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             model = DecisionTree(x_train, y_train, x_test, y_test,
                                  self.output_folder + "dt/" + model_fn, svm_save,
                                  max_depth=all_p["max_depth"],
@@ -174,9 +175,10 @@ class RecHParam(MasterHParam):
     hpam_method = None
     hpam_params = None
     ranks = None
+    fn_addition = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
-                 hpam_method=None, hpam_params=None):
+                 hpam_method=None, hpam_params=None, fn_addition=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -190,6 +192,7 @@ class RecHParam(MasterHParam):
         self.average_file_names = []
         self.all_p = get_grid_params(hpam_dict)
         self.dim_names = dim_names
+        self.fn_addition = fn_addition
         self.end_file_name = file_name + "_Kfold" + str(None) + str(
             generateNumber(hpam_dict)) + model_type
 
@@ -261,7 +264,8 @@ class RecHParam(MasterHParam):
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
         elif self.hpam_model_type == "dir":
-            self.getTopScoringByMetricDir()
+            print("skipped")
+            #self.getTopScoringByMetricDir()
         super().process()
     def getTopScoring(self):
         if self.final_arrays.value is None:
@@ -278,6 +282,7 @@ class RecHParam(MasterHParam):
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
+
         model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
 
 
