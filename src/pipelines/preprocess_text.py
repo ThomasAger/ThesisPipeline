@@ -1,3 +1,5 @@
+import util.classify
+import util.text_utils
 from util import io as dt
 import numpy as np
 from sklearn.datasets import fetch_20newsgroups
@@ -19,39 +21,31 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
              no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False,
              remove_stop_words=False,  auroc=False, score_metric="avg_f1", corpus_fn="", name_of_class="", mcm=MultiOutputClassifier, classifier_fn=""):
 
+
     probability = False
     if auroc is True:
         probability = True
 
     doc_amt = split.get_doc_amt(data_type)
-    if data_type != "anime":
-        no_below = int(doc_amt * no_below_fraction)
-    else:
-        no_below = int(2000 * no_below_fraction)
-
+    no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
     classes_save = SaveLoad(rewrite=rewrite_all)
-    classes_process = process_corpus.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
-                                         no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
+    classes_process = util.classify.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
+                                                   no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
     classes_process.process_and_save()
     classes = classes_process.getClasses()
     class_names = classes_process.getClassNames()
 
     # Process and save corpus
     corpus_save = SaveLoad(rewrite=rewrite_all)
-    if data_type == "placetypes" or data_type == "movies" or data_type == "anime":
+    if data_type == "placetypes" or data_type == "movies":
         p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
-                                         no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
-
-    elif data_type == "???":
-        p_corpus = process_corpus.LargeCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
     else:
         p_corpus = process_corpus.Corpus(corpus,  classes,name_of_class, file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
     p_classes = p_corpus.getClasses()
-
     matched_ids = []
     try:
         class_entities = dt.import1dArray(output_folder + "classes/" + name_of_class + "_entities.txt")
@@ -164,7 +158,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
-            if data_type != "sentiment" and data_type != "anime":
+            if data_type != "sentiment" :
                 mds_identifier =  "_" + str(dims[i])+"_MDS"
                 mds_fn = file_name + mds_identifier
                 classify_mds_fn = classifier_fn + mds_identifier
@@ -201,7 +195,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hpam_dict["wv_path"] = [wv_path_d2v]
 
             # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
-            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
+            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "dir", model_type,
                                          doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
                                     data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, mcm=mcm)
             hyper_param.process_and_save()
@@ -234,7 +228,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
         classes = np.asarray(np.concatenate((y_train, y_test), axis=0))
-        corpus = np.asarray(process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index()))
+        corpus = np.asarray(util.text_utils.makeCorpusFromIds(corpus, imdb.get_word_index()))
         class_names = ["sentiment"]
         classes_freq_cutoff = 0
         name_of_class = "Sentiment"
@@ -273,12 +267,10 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         name_of_class = "Reuters"
 
     elif data_type == "anime":
-        #corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
-        corpus = None
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
         classes_freq_cutoff = 10
-        anime_fn = "D:\Dropbox\PhD\My Work\Code\Anime review\data\complete/"
-        corpus_fn = anime_fn + "processed_corpus.txt"
-        classes = np.load(anime_fn + "trimmed_classes.npy")
+        corpus = np.load(raw_folder + "corpus.npy")
+        classes = np.load(raw_folder + "classes.npy")
         class_names = list(range(len(classes[0])))
         for i in range(len(class_names)):
             class_names[i] = str(class_names[i])
@@ -364,9 +356,9 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "anime"
+data_type = "reuters"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
-                                grams=0, model_type=classifiers[i], no_below=0.01, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
+                                grams=0, model_type=classifiers[i], no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
                                 score_metric="avg_f1", max_depth=max_depths[i], multiclass="OVR")
