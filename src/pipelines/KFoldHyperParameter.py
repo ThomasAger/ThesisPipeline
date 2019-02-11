@@ -103,7 +103,7 @@ class MasterHParam(Method):
             model_fn = self.file_name + "_Dev" + "_" + str(len(x_test)) + "_Balanced_" + str(all_p["class_weight"]) \
                        + "_C_" + str(all_p["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
             model = LinearSVM(x_train, y_train, x_test, y_test,
-                              self.output_folder + "rep/svm/" + model_fn, svm_save, C=all_p["C"],
+                              self.output_folder + "svm/" + model_fn, svm_save, C=all_p["C"],
                               class_weight=all_p["class_weight"], probability=self.probability, verbose=False,
                               mcm=self.mcm)
 
@@ -115,7 +115,7 @@ class MasterHParam(Method):
             model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
 
             model = GaussianSVM(x_train, y_train, x_test, y_test,
-                                self.output_folder + "rep/svm/" + model_fn, svm_save, gamma=all_p["gamma"],
+                                self.output_folder + "svm/" + model_fn, svm_save, gamma=all_p["gamma"],
                                 C=all_p["C"],
                                 class_weight=all_p["class_weight"], probability=self.probability, verbose=False,
                                 mcm=self.mcm)
@@ -128,7 +128,7 @@ class MasterHParam(Method):
 
             model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             model = RandomForest(x_train, y_train, x_test, y_test,
-                                 self.output_folder + "rep/rf/" + model_fn, svm_save,
+                                 self.output_folder + "rf/" + model_fn, svm_save,
                                  n_estimators=all_p["n_estimators"], bootstrap=all_p["bootstrap"],
                                  max_depth=all_p["max_depth"],
                                  min_samples_leaf=all_p["min_samples_leaf"],
@@ -143,7 +143,7 @@ class MasterHParam(Method):
 
             model_fn = self.file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             model = DecisionTree(x_train, y_train, x_test, y_test,
-                                 self.output_folder + "rep/dt/" + model_fn, svm_save,
+                                 self.output_folder + "dt/" + model_fn, svm_save,
                                  max_depth=all_p["max_depth"],
                                  class_weight=all_p["class_weight"], max_features=all_p["max_features"],
                                  probability=self.probability, verbose=False, mcm=self.mcm)
@@ -200,9 +200,9 @@ class RecHParam(MasterHParam):
         return self.save_class.load(self.top_scoring_row_data)
 
     def makePopos(self):
-        self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + ".csv", "csv")
-        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
-        self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "rep/score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
+        self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "score/csv_averages/" + self.end_file_name + ".csv", "csv")
+        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
+        self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
 
 
     def makePopoArray(self):
@@ -221,7 +221,7 @@ class RecHParam(MasterHParam):
                 doc2vec_fn = self.file_name + identifier
                 d2v_classify_fn = self.classify_fn + identifier
                 doc2vec_instance = d2v.D2V(self.all_p[i]["corpus_fn"], self.all_p[i]["wv_path"], doc2vec_fn,
-                                           self.output_folder + "rep/d2v/", doc2vec_save, self.all_p[i]["dim"], window_size=self.all_p[i]["window_size"],
+                                           self.output_folder + "d2v/", doc2vec_save, self.all_p[i]["dim"], window_size=self.all_p[i]["window_size"],
                                            min_count=self.all_p[i]["min_count"], train_epoch=self.all_p[i]["train_epoch"]
                                            )
                 doc2vec_instance.process_and_save()
@@ -264,7 +264,7 @@ class RecHParam(MasterHParam):
 
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(None, None, None, file_name=model_fn,
-                                         output_folder=self.output_folder + "rep/score/", save_class=score_save,
+                                         output_folder=self.output_folder + "score/", save_class=score_save,
                                          verbose=True, class_names=self.class_names,
                                          fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
         score.process_and_save()
@@ -290,7 +290,7 @@ class RecHParam(MasterHParam):
             self.all_p[index_sorted]["dim"]) + "_D2V"
 
         doc2vec_instance = d2v.D2V(self.all_p[index_sorted]["corpus_fn"], self.all_p[index_sorted]["wv_path"], doc2vec_fn,
-                                   self.output_folder + "rep/d2v/", doc2vec_save, self.all_p[index_sorted]["dim"],
+                                   self.output_folder + "d2v/", doc2vec_save, self.all_p[index_sorted]["dim"],
                                    window_size=self.all_p[index_sorted]["window_size"],
                                    min_count=self.all_p[index_sorted]["min_count"], train_epoch=self.all_p[index_sorted]["train_epoch"]
                                    )
@@ -339,9 +339,9 @@ class DirectionsHParam(MasterHParam):
         return self.save_class.load(self.top_scoring_row_data)
 
     def makePopos(self):
-        self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + ".csv", "csv")
-        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
-        self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "rep/score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
+        self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "score/csv_averages/" + self.end_file_name + ".csv", "csv")
+        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
+        self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
 
 
     def makePopoArray(self):
@@ -360,7 +360,7 @@ class DirectionsHParam(MasterHParam):
                 doc2vec_fn = self.file_name + identifier
                 d2v_classify_fn = self.classify_fn + identifier
                 doc2vec_instance = d2v.D2V(self.all_p[i]["corpus_fn"], self.all_p[i]["wv_path"], doc2vec_fn,
-                                           self.output_folder + "rep/d2v/", doc2vec_save, self.all_p[i]["dim"], window_size=self.all_p[i]["window_size"],
+                                           self.output_folder + "d2v/", doc2vec_save, self.all_p[i]["dim"], window_size=self.all_p[i]["window_size"],
                                            min_count=self.all_p[i]["min_count"], train_epoch=self.all_p[i]["train_epoch"]
                                            )
                 doc2vec_instance.process_and_save()
@@ -390,7 +390,7 @@ class DirectionsHParam(MasterHParam):
 
     #If you need other metrics than F1 just do metric = "acc" then index is 0 etc.
     def getTopScoringByMetric(self):
-        doc2vec_space = self.getTopScoringSpace()
+        doc2vec_space, index_sorted = self.getTopScoringSpace()
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
                                                                           self.classes, split_ids,
@@ -399,7 +399,7 @@ class DirectionsHParam(MasterHParam):
 
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
         score = classify.selectScore(None, None, None, file_name=model_fn,
-                                         output_folder=self.output_folder + "rep/score/", save_class=score_save,
+                                         output_folder=self.output_folder + "score/", save_class=score_save,
                                          verbose=True,
                                          fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
         score.process_and_save()
@@ -425,7 +425,7 @@ class DirectionsHParam(MasterHParam):
             self.all_p[index_sorted]["dim"]) + "_D2V"
 
         doc2vec_instance = d2v.D2V(self.all_p[index_sorted]["corpus_fn"], self.all_p[index_sorted]["wv_path"], doc2vec_fn,
-                                   self.output_folder + "rep/d2v/", doc2vec_save, self.all_p[index_sorted]["dim"],
+                                   self.output_folder + "d2v/", doc2vec_save, self.all_p[index_sorted]["dim"],
                                    window_size=self.all_p[index_sorted]["window_size"],
                                    min_count=self.all_p[index_sorted]["min_count"], train_epoch=self.all_p[index_sorted]["train_epoch"]
                                    )
@@ -463,9 +463,9 @@ class HParam(MasterHParam):
 
 
     def makePopos(self):
-        self.averaged_csv_data = SaveLoadPOPO(self.averaged_csv_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + ".csv", "scoredictarray")
-        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "rep/score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
-        self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "rep/score/csv_averages/top_params/" + self.end_file_name + "Top"+self.score_metric+".txt", "dct")
+        self.averaged_csv_data = SaveLoadPOPO(self.averaged_csv_data, self.output_folder + "score/csv_averages/" + self.end_file_name + ".csv", "scoredictarray")
+        self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
+        self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + "Top"+self.score_metric+".txt", "dct")
 
     def getTopScoringRowData(self):
         self.top_scoring_row_data.value = self.save_class.load(self.top_scoring_row_data)
@@ -489,13 +489,13 @@ class HParam(MasterHParam):
             self.file_names.append(model_fn)
             score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
-                                             output_folder=self.output_folder + "rep/score/", save_class=score_save, verbose=True,
+                                             output_folder=self.output_folder + "score/", save_class=score_save, verbose=True,
                                              fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc, class_names = self.class_names)
             score.process_and_save()
 
             self.p_score_dicts.append(score.get())
 
-        self.averaged_csv_data.value = [self.p_score_dicts, self.class_names, self.file_names, self.output_folder + "rep/score/csv_details/"]
+        self.averaged_csv_data.value = [self.p_score_dicts, self.class_names, self.file_names, self.output_folder + "score/csv_details/"]
         self.getTopScoringByMetric()
         super().process()
 
@@ -515,12 +515,12 @@ class HParam(MasterHParam):
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
         if self.final_score_on_dev:
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
-                                             output_folder=self.output_folder + "rep/score/", save_class=score_save,
+                                             output_folder=self.output_folder + "score/", save_class=score_save,
                                              verbose=True, class_names=self.class_names,
                                              fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
         else:
             score = classify.selectScore(self.y_test, pred, prob, file_name=model_fn,
-                                             output_folder=self.output_folder + "rep/score/", save_class=score_save,
+                                             output_folder=self.output_folder + "score/", save_class=score_save,
                                              verbose=True, class_names = self.class_names,
                                              fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
 

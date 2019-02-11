@@ -99,7 +99,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_pca_fn,
-                             output_folder=output_folder, save_class=hpam_save, rewrite_model=rewrite_all,
+                             output_folder=output_folder + "rep/", save_class=hpam_save, rewrite_model=rewrite_all,
                              score_metric=score_metric, mcm=mcm)
         if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
@@ -115,7 +115,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(class_names,
                                           kfold_hpam_dict, model_type, classify_pca_fn,
-                                     output_folder, hpam_save, probability, rewrite_model=rewrite_all,
+                                     output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all,
                              x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
                              mcm=mcm)
         hyper_param.process_and_save()
@@ -135,7 +135,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             hpam_save = SaveLoad(rewrite=rewrite_all)
             hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_awv_fn,
-                                 output_folder=output_folder, save_class=hpam_save, rewrite_model=rewrite_all,
+                                 output_folder=output_folder + "rep/", save_class=hpam_save, rewrite_model=rewrite_all,
                                  score_metric=score_metric, mcm=mcm)
             if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
@@ -151,7 +151,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hpam_save = SaveLoad(rewrite=rewrite_all)
             hyper_param = HParam(class_names,
                                               kfold_hpam_dict, model_type, classify_awv_fn,
-                                         output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                                         output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
                                  y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
                                  mcm=mcm)
             hyper_param.process_and_save()
@@ -166,7 +166,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
                 hpam_save = SaveLoad(rewrite=rewrite_all)
                 hyper_param = HParam( hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_mds_fn,
-                                      output_folder=output_folder, save_class=hpam_save,rewrite_model=rewrite_all, score_metric=score_metric,
+                                      output_folder=output_folder + "rep/", save_class=hpam_save,rewrite_model=rewrite_all, score_metric=score_metric,
                                       mcm=mcm)
                 if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
                     mds = dt.import2dArray(import_fn)
@@ -177,7 +177,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                                                                       dev_percent_of_train=dev_percent)
 
                 hpam_save = SaveLoad(rewrite=rewrite_all)
-                hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder, hpam_save,
+                hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder + "rep/", hpam_save,
                                      probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
                 hyper_param.process_and_save()
@@ -196,7 +196,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
             hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "dir", model_type,
-                                         doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
+                                         doc2vec_fn, classify_doc2vec_fn, output_folder + "rep/", hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
                                     data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, mcm=mcm)
             hyper_param.process_and_save()
             all_test_result_rows.append(hyper_param.getTopScoringRowData())

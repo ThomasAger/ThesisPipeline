@@ -30,7 +30,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
-                            file_name, None, processed_folder, hpam_save, probability=False,
+                            file_name, None, processed_folder + "rank/", hpam_save, probability=False,
                             rewrite_model=rewrite_all, dev_percent=dev_percent,
                             data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=None,
                             mcm=mcm, hpam_params=[dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file_name, processed_folder,
@@ -135,7 +135,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
                                                                           dev_percent_of_train=dev_percent)
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
         hpam_save = SaveLoad(rewrite=rewrite_all)
-        hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder, hpam_save,
+        hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
         hyper_param.process_and_save()
@@ -281,7 +281,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
                 # Have to leave classes in due to messy method
                 hyper_param = KFoldHyperParameter.RecHParam(None, classes, None, hpam_dict, hpam_dict, "d2v", "LinearSVM",
-                                        doc2vec_fn, classifier_fn, processed_folder, SaveLoad(rewrite=False), data_type=data_type,
+                                        doc2vec_fn, classifier_fn, processed_folder + "rep/", SaveLoad(rewrite=False), data_type=data_type,
                                         score_metric=score_metric)
                 d2v_space, __unused = hyper_param.getTopScoringSpace()
                 spaces.append(d2v_space)
@@ -330,7 +330,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "sentiment"
+data_type = "reuters"
 doLR = False
 dminf = -1
 dmanf = -1
