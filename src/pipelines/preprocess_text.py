@@ -195,7 +195,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hpam_dict["wv_path"] = [wv_path_d2v]
 
             # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
-            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
+            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "dir", model_type,
                                          doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
                                     data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, mcm=mcm)
             hyper_param.process_and_save()
@@ -356,7 +356,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "reuters"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

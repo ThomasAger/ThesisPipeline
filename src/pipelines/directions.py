@@ -17,7 +17,7 @@ from project.get_rankings import GetRankings
 from project.get_ndcg import GetNDCG
 from rep import pca, ppmi, awv
 
-from pipelines.KFoldHyperParameter import HParam, RecHParam
+import KFoldHyperParameter
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
@@ -26,7 +26,22 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
                      model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="",
              classifier_fn="", mcm=None, top_scoring_dirs=2000, score_type="kappa", ppmi=None, dct_unchanged=None, pipeline_hpam_dict=None):
+    hpam_save = SaveLoad(rewrite=rewrite_all)
 
+    # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
+    hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
+                            file_name, None, processed_folder, hpam_save, probability=False,
+                            rewrite_model=rewrite_all, dev_percent=dev_percent,
+                            data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=None,
+                            mcm=mcm, hpam_params=[dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file_name, processed_folder,
+                       words_to_get, space, name_of_class, model_type, classes, class_names, auroc, score_metric,
+                       mcm, dev_percent, ppmi, kfold_hpam_dict])
+    hyper_param.process_and_save()
+
+
+def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file_name, processed_folder,
+                       words_to_get, space, name_of_class, model_type, classes, class_names, auroc, score_metric,
+                       mcm, dev_percent, ppmi, kfold_hpam_dict, top_scoring_dir=None, top_scoring_freq=None):
     # Convert to hyper-parameter method, where hyper-parameters are:
     ##### dir_min_freq, dir_max freq
     ##### Scoring filters, aka top 200, top 400, etc, score-type
@@ -38,14 +53,14 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
 
     doc_amt = split.get_doc_amt(data_type)
 
-    wl_save = SaveLoad(rewrite=rewrite_all)
+    wl_save = SaveLoad(rewrite=True)
     if dir_min_freq != -1 and dir_max_freq != -1:
         no_below = int(doc_amt * dir_min_freq)
         no_above = int(doc_amt * dir_max_freq)
         dir = LimitWords(file_name, wl_save, dct, bow, processed_folder +"directions/words/", words_to_get, no_below, no_above)
     else:
         # called this for laziness sake
-        no_below = pipeline_hpam_dict["top_freq"][0]
+        no_below = top_scoring_freq
         no_above = 0
         dir = LimitWordsNumeric(file_name, wl_save, dct, bow, processed_folder +"directions/words/", words_to_get, no_below)
 
@@ -108,9 +123,9 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     score_array = [ndcg_scores, s_dict["f1"], s_dict["acc"], s_dict["kappa"]]
     sc_name_array = ["ndcg", "f1", "acc", "kappa"]
     # Filter directions based on the amount to filter in params and the score type to filter in params
-    all_test_result_rows = []
+
     for i in range(len(score_array)):
-        inds = np.flipud(np.argsort(score_array[i]))[:top_scoring_dirs]
+        inds = np.flipud(np.argsort(score_array[i]))[:top_scoring_dir]
         fil_rank = rankings[inds].transpose()
         words = np.asarray(list(new_word2id_dict.keys()))[inds]
 
@@ -118,24 +133,12 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
                                                                           classes, split_ids,
                                                                           dev_percent_of_train=dev_percent)
-        dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dirs) + "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
+        dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
         hpam_save = SaveLoad(rewrite=rewrite_all)
-        hyper_param = HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder, hpam_save,
+        hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder, hpam_save,
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
         hyper_param.process_and_save()
-        all_test_result_rows.append(hyper_param.getTopScoringRowData())
-
-    all_r = np.asarray(all_test_result_rows).transpose()
-    rows = all_r[1]
-    cols = np.asarray(rows.tolist()).transpose()
-    col_names = all_r[0][0]
-    key = all_r[2]
-    dt.write_csv(processed_folder + "rep/score/csv_final/" +file_name+ "_" + str(dir_min_freq) + "_" + str(dir_max_freq) + "reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
-    print("a")
-
-
-
 
 
 
@@ -277,7 +280,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                 hpam_dict["wv_path"] = [wv_path_d2v]
 
                 # Have to leave classes in due to messy method
-                hyper_param = RecHParam(None, classes, None, hpam_dict, hpam_dict, "d2v", "LinearSVM",
+                hyper_param = KFoldHyperParameter.RecHParam(None, classes, None, hpam_dict, hpam_dict, "d2v", "LinearSVM",
                                         doc2vec_fn, classifier_fn, processed_folder, SaveLoad(rewrite=False), data_type=data_type,
                                         score_metric=score_metric)
                 d2v_space, __unused = hyper_param.getTopScoringSpace()
@@ -327,7 +330,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "sentiment"
 doLR = False
 dminf = -1
 dmanf = -1

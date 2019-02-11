@@ -14,6 +14,7 @@ from rep import d2v
 from model.randomforest import RandomForest
 from model.decisiontree import DecisionTree
 from util import split
+from pipelines.directions import direction_pipeline
 
 def get_grid_params(hpam_dict):
     hyperparam_array = list(hpam_dict.values())
@@ -170,8 +171,11 @@ class RecHParam(MasterHParam):
     data_type = None
     classify_fn = None
     matched_ids = None
+    hpam_method = None
+    hpam_params = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None):
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
+                 hpam_method=None, hpam_params=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -180,6 +184,8 @@ class RecHParam(MasterHParam):
         self.space = space
         self.classes = classes
         self.classify_fn = classify_fn
+        self.hpam_method = hpam_method
+        self.hpam_params = hpam_params
         self.average_file_names = []
         self.all_p = get_grid_params(hpam_dict)
         self.dim_names = dim_names
@@ -236,6 +242,10 @@ class RecHParam(MasterHParam):
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
+            elif self.hpam_model_type is "dir":
+                if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
+                    continue
+                direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())

@@ -315,5 +315,6 @@ class LimitWordsNumeric(LimitWordsMaster):
         ids = ids[s_freqs]
         for key in ids:
             self.bow_word_dict.value[self.dct.id2token[key]] = self.dct.token2id[self.dct.id2token[key]]
-            self.new_word_dict.value[self.dct.id2token[key]] = self.dct.token2id[self.dct.id2token[key]]
+        for i in range(len(list(self.bow_word_dict.value.keys()))):
+            self.new_word_dict.value[list(self.bow_word_dict.value.keys())[i]] = i
         super().process()
