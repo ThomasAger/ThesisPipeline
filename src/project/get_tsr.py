@@ -1,0 +1,45 @@
+from common import Method
+from common.SaveLoadPOPO import SaveLoadPOPO
+import numpy as np
+class GetTopScoringRanks(Method.Method):
+    score_ind = None
+    top_scoring_dir = None
+    rankings = None
+    new_word2id_dict = None
+    output_folder = None
+    rank = None
+    words = None
+
+    def __init__(self, file_name, save_class, output_folder, score_ind, top_scoring_dir, rankings, new_word2id_dict):
+        self.score_ind = score_ind
+        self.top_scoring_dir = top_scoring_dir
+        self.rankings = rankings
+        self.new_word2id_dict = new_word2id_dict
+        self.output_folder = output_folder
+        super().__init__(file_name, save_class)
+
+    def makePopos(self):
+        self.words = SaveLoadPOPO(self.words,
+                                  self.output_folder + "fil/" + self.file_name + "_words.npy", "npy")
+        self.rank = SaveLoadPOPO(self.rank,
+                                 self.output_folder + "fil/" + self.file_name  + "_rank.npy", "npy")
+
+    def makePopoArray(self):
+        self.popo_array = [self.words, self.rank]
+
+    def process(self):
+        inds = np.flipud(np.argsort(self.score_ind))[:self.top_scoring_dir]
+        self.rank.value = self.rankings[inds].transpose()
+        self.words.value = np.asarray(list(self.new_word2id_dict.keys()))[inds]
+        super().process()
+
+    def getRank(self):
+        if self.processed is False:
+            self.rank.value = self.save_class.load(self.rank)
+        return self.rank.value
+
+    def getWords(self):
+        if self.processed is False:
+            self.words.value = self.save_class.load(self.words)
+        return self.words.value
+

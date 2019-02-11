@@ -173,6 +173,7 @@ class RecHParam(MasterHParam):
     matched_ids = None
     hpam_method = None
     hpam_params = None
+    ranks = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
                  hpam_method=None, hpam_params=None):
@@ -211,6 +212,7 @@ class RecHParam(MasterHParam):
     def process(self):
         col_names = []
         indexes = []
+        self.ranks = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
         for i in range(len(self.all_p)):
@@ -245,22 +247,66 @@ class RecHParam(MasterHParam):
             elif self.hpam_model_type is "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
-                direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+                top_params, top_row_data, rank_fn = direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+                self.top_scoring_params.value.append(top_params)
+                top_scoring_row_data = top_row_data
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
+                self.ranks.append(rank_fn)
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
         self.final_arrays.value.append(indexes)
-        self.getTopScoringByMetric()
+        if self.hpam_model_type == "d2v":
+            self.getTopScoringByMetric()
+        elif self.hpam_model_type == "dir":
+            self.getTopScoringByMetricDir()
         super().process()
+    def getTopScoring(self):
+        if self.final_arrays.value is None:
+            self.final_arrays.value = self.save_class.load(self.final_arrays)
+            self.top_scoring_params.value = self.save_class.load(self.top_scoring_params)
+        list_of_scores = self.find_on_row_data(self.final_arrays.value)
+        index_sorted = np.flipud(np.argsort(list_of_scores))[0]
+        return index_sorted
+
+    def getTopScoringByMetricDir(self):
+        index = self.getTopScoring()
+        space = np.load(self.ranks[index])
+        split_ids = split.get_split_ids(self.data_type, self.matched_ids)
+        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
+                                                                          self.classes, split_ids,
+                                                                          dev_percent_of_train=self.dev_percent)
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
+
+
+        score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
+        score = classify.selectScore(None, None, None, file_name=model_fn,
+                                         output_folder=self.output_folder + "score/", save_class=score_save,
+                                         verbose=True, class_names=self.class_names,
+                                         fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
+        score.process_and_save()
+
+        score_dict = score.get()
+        # This order cannot be changed as this is the order it is imported as.
+        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall"]
+        avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                     score_dict[col_names[2]], score_dict[col_names[3]],
+                     score_dict[col_names[4]]]
+        self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+
 
     #If you need other metrics than F1 just do metric = "acc" then index is 0 etc.
     def getTopScoringByMetric(self):
-        doc2vec_space, index_sorted = self.getTopScoringSpace()
+        self.getTopScoringByScore(self.getTopScoringSpace())
+
+    def getTopScoringByScore(self, space, index):
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
-        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
+        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index_sorted], x_train, y_train, x_test, y_test)
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
 
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(None, None, None, file_name=model_fn,
@@ -278,11 +324,7 @@ class RecHParam(MasterHParam):
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
 
     def getTopScoringSpace(self):
-        if self.final_arrays.value is None:
-            self.final_arrays.value = self.save_class.load(self.final_arrays)
-            self.top_scoring_params.value = self.save_class.load(self.top_scoring_params)
-        list_of_scores = self.find_on_row_data(self.final_arrays.value)
-        index_sorted = np.flipud(np.argsort(list_of_scores))[0]
+        index_sorted = self.getTopScoring()
         print("Training best parameters on test data not dev data")
         doc2vec_save = SaveLoad(rewrite=False)
         doc2vec_fn = self.file_name + "_WS_" + str(self.all_p[index_sorted]["window_size"]) + "_MC_" + str(

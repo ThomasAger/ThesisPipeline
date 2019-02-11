@@ -125,20 +125,22 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     # Filter directions based on the amount to filter in params and the score type to filter in params
 
     for i in range(len(score_array)):
-        inds = np.flipud(np.argsort(score_array[i]))[:top_scoring_dir]
-        fil_rank = rankings[inds].transpose()
-        words = np.asarray(list(new_word2id_dict.keys()))[inds]
+        gtr_save = SaveLoad(rewrite=rewrite_all)
+        gtr = project.get_tsr.GetTopScoringRanks(file_name, gtr_save, processed_folder, score_array[i], top_scoring_dir, rankings, new_word2id_dict)
+        fil_rank = gtr.getRankings()
+
 
         split_ids = split.get_split_ids(data_type, matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
                                                                           classes, split_ids,
                                                                           dev_percent_of_train=dev_percent)
-        dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
+        dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
         hyper_param.process_and_save()
+        return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), gtr.rank[1]
 
 
 
@@ -308,7 +310,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
                 if data_type == "movies" or data_type == "placetypes":
                     classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
-                    pipeline(final_fn, spaces[s], bow, dct, classes[ci], class_names[ci], word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                    pipeline(final_fn, spaces[s], bow, dct, classes, class_names[ci], word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                  model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                  score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
                              mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict)
@@ -330,7 +332,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 """
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "sentiment"
 doLR = False
 dminf = -1
 dmanf = -1
