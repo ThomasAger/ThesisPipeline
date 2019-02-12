@@ -260,7 +260,7 @@ class RecHParam(MasterHParam):
             self.getTopScoringByMetric()
         elif self.hpam_model_type == "dir":
             print("skipped")
-            self.getTopScoringByMetricDir()
+            #self.getTopScoringByMetricDir()
         super().process()
     def getTopScoring(self):
         if self.final_arrays.value is None:

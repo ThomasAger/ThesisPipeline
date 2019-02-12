@@ -39,7 +39,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=rewrite_all)
+    hpam_save = SaveLoad(rewrite=rewrite_all, no_save=True)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
@@ -357,26 +357,26 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "newsgroups"
+data_type = "placetypes"
 doLR = False
 dminf = -1
 dmanf = -1
 
 if data_type == "placetypes":
-    hp_top_freq = [50,200,400,1000,2000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
     hp_top_dir = [50,200,400,1000,2000]
 
 elif data_type == "reuters":
-    hp_top_freq = [50]
-    hp_top_dir = [50,200]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
+    hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "sentiment":
-    hp_top_freq = [50,200,400,1000,2000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
     hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [50,200,400,1000,2000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
     hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "movies":
-    hp_top_freq = [50,200,400,1000,2000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
     hp_top_dir = [50,200,400,1000,2000]
 
 multi_class_method = "OVR"
