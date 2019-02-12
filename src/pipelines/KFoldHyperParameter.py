@@ -250,13 +250,8 @@ class RecHParam(MasterHParam):
             elif self.hpam_model_type is "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
-                top_params, top_row_data, rank_fn = direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
-                self.top_scoring_params.value.append(top_params)
-                top_scoring_row_data = top_row_data
-                averaged_csv_data.append(top_scoring_row_data[1])
-                col_names = top_scoring_row_data[0]
-                indexes.append(top_scoring_row_data[2][0])
-                self.ranks.append(rank_fn)
+                direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
@@ -265,7 +260,7 @@ class RecHParam(MasterHParam):
             self.getTopScoringByMetric()
         elif self.hpam_model_type == "dir":
             print("skipped")
-            #self.getTopScoringByMetricDir()
+            self.getTopScoringByMetricDir()
         super().process()
     def getTopScoring(self):
         if self.final_arrays.value is None:
@@ -284,10 +279,10 @@ class RecHParam(MasterHParam):
                                                                           dev_percent_of_train=self.dev_percent)
 
         model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
-
-
+        model.process_and_save()
+        model_pred = model.getPred()
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
-        score = classify.selectScore(None, None, None, file_name=model_fn,
+        score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
                                          output_folder=self.output_folder + "score/", save_class=score_save,
                                          verbose=True, class_names=self.class_names,
                                          fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
