@@ -13,8 +13,8 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
 from project.get_directions import GetDirections
 from score.classify import MultiClassScore
-from project.get_rankings import GetRankings
-from project.get_ndcg import GetNDCG
+from project.get_rankings import GetRankings, GetRankingsStreamed
+from project.get_ndcg import GetNDCG, GetNDCGStreamed
 from rep import pca, ppmi, awv
 from project.get_tsr import GetTopScoringRanks
 
@@ -106,7 +106,15 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     dirs = dir.getDirections()
 
     rank_save = SaveLoad(rewrite=rewrite_all)
-    rank = GetRankings(dirs, space, new_word2id_dict,  rank_save,  file_name, processed_folder, no_below, no_above)
+
+    stream_rankings = False
+    if (data_type == "sentiment" and no_below > 5000) or no_below >= 10000:
+        stream_rankings = True
+
+    if stream_rankings: #and no_below > 5000) or no_below > 10000:
+        rank = GetRankingsStreamed(dirs, space, new_word2id_dict,  rank_save,  file_name, processed_folder, no_below, no_above)
+    else:
+        rank = GetRankings(dirs, space, new_word2id_dict,  rank_save,  file_name, processed_folder, no_below, no_above)
     rank.process_and_save()
     rankings = rank.getRankings()
 
@@ -116,7 +124,11 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
     # Get NDCG scores
     ndcg_save = SaveLoad(rewrite=rewrite_all)
-    ndcg = GetNDCG(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
+
+    if stream_rankings: #and no_below > 5000) or no_below > 10000:
+        ndcg = GetNDCGStreamed(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
+    else:
+        ndcg = GetNDCG(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
     ndcg.process_and_save()
     ndcg_scores = ndcg.getNDCG()
 
@@ -286,15 +298,17 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             pca_instance = pca.PCA(None, None, dims[i],
                                    pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
             pca_instance.process_and_save()
-            spaces.append(pca_instance.getRep())
-            space_names.append(pca_fn)
+            if data_type != "newsgroups":
+                spaces.append(pca_instance.getRep())
+                space_names.append(pca_fn)
 
             awv_identifier = "_" + str(dims[i]) + "_AWVEmp"
             awv_fn = pipeline_fn + awv_identifier
             awv_instance = awv.AWV(None, dims[i], awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
             awv_instance.process_and_save()
-            spaces.append(awv_instance.getRep())
-            space_names.append(awv_fn)
+            if data_type != "sentiment":
+                spaces.append(awv_instance.getRep())
+                space_names.append(awv_fn)
 
             if data_type != "sentiment":
                 mds_identifier = "_" + str(dims[i]) + "_MDS"
@@ -357,23 +371,22 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "placetypes"
+data_type = "newsgroups"
 doLR = False
 dminf = -1
 dmanf = -1
 
 if data_type == "placetypes":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
-
 elif data_type == "reuters":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "sentiment":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
-    hp_top_dir = [50,200,400,1000,2000]
+    hp_top_freq = [ 10000, 50,200,400,1000,2000,5000, 20000]
+    hp_top_dir = [ 50,200,400,1000, 2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "movies":
     hp_top_freq = [50,200,400,1000,2000, 5000, 10000]

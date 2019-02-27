@@ -30,15 +30,6 @@ class Method:
             if self.save_class.verbose:
                 print(self.__class__.__name__, "Already exists (lazy loading enabled)")
 
-    def makePopos(self):
-        __empty = 0
-
-    def makePopoArray(self):
-        __empty = 0
-
-    def process(self):
-        __empty = 0
-
     def save(self):
         if self.process:
             self.save_class.save(self.popo_array)
@@ -47,6 +38,15 @@ class Method:
 
     def load(self):
         self.save_class.load(self.popo_array)
+
+    def makePopos(self):
+        __empty = 0
+
+    def makePopoArray(self):
+        __empty = 0
+
+    def process(self):
+        __empty = 0
 
 # Only saves one thing, its predictions, and always uses x_train, y_train, y_test, x_test splits.
 class ModelMethod(Method):
