@@ -21,13 +21,13 @@ The success of these semantic spaces similarity-based structure has lead many to
 These relationships have been expanded on, for example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, while \cite{Mitchell2015} discovered that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, \cite{Garg2017} found that word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. %Copy pasted from this 
 
 
-%What are directions? Why are directions important? What have they been used for? What is a property?
+%What are directions? Why are directions important? What have they been used for? What is a feature direction?
 The semantic relation that we focus in on this paper are directions that correspond to salient features from the considered domain. A "direction" refers in this case to the orthogonal direction to a hyper plane that separates a term in a vector space. As the hyper plane separates entities, this means that the entities furthest along the hyper plane, at the end classified positively, are the entities we are most sure have the term we found the hyper plane for. To see an example of this, see \ref {LRHyperPlane} With this understanding, it becomes possible to induce a ranking of entities on the properties by finding the dot product of the entity points on the direction vector. These kind-of directions have been used in many different ways for different domains, For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model. Similarly, in \cite{kim2013deriving} directions in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{DBLP:conf/acl/RotheS16} found directions indicating lexical features such as the frequency of occurrence and polarity of words. 
 
 
 \subsection{Producing an Interpretable Property Representation}
 
-% How can I apply directions to produce an interpretable space? Why is this valuable? What makes this interesting?
+% How can I apply directions to produce an interpretable space? Why is this valuable? What makes this interesting? What are feature rankings?
 By finding the dot product between entity points in the space and direction vectors, it is possible to induce a ranking of entities on those directions. In this chapter, we more deeply investigate the potential of direction vectors to rank entities on properties to form an interpretable representation.  In this thesis, we refer to these direction vectors as directions to convey the ordinal meaning, and directions as 'properties' if they are sufficiently salient in the space, e.g. In a domain of IMDB movie reviews where movies are entities, a direction on the word "The" would not be a property, but a direction on the word "Horror" would be. 
 
 \begin{figure}[t]
@@ -128,11 +128,7 @@ What non linear classifiers networks are interpretable? How have they done it? H
 \subsection{Interpretable Representations}
 
 
-\subsection{Interpretable Classifiers}
-
-
 There are two ways in which topic models can be used for document classification. First, a supervised topic model can be used, in which the underlying graphical model is explicitly extended with a variable that represents the class label \cite{Blei2010}. Second, the parameters of the multinomial distribution corresponding to a given document can be used as a feature vector for a standard classifier, such as a Support Vector Machine (SVM) or Decision Tree. LDA has been extended by many approaches, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors \cite{rosen2004author} or time stamps \cite{wang2006topics}.
-
 
 
 Broadly speaking, in the context of document classification, the main advantage of topic models is that their topics tend to be easily interpretable, while vector space models tend to be more flexible in the kind of meta-data that can be exploited. The approach we propose in this paper aims to combine the best of both worlds, by providing a way to derive interpretable representations from vector space models.
@@ -145,58 +141,38 @@ Broadly speaking, in the context of document classification, the main advantage 
 % Chapter 2: The background and literature review for interpretable representations.
 % Chapter 3: An introduction on the value of a good interpretable classifier, and the position of our work in that domain and how it can be applied there. What entities, properties are. What a conceptual space is. A literature review on relevant interpretable classifiers.
 
-This section details the methodology to go from a Bag-Of-Words \ref{background:BOW} and a Semantic Space \ref{bg:SemanticSpaces} from a domain to an interpretable representation where each dimension of the feature vectors corresponds to a property in the domain labelled by a cluster of words.
-
-\subsection{Definitions}
-
-\textbf{Domain} Where the data was originally sourced from $DOM^IMDB$, e.g. IMDB movie reviews.
-
-\textbf{Word} A string of alphanumeric characters that originated from text in the domain $DOM_w$, e.g. the $w = "Horror"$ from a domain of IMDB movie reviews $DOM^IMDB$.
-
-\textbf{Documents} A unique group of words, e.g. a review from a domain of IMDB movie reviews $DOM_IMDB$.
-
-\textbf{Vector Space} A representation composed of vectors.
-
-\textbf{Semantic Space} A representation where spatial relationships between vectors correspond to semantic relationships.
-
-
-\textbf{Word frequency} The frequency of a word $wf$ for its document $D_wf$.
-
-
-\textbf{Bag-Of-Words} a BOW of documents $BOW_D$ where each document is composed of unordered frequencies of words $D = [wf_1, ..., wf_n]$. and Conceptual Space we obtain a representation of entities composed of properties. Then, we cover the additional methods we propose to improve this process.
-
-
-\textbf{Feature} A feature is a representation of a document, e.g. as a vector in a vector space or document in a bag-of-words. 
-
-\textbf{Direction vector} The orthogonal direction to a hyper plane that separates a term in a vector space. 
-
-\textbf{Cluster label} A cluster of words that describe a property.
-
-\textbf{Cluster direction} The averaged directions of all words in the label.
-% What does a vector space have that other representations do not?
-
-\textbf{Property} A distinguishing aspect of the domain, in the case of this work represented by the dot product between feature vectors of a Semantic Space and a direction vector (either clustered or corresponding to a single term) that corresponds to a word or group of words.
-
-
-
-
-% Why obtain directions for terms? What's the value of a direction for a term?
-Our process is generally in three parts, first we obtain directions for terms from the domain $T_d$ see \ref{intro:directions, chapter3:introduction}, then we filter these terms to remove those that will not result in good properties. Finally, we cluster the remaining terms to obtain property directions $P_d$ and an associated label $l = [t_1, ..., t_n]$. 
-
-
-
+This section details the methodology to go from a domain-specific Bag-Of-Words \ref{background:BOW} and Semantic Space \ref{bg:SemanticSpaces} constructed from text documents to an interpretable representation of feature-rankings. To begin, we filter out terms that will not be well represented in the space, and in-turn will not result in good feature rankings. We do so by first removing all terms below a frequency threshold then, we use various metrics to directly evaluate the representation of each term in the space and remove those that are poorly represented. We can consider the terms remaining to be candidate feature-directions, as they are all well represented in the space. However, it is possible that they may not represent different information from each other, e.g. "blood" and "bloody" are likely quite similar. Additionally, we can understand that a good feature will not correspond directly to a term, but instead to a more abstract concept, e.g. "Blood, Gore, Horror". To obtain these more abstract feature-directions, and ensure the feature-directions are distinct rather than representing the same information, we cluster together similar feature-directions and obtain their feature-rankings to obtain our final representation. Each of these feature-rankings can be labelled with the cluster of words they are composed of. We show examples of this final representation in \ref{ch3:FinalDirTable}.
 
 
 We start with a domain-specific vector space $S_e$ and its associated bag-of-words (BOW) representation $B_w$. To obtain these properties, we use a variant of the unsupervised method proposed in \cite{derracAIJ}, which we explain in this section. 
-\subsubsection{Obtaining Term Directions}
-We can understand that only some words will be properties, as only some correspond to domain knowledge, e.g. in a domain of IMDB movies, the word "the" does not correspond to a property of the domain, but the word "horror" does. Initially, we obtain rankings of entities for each word in the space. 
 
-As an initial filtering step, we remove words that do not meet a frequency threshold, with the understanding that words that do not occur in a minimum amount of documents are unlikely to correspond to properties as they are too specific to a subset of movies, which would make them difficult to learn. This leaves us with $w_n$ words. We show the kind of words that would be poorly represented  in \ref{Table2}.%Table of most frequent words compared with words that are low frequency
+\subsection{Corpus Preprocessing}
 
-Then, for each considered word $w$, a logistic regression classifier is trained to find a hyperplane $H_w$ in the space that separates entities $e$ which contain $w$ in their BOW $B_e$ representation from those that do not. %
-The vector $v_w$ perpendicular to this hyperplane is then taken as a direction that models the word $w$. In \ref{Figure2a}, we show an example of this in a toy domain. %Graphical representation of hyper-plane seperating a BoW with a direction orthogonal 
+We begin with an unstructured corpus of text documents $C_D$ from a domain, for example a collection of IMDB reviews, where each document contains the concatenated reviews for that movie. From these reviews, we want to extract terms that could correspond to good feature-rankings. To do so, we convert all text to lower-case, remove all punctuation, remove unnecessary whitespace, and remove all non-alphanumeric characters like emojis. From here, we remove standard English stop words using the NLTK library \cite{Bird}. We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}.
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/genres_separated.png}
+	\centering
+	\caption{Original And Converted.}\label{ch3:OrigAndConverted}
+\end{figure}
+
+Once we have extracted these terms, we obtain a Bag-Of-Words where we count the frequency of each term, see \ref{background:BOW}. Then, we remove all words that do not occur in $f$ documents. This filtered Bag-Of-Words $FBOW$ is used for the rest of the method.
+
+\subsection{Term Directions and Rankings}
+
+Then, for each considered word $w$, a Support Vector Machine \ref{bg:SVM} classifier is trained to find a hyperplane $H_w$ in the space that separates entities $e$ which contain $w$ in their BOW $B_e$ representation from those that do not. This hyper-plane also considers the degree to which an document is relevant for a term in the sense that those close to the hyper-plane on the positive side are less relevant than those furthest from the hyper-plane (and those furthest on the negative side are the least relevant for the property). Following this insight, we can consider the vector $v_w$ perpendicular to this hyperplane as a direction that models documents from least relevant to most relevant for the word $w$. In \ref{Figure2a}, we show an example of this in a toy domain. %Graphical representation of hyper-plane seperating a BoW with a direction orthogonal 
 %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity.  %Provide graphical intuition
 To rank the objects on the entity, if $e$ is the representation of an entity in the given vector space $S_e$ then we can think of the dot product $v_w \cdot e$ as the value $r_ew$ of object $e$ for vector $v_w$, and in particular, we take $r_e1 < r_e2$ to mean that $e_2$ has the property labelled with the word $w$ to a greater extent than $e_1$. The result of this is shown in \ref{}. Example entities, with their associated highest and lowest ranking properties, are shown in \ref{}. %Graphical representation of entities being ranked on a direction vector
+
+\subsection{Filtering Terms}
+
+
+\subsection{Feature-Rankings}
+
+
+\subsubsection{Obtaining Term Directions}
+
+
 
 \subsubsection{Filtering Directions}
 With the rankings $R_r$, we could create a representation of each entity $Se$,   composed of $w_n$ dimensions, where each dimension is a ranking of the entity $e$ on that word $w_re$. However, many of the words do not  properties. In-order to filter these words out, we evaluate them using a scoring metric, and remove the words that are not sufficiently well scored. We use three different metrics:
@@ -246,7 +222,23 @@ Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtai
 \noindent \textbf{Hdbscan}
 
 %Our overall aim is to find directions in the semantic space that model salient features of the considered domain. For example, given a semantic space of movies, we would like to find a direction that models the extent to which each movie is scary, among others. Such a direction would then allow us to rank movies from the least scary to the most scary. We will refer to such directions as \emph{feature directions}. Formally, each feature direction will be modelled as a vector $v_f$. However, we refer to \emph{directions} rather than \emph{vectors} to emphasize their intended ordinal meaning: feature directions are aimed at ranking objects rather than e.g.\ measuring degrees of similarity. 
+\subsection{Qualitative Results}
 
+\subsubsection{Dimension of the Space}
+
+\subsubsection{Space-type}
+
+\subsubsection{Scoring method}
+
+\subsubsection{Clustering method}
+
+\textbf{The effect of dimensions}
+
+
+\textbf{The effect of space-type}
+
+
+\textbf{The effect of scoring method}
 
 \subsection{Quantitative Results}
 % Basic explanation of why quantitative results are interesting, valuable, good etc

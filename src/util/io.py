@@ -1,7 +1,8 @@
 import os
 from collections import OrderedDict
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from scipy import sparse as sp
 
 def write2dCSV(array, name):
@@ -590,3 +591,10 @@ def save_csv_from_dict(score_dict, class_names, csv_fn):
 
     class_names = np.append(class_names, "AVERAGE")
     write_csv(csv_fn, col_names, col_data, class_names)
+
+
+if __name__ == '__main__':
+    orig_fn = "../../data/processed/newsgroups/rep/pca/"
+    pca50 = np.load(orig_fn + "num_stw_50_PCA.npy")
+    pca100 = np.load(orig_fn + "num_stw_100_PCA.npy")
+    print("k")
