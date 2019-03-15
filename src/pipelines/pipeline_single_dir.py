@@ -40,7 +40,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=rewrite_all, no_save=True)
+    hpam_save = SaveLoad(rewrite=True)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
@@ -51,6 +51,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
                        words_to_get, space, name_of_class, model_type, classes, class_names, auroc, score_metric,
                        mcm, dev_percent, ppmi, kfold_hpam_dict])
     hyper_param.process_and_save()
+    print("END OF SPACE")
 
 
 def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file_name, processed_folder,
@@ -152,7 +153,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     tsp = []
     tsrd = []
     rfn = []
-
+    f1s = []
     for i in range(len(score_array)):
         gtr_save = SaveLoad(rewrite=rewrite_all)
         if stream_rankings:
@@ -170,8 +171,11 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
         if data_type == "placetypes" or data_type == "movies":
             dir_fn += "_" + name_of_class
+        if i == 0 and data_type == "sentiment":
+            hpam_save = SaveLoad(rewrite=True)
+        else:
+            hpam_save = SaveLoad(rewrite=rewrite_all)
 
-        hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
@@ -180,20 +184,25 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         tsp.append(hyper_param.getTopScoringParams())
         tsrd.append(hyper_param.getTopScoringRowData())
         rfn.append(gtr.rank.file_name)
+        f1s.append(hyper_param.getTopScoringRowData()[1][1]) # F1 Score for the current scoring metric
+
+
+
+    best_ind = np.flipud(np.argsort(f1s))[0]
+    top_params = tsp[best_ind]
+    top_row_data = tsrd[best_ind]
+    top_rank = rfn[best_ind]
 
     all_r = np.asarray(tsrd).transpose()
     rows = all_r[1]
     cols = np.asarray(rows.tolist()).transpose()
     col_names = all_r[0][0]
     key = all_r[2]
-    dt.write_csv(processed_folder + "rank/score/csv_final/" +file_name+ "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
+    dt.write_csv(processed_folder + "rank/score/csv_averages/" +file_name+ "_" + str(no_above) + "_" + str(no_below)
                  + "reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
-    print("Pipeline completed, saved as, "+ processed_folder + "rank/score/csv_final/" +file_name+ "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
+    print("Pipeline completed, saved as, "+ processed_folder + "rank/score/csv_averages/" +file_name+ "_" + str(no_above) + "_" + str(no_below)
                  + "reps"+model_type+"_" + name_of_class + ".csv")
-
-    def getTopScoringParams():
-        
-    def getTopScoringRowData():
+    return top_params, top_row_data, top_rank
 
 
 
@@ -380,7 +389,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "sentiment"
+data_type = "reuters"
 doLR = False
 dminf = -1
 dmanf = -1
@@ -392,11 +401,11 @@ elif data_type == "reuters":
     hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "sentiment":
-    hp_top_freq = [ 20000,50,200,400,1000,2000, 5000, 10000]
-    hp_top_dir = [ 2000,50,200,400,1000,2000]
+    hp_top_freq = [ 50,200,400,1000,2000, 5000, 10000, 20000]
+    hp_top_dir = [ 50,200,400,1000,2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [20000,50,200,400,1000,2000, 5000, 10000]
-    hp_top_dir = [2000,50,200,400,1000,200]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
+    hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "movies":
     hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]

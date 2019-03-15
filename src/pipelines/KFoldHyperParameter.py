@@ -178,7 +178,7 @@ class RecHParam(MasterHParam):
     matched_ids = None
     hpam_method = None
     hpam_params = None
-    ranks = None
+    rank_fn = None
     fn_addition = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
@@ -219,7 +219,7 @@ class RecHParam(MasterHParam):
     def process(self):
         col_names = []
         indexes = []
-        self.ranks = []
+        self.rank_fn = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
         for i in range(len(self.all_p)):
@@ -246,17 +246,22 @@ class RecHParam(MasterHParam):
                                      self.output_folder, hpam_save, self.probability, rewrite_model=self.rewrite_model, x_train=x_train,
                                      y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc, mcm=self.mcm)
                 hyper_param.process_and_save()
-
+                self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
+                top_scoring_row_data = hyper_param.getTopScoringRowData()
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
             elif self.hpam_model_type is "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
-                hyper_param = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+                top_params, top_row_data, top_rank = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
 
-            self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
-            top_scoring_row_data = hyper_param.getTopScoringRowData()
-            averaged_csv_data.append(top_scoring_row_data[1])
-            col_names = top_scoring_row_data[0]
-            indexes.append(top_scoring_row_data[2][0])
+                self.top_scoring_params.value.append(top_params)
+                top_scoring_row_data = top_row_data
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
+                self.rank_fn.append(top_rank)
 
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
@@ -267,7 +272,7 @@ class RecHParam(MasterHParam):
         elif self.hpam_model_type == "dir":
             print("skipped")
             index = self.getTopScoring()
-            space = np.load(self.ranks[index])
+            space = np.load(self.rank_fn[index])
             self.getTopScoringByMetricDir(space, index)
         super().process()
     def getTopScoring(self):
@@ -516,11 +521,13 @@ class HParam(MasterHParam):
         self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + "Top"+self.score_metric+".txt", "dct")
 
     def getTopScoringRowData(self):
-        self.top_scoring_row_data.value = self.save_class.load(self.top_scoring_row_data)
+        if self.processed is False:
+            self.top_scoring_row_data.value = self.save_class.load(self.top_scoring_row_data)
         return self.top_scoring_row_data.value
 
     def getTopScoringParams(self):
-        self.top_scoring_params.value = self.save_class.load(self.top_scoring_params)
+        if self.processed is False:
+            self.top_scoring_params.value = self.save_class.load(self.top_scoring_params)
         return self.top_scoring_params.value
 
 
