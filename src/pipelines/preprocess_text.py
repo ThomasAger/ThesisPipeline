@@ -39,9 +39,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     # Process and save corpus
     corpus_save = SaveLoad(rewrite=rewrite_all)
     if data_type == "placetypes" or data_type == "movies":
+        print("Processing corpus")
         p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
     else:
+        print("Processing corpus")
         p_corpus = process_corpus.Corpus(corpus,  classes,name_of_class, file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
@@ -195,7 +197,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hpam_dict["wv_path"] = [wv_path_d2v]
 
             # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
-            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "dir", model_type,
+            hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
                                          doc2vec_fn, classify_doc2vec_fn, output_folder + "rep/", hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
                                     data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, mcm=mcm)
             hyper_param.process_and_save()
@@ -354,9 +356,13 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #opencyc = np.load("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data_request\Lucas email 1\data\classes/num_stwOpenCYC_classes.npy")
 #mds = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
+
+#x = np.load("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups\corpus/num_stw_corpus_processed.npy")
+#import scipy.sparse as sp
+#xy = sp.load_npz("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/NB_18_NA_0.95num_stw_ppmi.npz")
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+data_type = "newsgroups"
 if __name__ == '__main__':
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",

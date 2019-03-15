@@ -1,13 +1,13 @@
 # Train splits defined by various standards
 imdb_train = 25000
-newsgroups_train = 11314
+newsgroups_train = 12079
 reuters_train = 7656
 yahoo_train = 25000
 movies_train = 9225
 placetypes_train = 913
 anime_train = 700
 imdb_total = 50000
-newsgroups_total = 18846
+newsgroups_total = 18302
 reuters_total = 10655
 yahoo_total = 50000
 movies_total = 13978

@@ -55,6 +55,7 @@ class MasterCorpus(Method.Method):
     split_corpus = None
     bowdict = None
     filtered_dict = None
+    processed_corpus_txt = None
 
     def __init__(self, orig_classes, name_of_class, file_name, output_folder, bowmin, no_below,
                  no_above, remove_stop_words, save_class):
@@ -120,6 +121,10 @@ class Corpus(MasterCorpus):
                                            standard_fn + "metadata/" + file_name + "_filtered_vocab.npy", "npy")
         self.processed_corpus = SaveLoadPOPO(self.processed_corpus,
                                              output_folder + "corpus/" + file_name + "_corpus_processed.npy", "npy")
+
+        self.processed_corpus_txt = SaveLoadPOPO(self.processed_corpus_txt,
+                                             output_folder + "corpus/" + file_name + "_corpus_processed.txt", "1dtxt")
+
         self.split_corpus = SaveLoadPOPO(self.split_corpus,
                                              output_folder + "corpus/" + file_name + "_corpus_processed_split.npy", "npy")
         print(self.name_of_class )
@@ -143,7 +148,8 @@ class Corpus(MasterCorpus):
                            self.id2token,
                            self.bow_vocab, self.filtered_vocab,
                            self.processed_corpus, self.classes,  self.bow, self.filtered_bow,
-                           self.word_list, self.all_words,  self.split_corpus, self.bowdict, self.filtered_dict]
+                           self.word_list, self.all_words,  self.split_corpus, self.bowdict, self.filtered_dict,
+                           self.processed_corpus_txt]
 
     def process(self):
         print("Original doc len", len(self.orig_corpus))
@@ -153,7 +159,7 @@ class Corpus(MasterCorpus):
             self.tokenized_corpus.value, self.processed_corpus.value = removeStopWords(self.tokenized_corpus.value)
         self.processed_corpus.value, self.tokenized_corpus.value, self.remove_ind.value, self.classes.value = removeEmpty(self.processed_corpus.value,
                                                                                                                           self.tokenized_corpus.value, self.orig_classes)
-
+        self.processed_corpus_txt.value = self.processed_corpus.value
         self.split_corpus.value = split_all(self.processed_corpus.value)
 
         self.all_vocab.value, self.dct.value, self.id2token.value = getVocab(self.tokenized_corpus.value)

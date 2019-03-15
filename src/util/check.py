@@ -3,6 +3,7 @@ from util import py as pu
 import numbers
 import numpy as np
 import scipy.sparse as sp
+
 def check_y(true_targets, predictions):
     if sp.issparse(true_targets) or sp.issparse(predictions):
         print("One or two of the y's are sparse")

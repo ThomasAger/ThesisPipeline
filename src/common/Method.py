@@ -10,12 +10,14 @@ class Method:
     processed = False
 
     def __init__(self, file_name, save_class):
+        print("initializing")
         self.save_class = save_class
         self.file_name = file_name
         self.makePopos()
         self.makePopoArray()
 
     def process_and_save(self):
+        print("processing and saving")
         popo_array = self.popo_array
         if self.save_class.exists(popo_array) is False:
             if self.save_class.verbose:

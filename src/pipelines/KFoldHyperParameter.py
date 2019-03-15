@@ -14,7 +14,7 @@ from rep import d2v
 from model.randomforest import RandomForest
 from model.decisiontree import DecisionTree
 from util import split
-from pipelines.directions import direction_pipeline
+from pipelines import pipeline_single_dir
 
 def get_grid_params(hpam_dict):
     hyperparam_array = list(hpam_dict.values())
@@ -103,6 +103,7 @@ class MasterHParam(Method):
         if self.model_type == "LinearSVM":
             model_fn = file_name + "_Dev" + "_" + str(len(x_test)) + "_Balanced_" + str(all_p["class_weight"]) \
                        + "_C_" + str(all_p["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
+            print("Running", model_fn)
             model = LinearSVM(x_train, y_train, x_test, y_test,
                               self.output_folder + "svm/" + model_fn, svm_save, C=all_p["C"],
                               class_weight=all_p["class_weight"], probability=self.probability, verbose=False,
@@ -114,6 +115,7 @@ class MasterHParam(Method):
                 self.probability) + "_" + self.model_type
 
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            print("Running", model_fn)
 
             model = GaussianSVM(x_train, y_train, x_test, y_test,
                                 self.output_folder + "svm/" + model_fn, svm_save, gamma=all_p["gamma"],
@@ -128,6 +130,7 @@ class MasterHParam(Method):
                 all_p["min_samples_split"]) + "_" + self.model_type
 
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            print("Running", model_fn)
             model = RandomForest(x_train, y_train, x_test, y_test,
                                  self.output_folder + "rf/" + model_fn, svm_save,
                                  n_estimators=all_p["n_estimators"], bootstrap=all_p["bootstrap"],
@@ -143,6 +146,7 @@ class MasterHParam(Method):
                 all_p["max_depth"]) + "_" + self.model_type
 
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            print("Running", model_fn)
             model = DecisionTree(x_train, y_train, x_test, y_test,
                                  self.output_folder + "dt/" + model_fn, svm_save,
                                  max_depth=all_p["max_depth"],
@@ -242,15 +246,17 @@ class RecHParam(MasterHParam):
                                      self.output_folder, hpam_save, self.probability, rewrite_model=self.rewrite_model, x_train=x_train,
                                      y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc, mcm=self.mcm)
                 hyper_param.process_and_save()
-                self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
-                top_scoring_row_data = hyper_param.getTopScoringRowData()
-                averaged_csv_data.append(top_scoring_row_data[1])
-                col_names = top_scoring_row_data[0]
-                indexes.append(top_scoring_row_data[2][0])
+
             elif self.hpam_model_type is "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
-                direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+                hyper_param = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+
+            self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
+            top_scoring_row_data = hyper_param.getTopScoringRowData()
+            averaged_csv_data.append(top_scoring_row_data[1])
+            col_names = top_scoring_row_data[0]
+            indexes.append(top_scoring_row_data[2][0])
 
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
@@ -260,27 +266,26 @@ class RecHParam(MasterHParam):
             self.getTopScoringByMetric()
         elif self.hpam_model_type == "dir":
             print("skipped")
-            #self.getTopScoringByMetricDir()
+            index = self.getTopScoring()
+            space = np.load(self.ranks[index])
+            self.getTopScoringByMetricDir(space, index)
         super().process()
     def getTopScoring(self):
-        if self.final_arrays.value is None:
+        if self.final_arrays.value is None or len(self.final_arrays.value) == 0:
             self.final_arrays.value = self.save_class.load(self.final_arrays)
             self.top_scoring_params.value = self.save_class.load(self.top_scoring_params)
         list_of_scores = self.find_on_row_data(self.final_arrays.value)
         index_sorted = np.flipud(np.argsort(list_of_scores))[0]
         return index_sorted
 
-    def getTopScoringByMetricDir(self):
-        index = self.getTopScoring()
-        space = np.load(self.ranks[index])
+    def getTopScoringByMetricDir(self, space, index):
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
 
         model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
-        model.process_and_save()
-        model_pred = model.getPred()
+        model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
                                          output_folder=self.output_folder + "score/", save_class=score_save,
@@ -299,8 +304,8 @@ class RecHParam(MasterHParam):
 
     #If you need other metrics than F1 just do metric = "acc" then index is 0 etc.
     def getTopScoringByMetric(self):
-        self.getTopScoringByScore(self.getTopScoringSpace())
-
+        self.getTopScoringByMetricDir(*self.getTopScoringSpace())
+    """ Potentially repeated code so removed
     def getTopScoringByScore(self, space, index):
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
@@ -308,8 +313,9 @@ class RecHParam(MasterHParam):
                                                                           dev_percent_of_train=self.dev_percent)
         model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
 
+        model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
-        score = classify.selectScore(None, None, None, file_name=model_fn,
+        score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
                                          output_folder=self.output_folder + "score/", save_class=score_save,
                                          verbose=True, class_names=self.class_names,
                                          fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
@@ -322,7 +328,7 @@ class RecHParam(MasterHParam):
                      score_dict[col_names[2]], score_dict[col_names[3]],
                      score_dict[col_names[4]]]
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
-
+"""
     def getTopScoringSpace(self):
         index_sorted = self.getTopScoring()
         print("Training best parameters on test data not dev data")
@@ -579,6 +585,10 @@ class HParam(MasterHParam):
 from util import py
 
 def generateNumber(hpam_dict):
+    try:
+        hpam_dict["wv_path"][0] = "D" + hpam_dict["wv_path"][0][1:]
+    except KeyError:
+        print("wv path didnt exist")
     hyperparams_array = list(hpam_dict.values())
     hyperparam_names = list(hpam_dict.keys())
     unique_number = 0

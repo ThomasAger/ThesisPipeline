@@ -6,7 +6,8 @@
 % Examples of classification with SVM's 
 % What interpretable representations actually are, desiradata/features of interpretable representations
 % Examples with Decision trees, examples of classifiers that produce an interpretable result automatically
-\section{Text}
+\section{Text Representations}
+Need to write about the concept of salient features of a domain here.
 \subsection{Bag-of-words}\label{background:BOW}
 We begin by processing an unstructured text corpus, composed of documents $C_D$. We then remove all punctuation, convert any accented characters to non-accented characters, and lowercase the documents to obtain word tokens for each document $D_W$. From here, we can assume that any $W \approx W$ will now $W = W$, if a word varied in format but not alphanumeric characters. 
 
@@ -14,7 +15,7 @@ Then, we count the occurrences of each word
 \begin{itemize}
 	\item Frequency
 	\item Tf-idf
-	\item PPMI
+	\item PPMI \label{bg:ppmi}
 \end{itemize}
 \section{Text classification}
 \subsection{Decision Trees}
@@ -31,6 +32,8 @@ Then, we count the occurrences of each word
 	\item Difference between SVM and Nnet
 \end{itemize}
 \subsection{Semantic Spaces}\label{bg:SemanticSpaces}
+Bag-Of-Words representations of text result in large sparse vectors for each document, 
+
 
 % What representations are semantic spaces? What is not a semantic space?
 \subsubsection{How do vector spaces represent semantics? Why do we use them to represent semantics?}\label{background:WhySpace}
@@ -48,7 +51,8 @@ See Section \ref{background:WhySpace}\begin{itemize}
 	\item Word-vectors
 \end{itemize}
 \subsection{Document Representations}
-\subsubsection{Conceptual spaces}
+\subsubsection{LSA}
+Principal Component Analysis is a dimensionality reduction method that results in dimensions ordered by importance. Starting with a large data matrix, e.g. our TF-IDF values from before, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
 \begin{itemize}
 	\item PCA %Maybe explain directions a bit here
 	\item MDS

@@ -65,6 +65,7 @@ class LinearSVM(SVM):
         super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability,  class_weight, verbose, mcm)
 
     def process(self):
+        print("processing")
         # For old dicts without types
         if self.class_weight == "None":
             self.class_weight = None

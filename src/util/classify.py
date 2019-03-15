@@ -3,7 +3,7 @@ import numpy as np
 from common.SaveLoadPOPO import SaveLoadPOPO
 from data.process_corpus import MasterCorpus
 from util import py, proj
-
+from keras.utils import to_categorical
 
 def toBinary(x):
     for i in range(len(x)):

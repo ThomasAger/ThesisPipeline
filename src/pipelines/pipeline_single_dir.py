@@ -16,7 +16,8 @@ from score.classify import MultiClassScore
 from project.get_rankings import GetRankings, GetRankingsStreamed
 from project.get_ndcg import GetNDCG, GetNDCGStreamed
 from rep import pca, ppmi, awv
-from project.get_tsr import GetTopScoringRanks
+from project.get_tsr import GetTopScoringRanks, GetTopScoringRanksStreamed
+
 
 import KFoldHyperParameter
 
@@ -154,7 +155,10 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
     for i in range(len(score_array)):
         gtr_save = SaveLoad(rewrite=rewrite_all)
-        gtr = GetTopScoringRanks(file_name, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
+        if stream_rankings:
+            gtr = GetTopScoringRanksStreamed(file_name, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
+        else:
+            gtr = GetTopScoringRanks(file_name, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         gtr.process_and_save()
         fil_rank = gtr.getRank()
 
@@ -187,6 +191,11 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     print("Pipeline completed, saved as, "+ processed_folder + "rank/score/csv_final/" +file_name+ "_" + str(dir_min_freq) + "_" + str(dir_max_freq)
                  + "reps"+model_type+"_" + name_of_class + ".csv")
 
+    def getTopScoringParams():
+        
+    def getTopScoringRowData():
+
+
 
 
 
@@ -209,7 +218,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
     min_count = [1, 5, 10]
     train_epoch = [50, 100, 200]
 
-    dims = [50, 100, 200]
+    dims = [100, 50, 200]
     balance_params = ["balanced", None]
     C_params = [1.0, 0.01, 0.001, 0.0001]
     gamma_params = [1.0, 0.01, 0.001, 0.0001]
@@ -293,22 +302,22 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         for i in range(len(dims)):
             spaces = []
             space_names = []
-            pca_identifier = "_" + str(dims[i]) + "_PCA"
-            pca_fn = pipeline_fn + pca_identifier
-            pca_instance = pca.PCA(None, None, dims[i],
-                                   pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
-            pca_instance.process_and_save()
-            if data_type != "newsgroups":
-                spaces.append(pca_instance.getRep())
-                space_names.append(pca_fn)
+
 
             awv_identifier = "_" + str(dims[i]) + "_AWVEmp"
             awv_fn = pipeline_fn + awv_identifier
             awv_instance = awv.AWV(None, dims[i], awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
             awv_instance.process_and_save()
-            if data_type != "sentiment":
-                spaces.append(awv_instance.getRep())
-                space_names.append(awv_fn)
+            spaces.append(awv_instance.getRep())
+            space_names.append(awv_fn)
+
+            pca_identifier = "_" + str(dims[i]) + "_PCA"
+            pca_fn = pipeline_fn + pca_identifier
+            pca_instance = pca.PCA(None, None, dims[i],
+                                   pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
+            pca_instance.process_and_save()
+            spaces.append(pca_instance.getRep())
+            space_names.append(pca_fn)
 
             if data_type != "sentiment":
                 mds_identifier = "_" + str(dims[i]) + "_MDS"
@@ -371,7 +380,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 max_depths = [None, None, 3, 2, 1]
 classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "newsgroups"
+data_type = "sentiment"
 doLR = False
 dminf = -1
 dmanf = -1
@@ -383,13 +392,13 @@ elif data_type == "reuters":
     hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
 elif data_type == "sentiment":
-    hp_top_freq = [ 10000, 50,200,400,1000,2000,5000, 20000]
-    hp_top_dir = [ 50,200,400,1000, 2000]
+    hp_top_freq = [ 20000,50,200,400,1000,2000, 5000, 10000]
+    hp_top_dir = [ 2000,50,200,400,1000,2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
-    hp_top_dir = [50,200,400,1000,2000]
+    hp_top_freq = [20000,50,200,400,1000,2000, 5000, 10000]
+    hp_top_dir = [2000,50,200,400,1000,200]
 elif data_type == "movies":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000]
+    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
 
 multi_class_method = "OVR"
