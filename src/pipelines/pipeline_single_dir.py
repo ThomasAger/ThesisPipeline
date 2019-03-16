@@ -110,7 +110,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     rank_save = SaveLoad(rewrite=rewrite_all)
 
     stream_rankings = False
-    if (data_type == "sentiment" and no_below > 5000) or no_below >= 10000:
+    if (data_type == "sentiment" and no_below > 5000) or (no_below >= 10000 and data_type != "movies") or no_below > 10000:
         stream_rankings = True
 
     if stream_rankings: #and no_below > 5000) or no_below > 10000:
@@ -155,11 +155,12 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     rfn = []
     f1s = []
     for i in range(len(score_array)):
-        gtr_save = SaveLoad(rewrite=rewrite_all)
+        dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
+        gtr_save = SaveLoad(rewrite=True)
         if stream_rankings:
-            gtr = GetTopScoringRanksStreamed(file_name, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
+            gtr = GetTopScoringRanksStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         else:
-            gtr = GetTopScoringRanks(file_name, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
+            gtr = GetTopScoringRanks(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         gtr.process_and_save()
         fil_rank = gtr.getRank()
 
@@ -168,13 +169,12 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
                                                                           classes, split_ids,
                                                                           dev_percent_of_train=dev_percent)
-        dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
         if data_type == "placetypes" or data_type == "movies":
             dir_fn += "_" + name_of_class
         if i == 0 and data_type == "sentiment":
             hpam_save = SaveLoad(rewrite=True)
         else:
-            hpam_save = SaveLoad(rewrite=rewrite_all)
+            hpam_save = SaveLoad(rewrite=True)
 
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
@@ -389,26 +389,26 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 max_depths = [None, None, 3, 2, 1]
 classifiers = [ "DecisionTree3" ]
-data_type = "newsgroups"
+data_type = "movies"
 doLR = False
 dminf = -1
 dmanf = -1
 
 if data_type == "placetypes":
-    hp_top_freq = [ 20000]
-    hp_top_dir = [2000]
+    hp_top_freq = [5000, 10000, 20000]
+    hp_top_dir = [500, 1000, 2000]
 elif data_type == "reuters":
-    hp_top_freq = [20000]
-    hp_top_dir = [2000]
+    hp_top_freq = [5000, 10000, 20000]
+    hp_top_dir = [500, 1000, 2000]
 elif data_type == "sentiment":
-    hp_top_freq = [20000]
-    hp_top_dir = [2000]
+    hp_top_freq = [5000, 10000, 20000]
+    hp_top_dir = [500, 1000, 2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [20000]
-    hp_top_dir = [2000]
+    hp_top_freq = [5000, 10000, 20000]
+    hp_top_dir = [500, 1000, 2000]
 elif data_type == "movies":
-    hp_top_freq = [5,200,400,1000,2000, 5000, 10000, 20000]
-    hp_top_dir = [50,200,400,1000,2000]
+    hp_top_freq = [5000, 10000, 20000]
+    hp_top_dir = [500, 1000, 2000]
 
 multi_class_method = "OVR"
 bonus_fn = ""
