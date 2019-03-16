@@ -101,6 +101,7 @@ Topic models such as Latent Dirichlet Allocation (LDA) represent documents as mu
 
 
 %How is the chapter going to play out? Whats going to happen?
+As our work performs well even at lower-depth trees, this gives potential users more flexibility in how they want to present the information, e.g. to a potential client. Compared to bag-of-words, which loses its representation capabilities the lower the depth.
 
 This chapter continues as follows: We begin by describing the work related to this , giving valuable context for the utility and potential of our approach. This is followed by an explanation of the method, including the variations we have adopted for our experimental work. We follow this with our qualitative experimentation, explaining how these variations affect the results, as well as the interpretability of the method, and we end with a quantitative analysis on how well we can represent domain knowledge using decision trees constrained to a limited depth.
 
@@ -244,12 +245,16 @@ We will furthermore write $v_{C_j}$ to denote the centroid of the directions cor
 
 \subsection{Quantitative Results}
 
+\subsubsection{Datasets}
 
+Vocabulary size/entity size/origin of data/classes
 
 %Naturally, it is sometimes not enough to see a list of terms and understand the property without domain knowledge. However, by examining how classifiers use these directions to classify key domain knowledge we are better able to understand what they are modelling. For example, when classifying if a movie is a sci-fi, we see that if a movie is ranked highly on the term "science, scientist", then it is not a sci-fi movie. However, when classifying if a movie is a biography, we see that if a movie is ranked highly on "science, scientist" then it is a biography movie. From this, we can understand that the property is not about mad scientists, but normal non-fiction science. 
-
-In this section, we explain the processes to obtain a variety of different Semantic Spaces. \label{ch3:Method}
+\subsubsection{Semantic Spaces}
+In this section, we explain how we obtained four different Semantic Spaces. \label{ch3:Method}
 % Basic explanation of why quantitative results are interesting, valuable, good etc
+
+As the newsgroups contained empty documents after removing all words that do not occur in at least 2 documents, we have removed these empty documents, leaving us with 18302 overall documents. Following this, instead of using the train split as determined by previous literature, we did a simple 2/3 train/test split the same as our IMDB dataset.
 
 This section focuses on using linear classifiers to determine how well our method represents domain knowledge compared to standard baselines. We can understand that an accurate representation of domain knowledge will be one that ensures semantically distinct entities are separated, and semantically similar entities are close together. Put another way, if the space is representing domain knowledge well we can expect that the space should be linearly separable for key semantics of the domain. For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, where Horror movies are spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
 
@@ -276,9 +281,27 @@ When selecting the parameters to use for the doc2vec space when obtaining direct
 We use the kind of multiclass strategy as a hyper-parameter for each class-type in the grid search. We test the OneVsOne classifier method, treating each as binary problems, the OneVsRest method and the OutputCode method.
 We are not able to obtain an MDS space for sentiment or doc2vec spaces for placetypes/movies.
 
-As our work performs well even at lower-depth trees, this gives potential users more flexibility in how they want to present the information, e.g. to a potential client. Compared to bag-of-words, which loses its representation capabilities the lower the depth.
+We obtain results with just these spaces as input, and additionally results for a bag-of-words PPMI representation. These results act as our baselines for quantitative results, in addition to a Topic Model. We find results using a Linear SVM, and a Decision Tree with an unlimited depth, a depth of 3, a depth of 2, and a depth of 1. Each SVM is tuned using a grid search for the optimal C value, and whether or not to balance the classes. For all trees we attempt to find the best value between [None, 'auto', 'log2'], and additionally try differnet criterion, either the gini score or the information entropy score. In the same way as the SVM's, we include whether or not to balance the classes in the grid search.
 
-As the newsgroups contained empty documents after removing all words that do not occur in at least 2 documents, we have removed these empty documents, leaving us with 18302 overall documents. Following this, instead of using the train split as determined by previous literature, we did a simple 2/3 train/test split the same as our IMDB dataset.
+\subsubsection{Word Directions}
+The binary BOW representation for each word that has not been removed by the frequency cut-off is used as a target for a linear SVM, with a Semantic Space as features. We use the scikit-learn libraries LinearSVC implementation with a default C value (1.0). We balance the classes, as many of the binary BOW representations are sparse, and use the primal formulation. %Does this need to be explained more?
+We obtain results for the rankings induced from these word directions on Decision Tree's limited to a depth of 3 in-order to select the Semantic Space that finds the best directions for the remaining steps. In these experiments, we found that a threshold of using the top 20,000 words when compared with a more harsh threshold for all domains was often the best, or had very little performance decrease, so it is used for all experiments. Additionally, we found that similarly a scoring threshold of the top 2000 highest scored terms compared with a more harsh threshold was often the best. We determined this with a grid-search of both parameters. 
+These results allow us to choose for each class, the best Semantic Space and Scoring-type for that class. For all trees we use grid search to find the best values for the criterion, either the gini score or the information entropy score, the maximum amount of features between [None, 'auto', 'log2'], and additionally, we include whether or not to balance the classes in the grid search.
+What is the importance of the space size?
+What is the importance of the space type?
+How do directions perform compared to spaces? Why?
+What kind of directions do we find for each score type?
+Why does the score type matter? What score type works best?
+
+
+Next, we test single directions, attempting to find a good amount of directions to cluster and not including words which may hamper the unsupervised classification, as well as the best space-type for each domain. We found that generally, X was the best space and as expected classifiers performed better with more data, so we use 20000 as our frequency cutoff and 2000 as our score cutoff. These single directions typically overfit.
+
+
+\subsubsection{Clustered Directions}
+We continue with the optimal space and score-type chosen by our single direction experiments, and use the same frequency and score thresholds as before. We then experiment with two different clustering algorithms: Derrac and K-Means. As these algorithms select centroids from the top-scoring directions or randomly, we can expect that some clusters may not be salient features of the space. This is because top-scoring directions, e.g. for accuracy could simply infrequent terms that do not have much meaning, and these infrequehnt terms could also be randomly selected. We could use grid-search on the frequency and score cutoffs when obtaining these results in order to avoid terms that may disrupt existing clusters or form cluster centers that are not salient features of the space, but we chose a more standardized process that would rely on the parameters of the clustering algorithms and the ability of the classifiers to filter out clusters that are not informative, so as to not make a time-costly grid search a necessary part of the process.
+
+With that in mind, we use three clustering algorithms.
+
 
 \subsubsection{Results for vector spaces and bag-of-words}
 \begin{table}[]

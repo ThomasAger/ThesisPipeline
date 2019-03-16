@@ -46,7 +46,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
                             file_name, None, processed_folder + "rank/", hpam_save, probability=False,
                             rewrite_model=rewrite_all, dev_percent=dev_percent,
-                            data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids,
+                            data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, end_fn_added=name_of_class,
                             mcm=mcm, hpam_params=[dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file_name, processed_folder,
                        words_to_get, space, name_of_class, model_type, classes, class_names, auroc, score_metric,
                        mcm, dev_percent, ppmi, kfold_hpam_dict])
@@ -388,26 +388,26 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                              mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict)
 
 max_depths = [None, None, 3, 2, 1]
-classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "reuters"
+classifiers = [ "DecisionTree3" ]
+data_type = "newsgroups"
 doLR = False
 dminf = -1
 dmanf = -1
 
 if data_type == "placetypes":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
-    hp_top_dir = [50,200,400,1000,2000]
+    hp_top_freq = [ 20000]
+    hp_top_dir = [2000]
 elif data_type == "reuters":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
-    hp_top_dir = [50,200,400,1000,2000]
+    hp_top_freq = [20000]
+    hp_top_dir = [2000]
 elif data_type == "sentiment":
-    hp_top_freq = [ 50,200,400,1000,2000, 5000, 10000, 20000]
-    hp_top_dir = [ 50,200,400,1000,2000]
+    hp_top_freq = [20000]
+    hp_top_dir = [2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
-    hp_top_dir = [50,200,400,1000,2000]
+    hp_top_freq = [20000]
+    hp_top_dir = [2000]
 elif data_type == "movies":
-    hp_top_freq = [50,200,400,1000,2000, 5000, 10000, 20000]
+    hp_top_freq = [5,200,400,1000,2000, 5000, 10000, 20000]
     hp_top_dir = [50,200,400,1000,2000]
 
 multi_class_method = "OVR"
