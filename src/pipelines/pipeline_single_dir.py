@@ -177,7 +177,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
             hpam_save = SaveLoad(rewrite=True)
 
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
-                             False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
+                             False, rewrite_model=True, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
         hyper_param.process_and_save()
 
