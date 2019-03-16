@@ -182,7 +182,7 @@ class RecHParam(MasterHParam):
     fn_addition = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
-                 hpam_method=None, hpam_params=None, fn_addition=None):
+                 hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added=""):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -198,7 +198,7 @@ class RecHParam(MasterHParam):
         self.dim_names = dim_names
         self.fn_addition = fn_addition
         self.end_file_name = file_name + "_Kfold" + str(None) + str(
-            generateNumber(hpam_dict)) + model_type
+            generateNumber(hpam_dict)) + model_type + end_fn_added
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
