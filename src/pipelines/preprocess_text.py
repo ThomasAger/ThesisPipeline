@@ -166,21 +166,25 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 classify_mds_fn = classifier_fn + mds_identifier
                 import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
 
-                hpam_save = SaveLoad(rewrite=rewrite_all)
+                ####HERE TEMP CODE
+                rewrite_mds = True
+                ##################
+
+                hpam_save = SaveLoad(rewrite=rewrite_mds)
                 hyper_param = HParam( hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_mds_fn,
-                                      output_folder=output_folder + "rep/", save_class=hpam_save,rewrite_model=rewrite_all, score_metric=score_metric,
+                                      output_folder=output_folder + "rep/", save_class=hpam_save,rewrite_model=rewrite_mds, score_metric=score_metric,
                                       mcm=mcm)
                 if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
-                    mds = dt.import2dArray(import_fn)
+                    mds = np.load(import_fn)
 
                     split_ids = split.get_split_ids(data_type, matched_ids)
                     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(mds,
                                                                                       p_classes, split_ids,
                                                                                       dev_percent_of_train=dev_percent)
 
-                hpam_save = SaveLoad(rewrite=rewrite_all)
+                hpam_save = SaveLoad(rewrite=rewrite_mds)
                 hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder + "rep/", hpam_save,
-                                     probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
+                                     probability, rewrite_model=rewrite_mds, x_train=x_train, y_train=y_train, x_test=x_test,
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())

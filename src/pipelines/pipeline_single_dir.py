@@ -26,7 +26,7 @@ import KFoldHyperParameter
 last_dct = []
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
-                     score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="",
+                     score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="", space_name="",
              classifier_fn="", mcm=None, top_scoring_dirs=2000, score_type="kappa", ppmi=None, dct_unchanged=None, pipeline_hpam_dict=None):
     matched_ids = []
     try:
@@ -156,7 +156,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     f1s = []
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
-        gtr_save = SaveLoad(rewrite=True)
+        gtr_save = SaveLoad(rewrite=rewrite_all)
         if stream_rankings:
             gtr = GetTopScoringRanksStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         else:
@@ -164,18 +164,14 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         gtr.process_and_save()
         fil_rank = gtr.getRank()
 
-
         split_ids = split.get_split_ids(data_type, matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
                                                                           classes, split_ids,
                                                                           dev_percent_of_train=dev_percent)
         if data_type == "placetypes" or data_type == "movies":
             dir_fn += "_" + name_of_class
-        if i == 0 and data_type == "sentiment":
-            hpam_save = SaveLoad(rewrite=True)
-        else:
-            hpam_save = SaveLoad(rewrite=True)
-
+        dir_fn += "_Fix"
+        hpam_save = SaveLoad(rewrite=True)
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
                              False, rewrite_model=True, x_train=x_train, y_train=y_train, x_test=x_test,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
@@ -299,6 +295,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                                          no_below, no_above, True, corp_save)
         bow = p_corpus.getBow()
         word_list = p_corpus.getAllWords()
+        classes = p_corpus.getClasses()
 
         ppmi_save = SaveLoad(rewrite=False)
         ppmi_identifier = "_ppmi"
@@ -312,12 +309,28 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             spaces = []
             space_names = []
 
+            if data_type != "sentiment":
+                mds_identifier = "_" + str(dims[i]) + "_MDS"
+                mds_fn = pipeline_fn + mds_identifier
+                import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
+                mds_space = dt.import2dArray(import_fn)
+                spaces.append(mds_space)
+
+                metadata_fn = processed_folder + "bow/metadata/" + "num_stw_remove.npy"
+                """
+                if len(mds_space) != 18302:
+                    del_ids = np.load(metadata_fn)
+                    mds_space = np.delete(mds_space, del_ids, axis=0)
+                    np.save(import_fn,mds_space)
+                """
+                space_names.append(mds_fn)
 
             awv_identifier = "_" + str(dims[i]) + "_AWVEmp"
             awv_fn = pipeline_fn + awv_identifier
             awv_instance = awv.AWV(None, dims[i], awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
             awv_instance.process_and_save()
-            spaces.append(awv_instance.getRep())
+            awv_space = awv_instance.getRep()
+            spaces.append(awv_space)
             space_names.append(awv_fn)
 
             pca_identifier = "_" + str(dims[i]) + "_PCA"
@@ -328,12 +341,6 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             spaces.append(pca_instance.getRep())
             space_names.append(pca_fn)
 
-            if data_type != "sentiment":
-                mds_identifier = "_" + str(dims[i]) + "_MDS"
-                mds_fn = pipeline_fn + mds_identifier
-                import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
-                spaces.append(dt.import2dArray(import_fn))
-                space_names.append(mds_fn)
 
             if data_type != "movies" and data_type != "placetypes":
                 doc2vec_identifier = "_" + str(dims[i]) + "_D2V"
@@ -357,6 +364,11 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
             for s in range(len(spaces)):
+                if s > 0:
+                    if len(spaces[s]) != len(spaces[s-1]):
+                        raise ValueError("Space len is incorrect", s, len(spaces[s]), space_names[s])
+                if len(classes) != len(spaces[s]):
+                    raise ValueError("Length of classes does not equal length of spaces")
                 if len(bonus_fn) != 0:
                     print("WARNING, bonus fn active")
                 if LR:
@@ -365,6 +377,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                     final_fn = pipeline_fn + "_"+ space_names[s]
 
                 final_fn += bonus_fn
+
+
 
                 corp_save = SaveLoad(rewrite=False)
                 p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder,
@@ -379,36 +393,36 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                     pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                  model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                  score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
-                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict)
+                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s])
                 else:
                     classifier_fn = pipeline_fn + "_" + multiclass
                     pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                      score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
-                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict)
+                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s])
 
-max_depths = [None, None, 3, 2, 1]
+max_depths = [3]
 classifiers = [ "DecisionTree3" ]
-data_type = "movies"
+data_type = "reuters"
 doLR = False
 dminf = -1
 dmanf = -1
 
 if data_type == "placetypes":
     hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [500, 1000, 2000]
+    hp_top_dir = [1000, 2000]
 elif data_type == "reuters":
     hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [500, 1000, 2000]
+    hp_top_dir = [1000,  2000]
 elif data_type == "sentiment":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [500, 1000, 2000]
+    hp_top_freq = [5000,  10000, 20000]
+    hp_top_dir = [1000, 2000]
 elif data_type == "newsgroups":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [500, 1000, 2000]
+    hp_top_freq = [5000,  10000, 20000]
+    hp_top_dir = [1000,  2000]
 elif data_type == "movies":
     hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [500, 1000, 2000]
+    hp_top_dir = [1000,  2000]
 
 multi_class_method = "OVR"
 bonus_fn = ""
