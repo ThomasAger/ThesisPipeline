@@ -1,4 +1,4 @@
-from util import check
+from util import check_util
 from common.SaveLoadPOPO import SaveLoadPOPO
 
 # Can have many ways to define filenames
@@ -70,7 +70,7 @@ class ModelMethod(Method):
         self.probability = probability
         self.mcm = mcm
 
-        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
+        check_util.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
         super().__init__(file_name, save_class)
 
     def makePopos(self):

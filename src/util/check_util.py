@@ -62,6 +62,8 @@ def check_splits(x_train=None, y_train=None, x_test=None, y_test=None):
             y_train = y_train.transpose()
             check_splits(x_train, y_train, x_test, y_test)
         raise ValueError("Sizes do not match for x_train", len(x_train), "and y_train", len(y_train))
+    if len(x_test)!= len(y_test):
+        raise ValueError("Sizes do not match for x_test", len(x_train), "and y_test", len(y_train))
     if not pu.isList(x_train[0]):
         raise ValueError("X input is not 2d array, example", x_train[0])
     if isinstance(x_train[0][0], numbers.Integral):

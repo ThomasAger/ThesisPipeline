@@ -9,7 +9,7 @@ from score import classify
 import numpy as np
 import os
 from common.SaveLoadPOPO import SaveLoadPOPO
-from util import check
+from util import check_util
 from rep import d2v
 from model.randomforest import RandomForest
 from model.decisiontree import DecisionTree
@@ -180,9 +180,10 @@ class RecHParam(MasterHParam):
     hpam_params = None
     rank_fn = None
     fn_addition = None
+    top_scoring_features = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
-                 hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added=""):
+                 hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added="", name_of_class=""):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -205,13 +206,15 @@ class RecHParam(MasterHParam):
                          score_metric=score_metric, mcm=mcm, dim_names=dim_names)
 
     def getTopScoringRowData(self):
-        return self.save_class.load(self.top_scoring_row_data)
+        if self.processed is False:
+            return self.save_class.load(self.top_scoring_row_data)
+        return self.top_scoring_row_data.value
 
     def makePopos(self):
         self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "score/csv_averages/" + self.end_file_name + ".csv", "csv")
         self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
         self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
-
+        self.top_scoring_features = SaveLoadPOPO(self.top_scoring_features, self.output_folder + "top/" + self.end_file_name + ".npy", "npy")
 
     def makePopoArray(self):
         self.popo_array = [self.final_arrays, self.top_scoring_params, self.top_scoring_row_data]
@@ -300,10 +303,11 @@ class RecHParam(MasterHParam):
 
         score_dict = score.get()
         # This order cannot be changed as this is the order it is imported as.
-        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall"]
+        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn"]
         avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
                      score_dict[col_names[2]], score_dict[col_names[3]],
-                     score_dict[col_names[4]]]
+                     score_dict[col_names[4]], self.rank_fn[index]]
+        self.top_scoring_features = space
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
 
 
@@ -535,8 +539,8 @@ class HParam(MasterHParam):
         self.popo_array = [self.averaged_csv_data, self.top_scoring_row_data, self.top_scoring_params]
 
     def process(self):
-        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
-        check.check_splits(self.x_train, self.y_train, self.x_dev, self.y_dev)
+        check_util.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
+        check_util.check_splits(self.x_train, self.y_train, self.x_dev, self.y_dev)
         self.p_score_dicts = []
         for i in range(len(self.all_p)):
             model, model_fn = self.selectClassifier(self.all_p[i], self.x_train, self.y_train, self.x_dev, self.y_dev)

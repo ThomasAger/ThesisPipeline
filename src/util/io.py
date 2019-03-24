@@ -127,10 +127,6 @@ def write_csv(csv_fn, col_names, cols_to_add, key):
 
 def read_csv(csv_fn):
     csv = pd.read_csv(csv_fn, index_col=0)
-    for col in range(0, len(csv)):
-        for val in range(len(csv.iloc[col])):
-            if np.isnan(csv.iloc[col][val] ):
-                print("!NAN!", col, val)
     return csv
 
 def csv_pd_to_array(csv_pd):

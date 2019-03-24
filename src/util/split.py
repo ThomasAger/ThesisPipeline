@@ -19,7 +19,7 @@ from sklearn.model_selection import KFold
 import numbers
 from util import py as pu
 from util import py
-
+from util import check_util
 
 def get_name_dict(*params):
     print(*params)
@@ -47,7 +47,7 @@ def get_doc_amt(data_type):
 
 
 def check_shape(features, data_type):
-    print("Shape", len(features), len(features[0]))
+    print("Shape", len(features))
     if data_type == "imdb" or data_type == "sentiment":
         max_size = imdb_total
     elif data_type == "newsgroups":
@@ -65,7 +65,7 @@ def check_shape(features, data_type):
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
-    if len(features) != max_size and len(features[0]) != max_size:
+    if len(features) != max_size:
         raise ValueError(print(len(features), "This is not the standard size, expected " + str(max_size)))
     return True
 
@@ -122,7 +122,9 @@ def get_split_ids(data_type, matched_ids):
 
 import numpy as np
 
-def split_data(x, y, split_ids, dev_percent_of_train=0.2):
+def split_data(x, y, split_ids, dev_percent_of_train=0.2, data_type=""):
+    if data_type != "":
+        check_shape(x, data_type)
     y = py.transIfColsLarger(y)
     x_len = len(x)
     y_len = len(y)
@@ -140,6 +142,7 @@ def split_data(x, y, split_ids, dev_percent_of_train=0.2):
                 raise ValueError(str(x_len) + "does not equal its components")
             if (len(y_train) + len(y_test) + len(y_dev)) != y_len:
                 raise ValueError(str(y_len)+ "does not equal its components")
+        check_util.check_splits(x_train=x_train, y_train=y_train, x_test=x_dev, y_test=y_dev)
 
     else:
         if np.amax(x_train) == np.amax(y_train) and np.amax(x_test) == np.amax(y_test):
@@ -149,6 +152,7 @@ def split_data(x, y, split_ids, dev_percent_of_train=0.2):
                 raise ValueError(str(y_len)+ "does not equal its components")
     if len(x_dev) > len(x_train) and dev_percent_of_train <= 0.5:
         raise ValueError("Dev split is larger than train split")
+    check_util.check_splits(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     return x_train, y_train, x_test, y_test, x_dev, y_dev
 
 def old_split(features, classes, data_type, dev_percent=0.2):

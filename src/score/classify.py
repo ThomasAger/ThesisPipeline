@@ -9,7 +9,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from common import Method
 from util import io as dt
 from common.SaveLoadPOPO import SaveLoadPOPO
-from util import check
+from util import check_util
 from util import py
 import scipy.sparse as sp
 
@@ -74,7 +74,7 @@ class MasterScore(Method.Method):
         super().__init__(file_name, save_class)
 
     def process(self):
-        check.check_y(self.true_targets, self.predictions)
+        check_util.check_y(self.true_targets, self.predictions)
         if np.count_nonzero(self.true_targets) < 1:
             auroc = False
             print("Auroc has been automatically disabled as the true targets (len)", len(self.true_targets),
