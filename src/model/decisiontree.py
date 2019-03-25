@@ -12,6 +12,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
 from util import py
 
+
 class DecisionTree(Method.ModelMethod):
     max_features = None
     class_weight = None

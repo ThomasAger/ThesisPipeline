@@ -155,6 +155,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     tsp = []
     tsrd = []
     rfn = []
+    dfn = []
     f1s = []
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
@@ -165,17 +166,17 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
             gtr = GetTopScoringRanks(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         gtr.process_and_save()
         fil_rank = gtr.getRank()
-
+        fil_rank_fn = gtr.rank.file_name
 
         gtd_save = SaveLoad(rewrite=rewrite_all)
         if stream_rankings:
-            gtd = GetTopScoringDirsStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i],
+            gtd = GetTopScoringDirsStreamed(dir_fn, gtd_save, processed_folder + "directions/", score_array[i],
                                              top_scoring_dir, dirs, new_word2id_dict)
         else:
-            gtd = GetTopScoringDirs(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir,
+            gtd = GetTopScoringDirs(dir_fn, gtr_save, processed_folder + "directions/", score_array[i], top_scoring_dir,
                                     dirs, new_word2id_dict)
         gtd.process_and_save()
-        fil_rank = gtd.getDir()
+        fil_dir_fn = gtd.dir.file_name
 
         split_ids = split.get_split_ids(data_type, matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
@@ -192,7 +193,8 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
         tsp.append(hyper_param.getTopScoringParams())
         tsrd.append(hyper_param.getTopScoringRowData())
-        rfn.append(gtr.rank.file_name)
+        rfn.append(fil_rank_fn)
+        dfn.append(fil_dir_fn)
         f1s.append(hyper_param.getTopScoringRowData()[1][1]) # F1 Score for the current scoring metric
 
 
@@ -201,7 +203,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     top_params = tsp[best_ind]
     top_row_data = tsrd[best_ind]
     top_rank = rfn[best_ind]
-
+    top_dir = dfn[best_ind]
     all_r = np.asarray(tsrd).transpose()
     rows = all_r[1]
     cols = np.asarray(rows.tolist()).transpose()
@@ -211,7 +213,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
                  + "reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
     print("Pipeline completed, saved as, "+ processed_folder + "rank/score/csv_averages/" +file_name+ "_" + str(no_above) + "_" + str(no_below)
                  + "reps"+model_type+"_" + name_of_class + ".csv")
-    return top_params, top_row_data, top_rank
+    return top_params, top_row_data, top_rank, top_dir
 
 
 
@@ -449,11 +451,11 @@ if __name__ == '__main__':
         hp_top_freq = [5000, 10000, 20000]
         hp_top_dir = [1000, 2000]
 
-    multi_class_method = "OVR"
+    mcm = "OVR"
     bonus_fn = ""
     rewrite_all = False
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
                                 grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
-                                score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn, rewrite_all=rewrite_all,
+                                score_metric="avg_f1", max_depth=max_depths[i], multiclass=mcm, LR=doLR, bonus_fn=bonus_fn, rewrite_all=rewrite_all,
              hp_top_dir=hp_top_dir, hp_top_freq=hp_top_freq)

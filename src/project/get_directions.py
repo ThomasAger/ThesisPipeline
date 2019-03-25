@@ -110,6 +110,9 @@ class GetDirections(Method.Method):
             self.directions.value = self.save_class.load(self.directions)
         return self.directions.value
 
+    def getDirectionsFn(self):
+        return self.directions.file_name
+
     def getPreds(self):
         if self.processed is False:
             self.predictions.value = self.save_class.load(self.predictions)

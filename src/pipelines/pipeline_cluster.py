@@ -13,25 +13,24 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
 from project.get_directions import GetDirections
 from score.classify import MultiClassScore
-from project.get_rankings import GetRankings, GetRankingsStreamed
+from project.get_rankings import GetRankings, GetRankingsStreamed, GetRankingsNoSave
 from project.get_ndcg import GetNDCG, GetNDCGStreamed
 from rep import pca, ppmi, awv
 from project.get_tsr import GetTopScoringRanks, GetTopScoringRanksStreamed
 from util import py
-
+from util.normalize import NormalizeZeroMean
 import KFoldHyperParameter
+from model.kmeans import KMeansCluster
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 last_dct = []
 
 
-def pipeline(file_name, top_ranks, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict,
-             hpam_dict,
-             model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
-             score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="", space_name="",
-             classifier_fn="", mcm=None, top_scoring_dirs=2000, score_type="kappa", ppmi=None, dct_unchanged=None,
-             pipeline_hpam_dict=None):
+def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfold_hpam_dict,
+             model_type="", dev_percent=0.2, rewrite_all=False,
+             score_metric="", auroc=False, name_of_class="", mcm=None,
+             pipeline_hpam_dict=None, cluster_amt=0, data_type="", dir_names=None, space=None, n_init=10, max_iter=300, tol=1e-4, init="k-means++"):
     matched_ids = []
     try:
         class_entities = dt.import1dArray(processed_folder + "classes/" + name_of_class + "_entities.txt")
@@ -55,79 +54,78 @@ def pipeline(file_name, top_ranks, bow, dct, classes, class_names, words_to_get,
                                                 data_type=data_type, score_metric=score_metric, auroc=auroc,
                                                 matched_ids=matched_ids, end_fn_added=name_of_class,
                                                 mcm=mcm,
-                                                hpam_params=[dct_unchanged, dct, bow, dir_min_freq, dir_max_freq,
-                                                             file_name, processed_folder,
-                                                             words_to_get, top_ranks, name_of_class, model_type, classes,
-                                                             class_names, auroc, score_metric,
-                                                             mcm, dev_percent, ppmi, kfold_hpam_dict])
+                                                hpam_params=[file_name, processed_folder, cluster_amt, rewrite_all, top_dirs_fn, data_type, dir_names, space,class_names,
+                      kfold_hpam_dict, model_type, name_of_class, score_metric, mcm, classes, dev_percent, matched_ids, n_init, max_iter, tol, init])
     hyper_param.process_and_save()
     print("END OF SPACE")
     return hyper_param.getTopScoringRowData()
 
 
-def cluster_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file_name, processed_folder,
-                       words_to_get, top_ranks, name_of_class, model_type, classes, class_names, auroc, score_metric,
-                       mcm, dev_percent, ppmi, kfold_hpam_dict, top_scoring_dir=None, top_scoring_freq=None, matched_ids=None):
+def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top_dir_fn, data_type, word_fn, space, class_names,
+                      kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids, n_init, max_iter, tol, init):
 
-    dct_len_start = len(dct_unchanged.dfs.keys())
-    if bow.shape[0] != len(dct.dfs.keys()) or len(dct.dfs.keys()) != ppmi.shape[0]:
-        print("bow", bow.shape[0], "dct", len(dct.dfs.keys()), "ppmi", ppmi.shape[0])
-        raise ValueError("Size of vocab and dict do not match")
 
     doc_amt = split.get_doc_amt(data_type)
 
+    if len(space) != doc_amt:
+        raise ValueError("Space len does not equal doc amt")
+
+    top_dirs = np.load(top_dir_fn).transpose()
+    top_words = np.load(word_fn)
+
     # Normalize the directions (so that euclidian distance is equal to cosine similarity)
+    norm_save = SaveLoad(rewrite=rewrite_all)
+    normalize = NormalizeZeroMean(top_dirs, file_name, processed_folder + "directions/norm/", norm_save)
+    normalize.process_and_save()
+    norm_dir = normalize.getNormalized()
+
+    file_name = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init)
 
     # Get the clusters For the cluster input parameters with the directions as input
+    kmeans_save = SaveLoad(rewrite=rewrite_all)
+    kmeans = KMeansCluster( norm_dir, cluster_amt, file_name, processed_folder + "clusters/", kmeans_save, top_words)
+    kmeans.process_and_save()
+    cluster_dir = kmeans.getClusters()
+    cluster_names = kmeans.getClusterNames()
 
+    cluster_dict = {}
+    for i in range(len(cluster_names)):
+        cluster_dict[cluster_names[i]] = i
     # Get the rankings on the clusters
+    rank_save = SaveLoad(rewrite=rewrite_all)
+    rank = GetRankingsNoSave(cluster_dir, space, cluster_dict, rank_save, file_name, processed_folder + "clusters/", "best", cluster_amt)
+    rank.process_and_save()
+    rankings = rank.getRankings()
+    rankings = rankings.transpose()
+    if len(rankings) != doc_amt:
+        raise ValueError("Rankings len does not equal doc amt")
 
-
-
-    # Find which one is best with the model type
-
+    dir_fn = file_name
+    if data_type == "placetypes" or data_type == "movies":
+        dir_fn += "_" + name_of_class
     split_ids = split.get_split_ids(data_type, matched_ids)
-    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
+    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(rankings,
                                                                       classes, split_ids,
                                                                       dev_percent_of_train=dev_percent,
                                                                       data_type=data_type)
-
+    hpam_save = SaveLoad(rewrite=rewrite_all)
     hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn,
-                                             processed_folder + "rank/", hpam_save,
-                                             False, rewrite_model=rewrite_this, x_train=x_train, y_train=y_train,
+                                             processed_folder + "clusters/", hpam_save,
+                                             False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
                                              x_test=x_test,
                                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric,
-                                             auroc=auroc, mcm=mcm, dim_names=words)
+                                             auroc=False, mcm=multi_class_method, dim_names=cluster_names)
     hyper_param.process_and_save()
-
-    tsp.append(hyper_param.getTopScoringParams())
-    tsrd.append(hyper_param.getTopScoringRowData())
-    rfn.append(gtr.rank.file_name)
-    f1s.append(hyper_param.getTopScoringRowData()[1][1])  # F1 Score for the current scoring metric
-
-    best_ind = np.flipud(np.argsort(f1s))[0]
-    top_params = tsp[best_ind]
-    top_row_data = tsrd[best_ind]
-    top_rank = rfn[best_ind]
-
-    all_r = np.asarray(tsrd).transpose()
-    rows = all_r[1]
-    cols = np.asarray(rows.tolist()).transpose()
-    col_names = all_r[0][0]
-    key = all_r[2]
-    dt.write_csv(processed_folder + "rank/score/csv_averages/" + file_name + "_" + str(no_above) + "_" + str(no_below)
-                 + "reps" + model_type + "_" + name_of_class + ".csv", col_names, cols, key)
-    print("Pipeline completed, saved as, " + processed_folder + "rank/score/csv_averages/" + file_name + "_" + str(
-        no_above) + "_" + str(no_below)
-          + "reps" + model_type + "_" + name_of_class + ".csv")
-    return top_params, top_row_data, top_rank
+    # Get the scores for those rankings
+    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name
 
 
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
-         bonus_fn="",
-         rewrite_all=False, hp_top_freq=None, hp_top_dir=None):
+         bonus_fn="", cluster_amt=None,
+         rewrite_all=False):
     pipeline_fn = "num_stw"
+    name_of_class = None
     if data_type == "newsgroups":
         name_of_class = ["Newsgroups"]
     elif data_type == "sentiment":
@@ -183,7 +181,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                  "min_count": min_count,
                  "train_epoch": train_epoch}
 
-    pipeline_hpam_dict = {"top_freq": hp_top_freq, "top_dir": hp_top_dir}
+    pipeline_hpam_dict = {"cluster_amt": cluster_amt}
 
     multi_class_method = None
     if multiclass == "MOP":
@@ -198,7 +196,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     tsrds = []
 
     rank_fns = []
-
+    dir_fns = []
+    word_fns = []
+    feature_fns = []
     placetypes_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCArepsDecisionTree3_"
     reuters_fn = ""
     newsgroups_fn = ""
@@ -208,20 +208,39 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     all_fns = [placetypes_fn]#, reuters_fn, newsgroups_fn, movies_fn, sentiment_fn]
     space_names = []
     for i in range(len(all_fns)):
-        if i == 0: # Placetypes
+        if i == 0 or i == 3: # Placetypes or movies
             rank_fn_array = []
+            dir_fn_array = []
+            word_fn_array = []
+            features_fn_array = []
             space_name_array = []
             for j in range(len(name_of_class)):
                 csv = dt.read_csv(all_fns[i] + name_of_class[j] + ".csv")
                 rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
                 rank_fn_array.append(rank_fn)
+
+                word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
+                word_fn_array.append(word_fn)
+
+                dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
+                dir_fn_array.append(dir_fn)
                 space_name = rank_fn.split("/")[-1:][0][:-4]
                 space_name_array.append(space_name)
+
+
+
             rank_fns.append(rank_fn_array)
+            dir_fns.append(dir_fn_array)
+            word_fns.append(word_fn_array)
+            feature_fns.append(features_fn_array)
             space_names.append(space_name_array)
 
 
+
     classes_save = SaveLoad(rewrite=False)
+
+
+
     # These were the parameters used for the previous experiments
     no_below = 0.0001
     no_above = 0.95
@@ -231,6 +250,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
     for i in range(len(rank_fns)):
         for j in range(len(name_of_class)):
+            print(j)
             classes_process = util.classify.ProcessClasses(None, None, pipeline_fn, processed_folder, bowmin, no_below,
                                                            no_above, classes_freq_cutoff, True, classes_save,
                                                            name_of_class[j])
@@ -242,23 +262,79 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                              bowmin,
                                              no_below, no_above, True, corp_save)
             classes = p_corpus.getClasses()
-            bow = p_corpus.getBow()
-            word_list = p_corpus.getAllWords()
+            space = None
 
-            final_fn = pipeline_fn
+            dim = int(rank_fns[i][j].split("/")[-1:][0].split("_")[4])
+            type = rank_fns[i][j].split("/")[-1:][0].split("_")[5]
+            print(type)
+            print(type)
+            print(type)
+            print(type)
+            print(type)
+            print(type)
+            print(type)
+            print(type)
+            if type == "MDS":
+                if data_type != "sentiment":
+                    mds_identifier = "_" + str(dim) + "_MDS"
+                    mds_fn = pipeline_fn + mds_identifier
+                    import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
+                    mds_space = dt.import2dArray(import_fn)
+                    space = mds_space
+                    """
+                    metadata_fn = processed_folder + "bow/metadata/" + "num_stw_remove.npy"
+    
+                    if len(mds_space) != 18302:
+                        del_ids = np.load(metadata_fn)
+                        mds_space = np.delete(mds_space, del_ids, axis=0)
+                        np.save(import_fn,mds_space)
+                    """
 
-            dct = p_corpus.getBowDct()
-            dct_unchanged = p_corpus.getBowDct()
-            classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
-            if data_type == "movies" or data_type == "placetypes":
-                tsrd = pipeline(final_fn, rank_fns[i][j], bow, dct, classes, class_names, word_list, processed_folder, dims,
-                         kfold_hpam_dict, hpam_dict,
-                         model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
-                         remove_stop_words=True,
-                         score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq,
-                         dir_max_freq=dir_max_freq, name_of_class=name_of_class[j], classifier_fn=classifier_fn,
-                         mcm=multi_class_method,  dct_unchanged=dct_unchanged,
-                         pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[i][j])
+            elif type == "AWVEmp":
+                awv_identifier = "_" + str(dim) + "_AWVEmp"
+                awv_fn = pipeline_fn + awv_identifier
+                awv_instance = awv.AWV(None, dim, awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
+                awv_instance.process_and_save()
+                awv_space = awv_instance.getRep()
+                space = awv_space
+            elif type == "PCA":
+                pca_identifier = "_" + str(dim) + "_PCA"
+                pca_fn = pipeline_fn + pca_identifier
+                pca_instance = pca.PCA(None, None, dim,
+                                       pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
+                pca_instance.process_and_save()
+                pca_space = pca_instance.getRep()
+                space_names.append(pca_fn)
+                space = pca_space
+            elif type == "D2V":
+                if data_type != "movies" and data_type != "placetypes":
+                    doc2vec_identifier = "_" + str(dim) + "_D2V"
+                    doc2vec_fn = pipeline_fn + doc2vec_identifier
+                    classifier_fn = pipeline_fn + "_" + name_of_class[j] + "_"
+
+                    wv_path_d2v = os.path.abspath("../../data/raw/glove/" + "glove.6B.300d.txt")
+
+                    corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+                    hpam_dict["dim"] = [dim]
+                    hpam_dict["corpus_fn"] = [corpus_fn]
+                    hpam_dict["wv_path"] = [wv_path_d2v]
+
+                    # Have to leave classes in due to messy method
+                    hyper_param = KFoldHyperParameter.RecHParam(None, classes, None, hpam_dict, hpam_dict, "d2v",
+                                                                "LinearSVM",
+                                                                doc2vec_fn, classifier_fn, processed_folder + "rep/",
+                                                                SaveLoad(rewrite=False), data_type=data_type,
+                                                                score_metric=score_metric)
+                    d2v_space, __unused = hyper_param.getTopScoringSpace()
+                    space_names.append(doc2vec_fn)
+                    space = d2v_space
+            for c in range(len(cluster_amt)):
+                if data_type == "movies" or data_type == "placetypes":
+                    tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
+                                    model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
+                                    auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
+                                    cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space)
+
             """
             tsrds.append(tsrd)
             # Make the combined CSV of all the dims of all the space types
@@ -273,38 +349,34 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             print("a")
             """
 
+def init():
+    max_depths = [3]
+    classifiers = ["DecisionTree3"]
+    data_type = "placetypes"
+    doLR = False
+    dminf = -1
+    dmanf = -1
+    cluster_amt = []
+    if data_type == "placetypes":
+        cluster_amt = [50, 100, 200]
+    elif data_type == "reuters":
+        cluster_amt = [50, 100, 200]
+    elif data_type == "sentiment":
+        cluster_amt = [50, 100, 200]
+    elif data_type == "newsgroups":
+        cluster_amt = [50, 100, 200]
+    elif data_type == "movies":
+        cluster_amt = [50, 100, 200]
 
-max_depths = [3]
-classifiers = ["DecisionTree3"]
-data_type = "placetypes"
-doLR = False
-dminf = -1
-dmanf = -1
-
-if data_type == "placetypes":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [1000, 2000]
-elif data_type == "reuters":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [1000, 2000]
-elif data_type == "sentiment":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [1000, 2000]
-elif data_type == "newsgroups":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [1000, 2000]
-elif data_type == "movies":
-    hp_top_freq = [5000, 10000, 20000]
-    hp_top_dir = [1000, 2000]
-
-multi_class_method = "OVR"
-bonus_fn = ""
-rewrite_all = False
-if __name__ == '__main__':
+    multi_class_method = "OVR"
+    bonus_fn = ""
+    rewrite_all = False
     for i in range(len(classifiers)):
         main(data_type, "../../data/raw/" + data_type + "/", "../../data/processed/" + data_type + "/",
              proj_folder="../../data/proj/" + data_type + "/",
              grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
              score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
-             rewrite_all=rewrite_all,
-             hp_top_dir=hp_top_dir, hp_top_freq=hp_top_freq)
+             rewrite_all=rewrite_all, cluster_amt=cluster_amt)
+
+if __name__ == '__main__':
+    init()

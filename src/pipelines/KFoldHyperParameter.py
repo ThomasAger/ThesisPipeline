@@ -15,6 +15,7 @@ from model.randomforest import RandomForest
 from model.decisiontree import DecisionTree
 from util import split
 from pipelines import pipeline_single_dir
+from pipelines import pipeline_cluster
 
 def get_grid_params(hpam_dict):
     hyperparam_array = list(hpam_dict.values())
@@ -181,6 +182,7 @@ class RecHParam(MasterHParam):
     rank_fn = None
     fn_addition = None
     top_scoring_features = None
+    dir_fn = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
                  hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added="", name_of_class=""):
@@ -223,6 +225,7 @@ class RecHParam(MasterHParam):
         col_names = []
         indexes = []
         self.rank_fn = []
+        self.dir_fn = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
         for i in range(len(self.all_p)):
@@ -254,10 +257,10 @@ class RecHParam(MasterHParam):
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
-            elif self.hpam_model_type is "dir":
+            elif self.hpam_model_type == "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
-                top_params, top_row_data, top_rank = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+                top_params, top_row_data, top_rank, top_dir = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
 
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
@@ -265,18 +268,31 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(top_rank)
-
+                self.dir_fn.append(top_dir)
+            elif self.hpam_model_type == "cluster":
+                top_params, top_row_data, cluster_rank =  pipeline_cluster.cluster_pipeline(*self.hpam_params)
+                self.top_scoring_params.value.append(top_params)
+                top_scoring_row_data = top_row_data
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
+                self.rank_fn.append(cluster_rank)
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
         self.final_arrays.value.append(indexes)
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
-        elif self.hpam_model_type == "dir":
+        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster":
             print("skipped")
             index = self.getTopScoring()
-            space = np.load(self.rank_fn[index])
-            self.getTopScoringByMetricDir(space, index)
+            if self.hpam_model_type == "cluster":
+                space = np.load(self.rank_fn[index]).transpose()
+                self.getTopScoringCluster(space, index)
+            else:
+                space = np.load(self.rank_fn[index])
+                self.getTopScoringByMetricDir(space, index)
+
         super().process()
     def getTopScoring(self):
         if self.final_arrays.value is None or len(self.final_arrays.value) == 0:
@@ -299,6 +315,30 @@ class RecHParam(MasterHParam):
                                          output_folder=self.output_folder + "score/", save_class=score_save,
                                          verbose=True, class_names=self.class_names,
                                          fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
+        score.process_and_save()
+
+        score_dict = score.get()
+        # This order cannot be changed as this is the order it is imported as.
+        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn", "dir_fn"]
+        avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                     score_dict[col_names[2]], score_dict[col_names[3]],
+                     score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
+        self.top_scoring_features = space
+        self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+
+    def getTopScoringCluster(self, space, index):
+        split_ids = split.get_split_ids(self.data_type, self.matched_ids)
+        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
+                                                                          self.classes, split_ids,
+                                                                          dev_percent_of_train=self.dev_percent)
+
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
+        model_pred, __unused = self.trainClassifier(model)
+        score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
+        score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
+                                     output_folder=self.output_folder + "score/", save_class=score_save,
+                                     verbose=True, class_names=self.class_names,
+                                     fscore=self.fscore, acc=self.acc, kappa=self.kappa, auroc=self.auroc)
         score.process_and_save()
 
         score_dict = score.get()

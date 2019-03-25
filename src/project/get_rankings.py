@@ -49,6 +49,7 @@ class GetRankings(Method.Method):
     def process(self):
         i = 0
         for key, value in self.words.items():
+            # If the word isn't in the saved version
             if key not in self.rank_dir.value:
                 self.rank_dir.value[key] = self.get_dp(self.dirs[value])
             self.rankings.value[value] = self.rank_dir.value[key]
@@ -60,6 +61,55 @@ class GetRankings(Method.Method):
         if self.processed is False:
             self.rankings.value = self.save_class.load(self.rankings)
         return self.rankings.value
+
+class GetRankingsNoSave(Method.Method):
+    word_dir = None
+    words = None
+    output_directions = None
+    output_folder = None
+    directions = None
+    dirs = None
+    bowmin = None
+    bowmax = None
+    new_word_dict = None
+    space = None
+    LR = None
+
+    def __init__(self, dirs, space,  words, save_class, file_name, output_folder, bowmin, bowmax):
+        self.words = words
+        self.output_folder = output_folder
+        self.space = space
+        self.dirs = dirs
+        self.bowmin = bowmin
+        self.bowmax = bowmax
+        super().__init__(file_name, save_class)
+
+    def makePopos(self):
+
+        self.rankings = SaveLoadPOPO(np.empty(shape = (len(self.words.keys()), len(self.space))), self.output_folder + "rank/" + self.file_name + "_" + str(self.bowmin) + "_" + str(self.bowmax) + "_rank.npy", "npy")
+
+    def makePopoArray(self):
+        self.popo_array = [self.rankings]
+
+    def get_dp(self, direction):
+        ranking = np.empty(len(self.space))
+        for i in range(len(self.space)):
+            ranking[i] = np.dot(direction, self.space[i])
+        return ranking
+
+    def process(self):
+        i = 0
+        for key, value in self.words.items():
+            self.rankings.value[value] = self.get_dp(self.dirs[value])
+            print(i, "/", len(self.words.keys()), key)
+            i += 1
+        super().process()
+
+    def getRankings(self):
+        if self.processed is False:
+            self.rankings.value = self.save_class.load(self.rankings)
+        return self.rankings.value
+
 
 class GetRankingsStreamed(Method.Method):
     word_dir = None
