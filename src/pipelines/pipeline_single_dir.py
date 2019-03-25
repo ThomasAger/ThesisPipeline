@@ -169,11 +169,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         fil_rank_fn = gtr.rank.file_name
 
         gtd_save = SaveLoad(rewrite=rewrite_all)
-        if stream_rankings:
-            gtd = GetTopScoringDirsStreamed(dir_fn, gtd_save, processed_folder + "directions/", score_array[i],
-                                             top_scoring_dir, dirs, new_word2id_dict)
-        else:
-            gtd = GetTopScoringDirs(dir_fn, gtr_save, processed_folder + "directions/", score_array[i], top_scoring_dir,
+        gtd = GetTopScoringDirs(dir_fn, gtd_save, processed_folder + "directions/", score_array[i], top_scoring_dir,
                                     dirs, new_word2id_dict)
         gtd.process_and_save()
         fil_dir_fn = gtd.dir.file_name
@@ -430,7 +426,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 if __name__ == '__main__':
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = "placetypes"
+    data_type = "reuters"
     doLR = False
     dminf = -1
     dmanf = -1
