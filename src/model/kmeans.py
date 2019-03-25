@@ -20,8 +20,8 @@ class KMeansCluster(Method):
         super().__init__(file_name, save_class)
 
     def makePopos(self):
-        self.cluster_dirs = SaveLoadPOPO(self.cluster_dirs, self.folder_name + "directions/"+ self.file_name + "_" + str(self.cluster_amt) + ".npy", "npy")
-        self.cluster_names = SaveLoadPOPO(self.cluster_names, self.folder_name + "names/" +self.file_name + "_" + str(self.cluster_amt) + ".npy", "npy")
+        self.cluster_dirs = SaveLoadPOPO(self.cluster_dirs, self.folder_name + "directions/"+ self.file_name + ".npy", "npy")
+        self.cluster_names = SaveLoadPOPO(self.cluster_names, self.folder_name + "names/" +self.file_name + ".npy", "npy")
 
     def makePopoArray(self):
         self.popo_array = [self.cluster_dirs, self.cluster_names]

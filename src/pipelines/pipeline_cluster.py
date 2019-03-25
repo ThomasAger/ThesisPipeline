@@ -48,7 +48,7 @@ def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfol
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "cluster",
                                                 model_type,
-                                                file_name, None, processed_folder + "rank/", hpam_save,
+                                                file_name + "_"+ str(cluster_amt), None, processed_folder + "rank/", hpam_save,
                                                 probability=False,
                                                 rewrite_model=rewrite_all, dev_percent=dev_percent,
                                                 data_type=data_type, score_metric=score_metric, auroc=auroc,
@@ -79,7 +79,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
     normalize.process_and_save()
     norm_dir = normalize.getNormalized()
 
-    file_name = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init)
+    file_name = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init) + "_" + str(cluster_amt)
 
     # Get the clusters For the cluster input parameters with the directions as input
     kmeans_save = SaveLoad(rewrite=rewrite_all)
@@ -193,47 +193,59 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     elif multiclass == "OCC":
         multi_class_method = OutputCodeClassifier
 
-    tsrds = []
-
     rank_fns = []
     dir_fns = []
     word_fns = []
     feature_fns = []
-    placetypes_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCArepsDecisionTree3_"
-    reuters_fn = ""
-    newsgroups_fn = ""
-    movies_fn = ""
-    sentiment_fn = ""
-
-    all_fns = [placetypes_fn]#, reuters_fn, newsgroups_fn, movies_fn, sentiment_fn]
+    if data_type == "placetypes":
+        csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCArepsDecisionTree3_"
+    elif data_type == "reuters":
+        csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2VrepsDecisionTree3_"
     space_names = []
-    for i in range(len(all_fns)):
-        if i == 0 or i == 3: # Placetypes or movies
-            rank_fn_array = []
-            dir_fn_array = []
-            word_fn_array = []
-            features_fn_array = []
-            space_name_array = []
-            for j in range(len(name_of_class)):
-                csv = dt.read_csv(all_fns[i] + name_of_class[j] + ".csv")
-                rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
-                rank_fn_array.append(rank_fn)
+    if data_type == "movies" or data_type == "placetypes": # Placetypes or movies
+        rank_fn_array = []
+        dir_fn_array = []
+        word_fn_array = []
+        features_fn_array = []
+        space_name_array = []
+        for j in range(len(name_of_class)):
+            csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
+            rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
+            rank_fn_array.append(rank_fn)
 
-                word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
-                word_fn_array.append(word_fn)
+            word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
+            word_fn_array.append(word_fn)
 
-                dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
-                dir_fn_array.append(dir_fn)
-                space_name = rank_fn.split("/")[-1:][0][:-4]
-                space_name_array.append(space_name)
+            dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
+            dir_fn_array.append(dir_fn)
+            space_name = rank_fn.split("/")[-1:][0][:-4]
+            space_name_array.append(space_name)
+    else:
+        rank_fn_array = []
+        dir_fn_array = []
+        word_fn_array = []
+        features_fn_array = []
+        space_name_array = []
+        for j in range(len(name_of_class)):
+            csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
+            rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
+            rank_fn_array.append(rank_fn)
+
+            word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
+            word_fn_array.append(word_fn)
+
+            dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
+            dir_fn_array.append(dir_fn)
+            space_name = rank_fn.split("/")[-1:][0][:-4]
+            space_name_array.append(space_name)
 
 
 
-            rank_fns.append(rank_fn_array)
-            dir_fns.append(dir_fn_array)
-            word_fns.append(word_fn_array)
-            feature_fns.append(features_fn_array)
-            space_names.append(space_name_array)
+        rank_fns.append(rank_fn_array)
+        dir_fns.append(dir_fn_array)
+        word_fns.append(word_fn_array)
+        feature_fns.append(features_fn_array)
+        space_names.append(space_name_array)
 
 
 
@@ -328,6 +340,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     d2v_space, __unused = hyper_param.getTopScoringSpace()
                     space_names.append(doc2vec_fn)
                     space = d2v_space
+            tsrds = []
             for c in range(len(cluster_amt)):
                 if data_type == "movies" or data_type == "placetypes":
                     tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
@@ -335,8 +348,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                     auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
                                     cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space)
 
-            """
-            tsrds.append(tsrd)
+
+                    tsrds.append(tsrd)
             # Make the combined CSV of all the dims of all the space types
             all_r = np.asarray(tsrds).transpose()
             rows = all_r[1]
@@ -344,15 +357,15 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             col_names = all_r[0][0]
             key = all_r[2]
             dt.write_csv(
-                processed_folder + "rank/score/csv_final/" + final_fn + "reps" + model_type + "_" + name_of_class[j] + ".csv",
+                processed_folder + "clusters/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_" + name_of_class[j] + ".csv",
                 col_names, cols, key)
             print("a")
-            """
+
 
 def init():
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = "placetypes"
+    data_type = "reuters"
     doLR = False
     dminf = -1
     dmanf = -1
