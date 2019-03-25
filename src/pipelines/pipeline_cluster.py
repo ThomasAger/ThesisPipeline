@@ -48,7 +48,7 @@ def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfol
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "cluster",
                                                 model_type,
-                                                file_name + "_"+ str(cluster_amt), None, processed_folder + "rank/", hpam_save,
+                                                file_name + "_"+ str(cluster_amt), None, processed_folder + "clusters/", hpam_save,
                                                 probability=False,
                                                 rewrite_model=rewrite_all, dev_percent=dev_percent,
                                                 data_type=data_type, score_metric=score_metric, auroc=auroc,
@@ -146,9 +146,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     C_params = [1.0, 0.01, 0.001, 0.0001]
     gamma_params = [1.0, 0.01, 0.001, 0.0001]
 
-    n_estimators = [1000, 2000]
+    n_estimators = [ 1000, 2000]
     max_features = [None, 'auto', 'log2']
-    criterion = ["entropy"]
+    criterion = ["gini", "entropy"]
     max_depth = [max_depth]
     bootstrap = [True, False]
     min_samples_leaf = [1]
@@ -181,9 +181,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                  "min_count": min_count,
                  "train_epoch": train_epoch}
 
-    n_init = [10,50,100]
-    max_iter = [300,1000,2000]
-    tol=[0.001, 0.0001, 0.00001, 0.000001, 0.0]
+    n_init = [5, 10,50]
+    max_iter = [100, 300,1000]
+    tol=[0.001, 0.0001, 0.00001,  0.0]
 
     pipeline_hpam_dict = {"n_init": n_init,
                           "max_iter": max_iter,
@@ -330,14 +330,11 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             tsrds = []
             for c in range(len(cluster_amt)):
                 print(cluster_amt[c])
-                if data_type == "movies" or data_type == "placetypes":
-                    tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
-                                    model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
-                                    auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
-                                    cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space)
-
-
-                    tsrds.append(tsrd)
+                tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
+                                model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
+                                auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
+                                cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space)
+                tsrds.append(tsrd)
             # Make the combined CSV of all the dims of all the space types
             all_r = np.asarray(tsrds).transpose()
             rows = all_r[1]
@@ -353,11 +350,11 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = "placetypes"
+    data_type = "reuters"
     doLR = False
     dminf = -1
     dmanf = -1
-    cluster_amt = []
+    cluster_amt = [50, 100, 200]
     if data_type == "placetypes":
         cluster_amt = [50, 100, 200]
     elif data_type == "reuters":

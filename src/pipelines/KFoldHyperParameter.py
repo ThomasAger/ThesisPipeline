@@ -183,6 +183,7 @@ class RecHParam(MasterHParam):
     fn_addition = None
     top_scoring_features = None
     dir_fn = None
+    all_row_data = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
                  hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added="", name_of_class=""):
@@ -216,7 +217,8 @@ class RecHParam(MasterHParam):
         self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "score/csv_averages/" + self.end_file_name + ".csv", "csv")
         self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
         self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
-        self.top_scoring_features = SaveLoadPOPO(self.top_scoring_features, self.output_folder + "top/" + self.end_file_name + ".npy", "npy")
+        self.top_scoring_features = SaveLoadPOPO(self.top_scoring_features, self.output_folder + "score/csv_final/top/" + self.end_file_name + ".npy", "npy")
+        #self.all_row_data =  SaveLoadPOPO(self.all_row_data, self.output_folder + "score/csv_final/" + self.end_file_name + "All.csv", "csv")
 
     def makePopoArray(self):
         self.popo_array = [self.final_arrays, self.top_scoring_params, self.top_scoring_row_data]
@@ -413,6 +415,7 @@ class DirectionsHParam(MasterHParam):
     data_type = None
     classify_fn = None
     matched_ids = None
+    all_row_data = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None):
         self.kfold_hpam_dict = kfold_hpam_dict
@@ -440,16 +443,17 @@ class DirectionsHParam(MasterHParam):
         self.final_arrays = SaveLoadPOPO(self.final_arrays, self.output_folder + "score/csv_averages/" + self.end_file_name + ".csv", "csv")
         self.top_scoring_row_data = SaveLoadPOPO(self.top_scoring_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "Top"+self.score_metric+".csv", "csv")
         self.top_scoring_params = SaveLoadPOPO(self.top_scoring_params, self.output_folder + "score/csv_averages/top_params/" + self.end_file_name + ".npy", "npy")
-
+        self.all_row_data =  SaveLoadPOPO(self.all_row_data, self.output_folder + "score/csv_averages/" + self.end_file_name + "All.csv", "csv")
 
     def makePopoArray(self):
-        self.popo_array = [self.final_arrays, self.top_scoring_params, self.top_scoring_row_data]
+        self.popo_array = [self.final_arrays, self.top_scoring_params, self.top_scoring_row_data, self.all_row_data]
 
     def process(self):
         col_names = []
         indexes = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
+        self.all_row_data.value = []
         for i in range(len(self.all_p)):
             if self.hpam_model_type == "d2v":
                 doc2vec_save = SaveLoad(rewrite=self.rewrite_model)
@@ -475,6 +479,7 @@ class DirectionsHParam(MasterHParam):
                                      y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, final_score_on_dev=True, auroc=self.auroc)
                 hyper_param.process_and_save()
                 self.top_scoring_params.value.append(hyper_param.getTopScoringParams())
+                self.all_row_data.append(hyper_param.getTopScoringRowData())
                 top_scoring_row_data = hyper_param.getTopScoringRowData()
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
