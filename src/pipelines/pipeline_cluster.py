@@ -55,14 +55,14 @@ def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfol
                                                 matched_ids=matched_ids, end_fn_added=name_of_class,
                                                 mcm=mcm,
                                                 hpam_params=[file_name, processed_folder, cluster_amt, rewrite_all, top_dirs_fn, data_type, dir_names, space,class_names,
-                      kfold_hpam_dict, model_type, name_of_class, score_metric, mcm, classes, dev_percent, matched_ids, n_init, max_iter, tol, init])
+                      kfold_hpam_dict, model_type, name_of_class, score_metric, mcm, classes, dev_percent, matched_ids])
     hyper_param.process_and_save()
     print("END OF SPACE")
     return hyper_param.getTopScoringRowData()
 
 
 def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top_dir_fn, data_type, word_fn, space, class_names,
-                      kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids, n_init, max_iter, tol, init):
+                      kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids, n_init=10, max_iter=300, tol=1e-4, init="k-means++"):
 
 
     doc_amt = split.get_doc_amt(data_type)
@@ -148,7 +148,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
     n_estimators = [1000, 2000]
     max_features = [None, 'auto', 'log2']
-    criterion = ["gini", "entropy"]
+    criterion = ["entropy"]
     max_depth = [max_depth]
     bootstrap = [True, False]
     min_samples_leaf = [1]
@@ -181,7 +181,13 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                  "min_count": min_count,
                  "train_epoch": train_epoch}
 
-    pipeline_hpam_dict = {"cluster_amt": cluster_amt}
+    n_init = [10,50,100]
+    max_iter = [300,1000,2000]
+    tol=[0.001, 0.0001, 0.00001, 0.000001, 0.0]
+
+    pipeline_hpam_dict = {"n_init": n_init,
+                          "max_iter": max_iter,
+                          "tol": tol}
 
     multi_class_method = None
     if multiclass == "MOP":
@@ -202,50 +208,31 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     elif data_type == "reuters":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2VrepsDecisionTree3_"
     space_names = []
-    if data_type == "movies" or data_type == "placetypes": # Placetypes or movies
-        rank_fn_array = []
-        dir_fn_array = []
-        word_fn_array = []
-        features_fn_array = []
-        space_name_array = []
-        for j in range(len(name_of_class)):
-            csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
-            rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
-            rank_fn_array.append(rank_fn)
 
-            word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
-            word_fn_array.append(word_fn)
+    rank_fn_array = []
+    dir_fn_array = []
+    word_fn_array = []
+    space_name_array = []
+    for j in range(len(name_of_class)):
+        csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
+        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
+        print(rank_fn)
+        rank_fn_array.append(rank_fn)
 
-            dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
-            dir_fn_array.append(dir_fn)
-            space_name = rank_fn.split("/")[-1:][0][:-4]
-            space_name_array.append(space_name)
-    else:
-        rank_fn_array = []
-        dir_fn_array = []
-        word_fn_array = []
-        features_fn_array = []
-        space_name_array = []
-        for j in range(len(name_of_class)):
-            csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
-            rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
-            rank_fn_array.append(rank_fn)
+        word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
+        print(word_fn)
+        word_fn_array.append(word_fn)
 
-            word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
-            word_fn_array.append(word_fn)
+        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
+        dir_fn_array.append(dir_fn)
+        space_name = rank_fn.split("/")[-1:][0][:-4]
+        space_name_array.append(space_name)
 
-            dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
-            dir_fn_array.append(dir_fn)
-            space_name = rank_fn.split("/")[-1:][0][:-4]
-            space_name_array.append(space_name)
+    rank_fns.append(rank_fn_array)
+    dir_fns.append(dir_fn_array)
+    word_fns.append(word_fn_array)
+    space_names.append(space_name_array)
 
-
-
-        rank_fns.append(rank_fn_array)
-        dir_fns.append(dir_fn_array)
-        word_fns.append(word_fn_array)
-        feature_fns.append(features_fn_array)
-        space_names.append(space_name_array)
 
 
 
@@ -259,7 +246,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     bowmin = 2
     classes_freq_cutoff = 100
     # The True here and below is to remove stop words
-
+    print(rank_fns)
     for i in range(len(rank_fns)):
         for j in range(len(name_of_class)):
             print(j)
@@ -342,6 +329,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     space = d2v_space
             tsrds = []
             for c in range(len(cluster_amt)):
+                print(cluster_amt[c])
                 if data_type == "movies" or data_type == "placetypes":
                     tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
                                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
@@ -365,7 +353,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = "reuters"
+    data_type = "placetypes"
     doLR = False
     dminf = -1
     dmanf = -1
@@ -384,7 +372,9 @@ def init():
     multi_class_method = "OVR"
     bonus_fn = ""
     rewrite_all = False
+    print("iterating through classifiers")
     for i in range(len(classifiers)):
+        print(classifiers[i])
         main(data_type, "../../data/raw/" + data_type + "/", "../../data/processed/" + data_type + "/",
              proj_folder="../../data/proj/" + data_type + "/",
              grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
@@ -392,4 +382,5 @@ def init():
              rewrite_all=rewrite_all, cluster_amt=cluster_amt)
 
 if __name__ == '__main__':
+    print("starting")
     init()

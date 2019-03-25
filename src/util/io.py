@@ -324,8 +324,7 @@ def getFns(folder_path):
     file_names = []
     onlyfiles = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
     for i in onlyfiles:
-        if i != "class-all" and i != "nonbinary" and i != "low_keywords" and i != "class-All" and i != "archive" and i != "fns" and i!="fns.txt" and i!="class-all-200":
-            file_names.append(i)
+        file_names.append(i)
     return file_names
 
 
