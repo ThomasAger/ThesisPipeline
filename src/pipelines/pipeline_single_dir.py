@@ -424,28 +424,28 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    max_depths = [3]
-    classifiers = ["DecisionTree3"]
-    data_type = "newsgroups"
+    max_depths = [1,2,3]
+    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
+    data_type = "placetypes"
     doLR = False
     dminf = -1
     dmanf = -1
 
     if data_type == "placetypes":
         hp_top_freq = [5000, 10000, 20000]
-        hp_top_dir = [200, 500, 1000, 2000]
+        hp_top_dir = [1000, 2000]
     elif data_type == "reuters":
         hp_top_freq = [5000, 10000, 20000]
-        hp_top_dir = [200, 500, 1000, 2000]
+        hp_top_dir = [1000,2000]
     elif data_type == "sentiment":
         hp_top_freq = [5000, 10000, 20000]
-        hp_top_dir = [200, 500, 1000, 2000]
+        hp_top_dir = [1000, 2000]
     elif data_type == "newsgroups":
         hp_top_freq = [5000, 10000, 20000]
-        hp_top_dir = [200, 500, 1000, 2000]
+        hp_top_dir = [1000, 2000]
     elif data_type == "movies":
         hp_top_freq = [5000, 10000, 20000]
-        hp_top_dir = [200, 500, 1000, 2000]
+        hp_top_dir = [1000, 2000]
 
     mcm = "OVR"
     bonus_fn = ""

@@ -273,7 +273,7 @@ class RecHParam(MasterHParam):
                 self.dir_fn.append(top_dir)
             elif self.hpam_model_type == "cluster":
                 top_params, top_row_data, cluster_rank =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],
-                                                                                            tol=self.all_p[i]["tol"])
+                                                                                            tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
                 averaged_csv_data.append(top_scoring_row_data[1])
