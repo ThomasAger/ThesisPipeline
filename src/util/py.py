@@ -220,7 +220,15 @@ def reverseArrays(md_array):
     for a in md_array:
         reversed_array.append(a[::-1])
     return reversed_array
-
+import sys
+def aminId(array):
+    min = 2147000000
+    min_id = 0
+    for i in range(len(array)):
+        if array[i] < min:
+            min = array[i]
+            min_id = i
+    return min_id
 
 
 if __name__ == '__main__':
