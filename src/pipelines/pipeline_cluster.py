@@ -203,7 +203,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     dir_fns = []
     word_fns = []
     feature_fns = []
-    if data_type == "placetypes":
+    if data_type == "placetypes" or data_type == "movies":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCArepsDecisionTree3_"
     elif data_type == "reuters":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2VrepsDecisionTree3_"
@@ -213,9 +213,19 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     dir_fn_array = []
     word_fn_array = []
     space_name_array = []
+
+
+    # Sometimes directions is last in the csv, otherwise rank is
+    if data_type == "movies":
+        rank_id = 6
+        dir_id = 5
+    else:
+        rank_id = 5
+        dir_id = 6
+
     for j in range(len(name_of_class)):
         csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
-        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
+        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][rank_id]
         print(rank_fn)
         rank_fn_array.append(rank_fn)
 
@@ -223,7 +233,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         print(word_fn)
         word_fn_array.append(word_fn)
 
-        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
+        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][dir_id]
         dir_fn_array.append(dir_fn)
         space_name = rank_fn.split("/")[-1:][0][:-4]
         space_name_array.append(space_name)
@@ -350,7 +360,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = "reuters"
+    data_type = "movies"
     doLR = False
     dminf = -1
     dmanf = -1
