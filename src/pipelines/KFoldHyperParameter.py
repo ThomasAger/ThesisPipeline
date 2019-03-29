@@ -41,7 +41,6 @@ class MasterHParam(Method):
     space = None
     output_folder = None
     model_type = None
-    end_file_name = ""
     class_names = None
     probability = None
     averaged_csv_data = None
@@ -62,8 +61,9 @@ class MasterHParam(Method):
     final_score_on_dev = None
     top_scoring_params = None
     mcm = None
+    end_file_name = None
 
-    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True, acc=True, kappa=True, mcm=None, dim_names = None):
+    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None,end_file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True, acc=True, kappa=True, mcm=None, dim_names = None):
 
         self.rewrite_model = rewrite_model
         # Metric that determines what will be returned to the overall hyper-parameter method
@@ -82,7 +82,7 @@ class MasterHParam(Method):
         self.mcm = mcm
         self.file_names = []
         self.dim_names = dim_names
-        self.end_file_name = self.file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + self.model_type
+        self.end_file_name = end_file_name
         super().__init__(file_name, save_class)
 
     def trainClassifier(self, model):
@@ -201,12 +201,12 @@ class RecHParam(MasterHParam):
         self.all_p = get_grid_params(hpam_dict)
         self.dim_names = dim_names
         self.fn_addition = fn_addition
-        self.end_file_name = file_name + "_Kfold" + str(None) + str(
+        end_file_name = file_name + "_Kfold" + str(None) + str(
             generateNumber(hpam_dict)) + model_type + end_fn_added
-
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
-                         score_metric=score_metric, mcm=mcm, dim_names=dim_names)
+                         score_metric=score_metric, mcm=mcm, dim_names=dim_names, end_file_name=end_file_name)
+
 
     def getTopScoringRowData(self):
         if self.processed is False:
@@ -429,12 +429,12 @@ class DirectionsHParam(MasterHParam):
         self.average_file_names = []
         self.all_p = get_grid_params(hpam_dict)
 
-        self.end_file_name = file_name + "_Kfold" + str(None) + str(
+        end_file_name = file_name + "_Kfold" + str(None) + str(
             generateNumber(hpam_dict)) + model_type
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
-                         score_metric=score_metric)
+                         score_metric=score_metric, end_file_name=end_file_name)
 
     def getTopScoringRowData(self):
         return self.save_class.load(self.top_scoring_row_data)
@@ -556,13 +556,13 @@ class HParam(MasterHParam):
         self.file_names = []
         self.dim_names = dim_names
 
+        end_file_name = file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + str(self.model_type)
+
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa,
                          model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names, save_class=save_class,
                          hpam_dict=hpam_dict,
-                         score_metric=score_metric, mcm=mcm, dim_names=dim_names)
-        self.end_file_name = self.file_name + "_Kfold" + str(self.dev) + str(
-            generateNumber(hpam_dict)) + self.model_type
+                         score_metric=score_metric, mcm=mcm, dim_names=dim_names, end_file_name=end_file_name)
 
 
     def makePopos(self):

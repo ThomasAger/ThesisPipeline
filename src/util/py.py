@@ -230,7 +230,14 @@ def aminId(array):
             min_id = i
     return min_id
 
-
+def amaxId(array):
+    max = -2147000000
+    max_id = 0
+    for i in range(len(array)):
+        if array[i] > max:
+            max = array[i]
+            max_id = i
+    return max_id
 if __name__ == '__main__':
     """
     parameter_list_string = io.import1dArray("../../data/parameter_list_string.txt")
