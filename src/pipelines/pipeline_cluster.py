@@ -150,15 +150,16 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
                                                                       classes, split_ids,
                                                                       dev_percent_of_train=dev_percent,
                                                                       data_type=data_type)
-    hpam_save = SaveLoad(rewrite=rewrite_all)
     if dir_fn == "" or dir_fn is None:
         raise ValueError("Dir_fn is  nothing")
-    hyper_param = KFoldHyperParameter.HParam(class_names=class_names, hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=dir_fn,
-                                             output_folder=processed_folder + "clusters/", save_class=hpam_save,
-                                             probability=False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
+    hpam_save = SaveLoad(rewrite=True)
+    hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn,
+                                             processed_folder + "clusters/", hpam_save,
+                                             False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
                                              x_test=x_test,
                                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric,
                                              auroc=False, mcm=multi_class_method, dim_names=cluster_names)
+
     hyper_param.process_and_save()
     # Get the scores for those rankings
     return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name
@@ -422,12 +423,12 @@ def init():
         cluster_amt = [50, 100, 200]
         top_dir_amt = [2]
     elif data_type == "movies":
-        cluster_amt = [50]
+        cluster_amt = [50, 100, 200]
         top_dir_amt = [2]
 
-    cluster_methods = ["kmeans"]
+    cluster_methods = ["kmeans", "derrac"]
 
-    svm_clusters = False
+    svm_clusters = True
 
     multi_class_method = "OVR"
     bonus_fn = ""
