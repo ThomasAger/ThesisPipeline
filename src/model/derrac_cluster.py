@@ -53,6 +53,8 @@ class DerracCluster(Method):
             centroid_ids.append(min_val_id)
             print(c, "/", self.cluster_amt, self.feature_names[min_val_id], max_values[min_val_id])
 
+
+
     def getClusters(self):
         if self.processed is False:
             self.cluster_dirs.value = self.save_class.load(self.cluster_dirs)
