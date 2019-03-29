@@ -31,7 +31,8 @@ last_dct = []
 def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfold_hpam_dict,
              model_type="", dev_percent=0.2, rewrite_all=False,
              score_metric="", auroc=False, name_of_class="", mcm=None,
-             pipeline_hpam_dict=None, cluster_amt=0, data_type="", dir_names=None, space=None, cluster_method=None, n_init=10, max_iter=300, tol=1e-4, init="k-means++"):
+             pipeline_hpam_dict=None, cluster_amt=0, data_type="", dir_names=None, space=None, cluster_method=None, n_init=10, max_iter=300, tol=1e-4, init="k-means++",
+             svm_clusters=False,bow=None,dct=None):
     matched_ids = []
     try:
         class_entities = dt.import1dArray(processed_folder + "classes/" + name_of_class + "_entities.txt")
@@ -47,23 +48,26 @@ def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfol
     hpam_save = SaveLoad(rewrite=True)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
+    print(file_name)
+
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "cluster",
                                                 model_type,
                                                 file_name + "_"+ str(cluster_amt), None, processed_folder + "clusters/", hpam_save,
                                                 probability=False,
                                                 rewrite_model=rewrite_all, dev_percent=dev_percent,
                                                 data_type=data_type, score_metric=score_metric, auroc=auroc,
-                                                matched_ids=matched_ids, end_fn_added=name_of_class,
+                                                matched_ids=matched_ids, end_fn_added=name_of_class + "_" + str(svm_clusters) + "_" + cluster_method,
                                                 mcm=mcm,
                                                 hpam_params=[file_name, processed_folder, cluster_amt, rewrite_all, top_dirs_fn, data_type, dir_names, space,class_names,
-                      kfold_hpam_dict, model_type, name_of_class, score_metric, mcm, classes, dev_percent, matched_ids, cluster_method])
+                      kfold_hpam_dict, model_type, name_of_class, score_metric, mcm, classes, dev_percent, matched_ids, cluster_method, svm_clusters,bow, dct])
     hyper_param.process_and_save()
     print("END OF SPACE")
     return hyper_param.getTopScoringRowData()
 
 
 def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top_dir_fn, data_type, word_fn, space, class_names,
-                      kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids, cluster_method, n_init=10, max_iter=300, tol=1e-4, init="k-means++", top_dir_amt = 2):
+                      kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids, cluster_method,
+                      svm_clusters, bow, dct, n_init=10, max_iter=300, tol=1e-4, init="k-means++", top_dir_amt = 2):
 
 
     doc_amt = split.get_doc_amt(data_type)
@@ -76,7 +80,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 
     cluster_save = SaveLoad(rewrite=rewrite_all)
     if cluster_method == "kmeans":
-        dir_fn = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init) + "_" + str(cluster_amt)
+        dir_fn = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init) + "_" + str(cluster_amt) + "_" + cluster_method
         # Normalize the directions (so that euclidian distance is equal to cosine similarity)
         norm_save = SaveLoad(rewrite=rewrite_all)
         normalize = NormalizeZeroMean(top_dirs, file_name, processed_folder + "directions/norm/", norm_save)
@@ -84,13 +88,48 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
         top_dirs = normalize.getNormalized()
         cluster = KMeansCluster( top_dirs, cluster_amt, dir_fn, processed_folder + "clusters/", cluster_save, top_words)
     elif cluster_method == "derrac":
-        dir_fn = file_name + "_" + str(top_dir_amt) + "_" + str(cluster_amt)
+        dir_fn = file_name + "_" + str(top_dir_amt) + "_" + str(cluster_amt) + "_" + cluster_method
         cluster = DerracCluster(top_dirs, cluster_amt, dir_fn, processed_folder + "clusters/", cluster_save, top_words, top_dir_amt)
-
+    else:
+        raise ValueError("No cluster method found")
     # Get the clusters For the cluster input parameters with the directions as input
     cluster.process_and_save()
-    cluster_dir = cluster.getClusters()
-    cluster_names = cluster.getClusterNames()
+    cluster_dir = cluster.getCentroids()
+    cluster_names = np.asarray(cluster.getClusterNames())
+
+    if svm_clusters is True:
+        dir_fn = dir_fn + "_svmC"
+        cluster_dirs = cluster.getClusters()
+        cluster_bows = []
+        token2id = dct.token2id
+        for i in range(len(cluster_names)):
+            names = cluster_names[i].split()
+            bow_names = []
+            for j in range(len(names)):
+                names[j] = names[j].strip()
+                bow_name = bow[token2id[names[j]]]
+                bow_names.append(np.asarray(bow_name.todense())[0])
+
+            cluster_bow = np.zeros(len(bow_names[0]))
+            for j in range(len(bow_names)):
+                for k in range(len(bow_names[j])):
+                    if bow_names[j][k] >= 1:
+                        cluster_bow[k] = 1
+            cluster_bows.append(cluster_bow)
+
+        dir_save = SaveLoad(rewrite=rewrite_all)
+        new_word_dict = {}
+        for i in range(len(cluster_names)):
+            new_word_dict[cluster_names[i]] = i
+        dir = GetDirections(bow, space, new_word_dict, new_word_dict, dir_save, 0, 0, dir_fn,
+                            processed_folder + "clusters/directions/", LR=False)
+        dir.process_and_save()
+        cluster_dir = dir.getDirections()
+        # Make the new bow
+
+
+
+
 
     cluster_dict = {}
     for i in range(len(cluster_names)):
@@ -105,16 +144,18 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
         raise ValueError("Rankings len does not equal doc amt")
 
     if data_type == "placetypes" or data_type == "movies":
-        dir_fn += "_" + name_of_class
+        dir_fn = dir_fn + "_" + name_of_class
     split_ids = split.get_split_ids(data_type, matched_ids)
     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(rankings,
                                                                       classes, split_ids,
                                                                       dev_percent_of_train=dev_percent,
                                                                       data_type=data_type)
     hpam_save = SaveLoad(rewrite=rewrite_all)
-    hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn,
-                                             processed_folder + "clusters/", hpam_save,
-                                             False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
+    if dir_fn == "" or dir_fn is None:
+        raise ValueError("Dir_fn is  nothing")
+    hyper_param = KFoldHyperParameter.HParam(class_names=class_names, hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=dir_fn,
+                                             output_folder=processed_folder + "clusters/", save_class=hpam_save,
+                                             probability=False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
                                              x_test=x_test,
                                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric,
                                              auroc=False, mcm=multi_class_method, dim_names=cluster_names)
@@ -126,7 +167,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
          bonus_fn="", cluster_amt=None, cluster_methods=None,
-         rewrite_all=False, top_dir_amt=0):
+         rewrite_all=False, top_dir_amt=0, svm_clusters=False):
     pipeline_fn = "num_stw"
     name_of_class = None
     if data_type == "newsgroups":
@@ -200,11 +241,19 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     dir_fns = []
     word_fns = []
     feature_fns = []
-    if data_type == "placetypes":
+    if data_type == "placetypes" or data_type == "movies":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCAreps"+model_type+"_"
     elif data_type == "reuters":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2Vreps"+model_type+"_"
+
     space_names = []
+    # Sometimes directions is last in the csv, otherwise rank is
+    if data_type == "movies":
+        rank_id = 6
+        dir_id = 5
+    else:
+        rank_id = 5
+        dir_id = 6
 
     rank_fn_array = []
     dir_fn_array = []
@@ -212,7 +261,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     space_name_array = []
     for j in range(len(name_of_class)):
         csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
-        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][5]
+        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][rank_id]
         print(rank_fn)
         rank_fn_array.append(rank_fn)
 
@@ -220,7 +269,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         print(word_fn)
         word_fn_array.append(word_fn)
 
-        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][6]
+        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][dir_id]
         dir_fn_array.append(dir_fn)
         space_name = rank_fn.split("/")[-1:][0][:-4]
         space_name_array.append(space_name)
@@ -230,12 +279,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     word_fns.append(word_fn_array)
     space_names.append(space_name_array)
 
-
-
-
     classes_save = SaveLoad(rewrite=False)
-
-
 
     # These were the parameters used for the previous experiments
     no_below = 0.0001
@@ -258,6 +302,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                              bowmin,
                                              no_below, no_above, True, corp_save)
             classes = p_corpus.getClasses()
+            bow = p_corpus.getBow()
+            dct = p_corpus.getBowDct()
             space = None
 
             dim = int(rank_fns[i][j].split("/")[-1:][0].split("_")[4])
@@ -340,7 +386,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
                                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
                                     auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
-                                    cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space, cluster_method=cluster_methods[cm])
+                                    cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space, cluster_method=cluster_methods[cm],
+                                    svm_clusters=svm_clusters, bow=bow, dct=dct)
                     tsrds.append(tsrd)
             # Make the combined CSV of all the dims of all the space types
             all_r = np.asarray(tsrds).transpose()
@@ -349,15 +396,15 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             col_names = all_r[0][0]
             key = all_r[2]
             dt.write_csv(
-                processed_folder + "clusters/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_" + name_of_class[j] + ".csv",
+                processed_folder + "clusters/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_" + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
                 col_names, cols, key)
             print("a")
 
 
 def init():
-    max_depths = [1,2,3]
-    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = "reuters"
+    max_depths = [3]
+    classifiers = ["DecisionTree3"]
+    data_type = "movies"
     doLR = False
     dminf = -1
     dmanf = -1
@@ -375,10 +422,12 @@ def init():
         cluster_amt = [50, 100, 200]
         top_dir_amt = [2]
     elif data_type == "movies":
-        cluster_amt = [50, 100, 200]
+        cluster_amt = [50]
         top_dir_amt = [2]
 
-    cluster_methods = ["derrac"]
+    cluster_methods = ["kmeans"]
+
+    svm_clusters = False
 
     multi_class_method = "OVR"
     bonus_fn = ""
@@ -390,7 +439,8 @@ def init():
              proj_folder="../../data/proj/" + data_type + "/",
              grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
              score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
-             rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt)
+             rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
+             svm_clusters=svm_clusters)
 
 if __name__ == '__main__':
     print("starting")
