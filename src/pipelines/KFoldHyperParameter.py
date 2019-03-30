@@ -99,11 +99,15 @@ class MasterHParam(Method):
     def process(self):
         super().process()
 
-    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test, get_tree_image=False, tree_image_fn=""):
+    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test, get_tree_image=False, tree_image_fn="", entered_fn=""):
         svm_save = SaveLoad(rewrite=self.rewrite_model)
         model = None
         model_fn = None
-        file_name = self.file_name
+        # In the case of the clusters, we need to do this so that it does not repeat
+        if entered_fn != "":
+            file_name = entered_fn
+        else:
+            file_name = self.file_name
         if self.model_type == "LinearSVM":
             model_fn = file_name + "_Dev" + "_" + str(len(x_test)) + "_Balanced_" + str(all_p["class_weight"]) \
                        + "_C_" + str(all_p["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
@@ -233,7 +237,7 @@ class RecHParam(MasterHParam):
         col_names = []
         indexes = []
         self.rank_fn = []
-        self.dir_fn = []
+        self.entered_fn = []
         self.feature_names_from_par = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
@@ -279,10 +283,11 @@ class RecHParam(MasterHParam):
                 self.rank_fn.append(top_rank)
                 self.dir_fn.append(top_dir)
             elif self.hpam_model_type == "cluster":
-                top_params, top_row_data, cluster_rank, feature_names =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],
+                top_params, top_row_data, cluster_rank, feature_names, cluster_fn =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],
                                                                                             tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
                 self.top_scoring_params.value.append(top_params)
                 self.feature_names_from_par.append(feature_names)
+                self.entered_fn.append(cluster_fn)
                 top_scoring_row_data = top_row_data
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
@@ -320,7 +325,8 @@ class RecHParam(MasterHParam):
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
 
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test, get_tree_image=True, tree_image_fn="")
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
+                                                get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index])
         model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
@@ -345,7 +351,8 @@ class RecHParam(MasterHParam):
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
 
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test, get_tree_image=True, tree_image_fn="")
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
+                                                get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index])
         model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,

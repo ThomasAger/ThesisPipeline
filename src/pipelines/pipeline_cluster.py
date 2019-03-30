@@ -164,7 +164,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 
     hyper_param.process_and_save()
     # Get the scores for those rankings
-    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name, cluster_names
+    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name, cluster_names, dir_fn
 
 
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
@@ -432,7 +432,7 @@ def init():
 
     cluster_methods = ["kmeans", "derrac"]
 
-    svm_clusters = False
+    svm_clusters = True
 
     multi_class_method = "OVR"
     bonus_fn = ""
