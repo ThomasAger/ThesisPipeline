@@ -407,45 +407,47 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    max_depths = [3]
-    classifiers = ["DecisionTree3"]
-    data_type = "movies"
-    doLR = False
-    dminf = -1
-    dmanf = -1
-    cluster_amt = [50, 100, 200]
-    if data_type == "placetypes":
+    max_depths = [1,2,3]
+    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
+    data_type = ["placetypes", "reuters"]
+    for j in range(len(data_type)):
+        doLR = False
+        dminf = -1
+        dmanf = -1
         cluster_amt = [50, 100, 200]
-        top_dir_amt = [2]
-    elif data_type == "reuters":
-        cluster_amt = [50, 100, 200]
-        top_dir_amt = [2]
-    elif data_type == "sentiment":
-        cluster_amt = [50, 100, 200]
-        top_dir_amt = [2]
-    elif data_type == "newsgroups":
-        cluster_amt = [50, 100, 200]
-        top_dir_amt = [2]
-    elif data_type == "movies":
-        cluster_amt = [50, 100, 200]
-        top_dir_amt = [2]
+        if data_type[j] == "placetypes":
+            cluster_amt = [50, 100, 200]
+            top_dir_amt = [2]
+        elif data_type[j] == "reuters":
+            cluster_amt = [50, 100, 200]
+            top_dir_amt = [2]
+        elif data_type[j] == "sentiment":
+            cluster_amt = [50, 100, 200]
+            top_dir_amt = [2]
+        elif data_type[j] == "newsgroups":
+            cluster_amt = [50, 100, 200]
+            top_dir_amt = [2]
+        elif data_type[j] == "movies":
+            cluster_amt = [50, 100, 200]
+            top_dir_amt = [2]
 
-    cluster_methods = ["kmeans", "derrac"]
+        cluster_methods = ["kmeans", "derrac"]
 
-    svm_clusters = True
+        svm_clusters = [True, False]
 
-    multi_class_method = "OVR"
-    bonus_fn = ""
-    rewrite_all = False
-    print("iterating through classifiers")
-    for i in range(len(classifiers)):
-        print(classifiers[i])
-        main(data_type, "../../data/raw/" + data_type + "/", "../../data/processed/" + data_type + "/",
-             proj_folder="../../data/proj/" + data_type + "/",
-             grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
-             score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
-             rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
-             svm_clusters=svm_clusters)
+        multi_class_method = "OVR"
+        bonus_fn = ""
+        rewrite_all = False
+        print("iterating through classifiers")
+        for i in range(len(classifiers)):
+            for k in range(len(svm_clusters)):
+                print(classifiers[i])
+                main(data_type[j], "../../data/raw/" + data_type[j] + "/", "../../data/processed/" + data_type[j] + "/",
+                     proj_folder="../../data/proj/" + data_type[j] + "/",
+                     grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
+                     score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
+                     rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
+                     svm_clusters=svm_clusters[k])
 
 if __name__ == '__main__':
     print("starting")
