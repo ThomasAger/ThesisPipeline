@@ -11,7 +11,7 @@ import os
 from util.text_utils import LimitWords, LimitWordsNumeric
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCodeClassifier
-from project.get_directions import GetDirections
+from project.get_directions import GetDirections, GetDirectionsSimple
 from score.classify import MultiClassScore
 from project.get_rankings import GetRankings, GetRankingsStreamed, GetRankingsNoSave
 from project.get_ndcg import GetNDCG, GetNDCGStreamed
@@ -113,8 +113,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
         cc.process_and_save()
         cluster_bows = cc.getCentroids()
         dir_save = SaveLoad(rewrite=True)
-        dir = GetDirections(sp.csr_matrix(cluster_bows), space, new_word_dict, new_word_dict, dir_save, 0, 0, dir_fn,
-                            processed_folder + "clusters/directions/", LR=False)
+        dir = GetDirectionsSimple(cluster_bows, space, dir_save, dir_fn,processed_folder + "clusters/directions/", LR=False)
         dir.process_and_save()
         cluster_dir = dir.getDirections()
         # Make the new bow
@@ -400,7 +399,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = ["movies"]
+    data_type = ["placetypes"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -422,7 +421,7 @@ def init():
             cluster_amt = [50, 100, 200]
             top_dir_amt = [2]
 
-        cluster_methods = ["kmeans"]
+        cluster_methods = ["kmeans", "derrac"]
 
         svm_clusters = [True]
 

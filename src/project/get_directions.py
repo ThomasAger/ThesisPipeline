@@ -128,6 +128,54 @@ class GetDirections(Method.Method):
             self.words.value = self.save_class.load(self.words)
         return self.words.value
 
+class GetDirectionsSimple(Method.Method):
+
+    words = None
+    output_directions = None
+    output_folder = None
+    directions = None
+    bow = None
+    new_word_dict = None
+    space = None
+    LR = None
+
+    def __init__(self, bow, space, save_class,  file_name, output_folder, LR=False):
+
+        self.output_folder = output_folder
+        self.space = space
+        self.bow = bow
+        self.LR = LR
+        super().__init__(file_name, save_class)
+
+    def makePopos(self):
+
+        self.directions = SaveLoadPOPO(self.directions, self.output_folder
+                                     + "dir/" + self.file_name  + "_dir.npy", "npy")
+
+    def makePopoArray(self):
+        self.popo_array = [ self.directions]
+
+    def process(self):
+        self.directions.value = []
+        for i in range(len(self.bow)):
+            self.bow[i][self.bow[i] >= 1] = 1
+
+            if self.LR is False:
+                dir_svm = svm.LinearSVM(self.space, self.bow[i], self.space, self.bow[i], self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+            else:
+                dir_svm = svm.LogisticRegression(self.space, self.bow[i], self.space, self.bow[i], self.file_name, SaveLoad(rewrite=True, no_save=True, verbose=False))
+            dir_svm.process_and_save()
+            self.directions.value.append(dir_svm.getDirection())
+            print(i, "/", len(self.bow))
+
+        super().process()
+
+    def getDirections(self):
+        if self.processed is False:
+            self.directions.value = self.save_class.load(self.directions)
+        return self.directions.value
+
+
 if __name__ == '__main__':
     words_to_get = []
     save_class = SaveLoad(rewrite=True)
