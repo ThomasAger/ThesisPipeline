@@ -22,6 +22,8 @@ from util.normalize import NormalizeZeroMean
 import KFoldHyperParameter
 from model.kmeans import KMeansCluster
 from model.derrac_cluster import DerracCluster
+from util.consolidate_classes import ConsolidateClasses
+import scipy.sparse as sp
 
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
@@ -100,29 +102,18 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 
     if svm_clusters is True:
         dir_fn = dir_fn + "_svmC"
+
         cluster_dirs = cluster.getClusters()
-        cluster_bows = []
         token2id = dct.token2id
-        for i in range(len(cluster_names)):
-            names = cluster_names[i].split()
-            bow_names = []
-            for j in range(len(names)):
-                names[j] = names[j].strip()
-                bow_name = bow[token2id[names[j]]]
-                bow_names.append(np.asarray(bow_name.todense())[0])
-
-            cluster_bow = np.zeros(len(bow_names[0]))
-            for j in range(len(bow_names)):
-                for k in range(len(bow_names[j])):
-                    if bow_names[j][k] >= 1:
-                        cluster_bow[k] = 1
-            cluster_bows.append(cluster_bow)
-
-        dir_save = SaveLoad(rewrite=rewrite_all)
         new_word_dict = {}
         for i in range(len(cluster_names)):
             new_word_dict[cluster_names[i]] = i
-        dir = GetDirections(bow, space, new_word_dict, new_word_dict, dir_save, 0, 0, dir_fn,
+        cc_save = SaveLoad(rewrite=rewrite_all)
+        cc = ConsolidateClasses(token2id, bow, cluster_dirs, cluster_names, dir_fn, processed_folder + "clusters/bow/", cc_save )
+        cc.process_and_save()
+        cluster_bows = cc.getCentroids()
+        dir_save = SaveLoad(rewrite=True)
+        dir = GetDirections(sp.csr_matrix(cluster_bows), space, new_word_dict, new_word_dict, dir_save, 0, 0, dir_fn,
                             processed_folder + "clusters/directions/", LR=False)
         dir.process_and_save()
         cluster_dir = dir.getDirections()
@@ -407,9 +398,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    max_depths = [1,2,3]
-    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = ["placetypes", "reuters"]
+    max_depths = [3]
+    classifiers = ["DecisionTree3"]
+    data_type = ["movies"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -431,9 +422,9 @@ def init():
             cluster_amt = [50, 100, 200]
             top_dir_amt = [2]
 
-        cluster_methods = ["kmeans", "derrac"]
+        cluster_methods = ["kmeans"]
 
-        svm_clusters = [True, False]
+        svm_clusters = [True]
 
         multi_class_method = "OVR"
         bonus_fn = ""
