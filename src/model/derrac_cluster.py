@@ -82,6 +82,8 @@ class DerracCluster(Method):
         for i in range(len(self.cluster_names.value)):
             print(self.cluster_names.value[i])
 
+
+
     def getClusters(self):
         if self.processed is False:
             self.cluster_dirs.value = self.save_class.load(self.cluster_dirs)

@@ -2,23 +2,21 @@ from collections import defaultdict
 from functools import wraps
 saved_data = defaultdict(list)
 import numpy as np
+orig_array = np.random.rand(1)
 big_array = []
-
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-big_array.append([[0, 0],[0,0,0,0,0]])
-
-big_array = np.asarray(big_array).transpose()
-eval_array = np.asarray(big_array[1].tolist())
-print(eval_array)
-print(eval_array.shape)
+all_arrays = [orig_array]
+average_while_running = orig_array
+print(all_arrays)
+for i in range(5):
+    array = np.random.rand(1)
+    all_arrays.append(array)
+    average_while_running = np.average([average_while_running, array], axis=0)
+    print(all_arrays)
+    print(average_while_running)
+average_array = np.average(all_arrays, axis=0)
+print("------")
+print(average_array)
+print(average_while_running)
 """
 file = open("../../data/processed/reuters/rep/svm/pie.txt", "w")
 def save(func):
