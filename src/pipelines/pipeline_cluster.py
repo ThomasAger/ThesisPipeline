@@ -101,7 +101,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
     cluster_names = np.asarray(cluster.getClusterNames())
 
     if svm_clusters is True:
-        dir_fn = dir_fn + "_svmC"
+        dir_fn = dir_fn + "_svmCFix"
 
         cluster_dirs = cluster.getClusters()
         token2id = dct.token2id
@@ -112,7 +112,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
         cc = ConsolidateClasses(token2id, bow, cluster_dirs, cluster_names, dir_fn, processed_folder + "clusters/bow/", cc_save )
         cc.process_and_save()
         cluster_bows = cc.getCentroids()
-        dir_save = SaveLoad(rewrite=True)
+        dir_save = SaveLoad(rewrite=rewrite_all)
         dir = GetDirectionsSimple(cluster_bows, space, dir_save, dir_fn,processed_folder + "clusters/directions/", LR=False)
         dir.process_and_save()
         cluster_dir = dir.getDirections()
@@ -399,7 +399,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [3]
     classifiers = ["DecisionTree3"]
-    data_type = ["placetypes"]
+    data_type = ["movies"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -421,7 +421,7 @@ def init():
             cluster_amt = [50, 100, 200]
             top_dir_amt = [2]
 
-        cluster_methods = ["kmeans", "derrac"]
+        cluster_methods = ["kmeans"]
 
         svm_clusters = [True]
 
