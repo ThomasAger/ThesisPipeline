@@ -78,6 +78,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
     top_dirs = np.load(top_dir_fn).transpose()
     top_words = np.load(word_fn)
 
+
     cluster_save = SaveLoad(rewrite=rewrite_all)
     if cluster_method == "kmeans":
         dir_fn = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init) + "_" + str(cluster_amt) + "_" + cluster_method
@@ -152,23 +153,24 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
                                                                       data_type=data_type)
     if dir_fn == "" or dir_fn is None:
         raise ValueError("Dir_fn is  nothing")
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
     hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn,
                                              processed_folder + "clusters/", hpam_save,
                                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
                                              x_test=x_test,
                                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric,
-                                             auroc=False, mcm=multi_class_method, dim_names=cluster_names)
+                                             auroc=False, mcm=multi_class_method, dim_names=cluster_names,
+                                             feature_names=cluster_names)
 
     hyper_param.process_and_save()
     # Get the scores for those rankings
-    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name
+    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name, cluster_names
 
 
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
          bonus_fn="", cluster_amt=None, cluster_methods=None,
-         rewrite_all=False, top_dir_amt=0, svm_clusters=False):
+         rewrite_all=False, top_dir_amt=None, svm_clusters=False):
     pipeline_fn = "num_stw"
     name_of_class = None
     if data_type == "newsgroups":
@@ -379,6 +381,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                         n_init = [0]
                         max_iter = [0]
                         tol = [0]
+                        top_dir_amt = [2]
+
                         pipeline_hpam_dict = {"n_init": n_init,
                                               "max_iter": max_iter,
                                               "tol": tol,
@@ -428,7 +432,7 @@ def init():
 
     cluster_methods = ["kmeans", "derrac"]
 
-    svm_clusters = True
+    svm_clusters = False
 
     multi_class_method = "OVR"
     bonus_fn = ""

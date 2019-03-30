@@ -63,7 +63,9 @@ class MasterHParam(Method):
     mcm = None
     end_file_name = None
 
-    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None,end_file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True, acc=True, kappa=True, mcm=None, dim_names = None):
+    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None,end_file_name=None, output_folder=None,
+                 save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=False, fscore=True,
+                 acc=True, kappa=True, mcm=None, dim_names = None, feature_names=None):
 
         self.rewrite_model = rewrite_model
         # Metric that determines what will be returned to the overall hyper-parameter method
@@ -83,6 +85,7 @@ class MasterHParam(Method):
         self.file_names = []
         self.dim_names = dim_names
         self.end_file_name = end_file_name
+        self.feature_names = feature_names
         super().__init__(file_name, save_class)
 
     def trainClassifier(self, model):
@@ -96,7 +99,7 @@ class MasterHParam(Method):
     def process(self):
         super().process()
 
-    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test):
+    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test, get_tree_image=False, tree_image_fn=""):
         svm_save = SaveLoad(rewrite=self.rewrite_model)
         model = None
         model_fn = None
@@ -152,7 +155,9 @@ class MasterHParam(Method):
                                  self.output_folder + "dt/" + model_fn, svm_save,
                                  max_depth=all_p["max_depth"],
                                  class_weight=all_p["class_weight"], max_features=all_p["max_features"],
-                                 probability=self.probability, verbose=False, mcm=self.mcm)
+                                 probability=self.probability, verbose=False, mcm=self.mcm,
+                                 tree_image_fn=self.output_folder + "dt/img/" + model_fn, get_tree_image=get_tree_image
+                                 , feature_names=self.feature_names, class_names=self.class_names)
 
         return model, model_fn
 
@@ -184,9 +189,10 @@ class RecHParam(MasterHParam):
     top_scoring_features = None
     dir_fn = None
     all_row_data = None
+    feature_names_from_par = None
 
     def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
-                 hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added="", name_of_class=""):
+                 hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added="", name_of_class="", feature_names=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -205,7 +211,7 @@ class RecHParam(MasterHParam):
             generateNumber(hpam_dict)) + model_type + end_fn_added
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
-                         score_metric=score_metric, mcm=mcm, dim_names=dim_names, end_file_name=end_file_name)
+                         score_metric=score_metric, mcm=mcm, dim_names=dim_names, end_file_name=end_file_name, feature_names=feature_names)
 
 
     def getTopScoringRowData(self):
@@ -228,6 +234,7 @@ class RecHParam(MasterHParam):
         indexes = []
         self.rank_fn = []
         self.dir_fn = []
+        self.feature_names_from_par = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
         for i in range(len(self.all_p)):
@@ -272,9 +279,10 @@ class RecHParam(MasterHParam):
                 self.rank_fn.append(top_rank)
                 self.dir_fn.append(top_dir)
             elif self.hpam_model_type == "cluster":
-                top_params, top_row_data, cluster_rank =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],
+                top_params, top_row_data, cluster_rank, feature_names =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],
                                                                                             tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
                 self.top_scoring_params.value.append(top_params)
+                self.feature_names_from_par.append(feature_names)
                 top_scoring_row_data = top_row_data
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
@@ -306,12 +314,13 @@ class RecHParam(MasterHParam):
         return index_sorted
 
     def getTopScoringByMetricDir(self, space, index):
+        self.feature_names = self.feature_names_from_par[index]
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
 
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test, get_tree_image=True, tree_image_fn="")
         model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
@@ -330,12 +339,13 @@ class RecHParam(MasterHParam):
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
 
     def getTopScoringCluster(self, space, index):
+        self.feature_names = self.feature_names_from_par[index]
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
 
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test)
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test, get_tree_image=True, tree_image_fn="")
         model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
@@ -417,7 +427,10 @@ class DirectionsHParam(MasterHParam):
     matched_ids = None
     all_row_data = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None):
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name,
+                 classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True,
+                 acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None,
+                 feature_names=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
         self.matched_ids = matched_ids
@@ -434,7 +447,8 @@ class DirectionsHParam(MasterHParam):
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa, model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names,  save_class=save_class, hpam_dict=hpam_dict,
-                         score_metric=score_metric, end_file_name=end_file_name)
+                         score_metric=score_metric, end_file_name=end_file_name,
+        feature_names=feature_names)
 
     def getTopScoringRowData(self):
         return self.save_class.load(self.top_scoring_row_data)
@@ -498,7 +512,7 @@ class DirectionsHParam(MasterHParam):
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(doc2vec_space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index_sorted], x_train, y_train, x_test, y_test)
+        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index_sorted], x_train, y_train, x_test, y_test, get_tree_image=False)
 
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
         score = classify.selectScore(None, None, None, file_name=model_fn,
@@ -542,7 +556,7 @@ class HParam(MasterHParam):
     # The CSV data that corresponds to the highest scoring row for the score_metric
 
     def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None, final_score_on_dev=False,
-                 mcm=None, dim_names=None):
+                 mcm=None, dim_names=None, feature_names=None):
 
         # Metric that determines what will be returned to the overall hyper-parameter method
         self.all_p = get_grid_params(hpam_dict)
@@ -562,7 +576,8 @@ class HParam(MasterHParam):
                          model_type=model_type, output_folder=output_folder,
                          file_name=file_name, probability=probability, class_names=class_names, save_class=save_class,
                          hpam_dict=hpam_dict,
-                         score_metric=score_metric, mcm=mcm, dim_names=dim_names, end_file_name=end_file_name)
+                         score_metric=score_metric, mcm=mcm, dim_names=dim_names, end_file_name=end_file_name,
+        feature_names=feature_names)
 
 
     def makePopos(self):
@@ -615,7 +630,7 @@ class HParam(MasterHParam):
             model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train, self.x_dev, self.y_dev)
         else:
             model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train,
-                                                    self.x_test, self.y_test)
+                                                    self.x_test, self.y_test, get_tree_image=False)
         pred, prob = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
         if self.final_score_on_dev:
