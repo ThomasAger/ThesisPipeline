@@ -236,7 +236,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     feature_fns = []
     if data_type == "placetypes" or data_type == "movies":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCAreps"+model_type+"_"
-    elif data_type == "reuters":
+    elif data_type == "reuters" or data_type == "newsgroups" or data_type == "sentiment":
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2Vreps"+model_type+"_"
 
     space_names = []
@@ -397,9 +397,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    max_depths = [3]
-    classifiers = ["DecisionTree3"]
-    data_type = ["movies"]
+    max_depths = [1,2,3]
+    classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
+    data_type = ["reuters"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -421,9 +421,9 @@ def init():
             cluster_amt = [50, 100, 200]
             top_dir_amt = [2]
 
-        cluster_methods = ["kmeans"]
+        cluster_methods = ["kmeans", "derrac"]
 
-        svm_clusters = [True]
+        svm_clusters = [False]
 
         multi_class_method = "OVR"
         bonus_fn = ""

@@ -70,6 +70,8 @@ class DecisionTree(Method.ModelMethod):
         if self.get_tree_image:
             self.tree_image.value = []
             for i in range(len(ovr.estimators_)):
+                if len(self.class_names) == 1:
+                    self.class_names = ["NOT " + self.class_names[0], self.class_names[0]]
                 dotfile = tree.export_graphviz(ovr.estimators_[i], out_file=self.tree_image_fn + self.class_names[i] + ".dot", feature_names=self.feature_names, class_names=self.class_names,
                              label='all', filled=True, impurity=True, node_ids=True,
                              proportion=True, rounded=True )

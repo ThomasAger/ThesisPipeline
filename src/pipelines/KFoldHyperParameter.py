@@ -241,6 +241,7 @@ class RecHParam(MasterHParam):
         self.feature_names_from_par = []
         averaged_csv_data = []
         self.top_scoring_params.value = []
+        self.dir_fn = []
         for i in range(len(self.all_p)):
             if self.hpam_model_type == "d2v":
                 doc2vec_save = SaveLoad(rewrite=self.rewrite_model)
@@ -319,14 +320,19 @@ class RecHParam(MasterHParam):
         return index_sorted
 
     def getTopScoringByMetricDir(self, space, index):
-        self.feature_names = self.feature_names_from_par[index]
+
+        if len(self.feature_names_from_par) != 0:
+            self.feature_names = self.feature_names_from_par[index]
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(space,
                                                                           self.classes, split_ids,
                                                                           dev_percent_of_train=self.dev_percent)
-
-        model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
+        if len(self.entered_fn) > 0:
+            model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
                                                 get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index])
+        else:
+            model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
+                                                get_tree_image=True, tree_image_fn="")
         model_pred, __unused = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,

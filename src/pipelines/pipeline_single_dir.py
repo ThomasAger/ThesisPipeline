@@ -426,7 +426,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 if __name__ == '__main__':
     max_depths = [1,2,3]
     classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = "movies"
+    data_type = "reuters"
     doLR = False
     dminf = -1
     dmanf = -1
