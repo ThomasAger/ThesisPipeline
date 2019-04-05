@@ -219,8 +219,6 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                  "min_count": min_count,
                  "train_epoch": train_epoch}
 
-
-
     multi_class_method = None
     if multiclass == "MOP":
         multi_class_method = MultiOutputClassifier
@@ -400,7 +398,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [1,2,3]
     classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_type = ["reuters", "placetypes", "newsgroups", "sentiment"]
+    data_type = [ "placetypes", "reuters", "sentiment", "newsgroups"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -408,21 +406,21 @@ def init():
         cluster_amt = [50, 100, 200]
         if data_type[j] == "placetypes":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2, 1, 4]
+            top_dir_amt = [2, 1.0, 4, 6, 8]
         elif data_type[j] == "reuters":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2, 1, 4]
+            top_dir_amt = [2, 1.0, 4, 6, 8]
         elif data_type[j] == "sentiment":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2, 1, 4]
+            top_dir_amt = [2, 1.0, 4, 6, 8]
         elif data_type[j] == "newsgroups":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2, 1, 4]
+            top_dir_amt = [2, 1.0, 4, 6, 8]
         elif data_type[j] == "movies":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2, 1, 4]
+            top_dir_amt = [2, 1.0, 4, 6, 8]
 
-        cluster_methods = ["kmeans", "derrac"]
+        cluster_methods = ["derrac"]
 
         svm_clusters = [False]
 
