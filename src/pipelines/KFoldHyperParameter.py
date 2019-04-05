@@ -284,8 +284,7 @@ class RecHParam(MasterHParam):
                 self.rank_fn.append(top_rank)
                 self.dir_fn.append(top_dir)
             elif self.hpam_model_type == "cluster":
-                top_params, top_row_data, cluster_rank, feature_names, cluster_fn =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],
-                                                                                            tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
+                top_params, top_row_data, cluster_rank, feature_names, cluster_fn =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
                 self.top_scoring_params.value.append(top_params)
                 self.feature_names_from_par.append(feature_names)
                 self.entered_fn.append(cluster_fn)

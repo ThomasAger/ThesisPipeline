@@ -80,7 +80,6 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
     top_dirs = np.load(top_dir_fn).transpose()
     top_words = np.load(word_fn)
 
-
     cluster_save = SaveLoad(rewrite=rewrite_all)
     if cluster_method == "kmeans":
         dir_fn = file_name + "_" + str(n_init) + "_" + str(max_iter) + "_" + str(tol) + "_" + str(init) + "_" + str(cluster_amt) + "_" + cluster_method
@@ -95,6 +94,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
         cluster = DerracCluster(top_dirs, cluster_amt, dir_fn, processed_folder + "clusters/", cluster_save, top_words, top_dir_amt)
     else:
         raise ValueError("No cluster method found")
+
     # Get the clusters For the cluster input parameters with the directions as input
     cluster.process_and_save()
     cluster_dir = cluster.getCentroids()
@@ -371,7 +371,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                         n_init = [0]
                         max_iter = [0]
                         tol = [0]
-                        top_dir_amt = [2]
+                        top_dir_amt = top_dir_amt
 
                         pipeline_hpam_dict = {"n_init": n_init,
                                               "max_iter": max_iter,
@@ -399,7 +399,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     max_depths = [1,2,3]
     classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_type = ["reuters"]
+    data_type = ["reuters", "placetypes", "newsgroups", "sentiment"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -407,19 +407,19 @@ def init():
         cluster_amt = [50, 100, 200]
         if data_type[j] == "placetypes":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2]
+            top_dir_amt = [2, 1, 4]
         elif data_type[j] == "reuters":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2]
+            top_dir_amt = [2, 1, 4]
         elif data_type[j] == "sentiment":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2]
+            top_dir_amt = [2, 1, 4]
         elif data_type[j] == "newsgroups":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2]
+            top_dir_amt = [2, 1, 4]
         elif data_type[j] == "movies":
             cluster_amt = [50, 100, 200]
-            top_dir_amt = [2]
+            top_dir_amt = [2, 1, 4]
 
         cluster_methods = ["kmeans", "derrac"]
 
