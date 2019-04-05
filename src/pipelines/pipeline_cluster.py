@@ -161,6 +161,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
          bonus_fn="", cluster_amt=None, cluster_methods=None,
          rewrite_all=False, top_dir_amt=None, svm_clusters=False):
+    orig_top_dir_amt = top_dir_amt
     pipeline_fn = "num_stw"
     name_of_class = None
     if data_type == "newsgroups":
@@ -371,7 +372,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                         n_init = [0]
                         max_iter = [0]
                         tol = [0]
-                        top_dir_amt = top_dir_amt
+                        top_dir_amt = orig_top_dir_amt
 
                         pipeline_hpam_dict = {"n_init": n_init,
                                               "max_iter": max_iter,
