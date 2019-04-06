@@ -24,12 +24,13 @@ class DerracCluster(Method):
     centroids = None
 
     def __init__(self, features, cluster_amt, file_name, folder_name, save_class, feature_names, top_dir_amt):
+
         self.folder_name = folder_name
         self.cluster_amt = cluster_amt
         self.features = features
         self.feature_names = feature_names.tolist()
         self.top_dir_amt = top_dir_amt * cluster_amt
-
+        print(self.top_dir_amt, "top dir")
         super().__init__(file_name, save_class)
 
     def makePopos(self):
@@ -42,22 +43,28 @@ class DerracCluster(Method):
 
     def process(self):
 
-        centroid_ids = [1]
+        centroid_ids = [0]
 
-        for c in range(self.cluster_amt-1):
-            max_values = []
-            for i in range(self.top_dir_amt):
-                cos_vals = []
-                for j in range(len(centroid_ids)):
-                     cos_vals.append(cosSim(self.features[i], self.features[centroid_ids[j]]))
-                max_values.append(np.max(cos_vals))
-            min_val_id = py.aminId(max_values)
-            centroid_ids.append(min_val_id)
-            print(self.feature_names)
-            print(max_values)
-            print(self.top_dir_amt)
-            print(self.cluster_amt)
-            print(c+1, "/", self.cluster_amt, self.feature_names[min_val_id], max_values[min_val_id])
+
+        print(1, "/", self.cluster_amt, self.feature_names[0])
+
+
+        if self.top_dir_amt > len(self.features):
+            self.top_dir_amt = len(self.features)
+
+        if self.top_dir_amt == self.cluster_amt:
+            centroid_ids = range(self.cluster_amt)
+        else:
+            for c in range(1, self.cluster_amt):
+                max_values = []
+                for i in range(self.top_dir_amt):
+                    cos_vals = []
+                    for j in range(len(centroid_ids)):
+                         cos_vals.append(cosSim(self.features[i], self.features[centroid_ids[j]]))
+                    max_values.append(np.max(cos_vals))
+                min_val_id = py.aminId(max_values)
+                centroid_ids.append(min_val_id)
+                print(c+1, "/", self.cluster_amt, self.feature_names[min_val_id], max_values[min_val_id])
 
         self.centroids.value = self.features[centroid_ids]
         self.cluster_dirs.value = self.features[centroid_ids]
