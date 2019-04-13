@@ -3,49 +3,47 @@
 
 \section{Introduction}\label{chapter3:Introduction}
 %What is the importance of similarit
-Semantic spaces encode similarity information spatially, where the spatial position of entities in the space is affected by its semantic relationship to other entities. Semantic Spaces are able to accurately represent complex domain meaning, achieving state-of-the-art results in X, Y, Z. However, the dimensions of these spaces do not correspond to the kind-of features we typically understand to describe entities, for example describing a movie by its genre. Additionally, the dimensions of the space and the relationships between entities are not labelled with words. This makes it difficult to apply in X, Y, Z. Although the dimensions do not correspond to features, the space does accurately represent these features through spatial relationships. In this section, we show how to go from a bag-of-words and standard Semantic Space to a representation where each dimension corresponds to a ranking of the entity on a labelled feature of the domain, e.g. a movie would be ranked on dimensions like 'Horror, Gore, Scary', and 'Romance, Love, Relationships'. We then show that these features perform better than Semantic Spaces and a baseline Topic Model when applied to a simple linear classifiers (Decision Tree) and are more semantically cohesive and interpretable than a Topic Model.  We show an example representation and classifier that were obtained from a Semantic Space constructed from IMDB movie reviews in figure \ref{ch3:TreeAndRep}.
+The ever more pervasive digital infrastructure that supports our lives has resulted in many opportunities to obtain data and models to make sense of that data. Semantic Spaces that encode semantic relationships between documents spatially have recently achieved strong results on tasks like X, Y, Z. These neural-network learned representations make use of a variety of new information like grammatical structure, word-context and even image data. Further, as domains become more entrenched in the digital world, the need for models in safety critical domains like medicine or legal domains like credit evaluation have increased the need for producing interpretable models, as well as interpretable representations. However, the dimensions of a semantic space do not correspond to human understandable features, and standard approaches to interpretable text representations do not match the performance of these methods. Ideally, we would obtain a representation that makes use of the rich semantic relationships from a high-performing semantic space, but also has dimensions corresponding to interpretable features. To this end, we aim to introduce in this chapter a methodology to linearly transform a semantic space using just its associated bag-of-words as input into an interpretable representation, and demonstrate the applicability of this interpretable representation to simple interpretable classifiers. 
 
+%Why interpretability for document classification matters:
+
+%What semantic spaces are there that perform well at tasks:
+
+%What document classification tasks are important:
+
+%What methods are there for interpretable document classification:
+
+Derrac \cite{Derrac2015} introduced an unsupervised method to go from a semantic space and its associated bag-of-words to a representation where each dimension is a ranking of documents on a feature of the domain. For example, in the domain of movie reviews genres would be a feature, and the dimension would have a numeric value for each document corresponding to the degree it is a particular genre. The contribution of this Chapter is an analysis and experimentation on the quality of these features applied to document classification. The main insight from our work is that these interpretable features do not suffer a performance drop in a non-linear classifier compared to the original representation, and can outperform the original representation and a baseline interpretable representation in a linear classifier. In addition, we find that if a dimension ranks documents on a feature relevant to the task, it can be competitive with more complex models using a single decision tree node. We show an example of the representation from a domain of IMDB movie reviews in \ref{ch3:TreeAndRep}. 
 
 \begin{figure}[t]
 	\includegraphics[width=\textwidth]{images/tree and rep.png}
 	\centering
-	\caption{Movies and selected associated dimensions, and their use in a linear classifier.}\label{ch3:TreeAndRep}
+	\caption{Example movies and selected associated dimensions, chosen according to their relevance to the genre task.}\label{ch3:TreeAndRep}
 \end{figure}
-
-\subsection{Semantic Relations}
 
 %Semantic spaces encode semantic relationships
 
 %What are the applications of semantic relationships? What is the power of a semantic relationship? Why are semantic relationships important in a space?
-The success of these semantic spaces similarity-based structure has lead many to investigate how to formalize the relationships they encode, for word-vectors one example is in that of linear analogies (see Section \ref{WordVectors}, where it was found that the vector XXXX[]King queen blah blah[]XXXXXXX, formally justified in \cite{Ethayarajh2018}. %Vector example
-These relationships have been expanded on, for example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, while \cite{Mitchell2015} discovered that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, \cite{Garg2017} found that word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. %Copy pasted from this 
-
+%prolly need more about
 
 %What are directions? Why are directions important? What have they been used for? What is a feature direction?
-In this paper, we use directions in the space that correspond to salient features from the considered domain. A "direction" refers in this case to the orthogonal direction to a hyper plane that separates a term in a vector space. As the hyper plane separates entities, this means that the entities furthest along the hyper plane, at the end classified positively, are the entities we are most sure have the term we found the hyper plane for. To see an example of this, see \ref {LRHyperPlane} With this understanding, it becomes possible to induce a ranking of entities on the properties by finding the dot product of the entity points on the direction vector. These kind-of directions have been used in many different ways for different domains, For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model. Similarly, in \cite{kim2013deriving} directions in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{DBLP:conf/acl/RotheS16} found directions indicating lexical features such as the frequency of occurrence and polarity of words. 
+There are many types of semantic relationships in a semantic space. For our work, the representation is composed of rankings of documents on semantic directions in the space, in particular where those directions correspond to features. We show an example of the kind-of directions we use to obtain our representation in \ref{ch3:ToyDirectionsGraphic}. Directions from domain-specific semantic spaces have been used previously in a variety of ways, For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model. Similarly, in \cite{kim2013deriving} directions in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{DBLP:conf/acl/RotheS16} found directions indicating lexical features such as the frequency of occurrence and polarity of words. 
 
-
-\subsection{Producing an Interpretable Property Representation}
-
-% How can I apply directions to produce an interpretable space? Why is this valuable? What makes this interesting? What are feature rankings?
-By finding the dot product between entity points in the space and direction vectors, it is possible to induce a ranking of entities on those directions. In this chapter, we more deeply investigate the potential of direction vectors to rank entities on properties to form an interpretable representation.  In this thesis, we refer to these direction vectors as directions to convey the ordinal meaning, and directions as feature-directions if they are sufficiently salient in the space, e.g. In a domain of IMDB movie reviews where movies are entities, a direction on the word "The" would not be a feature-direction, but a direction on the word "Horror" would be. 
 
 \begin{figure}[t]
 	\includegraphics[width=\textwidth]{images/toydirections.png}
 	\centering
-	\caption{This figure shows a 2d toy space where entities are shapes and directions are properties. We demonstrate on the right the method to induce a ranking from the directions, in particular by using the dot-product of the entity point on the directions vector. In the same way for a more complex space, we can understand each entity point to be ranked on thousands of property directions, and the space to be much higher dimensionality.}\label{ToyDirection}
+	\caption{An example in a toy domain of shapes.}\label{ch3:ToyDirectionsGraphic}
 \end{figure}
+
+
+
+% How can I apply directions to produce an interpretable space? Why is this valuable? What makes this interesting? What are feature rankings?
 
 
 %%What are the advantages, disadvantages of the previous work?
 
-We demonstrate the effect of different filtering methods to find properties, the ability of different clustering methods to label properties, as well as the number and types of directions, for use in a Decision Tree. In Figure \ref{IntroDecisionTree}, we demonstrate how depth could affect a Decision Tree that uses salient feature-directions. Decision Tree's have the additional benefit of giving us a way to identify the degree to which our feature-directions are salient - if we are able to construct a simple but high-scoring Decision Tree limited to only a single node for if a movie has the genre of 'Comedy' using only our ranking of entities on the feature-direction $p = {"Funny", "Hilarious", "Laughing"}$ then we know that this feature-direction is salient. 
 
-\begin{figure}[t]
-	\includegraphics[width=\textwidth]{images/decisiontree.png}
-	\centering
-	\caption{This figure shows an example tree from one of our classifiers. Here, we can see that the model increases in complexity as it increases in depth. In this case, we end-up getting better F-score with just a depth-one tree, as the tree begins to overfit at depth three.  }\label{IntroDecisionTree}
-\end{figure}
 
 %Why do this work? What is the value of this work?  How is this relevant to the readers interests?
 
@@ -103,7 +101,7 @@ We demonstrate the effect of different filtering methods to find properties, the
 %How is the chapter going to play out? Whats going to happen?
 %As our work performs well even at lower-depth trees, this gives potential users more flexibility in how they want to present the information, e.g. to a potential client. Compared to bag-of-words, which loses its representation capabilities the lower the depth.
 
-This chapter continues as follows: We begin by describing the work related to this , giving valuable context for the utility and potential of our approach. This is followed by an explanation of the method, including the variations we have adopted for our experimental work. We follow this with our qualitative experimentation, explaining how these variations affect the results, as well as the interpretability of the method, and we end with a quantitative analysis on how well we can represent domain knowledge using decision trees constrained to a limited depth.
+This chapter continues as follows: We begin by describing related work, then explain the method, making explicit the variations we have introduced for our experimental work. We follow this with the results of our experiments accompanied by qualitative examples and explanations, and finish with a conclusion on the  benefits and limitations of this approach.
 
 
 
@@ -111,6 +109,9 @@ This chapter continues as follows: We begin by describing the work related to th
 %Sparse word vectors
 %Adapted to composition \cite{Fyshe2015}
 \subsection{Semantic Relations \& Their Applications}
+
+Our method uses the relationships inherent in a semantic space. Other work has formalized the relationships found in semantic spaces, for example in word-vectors, linear analogies (see Section \ref{WordVectors, Ethayarajh2018}, were found where the vector between king and queen was parallel to the vector between prince and princess. % NEED TO MAKE THIS REAL
+These relationships have been expanded on, for example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, and \cite{Mitchell2015}, found that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, they have also been found to hold inherent gender bias  \cite{Garg2017} as word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. %Copy pasted from this 
 %[ENTIRE SECTION COPY PASTED FROM PREVIOUS PAPER]
 \textbf{Linear Classifiers}
 Decision trees, linear SVM's, logistic regression, decision tables, IF Then rules.
@@ -134,6 +135,7 @@ There are two ways in which topic models can be used for document classification
 
 Broadly speaking, in the context of document classification, the main advantage of topic models is that their topics tend to be easily interpretable, while vector space models tend to be more flexible in the kind of meta-data that can be exploited. The approach we propose in this paper aims to combine the best of both worlds, by providing a way to derive interpretable representations from vector space models.
 
+ One of the more popular models for text representation that labels features in a similar way to our method are Topic Models.
 
 
 \section{Method}
@@ -144,7 +146,7 @@ Broadly speaking, in the context of document classification, the main advantage 
 
 This section details the methodology to go from a Bag-Of-Words (BOW) \ref{background:BOW} and Semantic Space \ref{bg:SemanticSpaces}, to interpretable vectors that rank documents on features of the domain, e.g. A movie would be ranked on how ${Scary, Horror, Bloody}$ it is for one dimension of the feature-vector, and how ${Romantic, Love, Cute}$ it is in another, ideally with as many dimensions as there are distinct salient features of the domain. 
 %Make sure features are explained well earlier 
-We show examples of this final representation in \ref{ch3:FinalDirTable}. For the Bag-Of-Words, we begin with an unstructured corpus of text documents from a domain, e.g. movie reviews, where each document is a collection of reviews for a movie. From these reviews, we preprocess the text such that it is converted to lower-case, and non-alphanumeric characters are removed. From here, we remove standard English stop words using the NLTK library \cite{Bird}. We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}. From this preprocessed corpus, we obtain a Bag-Of-Words where we count the frequency of each term $BOW_wf$, see \ref{background:BOW}. For the semantic space, we compute the Positive Pointwise Mutual Information (See \ref{bg:PPMI}) scores for the Bag-Of-Words, and use that as input to a variety of different off-the-shelf dimensionality reduction algorithms. We explain these in further detail in Section \ref{ch3:Spaces}. 
+ For the semantic space, we compute the Positive Pointwise Mutual Information (See \ref{bg:PPMI}) scores for the Bag-Of-Words, and use that as input to a variety of different off-the-shelf dimensionality reduction algorithms. We explain these in further detail in Section \ref{ch3:Spaces}. 
 
 \begin{figure}[t]
 	\includegraphics[width=\textwidth]{images/genres_separated.png}
@@ -168,9 +170,13 @@ The method to obtain interpretable feature-vectors is an extension of the work b
 \end{figure}
 
 
-\noindent \textbf{Obtaining directions for each word} For each word $w$, a Support Vector Machine (See Section \ref{bg:SVM}) classifier is trained on the binary Bag-Of-Words representation of that word, where words are labelled as positive if they occurred more than once $w_f >= 1$ and negative otherwise. Although the separation of documents is binary, given the structure of the semantic space we can expect for salient features that the documents close to the hyper-plane on the positive side will have lower PPMI scores for the term than those furthest from the hyper-plane on the positive side, as they are closest to the documents that are classified negatively. Following this, we can consider the vector $v_w$ perpendicular to the hyperplane as the direction' that models documents from least relevant at the distance furthest from the hyperplane on the negative side to most relevant for the word $w$ at the distance furthest from the hyperplane at the positive side. In \ref{Figure2a}, we show an example of directions in a toy domain. %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity. %Graphical representation of 
+\noindent \textbf{Obtaining directions for each word} For each word $w$, a Support Vector Machine (See Section \ref{bg:SVM}) classifier is trained on the binary Bag-Of-Words representation of that word, where words are labelled as positive if they occurred more than once $w_f >= 1$ and negative otherwise. Although the separation of documents is binary, given the structure of the semantic space we can expect for salient features that the documents close to the hyper-plane on the positive side will have lower PPMI scores for the term than those furthest from the hyper-plane on the positive side, as they are closest to the documents that are classified negatively. Following this, we can consider the vector $v_w$ perpendicular to the hyperplane as the direction that models documents from least relevant at the distance furthest from the hyperplane on the negative side to most relevant for the word $w$ at the distance furthest from the hyperplane at the positive side.  %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity. %Graphical representation of 
 
 \noindent \textbf{Ranking documents on directions} Once we have obtained a direction vector for each word $v_w$ the next step is to quantify the degree to which each document has that word, by obtaining a value that corresponds to how far-up it is on the direction vector. These are our rankings of documents on words, if $p_d$ is the representation of an document in the given vector space as a point then we can think of the dot product between the hyper-plane and the document vector $H_w \cdot p_d$ as the ranking $r_dw$ of the document $d$ for the word $w$, and in particular, we take $r_d1 < r_d2$ to mean that $d_2$ has the property labelled with the word $w$ to a greater extent than $e_1$.  %Graphical representation of entities being ranked on a direction vector
+
+
+
+
 
 \subsection{Filtering Words}
 
@@ -179,7 +185,7 @@ With the rankings $R_r$, we could create a representation of each document $d$, 
 \noindent \textbf{Classification accuracy}. Evaluating the quality in terms of the accuracy of the SVM classifier: if this classifier is sufficiently accurate, it must mean that whether word $w$ relates to document $d$ (i.e.\ whether it is used in the description of $d$) is important enough to affect the semantic space representation of $d$. In such a case, it seems reasonable to assume that $w$ describes a salient property for the given domain.%This is basically copy pasted.
 \smallskip
 
-\noindent \textbf{Cohen's Kappa}. One problem with accuracy as a scoring function is that these classification problems are often very imbalanced. In particular, for very rare words, a high accuracy might not necessarily imply that the corresponding direction is accurate. For this reason, X proposed to use Cohen's Kappa score instead. In our experiments, however, we found that accuracy sometimes yields better results, so  as an alternative metric. %This is basically copy pasted.
+\noindent \textbf{Cohen's Kappa}. One problem with accuracy as a scoring function is that these classification problems are often very imbalanced. In particular, for very rare words, a high accuracy might not necessarily imply that the corresponding direction is accurate. For this reason, \cite{Derrac2015} proposed to use Cohen's Kappa score instead. In our experiments, however, we found that accuracy sometimes yields better results, so we retain Kappa as an alternative metric. %This is basically copy pasted.
 \smallskip
 
 \noindent \textbf{Normalized Discounted Cumulative Gain} % MATHEMATICS NEEDS TO BE REWRITTEN
@@ -197,16 +203,17 @@ By scoring the words on these features, we can apply a simple cut-off (e.g. the 
 \subsubsection{Clustering Direction Vectors}
 
 %What are we doing with clustering
-If we consider two directions, "Blood" and "Gore", we can understand both of these to be approximating a similar feature of movies, as they both relate to how much blood a movie contains. Because of this, we can expect their directions to be very similar to each other. This is the first idea behind clustering these directions, if we average these directions together we can obtain a direction inbetween them that results in this more abstract feature. As some entities would have the property of being bloody films, but did not necessarily use the term gore in their reviews, same as some entities having the property but using the term gore not bloody, we can understand that this new hyper plane and associated direction more accurately represents the property of a bloody film more than either of the terms individually. By extending this to a clustering method, we can find similar abstract features by ensuring that all similar directions are clustered together. %Similarly, obtaining a hyper plane using a Logistic Regression classifier that uses occurences of both and either of these terms as positive would be similar to this averaged direction.
+If we consider two directions, "Blood" and "Gore", we can understand both of these to be approximating a similar feature of movies, as they both relate to how much blood a movie contains. Because of this, we can expect their directions to be very similar to each other. This is the first idea behind clustering these directions, if we average these directions together we can obtain a direction inbetween them that is a balance between documents that used the word 'Bloody' to describe the blood and the word 'Gore'. To expand on this, some entities would have the property of being bloody films, but did not necessarily use the term gore in their reviews, same as some entities having the property but using the term gore not bloody, we can understand that this new hyper plane and associated direction more accurately represents the property of a bloody film more than either of the terms individually. By extending this to a clustering method, we can find similar abstract features by ensuring that all similar directions are clustered together. %Similarly, obtaining a hyper plane using a Logistic Regression classifier that uses occurences of both and either of these terms as positive would be similar to this averaged direction.
 
 %What is the value of a cluster label?
 The word direction for "beautiful" can be nebulous to the interpreter, as it is not clear what it means for a movie to be ranked highly on 'beautiful'. Considering this, clustering provides another advantage, once we cluster the terms to find the property ("beautiful", "cinematography" "shots") we are given context for the word and more easily intuit the feature, in this case it is a feature about how well the movie was directed. 
 
-The final benefit to clustering the words is that linear classifiers are generally suited better to 'disentangled' representations \cite{Bengio2012}. In this case, we refer to disentanglement in the sense of obtaining a feature vector where each dimension is distinct, rather than the semantic space being naturally clustered. Additionally, if our representation is dense and disentangled into the natural features of the domain, it is unlikely to overfit and will be able to generalize more easily. When investigating the use of directions without clustering in Section \ref{ch3:WordScores} we found that the sparsity of the directions when using only words tends to overfit in simple linear classifiers.
+%The final benefit to clustering the words is that linear classifiers are generally suited better to 'disentangled' representations \cite{Bengio2012}. In this case, we refer to disentanglement in the sense of obtaining a feature vector where each dimension is distinct, rather than the semantic space being naturally clustered. Additionally, if our representation is dense and disentangled into the natural features of the domain, it is unlikely to overfit and will be able to generalize more easily. 
 
 We approach clustering the directions with a variety of methods:
 
 \noindent \textbf{K-Means} K-Means is a clustering algorithm that starts with determining the amount of clusters, $K$. To begin, $K$ centroids $c$ are randomly placed into the space. Then, the distance between each point $p$ and centroid $c$ (in our case, points are determined by rankings) is calculated. Each point $p$ is then assigned to its closest centroid $c$. Then, the centroids are recomputed to be the mean of their assigned points. This process starting with the distance calculation is repeated until the points assigned to the centroids do not change. 
+
 \noindent \textbf{Derrac's K-Means Variation} This is the clustering method used in the previous work \cite{derracAIJ}. As input to the clustering algorithm, we consider the $N$ best-scoring candidate feature directions $v_w$, where $N$ is a hyperparameter. The main idea underlying their approach is to select the cluster centers such that (i) they are among the top-scoring candidate feature directions, and (ii) are as close to being orthogonal to each other as possible. 
  
 The output of this step is a set of clusters $C_1,...,C_K$, where we will identify each cluster $C_j$ with a set of words.
@@ -241,10 +248,12 @@ We choose our first cluster centroid by taking the top-scoring direction for its
 
 \textbf{The effect of space-type}
 
-
 \textbf{The effect of scoring method}
 
 \subsection{Quantitative Results}
+From a domain, e.g. movie reviews, where each document is a collection of reviews for a movie, we preprocess the text such that it is converted to lower-case, and non-alphanumeric characters are removed. From here, we remove standard English stop words using the NLTK library \cite{Bird}. We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}. From this preprocessed corpus, we obtain a Bag-Of-Words where we count the frequency of each term $BOW_wf$, see \ref{background:BOW}. 
+
+
 
 \subsubsection{Datasets}
 
@@ -291,11 +300,11 @@ We obtain results for the rankings induced from these word directions on Decisio
 
 These results allow us to choose for each class, the best Semantic Space and Scoring-type for that class. For all trees we use grid search to find the best values for the criterion, either the gini score or the information entropy score, the maximum amount of features between [None, 'auto', 'log2'], and additionally, we include whether or not to balance the classes in the grid search.
 
-What is the importance of the space size?
-What is the importance of the space type?
-How do directions perform compared to spaces? Why?
-What kind of directions do we find for each score type?
-Why does the score type matter? What score type works best?
+%What is the importance of the space size?
+%What is the importance of the space type?
+%How do directions perform compared to spaces? Why?
+%What kind of directions do we find for each score type?
+%Why does the score type matter? What score type works best?
 
 
 Next, we test single directions, attempting to find a good amount of directions to cluster and not including words which may hamper the unsupervised classification, as well as the best space-type for each domain. We found that generally, X was the best space and as expected classifiers performed better with more data, so we use 20000 as our frequency cutoff and 2000 as our score cutoff. These single directions typically overfit.
@@ -306,8 +315,37 @@ We continue with the optimal space and score-type chosen by our single direction
 
 With that in mind, we use three clustering algorithms.
 
-Mini batch K-means, implemented by scikit-learn \footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}, introduced by \cite{Sculley2010} and the kmeans++ to initialize \cite{Arthur}
+Mini batch K-means, implemented by scikit-learn \footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}, introduced by \cite{Sculley2010} and kmeans++ to initialize \cite{Arthur}
 
+\subsubsection{Quantitative Results}
+In Figure \ref{IntroDecisionTree}, we demonstrate how depth could affect a Decision Tree that uses salient feature-directions. 
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/decisiontree.png}
+	\centering
+	\caption{This figure shows an example tree from one of our classifiers. Here, we can see that the model increases in complexity as it increases in depth. In this case, we end-up getting better F-score with just a depth-one tree, as the tree begins to overfit at depth three.  }\label{IntroDecisionTree}
+\end{figure}
+
+\begin{landscape}
+\begin{table}[]
+	\begin{tabular}{llllllllllll}
+		& Genres     &       &       & Keywords  &       &       & Ratings  &       &       &  &  \\
+		Movies            & D1         & D2    & D3    & D1        & D2    & D3    & D1       & D2    & D3    &  &  \\
+		Space             & 0.301      & 0.358 & 0.354 & 0.185     & 0.198 & 0.201 & 0.463    & 0.475 & 0.486 &  &  \\
+		Single directions & N/A        & N/A   & N/A   & N/A       & N/A   & N/A   & N/A      & N/A   & N/A   &  &  \\
+		Clusters          & N/A        & N/A   & N/A   & N/A       & N/A   & N/A   & N/A      & N/A   & N/A   &  &  \\
+		& Newsgroups &       &       & Sentiment &       &       & Reuters  &       &       &  &  \\
+		Rep               & 0.251      & 0.366 & 0.356 & 0.705     & 0.770 & 0.773 & 0.328    & 0.413 & 0.501 &  &  \\
+		Single dir        & 0.418      & 0.490 & 0.537 & 0.784     & 0.814 & 0.821 & N/A      & N/A   & N/A   &  &  \\
+		Cluster           & 0.394      & 0.433 & 0.513 & 0.735     & 0.844 & 0.813 & N/A      & N/A   & N/A   &  &  \\
+		& Foursquare &       &       & OpenCYC   &       &       & Geonames &       &       &  &  \\
+		Placetypes        & D1         & D2    & D3    & D1        & D2    & D3    & D1       & D2    & D3    &  &  \\
+		Rep               & 0.438      & 0.478 & 0.454 & 0.383     & 0.397 & 0.396 & 0.349    & 0.340 & 0.367 &  &  \\
+		Single dir        & N/A        & N/A   & N/A   & N/A       & N/A   & N/A   & N/A      & N/A   & N/A   &  &  \\
+		Cluster           & N/A        & N/A   & N/A   & N/A       & N/A   & N/A   & N/A      & N/A   & N/A   &  &  \\
+	\end{tabular}\caption{Best-scoring results for each type.}
+\end{table}
+\end{landscape}
 
 
 % Deeper explanation of our methodology and approach

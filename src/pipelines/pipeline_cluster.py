@@ -396,9 +396,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    max_depths = [1,2,3]
-    classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_type = [ "placetypes", "reuters", "sentiment", "newsgroups"]
+    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
+    data_type = [ "placetypes", "reuters"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -420,21 +419,29 @@ def init():
             cluster_amt = [50, 100, 200]
             top_dir_amt = [2, 1.0, 4, 6, 8]
 
-        cluster_methods = ["derrac"]
+        cluster_methods = ["derrac", "kmeans"]
 
         svm_clusters = [False]
 
         multi_class_method = "OVR"
         bonus_fn = ""
-        rewrite_all = False
+        rewrite_all = True
         print("iterating through classifiers")
         for i in range(len(classifiers)):
+            if "1" in classifiers[i]:
+                max_depths = 1
+            elif "2" in classifiers[i]:
+                max_depths = 2
+            elif "3" in classifiers[i]:
+                max_depths = 3
+            else:
+                max_depths = None
             for k in range(len(svm_clusters)):
                 print(classifiers[i])
                 main(data_type[j], "../../data/raw/" + data_type[j] + "/", "../../data/processed/" + data_type[j] + "/",
                      proj_folder="../../data/proj/" + data_type[j] + "/",
                      grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
-                     score_metric="avg_f1", max_depth=max_depths[i], multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
+                     score_metric="avg_f1", max_depth=max_depths, multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
                      rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
                      svm_clusters=svm_clusters[k])
 

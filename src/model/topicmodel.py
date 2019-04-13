@@ -143,7 +143,7 @@ tf_fn = "class-all-50-10-all.npz"
 
 doc_topic_prior = [ 0.001, 0.01, 0.1]
 topic_word_prior =[ 0.1,0.01, 0.001]
-n_topics = [400,200,100,50]
+n_topics = [2000,1000,500,200,100,50]
 
 for c in classify:
     file_name = "class-all-50-10-all.npz"
