@@ -16,6 +16,7 @@ from model.decisiontree import DecisionTree
 from util import split
 from pipelines import pipeline_single_dir
 from pipelines import pipeline_cluster
+from pipelines import pipeline_topic_model
 
 def get_grid_params(hpam_dict):
     hyperparam_array = list(hpam_dict.values())
@@ -293,6 +294,15 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(cluster_rank)
+            elif self.hpam_model_type == "topic":
+                top_params, top_row_data, new_bow_fn = pipeline_topic_model.pipeline_topic_model(*self.hpam_params,top_scoring_freq=self.all_p[i]["top_scoring_freq"],
+                                                                                                 topic_word_prior=self.all_p[i]["topic_word_prior"], doc_topic_prior=self.all_p[i]["doc_topic_prior"], n_topics=self.all_p[i]["n_topics"])
+                self.top_scoring_params.value.append(top_params)
+                top_scoring_row_data = top_row_data
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
+                self.rank_fn.append(new_bow_fn)
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())

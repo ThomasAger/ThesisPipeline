@@ -71,27 +71,42 @@ class MasterCorpus(Method.Method):
         super().__init__(file_name, save_class)
 
     def getSplitCorpus(self):
-        return self.save_class.load(self.split_corpus)
+        if self.processed is False:
+            self.split_corpus.value = self.save_class.load(self.split_corpus)
+        return self.split_corpus.value
     def getClasses(self):
-        return self.save_class.load(self.classes)
+        if self.processed is False:
+            self.classes.value = self.save_class.load(self.classes)
+        return self.classes.value
     def getBow(self):
-        return self.save_class.load(self.bow)
+        if self.processed is False:
+            self.bow.value = self.save_class.load(self.bow)
+        return self.bow.value
     def getFilteredBow(self):
-        return self.save_class.load(self.filtered_bow)
+        if self.processed is False:
+            self.filtered_bow.value = self.save_class.load(self.filtered_bow)
+        return self.filtered_bow.value
 
     def getDct(self):
-        self.dct =  self.save_class.load(self.dct)
-        return self.dct
+        if self.processed is False:
+            self.dct.value = self.save_class.load(self.dct)
+        return self.dct.value
 
 
     def getBowDct(self):
-        return self.save_class.load(self.bowdict)
+        if self.processed is False:
+            self.bowdict.value = self.save_class.load(self.bowdict)
+        return self.bowdict.value
     def getFilteredDct(self):
-        return self.save_class.load(self.filtered_dict)
+        if self.processed is False:
+            self.filtered_dict.value = self.save_class.load(self.filtered_dict)
+        return self.filtered_dict.value
 
     def getAllWords(self):
-        self.all_words =  self.save_class.load(self.all_words)
-        return self.all_words
+
+        if self.processed is False:
+            self.all_words.value = self.save_class.load(self.all_words)
+        return self.all_words.value
 
 class Corpus(MasterCorpus):
     orig_corpus = None

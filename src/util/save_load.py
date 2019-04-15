@@ -59,12 +59,14 @@ def load_by_type(type, file_name):
     try:
         if type == "npy":
             file = np.load(file_name)
-        elif type == "scipy":
+        elif type == "scipy" or type == "npz":
             file = sp.load_npz(file_name)
         elif type == "dct":
             file = dt.load_dict(file_name)
         elif type == "npy_dict":
             file = dt.loadNpyDict(file_name)
+        elif type == "joblib":
+            joblib.load( file_name)
         elif type == "gensim":
             file = Dictionary.load(file_name)
         elif type == "1dtxts":
@@ -90,10 +92,13 @@ def load_by_type(type, file_name):
         return None
     return file
 
+from sklearn.externals import joblib
 def save_by_type(file, type, file_name):
     if type == "npy":
         np.save(file_name, file)
-    elif type == "scipy":
+    elif type == "joblib":
+        joblib.dump(file, file_name)
+    elif type == "scipy" or type == "npz":
         sp.save_npz(file_name, file)
     elif type == "gensim":
         file.save(file_name)
