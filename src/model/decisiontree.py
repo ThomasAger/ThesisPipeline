@@ -70,13 +70,13 @@ class DecisionTree(Method.ModelMethod):
         if self.get_tree_image:
             self.tree_image.value = []
             for i in range(len(ovr.estimators_)):
-                if len(self.class_names) == 1:
-                    self.class_names = ["NOT " + self.class_names[0], self.class_names[0]]
-                dotfile = tree.export_graphviz(ovr.estimators_[i], out_file=self.tree_image_fn + self.class_names[i] + ".dot", feature_names=self.feature_names, class_names=self.class_names,
+                class_names = ["NOT " + self.class_names[i], self.class_names[i]]
+                dotfile = tree.export_graphviz(ovr.estimators_[i], out_file=self.tree_image_fn + self.class_names[i] + ".dot", feature_names=self.feature_names, class_names=class_names,
                              label='all', filled=True, impurity=True, node_ids=True,
                              proportion=True, rounded=True )
                 self.tree_image.value.append(dotfile)
                 orig_graph = pydot.graph_from_dot_file(self.tree_image_fn + self.class_names[i] + ".dot")
                 orig_graph.write_png(self.tree_image_fn + self.class_names[i] + ".png")
         super().process()
+
 

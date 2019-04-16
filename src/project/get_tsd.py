@@ -10,29 +10,38 @@ class GetTopScoringDirs(Method.Method):
     dir = None
     words = None
 
-    def __init__(self, file_name, save_class, output_folder, score_ind, top_scoring_dir, directions, new_word2id_dict):
+    def __init__(self, file_name, save_class, output_folder, score_ind, top_scoring_dir, words, directions, new_word2id_dict):
         self.score_ind = score_ind
         self.top_scoring_dir = top_scoring_dir
         self.directions = directions
         self.new_word2id_dict = new_word2id_dict
         self.output_folder = output_folder
+        self.words = words
         super().__init__(file_name, save_class)
 
     def makePopos(self):
         self.dir = SaveLoadPOPO([],self.output_folder + "fil/" + self.file_name  + "_dir.npy", "npy")
+        self.fil_words = SaveLoadPOPO([],self.output_folder + "fil/" + self.file_name  + "_words.txt", "1dtxts")
 
     def makePopoArray(self):
-        self.popo_array = [self.dir]
+        self.popo_array = [self.dir, self.fil_words]
 
     def process(self):
         inds = np.flipud(np.argsort(self.score_ind))[:self.top_scoring_dir]
         self.dir.value = self.directions[inds].transpose()
+        self.fil_words.value = self.words[inds].transpose()
         super().process()
 
     def getDir(self):
         if self.processed is False:
             self.dir.value = self.save_class.load(self.dir)
         return self.dir.value
+
+    def getWords(self):
+        if self.processed is False:
+            self.fil_words.value = self.save_class.load(self.fil_words)
+        return self.fil_words.value
+
 
 
 class GetTopScoringDirsStreamed(Method.Method):

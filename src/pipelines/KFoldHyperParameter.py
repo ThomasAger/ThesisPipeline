@@ -100,8 +100,10 @@ class MasterHParam(Method):
     def process(self):
         super().process()
 
-    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test, get_tree_image=False, tree_image_fn="", entered_fn=""):
-        svm_save = SaveLoad(rewrite=self.rewrite_model)
+    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test, get_tree_image=False, tree_image_fn="", entered_fn="", rewrite_method=None):
+        if rewrite_method is None:
+            rewrite_method = self.rewrite_model
+        svm_save = SaveLoad(rewrite_method)
         model = None
         model_fn = None
         # In the case of the clusters, we need to do this so that it does not repeat
@@ -275,7 +277,7 @@ class RecHParam(MasterHParam):
             elif self.hpam_model_type == "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
-                top_params, top_row_data, top_rank, top_dir = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
+                top_params, top_row_data, top_rank, top_dir, feature_names = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
 
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
@@ -283,6 +285,7 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(top_rank)
+                self.feature_names_from_par.append(feature_names)
                 self.dir_fn.append(top_dir)
             elif self.hpam_model_type == "cluster":
                 top_params, top_row_data, cluster_rank, feature_names, cluster_fn =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
@@ -297,6 +300,7 @@ class RecHParam(MasterHParam):
             elif self.hpam_model_type == "topic":
                 top_params, top_row_data, new_bow_fn, feature_names = pipeline_topic_model.pipeline_topic_model(*self.hpam_params,top_scoring_freq=self.all_p[i]["top_scoring_freq"],
                                                                                                  topic_word_prior=self.all_p[i]["topic_word_prior"], doc_topic_prior=self.all_p[i]["doc_topic_prior"], n_topics=self.all_p[i]["n_topics"])
+
                 self.feature_names_from_par.append(feature_names)
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
@@ -304,21 +308,17 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(new_bow_fn)
-                self.entered_fn.append("")
-
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
         self.final_arrays.value.append(indexes)
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
-        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
+        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster":
             print("skipped")
             index = self.getTopScoring()
-            if self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
+            if self.hpam_model_type == "cluster" :
                 space = np.load(self.rank_fn[index]).transpose()
-                if self.hpam_model_type == "topic":
-                    space = space.transpose()
                 self.getTopScoringCluster(space, index)
             else:
                 space = np.load(self.rank_fn[index])
@@ -343,12 +343,14 @@ class RecHParam(MasterHParam):
                                                                           dev_percent_of_train=self.dev_percent)
         if len(self.entered_fn) > 0:
             model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
-                                                get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index])
+                                                get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index],
+                                                    rewrite_method=self.save_class.rewrite)
         else:
             model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
-                                                get_tree_image=True, tree_image_fn="")
+                                                get_tree_image=True, tree_image_fn="",
+                                                    rewrite_method=self.save_class.rewrite)
         model_pred, __unused = self.trainClassifier(model)
-        score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
+        score_save = SaveLoad(rewrite=self.save_class.rewrite, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
                                          output_folder=self.output_folder + "score/", save_class=score_save,
                                          verbose=True, class_names=self.class_names,
@@ -372,9 +374,10 @@ class RecHParam(MasterHParam):
                                                                           dev_percent_of_train=self.dev_percent)
 
         model, model_fn = self.selectClassifier(self.top_scoring_params.value[index], x_train, y_train, x_test, y_test,
-                                                get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index])
+                                                get_tree_image=True, tree_image_fn="", entered_fn=self.entered_fn[index],
+                                                rewrite_method=self.save_class.rewrite)
         model_pred, __unused = self.trainClassifier(model)
-        score_save = SaveLoad(rewrite=self.rewrite_model, load_all=True)
+        score_save = SaveLoad(rewrite=self.save_class.rewrite, load_all=True)
         score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
                                      output_folder=self.output_folder + "score/", save_class=score_save,
                                      verbose=True, class_names=self.class_names,
@@ -654,12 +657,13 @@ class HParam(MasterHParam):
         self.top_scoring_params.value = self.all_p[index_sorted]
         print("Training best parameters on test data not dev data")
         if self.final_score_on_dev:
-            model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train, self.x_dev, self.y_dev)
+            model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train, self.x_dev, self.y_dev, rewrite_method=self.rewrite_model)
         else:
             model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train,
-                                                    self.x_test, self.y_test, get_tree_image=False)
+                                                    self.x_test, self.y_test, get_tree_image=False, rewrite_method=self.rewrite_model)
         pred, prob = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
+
         if self.final_score_on_dev:
             score = classify.selectScore(self.y_dev, pred, prob, file_name=model_fn,
                                              output_folder=self.output_folder + "score/", save_class=score_save,
