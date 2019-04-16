@@ -309,7 +309,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree1","DecisionTree3", "DecisionTree2"]
-    data_types = ["newsgroups", "sentiment"]
+    data_types = ["movies"]
     doLR = False
     dminf = -1
     dmanf = -1
@@ -327,7 +327,7 @@ if __name__ == '__main__':
         elif data_types[j] == "newsgroups":
             hp_top_freq = [20000]
         elif data_types[j] == "movies":
-            hp_top_freq = [20000, None]
+            hp_top_freq = [20000]
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
                 max_depths = 1

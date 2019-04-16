@@ -157,6 +157,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     rfn = []
     dfn = []
     f1s = []
+    fn_final = []
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
         gtr_save = SaveLoad(rewrite=rewrite_all)
@@ -170,8 +171,9 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
         gtd_save = SaveLoad(rewrite=rewrite_all)
         gtd = GetTopScoringDirs(dir_fn, gtd_save, processed_folder + "directions/", score_array[i], top_scoring_dir,
-                                    dirs, new_word2id_dict)
+                                    words, dirs, new_word2id_dict)
         gtd.process_and_save()
+        fil_words = gtd.getWords()
         fil_dir_fn = gtd.dir.file_name
 
         split_ids = split.get_split_ids(data_type, matched_ids)
@@ -183,19 +185,21 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         dir_fn += "_Fix"
         hpam_save = SaveLoad(rewrite=True)
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
-                             False, rewrite_model=True, x_train=x_train, y_train=y_train, x_test=x_test,
-                             y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=words)
+                             False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, feature_names=fil_words,
+                             y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=fil_words)
         hyper_param.process_and_save()
 
         tsp.append(hyper_param.getTopScoringParams())
         tsrd.append(hyper_param.getTopScoringRowData())
         rfn.append(fil_rank_fn)
         dfn.append(fil_dir_fn)
+        fn_final.append(fil_words)
         f1s.append(hyper_param.getTopScoringRowData()[1][1]) # F1 Score for the current scoring metric
 
 
 
     best_ind = np.flipud(np.argsort(f1s))[0]
+    feature_names = fn_final[best_ind]
     top_params = tsp[best_ind]
     top_row_data = tsrd[best_ind]
     top_rank = rfn[best_ind]
@@ -209,7 +213,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
                  + "reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
     print("Pipeline completed, saved as, "+ processed_folder + "rank/score/csv_averages/" +file_name+ "_" + str(no_above) + "_" + str(no_below)
                  + "reps"+model_type+"_" + name_of_class + ".csv")
-    return top_params, top_row_data, top_rank, top_dir
+    return top_params, top_row_data, top_rank, top_dir, feature_names
 
 
 
