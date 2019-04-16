@@ -317,7 +317,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree1","DecisionTree3", "DecisionTree2"]
-    data_types = ["placetypes", "reuters"]
+    data_types = ["newsgroups"]
     doLR = False
     dminf = -1
     dmanf = -1

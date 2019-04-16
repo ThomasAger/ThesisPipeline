@@ -314,11 +314,13 @@ class RecHParam(MasterHParam):
         self.final_arrays.value.append(indexes)
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
-        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster":
+        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
             print("skipped")
             index = self.getTopScoring()
-            if self.hpam_model_type == "cluster" :
+            if self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
                 space = np.load(self.rank_fn[index]).transpose()
+                if self.hpam_model_type == "topic":
+                    space = space.transpose()
                 self.getTopScoringCluster(space, index)
             else:
                 space = np.load(self.rank_fn[index])
@@ -363,8 +365,9 @@ class RecHParam(MasterHParam):
         avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
                      score_dict[col_names[2]], score_dict[col_names[3]],
                      score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
-        self.top_scoring_features = space
+        self.top_scoring_features.value = space
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+        print("GOt topscoringdir")
 
     def getTopScoringCluster(self, space, index):
         self.feature_names = self.feature_names_from_par[index]
@@ -390,8 +393,9 @@ class RecHParam(MasterHParam):
         avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
                      score_dict[col_names[2]], score_dict[col_names[3]],
                      score_dict[col_names[4]], self.rank_fn[index]]
-        self.top_scoring_features = space
+        self.top_scoring_features.value = space
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+        print("GOt cluster")
 
 
     #If you need other metrics than F1 just do metric = "acc" then index is 0 etc.
