@@ -295,25 +295,30 @@ class RecHParam(MasterHParam):
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(cluster_rank)
             elif self.hpam_model_type == "topic":
-                top_params, top_row_data, new_bow_fn = pipeline_topic_model.pipeline_topic_model(*self.hpam_params,top_scoring_freq=self.all_p[i]["top_scoring_freq"],
+                top_params, top_row_data, new_bow_fn, feature_names = pipeline_topic_model.pipeline_topic_model(*self.hpam_params,top_scoring_freq=self.all_p[i]["top_scoring_freq"],
                                                                                                  topic_word_prior=self.all_p[i]["topic_word_prior"], doc_topic_prior=self.all_p[i]["doc_topic_prior"], n_topics=self.all_p[i]["n_topics"])
+                self.feature_names_from_par.append(feature_names)
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(new_bow_fn)
+                self.entered_fn.append("")
+
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
         self.final_arrays.value.append(indexes)
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
-        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster":
+        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
             print("skipped")
             index = self.getTopScoring()
-            if self.hpam_model_type == "cluster":
+            if self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
                 space = np.load(self.rank_fn[index]).transpose()
+                if self.hpam_model_type == "topic":
+                    space = space.transpose()
                 self.getTopScoringCluster(space, index)
             else:
                 space = np.load(self.rank_fn[index])

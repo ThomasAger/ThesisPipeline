@@ -23,10 +23,10 @@ class Filter(Method):
 
     def makePopos(self):
         self.new_bow = SaveLoadPOPO(self.new_bow, self.output_folder + self.file_name + ".npy", "npy")
-        self.words = SaveLoadPOPO(self.words, self.output_folder + self.file_name + ".npy", "npy")
+        self.words = SaveLoadPOPO(self.words, self.output_folder + self.file_name + "_words.npy", "npy")
 
     def makePopoArray(self):
-        self.popo_array = [self.new_bow]
+        self.popo_array = [self.new_bow, self.words]
 
     def process(self):
         # Process
