@@ -308,6 +308,7 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(new_bow_fn)
+                self.entered_fn.append("")
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
@@ -604,7 +605,7 @@ class HParam(MasterHParam):
         self.file_names = []
         self.dim_names = dim_names
 
-        end_file_name = file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + str(self.model_type)
+        end_file_name = file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + str(model_type)
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa,
                          model_type=model_type, output_folder=output_folder,

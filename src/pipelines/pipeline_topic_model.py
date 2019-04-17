@@ -152,6 +152,8 @@ doc_topic_prior=None, topic_word_prior=None, n_topics=None,
 
 
     hpam_save = SaveLoad(rewrite=rewrite_all)
+    print(model_type)
+    print(kfold_hpam_dict)
     hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn,
                                              processed_folder + "topic/", hpam_save,
                                              False, rewrite_model=True, x_train=x_train, y_train=y_train,
@@ -316,8 +318,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree1","DecisionTree3", "DecisionTree2"]
-    data_types = ["newsgroups"]
+    classifiers = ["DecisionTree3", "DecisionTree2","DecisionTree1"]
+    data_types = ["placetypes", "reuters"]
     doLR = False
     dminf = -1
     dmanf = -1
@@ -327,15 +329,15 @@ if __name__ == '__main__':
     rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "reuters":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "sentiment":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "movies":
-            hp_top_freq = [20000, None]
+            hp_top_freq = [5000,10000, 20000, None]
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
                 max_depths = 1
