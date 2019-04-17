@@ -35,9 +35,9 @@ class TopicModel(Method):
         super().__init__(file_name, save_class)
 
     def makePopos(self):
-        self.model_words = SaveLoadPOPO(self.model_words, self.output_folder + self.file_name + ".npy", "npy")
-        self.model_rep = SaveLoadPOPO(self.model_rep, self.output_folder + self.file_name + ".npy", "npy")
-        self.model =  SaveLoadPOPO(self.model, self.output_folder + self.file_name + ".bin", "joblib")
+        self.model_words = SaveLoadPOPO(self.model_words, self.output_folder + self.file_name + "_words.txt", "1dtxts")
+        self.model_rep = SaveLoadPOPO(self.model_rep, self.output_folder + self.file_name + "_rep.npy", "npy")
+        self.model =  SaveLoadPOPO(self.model, self.output_folder + self.file_name + "model.bin", "joblib")
 
     def makePopoArray(self):
         self.popo_array = [self.model_words, self.model_rep, self.model]
@@ -52,10 +52,9 @@ class TopicModel(Method):
         print("done in %0.3fs." % (time() - t0))
 
         print("\nTopics in LDA model:")
-        self.model_words = self.print_top_words(lda, self.words)
-        self.model_words.reverse()
-        self.model_rep = new_rep.transpose()
-        self.model = lda
+        self.model_words.value = self.print_top_words(lda, self.words)
+        self.model.value = lda
+        self.model_rep.value = new_rep
         print("completed")
         super().process()
 
@@ -64,13 +63,16 @@ class TopicModel(Method):
             self.model_rep.value = self.save_class.load(self.model_rep)
         return self.model_rep.value
 
+    def getWords(self):
+        if self.processed is False:
+            self.model_words.value = self.save_class.load(self.model_words)
+        return self.model_words.value
 
     def print_top_words(self, model, feature_names):
         names = []
         for topic_idx, topic in enumerate(model.components_):
             message = ""
-            message += " ".join([feature_names[i]
-                                 for i in topic.argsort()])
+            message += " ".join([feature_names[i] for i in topic.argsort()[::-1]])
             print(message[:100])
             names.append(message)
         print()

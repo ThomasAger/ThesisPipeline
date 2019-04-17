@@ -48,7 +48,7 @@ def pipeline(file_name,  bow, dct, classes, class_names, words_to_get, processed
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "topic",
                                                 model_type,
-                                                file_name, None, processed_folder + "rank/", hpam_save,
+                                                file_name, None, processed_folder + "topic/", hpam_save,
                                                 probability=False,
                                                 rewrite_model=rewrite_all, dev_percent=dev_percent,
                                                 name_of_class=name_of_class,
@@ -100,7 +100,7 @@ doc_topic_prior=None, topic_word_prior=None, n_topics=None,
         dir.process_and_save()
         words_to_get = dir.getBowWordDct()
         new_word_dict = dir.getNewWordDict()
-
+        file_name = file_name + "_" + str(no_below) + "_" + str(no_above)
         fil_save = SaveLoad(rewrite=rewrite_all)
         fil_words = filter_bow.Filter(bow, words_to_get, new_word_dict, file_name, fil_save,
                                       processed_folder + "topic/fil/")
@@ -127,14 +127,21 @@ doc_topic_prior=None, topic_word_prior=None, n_topics=None,
 
     print(len(new_bow), len(new_bow[0]))
 
-    dir_fn = file_name + "_" + str(no_below) + "_" + str(no_above) + "_" + str(topic_word_prior) + "_" + str(doc_topic_prior) + "_" + str(n_topics)
+    dir_fn = file_name + "_" + str(topic_word_prior) + "_" + str(doc_topic_prior) + "_" + str(n_topics)
 
     top_save = SaveLoad(rewrite=rewrite_all)
-    topic_model = topicmodel.TopicModel(new_bow, words, doc_topic_prior, topic_word_prior, n_topics, dir_fn, "topic/model/", top_save)
+    topic_model = topicmodel.TopicModel(new_bow, words, doc_topic_prior, topic_word_prior, n_topics, dir_fn, processed_folder+ "topic/model/", top_save)
     topic_model.process_and_save()
     topic_rep = topic_model.getRep()
+    topic_words = topic_model.getWords()
+    limited_words = []
+    for i in range(len(topic_words)):
+        limited_words.append(" ".join(topic_words[i].split()[:3]))
+
+    rep_name = topic_model.model_rep.file_name
 
     if len(topic_rep) != doc_amt:
+        print(len(topic_rep), doc_amt)
         raise ValueError("topic rep wrong size")
 
     split_ids = split.get_split_ids(data_type, matched_ids)
@@ -144,18 +151,20 @@ doc_topic_prior=None, topic_word_prior=None, n_topics=None,
                                                                       data_type=data_type)
 
 
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
+    print(model_type)
+    print(kfold_hpam_dict)
     hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn,
                                              processed_folder + "topic/", hpam_save,
                                              False, rewrite_model=True, x_train=x_train, y_train=y_train,
-                                             x_test=x_test,
+                                             x_test=x_test, feature_names=limited_words,
                                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric,
                                              auroc=auroc, mcm=mcm, dim_names=words)
     hyper_param.process_and_save()
 
     top_params = hyper_param.getTopScoringParams()
     top_row_data = hyper_param.getTopScoringRowData()
-    return top_params, top_row_data, new_bow_fn
+    return top_params, top_row_data, rep_name, limited_words
 
 
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_min_freq=0.001,
@@ -197,7 +206,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
     doc_topic_prior = [0.001, 0.01, 0.1]
     topic_word_prior = [0.1, 0.01, 0.001]
-    n_topics = [2000, 1000, 500, 200, 100, 50]
+    n_topics = [200, 100, 50]
     if model_type == "GaussianSVM" or model_type == "GaussianSVMMultiClass":
         kfold_hpam_dict = {"C":C_params,
                     "class_weight":balance_params,
@@ -224,7 +233,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
                  "min_count": min_count,
                  "train_epoch": train_epoch}
 
-    pipeline_hpam_dict = {"top_scoring_freq": hp_top_freq,"doc_topic_prior": doc_topic_prior,
+    pipeline_hpam_dict = {"top_scoring_freq": hp_top_freq,
+                          "doc_topic_prior": doc_topic_prior,
                        "topic_word_prior": topic_word_prior,
                        "n_topics": n_topics }
 
@@ -302,14 +312,14 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
         cols = np.asarray(rows.tolist()).transpose()
         col_names = all_r[0][0]
         key = all_r[2]
-        dt.write_csv(processed_folder + "rank/score/csv_final/" + pipeline_fn + "reps" + model_type + "_" + name_of_class[
+        dt.write_csv(processed_folder + "topic/score/csv_final/" + pipeline_fn + "reps" + model_type + "_" + name_of_class[
             ci] + ".csv", col_names, cols, key)
         print("a")
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree1","DecisionTree3", "DecisionTree2"]
-    data_types = ["movies"]
+    classifiers = ["DecisionTree3", "DecisionTree2","DecisionTree1"]
+    data_types = ["placetypes", "reuters"]
     doLR = False
     dminf = -1
     dmanf = -1
@@ -319,15 +329,15 @@ if __name__ == '__main__':
     rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "reuters":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "sentiment":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         elif data_types[j] == "movies":
-            hp_top_freq = [20000]
+            hp_top_freq = [5000,10000, 20000, None]
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
                 max_depths = 1

@@ -308,17 +308,20 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(new_bow_fn)
+                self.entered_fn.append("")
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
         self.final_arrays.value.append(indexes)
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
-        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster":
+        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
             print("skipped")
             index = self.getTopScoring()
-            if self.hpam_model_type == "cluster" :
+            if self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
                 space = np.load(self.rank_fn[index]).transpose()
+                if self.hpam_model_type == "topic":
+                    space = space.transpose()
                 self.getTopScoringCluster(space, index)
             else:
                 space = np.load(self.rank_fn[index])
@@ -363,8 +366,9 @@ class RecHParam(MasterHParam):
         avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
                      score_dict[col_names[2]], score_dict[col_names[3]],
                      score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
-        self.top_scoring_features = space
+        self.top_scoring_features.value = space
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+        print("GOt topscoringdir")
 
     def getTopScoringCluster(self, space, index):
         self.feature_names = self.feature_names_from_par[index]
@@ -390,8 +394,9 @@ class RecHParam(MasterHParam):
         avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
                      score_dict[col_names[2]], score_dict[col_names[3]],
                      score_dict[col_names[4]], self.rank_fn[index]]
-        self.top_scoring_features = space
+        self.top_scoring_features.value = space
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+        print("GOt cluster")
 
 
     #If you need other metrics than F1 just do metric = "acc" then index is 0 etc.
@@ -600,7 +605,7 @@ class HParam(MasterHParam):
         self.file_names = []
         self.dim_names = dim_names
 
-        end_file_name = file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + str(self.model_type)
+        end_file_name = file_name + "_Kfold" + str(self.dev) + str(generateNumber(hpam_dict)) + str(model_type)
 
         super().__init__(rewrite_model=rewrite_model, auroc=auroc, fscore=fscore, acc=acc, kappa=kappa,
                          model_type=model_type, output_folder=output_folder,
