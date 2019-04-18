@@ -1,6 +1,8 @@
 import numpy as np
-words1 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_100_PCA_ndcg_1000_20000_0_words.npy")
-words2 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_100_PCA_kappa_1000_20000_0_words.npy")
+words1 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_D2V_ndcg_1000_10000_0_words.npy")
+words2 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_D2V_kappa_1000_10000_0_words.npy")
+score1 = []
+score2 = []
 
 words_to_keep = []
 for i in range(len(words2)):
@@ -27,12 +29,14 @@ for i in range(len(words1)):
             break
 print(len(words_to_delete))
 words1 = np.delete(words1, words_to_delete, axis=0)
-for w in words1:
-    print(w)
 print("----")
-for w in words2:
-    print(w)
+print(words1)
 print("----")
-for w in words_to_keep:
-    print(w)
+print(words2)
+print("----")
+print(words1)
+print("----")
+print(words2)
+print("----")
+print(words_to_keep)
 print("----")

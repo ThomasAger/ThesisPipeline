@@ -167,7 +167,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
 
                 ####HERE TEMP CODE
-                rewrite_mds = True
+                rewrite_mds = rewrite_all
                 ##################
 
                 hpam_save = SaveLoad(rewrite=rewrite_mds)

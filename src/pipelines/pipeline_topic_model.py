@@ -113,7 +113,9 @@ doc_topic_prior=None, topic_word_prior=None, n_topics=None,
         no_below = 0
         no_above = 0
         new_bow = np.asarray(bow.todense())
+        print(bow)
         words = words_to_get
+        print(words)
         new_bow_fn = "original full bow"
 
 
@@ -264,11 +266,16 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
         class_names = classes_process.getClassNames()
 
         corp_save = SaveLoad(rewrite=False)
-        p_corpus = process_corpus.Corpus(None, None, name_of_class[ci], pipeline_fn, processed_folder,
-                                         bowmin,
-                                         no_below, no_above, True, corp_save)
+        if data_type == "movies" or data_type == "placetypes":
+            p_corpus = process_corpus.StreamedCorpus(None, name_of_class[ci], pipeline_fn, processed_folder,bowmin,  no_below, no_above, True, corp_save)
+        else:
+            p_corpus = process_corpus.Corpus(None, None, name_of_class[ci], pipeline_fn, processed_folder,
+                                             bowmin,
+                                             no_below, no_above, True, corp_save)
         bow = p_corpus.getBow()
         word_list = p_corpus.getAllWords()
+        if word_list is None:
+            raise ValueError("Word list is none")
         classes = p_corpus.getClasses()
 
         for i in range(len(dims)):
@@ -319,7 +326,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree3", "DecisionTree2","DecisionTree1"]
-    data_types = ["placetypes", "reuters"]
+    data_types = ["newsgroups", "sentiment"]
     doLR = False
     dminf = -1
     dmanf = -1
@@ -329,15 +336,15 @@ if __name__ == '__main__':
     rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [5000,10000, 20000, None]
+            hp_top_freq = [None]
         elif data_types[j] == "reuters":
-            hp_top_freq = [5000,10000, 20000, None]
+            hp_top_freq = [None]
         elif data_types[j] == "sentiment":
-            hp_top_freq = [5000,10000, 20000, None]
+            hp_top_freq = [None]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [5000,10000, 20000, None]
+            hp_top_freq = [None]
         elif data_types[j] == "movies":
-            hp_top_freq = [5000,10000, 20000, None]
+            hp_top_freq = [None]
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
                 max_depths = 1
