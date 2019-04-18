@@ -274,7 +274,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
                                              bowmin,
                                              no_below, no_above, True, corp_save)
         bow = p_corpus.getBow()
-        word_list = p_corpus.getId2Token()
+        dct = p_corpus.getBowDct()
+        word_list = list(dct.token2id.keys())
         if word_list is None:
             raise ValueError("Word list is none")
         classes = p_corpus.getClasses()
@@ -334,7 +335,7 @@ if __name__ == '__main__':
 
     mcm = "OVR"
     bonus_fn = ""
-    rewrite_all = False
+    rewrite_all = True
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
             hp_top_freq = [None]
