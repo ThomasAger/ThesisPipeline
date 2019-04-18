@@ -157,6 +157,9 @@ class Corpus(MasterCorpus):
         self.processed_corpus = self.save_class.load(self.processed_corpus)
         return self.processed_corpus
 
+    def getId2Token(self):
+        self.id2token.value = self.save_class.load(self.id2token)
+        return self.id2token.value
 
     def makePopoArray(self):
         self.popo_array = [self.dct, self.remove_ind, self.tokenized_corpus, self.tokenized_ids,
@@ -253,6 +256,9 @@ class StreamedCorpus(MasterCorpus):
         self.word_list.value = self.save_class.load(self.word_list)
         return self.word_list.value
 
+    def getId2Token(self):
+        self.id2token.value = self.save_class.load(self.id2token)
+        return self.id2token.value
 
     def makePopoArray(self):
         self.popo_array = [self.dct,
@@ -336,6 +342,9 @@ class LargeCorpus(MasterCorpus):
         self.word_list.value = self.save_class.load(self.word_list)
         return self.word_list.value
 
+    def getId2Token(self):
+        self.id2token.value = self.save_class.load(self.id2token)
+        return self.id2token.value
 
     def makePopoArray(self):
         self.popo_array = [self.dct,
@@ -348,6 +357,8 @@ class LargeCorpus(MasterCorpus):
 
         cleaned_corpus_fn = self.output_folder + "corpus/" + self.file_name + "_corpus_processed.txt"
         cleanLargeCorpus(self.corpus_fn_to_stream, cleaned_corpus_fn)
+
+
 
         self.all_vocab.value, self.dct.value, self.id2token.value = getVocabStreamed(cleaned_corpus_fn)
 
