@@ -51,6 +51,7 @@ class DecisionTree(Method.ModelMethod):
     def makePopos(self):
         super().makePopos()
         self.tree_image = SaveLoadPOPO(self.tree_image, self.tree_image_fn + self.class_names[0] + "dot_data.npy", "npy")
+        #self.top_words = SaveLoadPOPO(self.tree_image, self.tree_image_fn + self.class_names[0] + "dot_data.npy", "npy")
 
     def process(self):
         # Before we didnt save dictionaries with their types so this is necessary to convert those dicts
