@@ -122,6 +122,7 @@ doc_topic_prior=None, topic_word_prior=None, n_topics=None,
     if len(new_bow) != doc_amt:
         new_bow = new_bow.transpose()
         if len(new_bow) != doc_amt:
+            print(len(new_bow), doc_amt)
             raise ValueError("Bow is wrong shape")
 
     if len(words) != len(new_bow[0]):
@@ -273,7 +274,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
                                              bowmin,
                                              no_below, no_above, True, corp_save)
         bow = p_corpus.getBow()
-        word_list = p_corpus.getAllWords()
+        word_list = p_corpus.getId2Token()
         if word_list is None:
             raise ValueError("Word list is none")
         classes = p_corpus.getClasses()
@@ -326,7 +327,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree3", "DecisionTree2","DecisionTree1"]
-    data_types = ["newsgroups", "sentiment"]
+    data_types = ["movies"]
     doLR = False
     dminf = -1
     dmanf = -1

@@ -214,6 +214,7 @@ def cleanLargeCorpus(corpus_fn_to_stream, corpus_fn_to_save):
     space_table = str.maketrans(dict.fromkeys("\n\r", " "))
     punc_table = str.maketrans(dict.fromkeys(string.punctuation))
     stop_words = set(stopwords.words('english'))
+    c = 0
     with open(corpus_fn_to_save, 'a') as write_file:
         with open(corpus_fn_to_stream) as infile:
             for line in infile:
@@ -237,8 +238,10 @@ def cleanLargeCorpus(corpus_fn_to_stream, corpus_fn_to_save):
                 processed_line = " ".join(processed_line)
 
                 if len(processed_line) > 0:
+                    c += 1
                     write_file.write(processed_line + "\n")
                     print(processed_line)
+    print("Len of docs", c)
 class LimitWordsMaster(Method.Method):
 
     word_list = None
