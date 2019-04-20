@@ -89,7 +89,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
 
     dir_save = SaveLoad(rewrite=rewrite_all)
-    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
+    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False, rewrite_words=True)
     dir.process_and_save()
     binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     binary_bow[binary_bow >= 1] = 1
@@ -100,7 +100,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     for i in range(len(words)):
         new_word2id_dict[words[i]] = i
 
-    score_save = SaveLoad(rewrite=rewrite_all)
+    score_save = SaveLoad(rewrite=True)
     score = MultiClassScore(binary_bow, preds, None, file_name + "_" + str(no_below) + "_" + str(no_above) , processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
@@ -127,7 +127,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         raise ValueError("Dct has changed shape")
 
     # Get NDCG scores
-    ndcg_save = SaveLoad(rewrite=rewrite_all)
+    ndcg_save = SaveLoad(rewrite=True)
 
     if stream_rankings: #and no_below > 5000) or no_below > 10000:
         ndcg = GetNDCGStreamed(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
@@ -160,7 +160,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     fn_final = []
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
-        gtr_save = SaveLoad(rewrite=rewrite_all)
+        gtr_save = SaveLoad(rewrite=True)
         if stream_rankings:
             gtr = GetTopScoringRanksStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         else:
@@ -169,7 +169,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         fil_rank = gtr.getRank()
         fil_rank_fn = gtr.rank.file_name
 
-        gtd_save = SaveLoad(rewrite=rewrite_all)
+        gtd_save = SaveLoad(rewrite=True)
         gtd = GetTopScoringDirs(dir_fn, gtd_save, processed_folder + "directions/", score_array[i], top_scoring_dir,
                                     words, dirs, new_word2id_dict)
         gtd.process_and_save()
@@ -183,7 +183,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         if data_type == "placetypes" or data_type == "movies":
             dir_fn += "_" + name_of_class
         dir_fn += "_Fix"
-        hpam_save = SaveLoad(rewrite=True)
+        hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, model_type, dir_fn, processed_folder + "rank/", hpam_save,
                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test, feature_names=fil_words,
                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm, dim_names=fil_words)
@@ -428,8 +428,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["LinearSVM", "DecisionTreeNone"]
-    data_types = ["newsgroups"]
+    classifiers = ["DecisionTree3"]
+    data_types = ["placetypes"]
     doLR = False
     dminf = -1
     dmanf = -1
@@ -439,8 +439,8 @@ if __name__ == '__main__':
     rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [5000, 10000, 20000]
-            hp_top_dir = [1000, 2000]
+            hp_top_freq = [5000]
+            hp_top_dir = [1000]
         elif data_types[j] == "reuters":
             hp_top_freq = [5000, 10000, 20000]
             hp_top_dir = [1000, 2000]

@@ -328,14 +328,14 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree3", "DecisionTree2","DecisionTree1"]
-    data_types = ["movies"]
+    data_types = ["newsgroups", "reuters"]
     doLR = False
     dminf = -1
     dmanf = -1
 
     mcm = "OVR"
     bonus_fn = ""
-    rewrite_all = True
+    rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
             hp_top_freq = [None]
