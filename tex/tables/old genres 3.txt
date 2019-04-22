@@ -1,0 +1,1 @@
+0.911433511	0.444558478	0.381996821	0.528311008	0.383726726	../../data/processed/movies/directions/fil/num_stw_num_stw_200_MDS_ndcg_2000_20000_0_dir.npy

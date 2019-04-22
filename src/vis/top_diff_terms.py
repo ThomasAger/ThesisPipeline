@@ -1,8 +1,20 @@
 import numpy as np
-words1 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_D2V_ndcg_1000_10000_0_words.npy")
-words2 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_D2V_kappa_1000_10000_0_words.npy")
+
+# Get the terms unique to only that space-type
+
+dir1 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_MDS_f1_1000_20000_0_dir.npy")
+dir2 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_dir.npy")
+dir3 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_PCA_kappa_1000_5000_0_dir.npy")
+dir4 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_dir.npy")
+words1 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_MDS_f1_1000_20000_0_words.npy")
+words2 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_words.npy")
+words3 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_PCA_kappa_1000_5000_0_words.npy")
+words4 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")
 score1 = []
 score2 = []
+
+
+
 
 words_to_keep = []
 for i in range(len(words2)):
