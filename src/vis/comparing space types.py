@@ -26,8 +26,29 @@ def termsUniqueOnlyTo(this_array, all_other_arrays):
     remaining_inds = np.delete(inds, ids_to_del)
     return remaining_inds
 
+def termsCommonTo(arrays, amt_of_arrays):
+    ids_to_del = []
+    counts = []
+    for i in range(len(arrays)):
+        counts.append(arrays.count(arrays[i]))
+    common_ids = []
+    for i in range(len(counts)):
+        if counts[i] == amt_of_arrays:
+            common_ids.append(i)
+    common_ids = np.unique(common_ids)
+    return common_ids
 
+import sys
 
+def printPretty(word_array):
+    for k in range(len(word_array)):
+        if k == 0:
+            sys.stdout.write(word_array[k] + " (")
+        elif k != len(word_array) - 1:
+            sys.stdout.write(word_array[k] + ", ")
+        else:
+            sys.stdout.write(word_array[k])
+    sys.stdout.write(")\n")
 def contextualizeWords(words, word_directions, context_words, ctx_word_directions):
     word_arrays = []
     for i in range(len(words)):
@@ -35,7 +56,7 @@ def contextualizeWords(words, word_directions, context_words, ctx_word_direction
         word_arrays.append([words[i]])
         for j in inds:
             word_arrays[i].append(context_words[j])
-        print(word_arrays[i])
+        printPretty(word_arrays[i])
     return word_arrays
 # Get the terms unique to only that space-type
 """
@@ -48,26 +69,77 @@ words2 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_AW
 words3 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_PCA_kappa_1000_5000_0_words.npy")[:1000]
 words4 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")[:1000]
 """
-dir1 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_MDS_ndcg_1000_20000_0_dir.npy").transpose()
-dir2 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_dir.npy").transpose()
-dir3 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_PCA_ndcg_1000_5000_0_dir.npy").transpose()
-dir4 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_dir.npy").transpose()
-words1 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_MDS_ndcg_1000_20000_0_words.npy")
-words2 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_words.npy")
-words3 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_PCA_ndcg_1000_5000_0_words.npy")
-words4 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")
-words_to_get_amt = 500
-words_array = [words1[:words_to_get_amt], words2[:words_to_get_amt], words3[:words_to_get_amt], words4[:words_to_get_amt]]
-dir_array = [dir1[:words_to_get_amt], dir2[:words_to_get_amt], dir3[:words_to_get_amt], dir4[:words_to_get_amt]]
-ctx_dir_array = [dir1[:1000], dir2[:1000], dir3[:1000], dir4[:1000]]
-context_words_array = [words1[:1000], words2[:1000], words3[:1000], words4[:1000]]
-pairs = getPairs(*words_array)
+dir1 = np.load("../../data/processed/movies/directions/fil/num_stw_num_stw_50_MDS_ndcg_1000_20000_0_dir.npy").transpose()
+dir2 = np.load("../../data/processed/movies/directions/fil/num_stw_num_stw_50_PCA_ndcg_2000_20000_0_dir.npy").transpose()
+dir3 = np.load("../../data/processed/movies/directions/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_20000_0_dir.npy").transpose()
+words1 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_50_MDS_ndcg_1000_20000_0_words.npy")
+words2 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_50_PCA_ndcg_2000_20000_0_words.npy")
+words3 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_20000_0_words.npy")
+words_to_get_amt = 1000
+
+file_name = "comparing_mds_awv_fixed"
+words_array = np.asarray([words1[:words_to_get_amt], words3[:words_to_get_amt]])
+dir_array =np.asarray([dir1[:words_to_get_amt], dir3[:words_to_get_amt]])
+
+import os
+getDiff = False
 remaining_inds = []
-for i in range(len(pairs)):
-    remaining_inds.append(termsUniqueOnlyTo(*pairs[i]))
 words_with_context = []
-for i in range(len(remaining_inds)):
-    word_arrays = contextualizeWords(words_array[i][remaining_inds[i]], dir_array[i][remaining_inds[i]], context_words_array[i], ctx_dir_array[i])
-    words_with_context.append(word_arrays)
-    print(word_arrays)
-    print("---")
+ctx_path = "../../data/processed/movies/vis/words_with_ctx "+file_name+".npy"
+if os.path.exists(ctx_path) is True:
+    words_with_context = np.load(ctx_path)
+else:
+    pairs = getPairs(*words_array)
+    for i in range(len(pairs)):
+        remaining_inds.append(termsUniqueOnlyTo(*pairs[i]))
+    for i in range(len(remaining_inds)):
+        word_arrays = contextualizeWords(words_array[i][remaining_inds[i]], dir_array[i][remaining_inds[i]], words_array[i], dir_array[i])
+        words_with_context.append(word_arrays)
+        print("---")
+    np.save(ctx_path, words_with_context)
+
+common_path = "../../data/processed/movies/vis/common_words "+file_name+".npy"
+if os.path.exists(common_path) is True:
+    common_words_ctx = np.load(common_path)
+else:
+    all_array = np.concatenate(words_array)
+    all_dirs = np.concatenate(dir_array)
+    ids = termsCommonTo(all_array.tolist(), len(words_array))
+    print(ids)
+    common_words_ctx = contextualizeWords(all_array[ids], all_dirs[ids],  all_array, all_dirs)
+    np.save(common_path, common_words_ctx)
+common_words_ctx_concat = np.concatenate(common_words_ctx)
+
+print("---")
+matching_concept_ids = []
+for i in range(len(words_with_context)):
+    matching_concept_ids.append([])
+    for j in range(len(words_with_context[i])):
+        for z in range(len(words_with_context[i][j])):
+            for k in range(len(common_words_ctx_concat)):
+                if words_with_context[i][j][z] == common_words_ctx_concat[k]:
+                    matching_concept_ids[i].append(j)
+                    break
+        print(i, "/", len(words_with_context), j, "/", len(words_with_context[i]))
+
+true_uniques = []
+for i in range(len(matching_concept_ids)):
+    true_uniques.append(np.delete(words_with_context[i], matching_concept_ids[i], axis=0))
+
+for i in range(len(matching_concept_ids)):
+    matching_concept_ids[i] = np.unique(matching_concept_ids[i])
+fake_uniques = []
+for i in range(len(matching_concept_ids)):
+    fake_uniques.append(np.asarray(words_with_context[i])[matching_concept_ids[i]])
+
+print("true uniques")
+for i in range(len(true_uniques)):
+    for j in range(len(true_uniques[i])):
+        printPretty(true_uniques[i][j])
+    print("-----")
+
+print("fake uniques")
+for i in range(len(fake_uniques)):
+    for j in range(len(fake_uniques[i])):
+        printPretty(fake_uniques[i][j])
+    print("-----")
