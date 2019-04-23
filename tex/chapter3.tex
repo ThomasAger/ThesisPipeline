@@ -292,6 +292,21 @@ What are the differences and similarities between the clustering algorithms?
 
 IF directions are non informative, then use clustering to label them
 
+\subsection{Comparing Space Types}
+
+Comparing reps constructed from PPMI scores (MDS and PCA)
+
+We show terms unique to each domain type above. The terms are contextualized by finding the two closest term directions to the term. Here, we show the terms that are not duplicated in meaning for the other spaces. We can understand that the term 'gay (gays, homosexuality) has a similar meaning to the term 'homosexuality (gays, gay)' despite the term 'homosexuality' being high scored for one space, and the term 'gay' being highly scored for the other space. Almost all of the unique terms were of this variety. To demonstrate instead the unique meanings found in the individual spaces, we filter the results as follows: from the term and its associated descriptive terms found by getting the most similar terms, if those terms or any of the more similar terms occur in any of the terms or more similar terms in the space's top 1000 terms that we are comparing to, do not include those terms.
+
+We find that the 50-dimensional MDS space, which performs 0.04 F1 score higher on the genres task, finds many interesting and unique terms, which can potentially enable more nuanced decisions in the decision trees for classification. On the other hand, in the PCA space, we find terms that relate to metadata, and spanish language words. We argue that this means the MDS is better at finding unique interesting meanings than PCA, in the case of using a frequency-based BOW to create the representation.
+
+Comparing MDS and AWV
+
+We perform the same process as above but comparing MDS and AWV, and find that the PPMI-based representations have their own metadata in the representation that is elevated. We can assume that the AWV space does not contain these metadata as there are simply not word-vectors available for these terms. Although, we also find unique terms that are likely to help performance on natural domain tasks for the MDS space, e.g. goodfellas, disgusting, swashbuckling. Interestingly, for the AWV space we find similar spanish-language terms, but also find some new concepts, in particular the 'republican' and 'yoga' directions.
+
+Comparing PPMI representations to doc2vec
+
+The previous two experiments were conducted with the IMDB movies dataset, but the doc2vec space is not available for that dataset, as the original text corpus was not made available by the authors. Because of this, we choose to compare the PCA representation for the sentiment space and the Doc2Vec representation for the sentiment space, as these are still IMDB movie reviews, but instead with reviews as documents rather than compilations of reviews as documents, we can expect different directions to be important but still use our knowledge of movies and reviews to inform us, which would be difficult for the newsgroups or reuters representations which are mostly composed of archaic syntax. 
 
 \subsection{Datasets}
 
