@@ -69,12 +69,12 @@ words2 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_AW
 words3 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_PCA_kappa_1000_5000_0_words.npy")[:1000]
 words4 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")[:1000]
 """
-dir1 = np.load("../../data/processed/sentiment/directions/fil/num_stw_num_stw_100_D2V_ndcg_1000_10000_0_dir.npy").transpose()
-dir2 = np.load("../../data/processed/sentiment/directions/fil/num_stw_num_stw_100_PCA_ndcg_2000_20000_0_dir.npy").transpose()
-dir3 = np.load("../../data/processed/sentiment/directions/fil/num_stw_num_stw_100_AWVEmp_ndcg_1000_20000_0_dir.npy").transpose()
-words1 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_D2V_ndcg_1000_10000_0_words.npy")
-words2 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_PCA_ndcg_2000_20000_0_words.npy")
-words3 = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_AWVEmp_ndcg_1000_20000_0_words.npy")
+
+
+dir1 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_MDS_f1_1000_20000_0_dir.npy").transpose()
+dir2 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_dir.npy").transpose()
+words1 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_MDS_f1_1000_20000_0_words.npy")
+words2 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")
 words_to_get_amt = 1000
 
 file_name = "comparing_mds_awv_fixed"
@@ -85,7 +85,7 @@ import os
 getDiff = False
 remaining_inds = []
 words_with_context = []
-ctx_path = "../../data/processed/sentiment/vis/words_with_ctx "+file_name+".npy"
+ctx_path = "../../data/processed/newsgroups/vis/words_with_ctx "+file_name+".npy"
 if os.path.exists(ctx_path) is True:
     words_with_context = np.load(ctx_path)
 else:
@@ -98,7 +98,7 @@ else:
         print("---")
     np.save(ctx_path, words_with_context)
 
-common_path = "../../data/processed/sentiment/vis/common_words "+file_name+".npy"
+common_path = "../../data/processed/newsgroups/vis/common_words "+file_name+".npy"
 if os.path.exists(common_path) is True:
     common_words_ctx = np.load(common_path)
 else:
