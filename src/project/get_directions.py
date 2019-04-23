@@ -112,7 +112,7 @@ class GetDirections(Method.Method):
         words = np.empty(len(list(self.new_word_dict.keys())), dtype=object)
         for key, value in self.new_word_dict.items():
             words[value] = key
-        self.words.value = list(self.new_word_dict.keys())
+        self.words.value = np.asarray(list(self.new_word_dict.keys()))
         super().process()
 
     def getDirections(self):
