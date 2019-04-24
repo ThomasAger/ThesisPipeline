@@ -89,7 +89,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
 
     dir_save = SaveLoad(rewrite=rewrite_all)
-    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False, rewrite_words=True)
+    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
     binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     binary_bow[binary_bow >= 1] = 1
