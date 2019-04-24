@@ -69,23 +69,27 @@ words2 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_AW
 words3 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_PCA_kappa_1000_5000_0_words.npy")[:1000]
 words4 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")[:1000]
 """
-dir1 = np.load("../../data/processed/movies/directions/fil/num_stw_num_stw_50_MDS_ndcg_1000_20000_0_dir.npy").transpose()
-dir2 = np.load("../../data/processed/movies/directions/fil/num_stw_num_stw_50_PCA_ndcg_2000_20000_0_dir.npy").transpose()
-dir3 = np.load("../../data/processed/movies/directions/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_20000_0_dir.npy").transpose()
-words1 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_50_MDS_ndcg_1000_20000_0_words.npy")
-words2 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_50_PCA_ndcg_2000_20000_0_words.npy")
-words3 = np.load("../../data/processed/movies/rank/fil/num_stw_num_stw_50_AWVEmp_ndcg_2000_20000_0_words.npy")
+
+data_type_1 = "sentiment"
+data_type_2 = "sentiment"
+
+first_fn = "100_D2V_ndcg_1000_10000_0_"
+second_fn = "100_PCA_ndcg_1000_10000_0_"
+dir1 = np.load("../../data/processed/"+data_type_1+"/directions/fil/num_stw_num_stw_"+first_fn+"dir.npy").transpose()
+dir2 = np.load("../../data/processed/"+data_type_2+"/directions/fil/num_stw_num_stw_"+second_fn+"dir.npy").transpose()
+words1 = np.load("../../data/processed/"+data_type_1+"/rank/fil/num_stw_num_stw_"+first_fn+"words.npy")
+words2 = np.load("../../data/processed/"+data_type_2+"/rank/fil/num_stw_num_stw_"+second_fn+"words.npy")
 words_to_get_amt = 1000
 
-file_name = "comparing_all"
-words_array = np.asarray([words1[:words_to_get_amt], words2[:words_to_get_amt], words3[:words_to_get_amt]])
-dir_array =np.asarray([dir1[:words_to_get_amt], dir2[:words_to_get_amt] ,dir3[:words_to_get_amt]])
+file_name = data_type_1 + data_type_2 + first_fn + second_fn
+words_array = np.asarray([words1[:words_to_get_amt], words2[:words_to_get_amt]])
+dir_array =np.asarray([dir1[:words_to_get_amt], dir2[:words_to_get_amt]])
 
 import os
 getDiff = False
 remaining_inds = []
 words_with_context = []
-ctx_path = "../../data/processed/movies/vis/words_with_ctx "+file_name+".npy"
+ctx_path = "../../data/processed/newsgroups/vis/words_with_ctx "+file_name+".npy"
 if os.path.exists(ctx_path) is True:
     words_with_context = np.load(ctx_path)
 else:
@@ -98,7 +102,7 @@ else:
         print("---")
     np.save(ctx_path, words_with_context)
 
-common_path = "../../data/processed/movies/vis/common_words "+file_name+".npy"
+common_path = "../../data/processed/newsgroups/vis/common_words "+file_name+".npy"
 if os.path.exists(common_path) is True:
     common_words_ctx = np.load(common_path)
 else:
