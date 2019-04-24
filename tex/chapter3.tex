@@ -256,6 +256,55 @@ We choose our first cluster centroid by taking the top-scoring direction for its
 %Our overall aim is to find directions in the semantic space that model salient features of the considered domain. For example, given a semantic space of movies, we would like to find a direction that models the extent to which each movie is scary, among others. Such a direction would then allow us to rank movies from the least scary to the most scary. We will refer to such directions as \emph{feature directions}. Formally, each feature direction will be modelled as a vector $v_f$. However, we refer to \emph{directions} rather than \emph{vectors} to emphasize their intended ordinal meaning: feature directions are aimed at ranking objects rather than e.g.\ measuring degrees of similarity. 
 \subsection{Qualitative Results}
 
+\subsubsection{The best-performing directions for each space type}
+
+What are the domains that best convey the similarities and differences between different domains?
+
+1. Find domains that act differently (perhaps one domain where a space-type that is not usually scoring high is scoring high, big differences in F1)
+2. Get interesting directions from those domains
+
+\begin{landscape}
+	\begin{table}[]
+		\scriptsize
+		\begin{tabular}{lllll}
+			\textbf{Movies} \textit{(50 MDS NDCG)}        & \textbf{Sentiment} \textit{(100 D2V NDCG)}   & \textbf{Newsgroups} \textit{(50 D2V NDCG)} 			  & \textbf{Place-types} \textit{(50 PCA Kappa)}	 						 & \textbf{Reuters} \textit{(200 MDS NDCG)}       \\
+			horror (scares, scary)               & glenda (glen, matthau)         & karabag (iranian, turkiye)                 & blackcountry (listed, westmidlands)     & franklin (fund, mthly)            \\
+			hilarious (funniest, hilarity)       & scarlett (gable, dalton)       & leftover (flaming, vancouver)              & ears (stare, adorable)                  & quarterly (shearson, basis)       \\
+			bollywood (hindi, india)             & giallo (argento, fulci)        & wk (5173552178, 18084tmibmclmsuedu)        & spagna (espanha, colores)               & feb (28, splits)                  \\
+			laughs (funnier, funniest)           & bourne (damon, cusack)         & 1069 (mlud, wibbled)                       & oldfashioned (winery, antiques)         & 22 (booked, hong)                 \\
+			jokes (gags, laughs)                 & piper (omen, knightley)        & providence (norris, ahl)                   & gardening (greenhouse, petals)          & april (monthly, average)          \\
+			comedies (comedic, laughs)           & casper (dolph, damme)          & celestial (interplanetary, bible)          & pagoda (hindu, carved)                  & sets (principally, precious)      \\
+			hindi (bollywood, india)             & norris (chuck, rangers)        & mlud (wibbled, 1069)                       & artificial (saturation, cs4)            & 16 (creditor, trillion)           \\
+			war (military, army)                 & holmes (sherlock, rathbone)    & endif (olwm, ciphertext)                   & inner (curved, rooftops)                & 1st (qtr, pennsylvania)           \\
+			western (outlaw, unforgiven)         & rourke (mickey, walken)        & gd3004 (35894, intergraph)                 & celebrate (festive, celebrity)          & 26 (approve, inadequate)          \\
+			romantic (romance, chemistry)        & ustinov (warden, cassavetes)   & rtfmmitedu (newsanswers, ieee)             & vietnamese (ethnic, hindu)              & 23 (offsetting, weekly)           \\
+			songs (song, tunes)                  & scooby (doo, garfield)         & eng (padres, makefile)                     & cn (elevated, amtrak)                   & prior (recapitalization, payment) \\
+			sci (science, outer)                 & doo (scooby, garfield)         & pizza (bait, wiretap)                      & mannequin (bags, jewelry)               & avg (shrs, shr)                   \\
+			funniest (hilarious, funnier)        & heston (charlton, palance)     & porsche (nanao, mercedes)                  & falcon (r, 22)                          & june (july, venice)               \\
+			noir (noirs, bogart)                 & homer (pacino, macy)           & gebcadredslpittedu (n3jxp, skepticism)     & jewish (monuments, cobblestone)         & march (31, day)                   \\
+			documentary (documentaries, footage) & welles (orson, kane)           & scsi2 (scsi, cooling)                      & canon60d (kitlens, 600d)                & regular (diesel, petrol)          \\
+			animation (animated, animators)      & frost (snowman, damme)         & playback (quicktime, xmotif)               & reflective (curved, cropped)            & 4th (qtr, fourth)                 \\
+			adults (adult, children)             & streisand (bridget, salman)    & 35894 (gd3004, medin)                      & mason (edward, will)                    & 27 (chemlawn, theyre)             \\
+			creepy (spooky, scary)               & davies (rhys, marion)          & diesel (volvo, shotguns)                   & aerialview (manmade, largest)           & 14 (borrowing, borrowings)        \\
+			gay (gays, homosexuality)            & cinderella (fairy, stepmother) & evolutionary (shifting, hulk)              & shelf (rack, boxes)                     & 11 (chapter, ranged)              \\
+			workout (intermediate, instruction)  & boll (uwe, belushi)            & techniciandr (obp, 144k)                   & monroe (raleigh, jefferson)             & may (probably, however)           \\
+			thriller (thrillers, suspense)       & rochester (eyre, dalton)       & 8177 (obp, 144k)                           & litter (fujichrome, e6)                 & 38 (33, strong)                   \\
+			funnier (laughs, funniest)           & edie (soprano, vertigo)        & shaw (medicine, ottoman)                   & streetlights (streetlamp, headlights)   & m1 (m2, m3)                       \\
+			suspense (suspenseful, thrillers)    & scarecrow (zombies, reese)     & scorer (gilmour, lindros)                  & carlzeiss (f2, voigtlander)             & dlr (writedown, debt)             \\
+			arts (hong, chan)                    & kramer (streep, meryl)         & xwd (xloadimage, openwindows)              & manmade (aerialview, below)             & five (years, jones)               \\
+			christianity (religious, religion)   & marty (amitabh, goldie)        & ee (275, xloadimage)                       & demolished (neglected, rundown)         & bushels (soybeans, ccc)           \\
+			musical (singing, sing)              & columbo (falk, garfield)       & com2 (com1, v32bis)                        & wald (berge, wildflower)                & revs (net, 3for2)                 \\
+			gore (gory, blood)                   & kidman (nicole, jude)          & examiner (corpses, brass)                  & arquitetura (exposition, cidade)        & 29 (175, include)                 \\
+			animated (animation, cartoon)        & juliet (romeo, troma)          & migraine (ama, placebo)                    & greyscale (highcontrast, monochromatic) & acquisition (make, usairs)        \\
+			gags (jokes, slapstick)              & garland (judy, lily)           & parliament (parliamentary, armored)        & alameda (monday, marin)                 & payable (div, close)              \\
+			sexual (sexually, sexuality)         & hawn (goldie, matthau)         & manhattan (bobbeviceicotekcom, beauchaine) & button (monday, only)                   & 13 (dlrsbbl, groups)             
+			          
+		\end{tabular}
+		\caption{Table}
+	\end{table}
+\end{landscape}
+
+
 Start chucking in real world examples here.
 
 Do certain spaces perform better across multiple domains?
@@ -281,10 +330,7 @@ What are the domain(s?) and space type(s?) that best conveys the differences and
 1. Find the domain with the largest differences between score types
 2. Compare and contrast directions in those score types for that domain
 
-What are the domains that best convey the similarities and differences between different domains?
 
-1. Find domains that act differently (perhaps one domain where a space-type that is not usually scoring high is scoring high, big differences in F1)
-2. Get interesting directions from those domains
 
 What are the differences and similarities between the clustering algorithms?
 
@@ -296,10 +342,13 @@ IF directions are non informative, then use clustering to label them
 
 \subsubsection{Comparing IMDB Movie Reviews to Concatenated Movie Reviews from a variety of sources}
 
+\subsection{Score Types}
+
+
 
 \subsection{Comparing Space Types}
 
-We begin by selecting the space that performed well on the genres task for the movies, with the understanding that genres as a key natural classification task will likely make use of good directions that correspond to domain knowledge. After selecting this space, we choose similarly sized spaces from the other space-types, in this case we selected the 50 dimensional MDS space as it performed the best and from there, we selected the 50 dimensional PCA space and AWV space. We approach these qualitative experiments with the following idea: spaces that perform better on natural domain tasks using decision trees contain unique natural directions that other spaces do not have. 
+We begin by selecting the space that performed well on the genres task for the movies, with the understanding that genres as a key natural classification task will likely make use of good directions that correspond to domain knowledge. After selecting this space, we choose similarly sized spaces from the other space-types, in this case we selected the 50 dimensional MDS space as it performed the best and from there, we selected the 50 dimensional PCA space and AWV space. We also use the same score-type and frequency cut-off as the best performing space-type. This means that we are sometimes using a slightly worse performing space-type than the one we used as our final results, and that the original space has a performance advantage, but we have chosen to do so to make the results more consistent and specific. We approach these qualitative experiments with the following idea: spaces that perform better on natural domain tasks using decision trees contain unique natural directions that other spaces do not have. 
 
 The commonalities between spaces are much more prevalent than the differences, with natural concepts of the domain being represented in all of the different space types. However, different spaces do perform better than others on natural domain tasks. In this section, we investigate why this occurs and the differences between spaces built using a standard frequency-based approach, word-vectors and doc2vec, which uses a combination of contextual information and word vectors. 
 
@@ -315,13 +364,15 @@ We perform the same process as above but comparing MDS and AWV, and find that th
 
 \subsubsection{Comparing PPMI representations to doc2vec}
 
-The previous two experiments were conducted with the IMDB movies dataset, but the doc2vec space is not available for that dataset, as the original text corpus was not made available by the authors. Because of this, we choose to compare the PCA representation for the sentiment space and the Doc2Vec representation for the sentiment space, as these are still IMDB movie reviews, but instead with reviews as documents rather than compilations of reviews as documents, we can expect different directions to be important but still use our knowledge of movies and reviews to inform us, which would be difficult for the newsgroups or reuters representations which are mostly composed of archaic syntax. We take the 100 dimensional D2V space and the 100 dimensional PCA space. 
+The previous two experiments were conducted with the IMDB movies dataset, but the doc2vec space is not available for that dataset, as the original text corpus was not made available by the authors. Because of this, we choose to compare the PCA representation for the sentiment space and the Doc2Vec representation for the sentiment space, as these are still IMDB movie reviews, but instead with reviews as documents rather than compilations of reviews as documents, we can expect different directions to be important but still use our knowledge of movies and reviews to inform us. We take the 100 dimensional D2V space and the 100 dimensional PCA space, both of which perform best using the ndcg scoring type which we do not change.
 
 The assumption going into this analysis was that, in the same way that the AWV space does not contain metadata that is not present in the word-vectors, as will the Doc2Vec space not be informed especially by that metadata. Further, as in this case the D2V space outperforms the PCA space on the sentiment task, we also expect that by using word-context to produce the representation, we are able to find better sentiment information directions, for example by better understanding sarcasm. Additionally, the benefit of word-vectors is likely to play into this space in a positive way, informing the representation based on global context. 
 
 When looking at these directions, we can split the terms into two types. The names of things, and conceptual properties about movies. For the doc2vec space, the names largely dominate the unique terms list, which we can understand to mean that these terms used contextually and in the broader global context from the word-vectors is informative enough in the doc2vec space to be usefully represented. For the PCA space, there are still these unique names found, but there are less overall terms and it's a bit more balanced between concepts and names. 
 
-As this was not particularly conclusive, we additionally compare the MDS representation for the newsgroups and the Doc2Vec representation. We chose the newsgroups in this case because the matters discussed on those newsgroups can be summed up into meaningful domain knowledge, and are not as difficult to interpret for a layman to the field as the reuters newswires, which are dominated by syntax and numbers. 
+For some additional examples, we compare the MDS representation for the newsgroups and the Doc2Vec representation. The MDS performed best with F1, but we compare it to NDCG, as that is what the doc2vec space performs best with.
+
+
 
 \subsection{Datasets}
 

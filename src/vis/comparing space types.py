@@ -70,14 +70,18 @@ words3 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_PC
 words4 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")[:1000]
 """
 
+data_type_1 = "sentiment"
+data_type_2 = "sentiment"
 
-dir1 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_MDS_f1_1000_20000_0_dir.npy").transpose()
-dir2 = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_dir.npy").transpose()
-words1 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_MDS_f1_1000_20000_0_words.npy")
-words2 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")
+first_fn = "100_D2V_ndcg_1000_10000_0_"
+second_fn = "100_PCA_ndcg_1000_10000_0_"
+dir1 = np.load("../../data/processed/"+data_type_1+"/directions/fil/num_stw_num_stw_"+first_fn+"dir.npy").transpose()
+dir2 = np.load("../../data/processed/"+data_type_2+"/directions/fil/num_stw_num_stw_"+second_fn+"dir.npy").transpose()
+words1 = np.load("../../data/processed/"+data_type_1+"/rank/fil/num_stw_num_stw_"+first_fn+"words.npy")
+words2 = np.load("../../data/processed/"+data_type_2+"/rank/fil/num_stw_num_stw_"+second_fn+"words.npy")
 words_to_get_amt = 1000
 
-file_name = "comparing_mds_awv_fixed"
+file_name = data_type_1 + data_type_2 + first_fn + second_fn
 words_array = np.asarray([words1[:words_to_get_amt], words2[:words_to_get_amt]])
 dir_array =np.asarray([dir1[:words_to_get_amt], dir2[:words_to_get_amt]])
 
