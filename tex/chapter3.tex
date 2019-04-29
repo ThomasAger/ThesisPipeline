@@ -254,9 +254,126 @@ We choose our first cluster centroid by taking the top-scoring direction for its
 %\noindent \textbf{Hdbscan}
 
 %Our overall aim is to find directions in the semantic space that model salient features of the considered domain. For example, given a semantic space of movies, we would like to find a direction that models the extent to which each movie is scary, among others. Such a direction would then allow us to rank movies from the least scary to the most scary. We will refer to such directions as \emph{feature directions}. Formally, each feature direction will be modelled as a vector $v_f$. However, we refer to \emph{directions} rather than \emph{vectors} to emphasize their intended ordinal meaning: feature directions are aimed at ranking objects rather than e.g.\ measuring degrees of similarity. 
-\subsection{Qualitative Results}
+\section{Quantitative Results}
 
-\subsubsection{The best-performing directions for each space type}
+
+\subsection{Datasets}
+
+We use five different domains:
+
+Newsgroups, originally containing 18,846 documents, is preprocessed using sklearn to remove headers, footers and quotes. Then, empty and duplicate documents are removed, resulting in 18302 documents. The vocabulary size is 141,321. The data is not shuffled. After filtering out terms that did not occur in at least 1/1000 documents, we ended up with a vocabulary of size 51,064.
+
+Sentiment is dataset where documents are reviews, containing 50,000 documents with a vocabulary size of 78588. After removing terms that did not occur in at least 1/1000 documents, we ended up with a vocab of size 55384. Notably, this means that we removed all terms that did not occur in 50 documents for the sentiment, and in 18 documents for the newsgroups, and newsgroups began with a larger vocabulary than sentiment, but the ending vocabularies were about the same. This means that the terms in the newsgroups were more sparse than sentiment. In other words, newsgroups contained many terms that were not relevant to a majority of the documents. This is unsurprising, as it is a collection of 20 different newsgroups, rather than one single domain.
+
+Reuters is a dataset of reuters news wires, originally containing 10788 documents. After removing empty and duplicate documents, we end-up with 10655 documents. It originally contained 90 classes, but as they were extremely unbalanced we removed all classes that did not have at least 100 positive instances, resulting in 21 classes. The original vocabulary size is 51,0001, and after removing all words that do not occur in at least 10 documents, the vocabulary size is 22542. 
+
+Placetypes is a data-set of flickr tags, taken from the previous work \cite{Derrac2015}. It originally has a vocabulary size of 746527, and has 1383 documents. This is a very large vocabulary size to document ratio. The end vocabulary for this space was 100,000, meeting our hard limit. This is roughly equivalent to removing all documents that would not be in at least 6 documents.
+
+Movies is a dataset where each document is a movie represneted by all of its reviews concatenated across a number of sources. It starts off with a vocabulary size of 551,080 and a document size of 15,000. However, after investigating the data made available by the authors, we found that there were a number of duplicate documents. After removing these duplicate documents, we end-up with 13978 documents. In the same way as the movies, we limit the vocabulary size at 100,000.
+
+\subsection{Semantic Spaces}
+In this section, we explain how we obtained four different Semantic Spaces. \label{ch3:Method}
+% Basic explanation of why quantitative results are interesting, valuable, good etc
+
+As the newsgroups contained empty documents after removing all words that do not occur in at least 2 documents, we have removed these empty documents, leaving us with 18302 overall documents. Following this, instead of using the train split as determined by previous literature, we did a simple 2/3 train/test split the same as our IMDB dataset.
+
+This section focuses on using low-depth Decision Tree classifiers to determine how well our method represents domain knowledge compared to standard baselines. We can understand that an accurate representation of domain knowledge will be one that ensures semantically distinct entities are separated, and semantically similar entities are close together. Put another way, if the space is representing domain knowledge well we can expect that the space should be linearly separable for key semantics of the domain. For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, where Horror movies are spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/genres_separated.png}
+	\centering
+	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{figure:genres_separated}
+\end{figure}
+
+\begin{table}[]
+	\begin{tabular}{ll}
+		& Top PPMI scoring terms                                                \\
+		Example Horror Entity      & Term term term term term term term term term term term term term term \\
+		Similar Horror Entity      & Term term term term term term term term term term term term term term \\
+		Somewhere Inbetween Entity & Term term term term term term term term term term term term term term \\
+		Romance Movie              & Term term term term term term term term term term term term term term \\
+		Similar Romance movie      & Term term term term term term term term term term term term term term
+	\end{tabular}
+\caption{Two of the following entities: Those classified as horror, those classified as horror and romance, and those classified as romance with their associated highest value PPMI terms. We show the highest positive instances here as the representation is sparse, even though we can also expect the terms that are low scoring to be similar too.}
+\label{table:PPMI_example}
+\end{table}
+
+When selecting the parameters to use for the doc2vec space when obtaining directions, we choose the one that scored the highest for its class on a Linear SVM, rather than tuning the entire process around the doc2vecs vectors.
+%We use the kind of multiclass strategy as a hyper-parameter for each class-type in the grid search. We test the OneVsOne classifier method, treating each as binary problems, the OneVsRest method and the OutputCode method.
+We are not able to obtain an MDS space for sentiment or doc2vec spaces for placetypes/movies.
+
+We obtain results with just these spaces as input, and additionally results for a bag-of-words PPMI representation. These results act as our baselines for quantitative results, in addition to a Topic Model. We find results using a Linear SVM, and a Decision Tree with an unlimited depth, a depth of 3, a depth of 2, and a depth of 1. Each SVM is tuned using a grid search for the optimal C value, and whether or not to balance the classes. For all trees we attempt to find the best value between [None, 'auto', 'log2'], and additionally try differnet criterion, either the gini score or the information entropy score. In the same way as the SVM's, we include whether or not to balance the classes in the grid search.
+
+\subsection{Word Directions}
+The binary BOW representation for each word that has not been removed by the frequency cut-off is used as a target for a linear SVM, with a Semantic Space as features. We use the scikit-learn libraries LinearSVC implementation with a default C value (1.0). We balance the classes, as many of the binary BOW representations are sparse, and use the primal formulation. %Does this need to be explained more?
+
+We obtain results for the rankings induced from these word directions on Decision Tree's limited to a depth of 3 in-order to select the best parameters when using directions for each class. The parameters that we want to determine are the type of Semantic Space, the size of the space, the frequency threshold and the score threshold. To do so, for each space-type of each size, we use a grid search to find the best frequency and score cut-offs for that sized space-type. Then, we select from these space-types and sizes the best performing one. We can understand there to be a balance between finding words which are useful for creating salient features in our clustering step without including too many words which do not. As our clustering methods are unsupervised, it is important that we try and limit the amount of junk being entered into them, despite the classifiers that use these directions typically being able to filter out those directions which are not suitable to the class. Additionally, as the vocabulary size varies from dataset to dataset, the threshold will naturally be different for each one. 
+
+These results allow us to choose for each class, the best Semantic Space and Scoring-type for that class. For all trees we use grid search to find the best values for the criterion, either the gini score or the information entropy score, the maximum amount of features between [None, 'auto', 'log2'], and additionally, we include whether or not to balance the classes in the grid search.
+
+%What is the importance of the space size?
+%What is the importance of the space type?
+%How do directions perform compared to spaces? Why?
+%What kind of directions do we find for each score type?
+%Why does the score type matter? What score type works best?
+
+
+Next, we test single directions, attempting to find a good amount of directions to cluster and not including words which may hamper the unsupervised classification, as well as the best space-type for each domain. We found that generally, X was the best space and as expected classifiers performed better with more data, so we use 20000 as our frequency cutoff and 2000 as our score cutoff. These single directions typically overfit.
+
+
+\subsection{Clustered Directions}
+We continue with the optimal space and score-type chosen by our single direction experiments, and use the same frequency and score thresholds as before. We then experiment with two different clustering algorithms: Derrac and K-Means. As these algorithms select centroids from the top-scoring directions or randomly, we can expect that some clusters may not be salient features of the space. This is because top-scoring directions, e.g. for accuracy could simply infrequent terms that do not have much meaning, and these infrequehnt terms could also be randomly selected. We could use grid-search on the frequency and score cutoffs when obtaining these results in order to avoid terms that may disrupt existing clusters or form cluster centers that are not salient features of the space, but we chose a more standardized process that would rely on the parameters of the clustering algorithms and the ability of the classifiers to filter out clusters that are not informative, so as to not make a time-costly grid search a necessary part of the process.
+
+With that in mind, we use three clustering algorithms.
+
+Mini batch K-means, implemented by scikit-learn \footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}, introduced by \cite{Sculley2010} and kmeans++ to initialize \cite{Arthur}
+
+\subsubsection{Quantitative Results}
+In Figure \ref{IntroDecisionTree}, we demonstrate how depth could affect a Decision Tree that uses salient feature-directions. 
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/decisiontree.png}
+	\centering
+	\caption{This figure shows an example tree from one of our classifiers. Here, we can see that the model increases in complexity as it increases in depth. In this case, we end-up getting better F-score with just a depth-one tree, as the tree begins to overfit at depth three.  }\label{IntroDecisionTree}
+\end{figure}
+
+\begin{landscape}
+\begin{table}[]
+	\begin{tabular}{llllllllllll}
+                  & Genres     &       &       & Keywords  &       &       & Ratings  &       &       &  &  \\
+Movies            & D1         & D2    & D3    & D1        & D2    & D3    & D1       & D2    & D3    &  &  \\
+Space             & 0.301      & 0.358 & 0.354 & 0.185     & 0.198 & 0.201 & 0.463    & 0.475 & 0.486 &  &  \\
+Single directions & 0.436      & 0.463 & 0.492 & 0.230     & N/A   & N/A   & 0.466    & N/A   & N/A   &  &  \\
+Clusters          & N/A        & N/A   & 0.518 & N/A       & N/A   & N/A   & N/A      & N/A   & N/A   &  &  \\
+& Newsgroups &       &       & Sentiment &       &       & Reuters  &       &       &  &  \\
+Rep               & 0.251      & 0.366 & 0.356 & 0.705     & 0.770 & 0.773 & 0.328    & 0.413 & 0.501 &  &  \\
+Single dir        & 0.418      & 0.490 & 0.537 & 0.784     & 0.814 & 0.821 & 0.678    & 0.706 & 0.720 &  &  \\
+Cluster           & 0.394      & 0.433 & 0.513 & 0.735     & 0.844 & 0.813 & 0.456    & 0.569 & 0.583 &  &  \\
+& Foursquare &       &       & OpenCYC   &       &       & Geonames &       &       &  &  \\
+Placetypes        & D1         & D2    & D3    & D1        & D2    & D3    & D1       & D2    & D3    &  &  \\
+Rep               & 0.438      & 0.478 & 0.454 & 0.383     & 0.397 & 0.396 & 0.349    & 0.340 & 0.367 &  &  \\
+Single dir        & 0.541      & 0.498 & 0.531 & 0.404     & 0.428 & 0.390 & 0.444    & 0.533 & 0.473 &  &  \\
+Cluster           & 0.462      & 0.507 & 0.496 & 0.413     & 0.420 & 0.429 & 0.444    & 0.458 & 0.470 &  &  \\
+	\end{tabular}\caption{Best-scoring results for each type.}
+\end{table}
+\end{landscape}
+
+\section{Qualitative Results}
+
+
+Make reference to the qualitative results found in the previous work here.
+
+
+\subsection{Examining the differences between directions}
+
+Investigating three potential hypothesis:
+1. The ranks are more accurate, so the key directions are better represented that would contribute
+2. The spaces/score-types contain unique directions that contribute to the tree directly
+3. The spaces/score-types influence the rankings so that they are better represented, but are not directly used in the tree
+
+First, we look at the best scoring directions. Then, we look at the unique directions for each space-type and score-type. The section is then followed by conclusions, and we begin to look into the clusters.
+
+\subsection{The best-performing directions for each space type}
 
 What are the domains that best convey the similarities and differences between different domains?
 
@@ -296,87 +413,164 @@ What are the domains that best convey the similarities and differences between d
 			musical (singing, sing)              & columbo (falk, garfield)       & com2 (com1, v32bis)                        & wald (berge, wildflower)                & revs (net, 3for2)                 \\
 			gore (gory, blood)                   & kidman (nicole, jude)          & examiner (corpses, brass)                  & arquitetura (exposition, cidade)        & 29 (175, include)                 \\
 			animated (animation, cartoon)        & juliet (romeo, troma)          & migraine (ama, placebo)                    & greyscale (highcontrast, monochromatic) & acquisition (make, usairs)        \\
-			gags (jokes, slapstick)              & garland (judy, lily)           & parliament (parliamentary, armored)        & alameda (monday, marin)                 & payable (div, close)              \\
-			sexual (sexually, sexuality)         & hawn (goldie, matthau)         & manhattan (bobbeviceicotekcom, beauchaine) & button (monday, only)                   & 13 (dlrsbbl, groups)             
-			          
+			gags (jokes, slapstick)              & garland (judy, lily)           & parliament (parliamentary, armored)        & alameda (monday, marin)                 & payable (div, close)              \\          
+			
 		\end{tabular}
 		\caption{Table}
 	\end{table}
 \end{landscape}
 
 
-Start chucking in real world examples here.
-
-Do certain spaces perform better across multiple domains?
-What are the differences between spaces in terms of the features they represent? How does that relate to their domain performance?
-What are the differences between score types? How does that relate to their domain performance?
-How does performance on pure representation dimensions relate to performance on single dirs/clusters?
-What kind of similarities are there between domains? What kind of differences?
-What similarities are there between score types?
-What are the differences in directions between domains? Do we find different kinds of properties? How does it relate to vocabulary size or document amount?
-How do the directions in particular between a doc2vec space, trained on context, differ from one trained on PPMI?
-
-
-What are the domain(s?) that best conveys the differences and similarities between different space types?
-	Movies, unless...
-		Do different domains have more differences between space types? Theories:
-			1. Large differences in scoring for a particular domain will be indicative
-			
-1. Find the domain which has the largest score differences between two reasonably scoring space types (so not AWV..)
-2. Compare and contrast the directions found in those space types. 
-
-What are the domain(s?) and space type(s?) that best conveys the differences and similarities between different score types?
-
-1. Find the domain with the largest differences between score types
-2. Compare and contrast directions in those score types for that domain
-
-
-
-What are the differences and similarities between the clustering algorithms?
-
-1. Find domain with the largest difference between clustering options
-
-IF directions are non informative, then use clustering to label them
-
 \subsection{How Domain Directions Differ}
 
-\subsubsection{Comparing IMDB Movie Reviews to Concatenated Movie Reviews from a variety of sources}
+For the single directions, arrange them by score where the highest scoring directions are at the top. For the clusters, there is no convenient way to organize them without bias, so clusters that are interesting are selected.
 
-\subsection{Score Types}
+\subsubsection{Score Types}
 
+There are unique directions for each different space type, each suitable to different tasks. NDCG was selected as the best score-type for Sentiment, Newsgroups, Reuters, Movies Genres, Movies Keywords in depth-3 Decision Trees. Place-types foursquare used F1-score, but the classes are very unbalanced and there are few documents. 
+\begin{landscape}
+\begin{table}[]
+	\scriptsize
+	\begin{tabular}{lllll}
+		\textbf{NDCG}                     & \textbf{F1}            		     & \textbf{Accuracy}    				   & \textbf{Kappa}                     & \textbf{Common}                               \\
+		gay \textit{(homosexuality, sexuality)}    & company \textit{(sell, pay)}              & kennedy \textit{(republic, elected)}             & definately \textit{(alot, awesome)}         & horror \textit{(scares, scares)}              \\
+		arts \textit{(hong, chan)}                 & street \textit{(city, york)}              & bags \textit{(listened, salvation)}              & guns \textit{(gun, shoot)}                  & laughs \textit{(funnier, funnier)}            \\
+		sports \textit{(win, players)}             & red \textit{(numerous, fashion)}          & summers \textit{(verge, medieval)}               & flawless \textit{(perfection, brilliantly)} & jokes \textit{(gags, gags)}                   \\
+		apes \textit{(remembered, planet)}         & project \textit{(creating, spent)}        & revolve \textit{(sincerely, historian)}          & mail \textit{(reviewed, rated)}             & comedies \textit{(comedic, comedic)}          \\
+		german \textit{(germans, europe)}          & mark \textit{(favor, pull)}               & locale \textit{(foster, sharply)}                & garbage \textit{(crap, horrible)}           & sci \textit{(scifi, alien)}                   \\
+		satire \textit{(parody, parodies)}         & lady \textit{(actress, lovely)}           & cooler \textit{(downward, reports)}              & featurette \textit{(featurettes, extras)}   & funniest \textit{(hilarious, hilarious)}      \\
+		band \textit{(rock, vocals)}               & fire \textit{(ground, force)}             & spades \textit{(ralph, medieval)}                & complaint \textit{(extra, added)}           & creepy \textit{(spooky, spooky)}              \\
+		crude \textit{(offensive, offended)}       & post \textit{(essentially, purpose)}      & filmography \textit{(ralph, experiments)}        & mission \textit{(enemy, saving)}            & thriller \textit{(thrillers, thrillers)}      \\
+		dancing \textit{(dance, dances)}           & heads \textit{(large, throw)}             & quentin \textit{(downward, anime)}               & ruin \textit{(wondering, heck)}             & funnier \textit{(laughs, laughs)}             \\
+		restored \textit{(print, remastered)}      & water \textit{(land, large)}              & employers \textit{(finishes, downward)}          & wars \textit{(forces, enemy)}               & suspense \textit{(suspenseful, suspenseful)}  \\
+		drugs \textit{(drug, abuse)}               & road \textit{(drive, trip)}               & formal \textit{(victory, kennedy)}               & prefer \textit{(compare, added)}            & gore \textit{(gory, gory)}                    \\
+		church \textit{(religious, jesus)}         & brother \textit{(son, dad)}               & tube \textit{(esta, muscle)}                     & heroes \textit{(packed, hero)}              & gags \textit{(jokes, jokes)}                  \\
+		sexuality \textit{(sexual, sexually)}      & party \textit{(decide, hot)}              & woefully \textit{(restless, knockout)}           & necessarily \textit{(offer, draw)}          & science \textit{(sci, sci)}                   \\
+		sexually \textit{(sexual, sexuality)}      & badly \textit{(awful, poorly)}            & scientists \textit{(hilarity, locale)}           & portray \textit{(portrayed, portraying)}    & gory \textit{(gore, gore)}                    \\
+		england \textit{(british, english)}        & limited \textit{(aspect, unlike)}         & overboard \textit{(civilized, cinderella)}       & critic \textit{(reviewed, net)}             & government \textit{(political, political)}    \\
+		ocean \textit{(sea, boat)}                 & impression \textit{(instance, reasons)}   & rumors \textit{(homosexuality, characteristics)} & reviewed \textit{(rated, mail)}             & suspenseful \textit{(suspense, suspense)}     \\
+		marry \textit{(married, marriage)}         & trip \textit{(journey, road)}             & salvation \textit{(bags, cooler)}                & saving \textit{(carry, forced)}             & frightening \textit{(terrifying, terrifying)} \\
+		campy \textit{(cult, cheesy)}              & michael \textit{(producers, david)}       & actively \textit{(assassination, overcoming)}    & technical \textit{(digital, presentation)}  & military \textit{(army, army)}                \\
+		christian \textit{(religious, jesus)}      & memory \textit{(forgotten, memories)}     & stretching \textit{(victory, hideous)}           & statement \textit{(exist, critical)}        & slapstick \textit{(gags, gags)}               \\
+		melodrama \textit{(dramatic, tragedy)}     & james \textit{(robert, michael)}          & downward \textit{(cooler, crawling)}             & shocked \textit{(hate, warning)}            & scary \textit{(scare, scare)}                 \\
+		sing \textit{(singing, sings)}             & thin \textit{(barely, flat)}              & rocked \textit{(staple, demented)}               & flying \textit{(air, force)}                & blu \textit{(unanswered, ray)}                \\
+		sentimental \textit{(touching, sappy)}     & pre \textit{(popular, include)}           & affectionate \textit{(esta, muscle)}             & danger \textit{(dangerous, edge)}           & internetreviews \textit{(rhodes, rhodes)}     \\
+		depressing \textit{(bleak, suffering)}     & faces \textit{(constant, unlike)}         & protest \textit{(protective, assassination)}     &                                    & cgi \textit{(computer, computer)}             \\
+		evidence \textit{(investigation, accused)} & values \textit{(exception, wise)}         & confined \textit{(cooler, downward)}             &                                    & email \textit{(web, web)}                     \\
+		adorable \textit{(cute, sweet)}            & unusual \textit{(odd, seemingly)}         & inhabit \textit{(quentin, drawback)}             &                                    & thrilling \textit{(thrill, exciting)}         \\
+		episodes \textit{(episode, television)}    & lovers \textit{(lover, lovely)}           & latin \textit{(communities, mount)}              &                                    & web \textit{(email, email)}                   \\
+		teenager \textit{(teen, teenage)}          & frame \textit{(image, effect)}            & reception \textit{(como, finishes)}              &                                    & horror \textit{(scares, scares)}              \\
+		magical \textit{(fantasy, lovely)}         & mans \textit{(ultimate, sees)}            & uptight \textit{(suspensful, stalked)}           &                                    & laughs \textit{(funnier, funnier)}            \\
+		health \textit{(medical, suffering)}       & efforts \textit{(generally, nonetheless)} & brink \textit{(inexplicable, freddy)}            &                                    & suspense \textit{(suspenseful, suspenseful)} 
+	\end{tabular}
+	\caption{Different score types}
+\end{table}
+\end{landscape}
 
+\subsubsection{Comparing Space Types}
 
-\subsection{Comparing Space Types}
-
-We begin by selecting the space that performed well on the genres task for the movies, with the understanding that genres as a key natural classification task will likely make use of good directions that correspond to domain knowledge. After selecting this space, we choose similarly sized spaces from the other space-types, in this case we selected the 50 dimensional MDS space as it performed the best and from there, we selected the 50 dimensional PCA space and AWV space. We also use the same score-type and frequency cut-off as the best performing space-type. This means that we are sometimes using a slightly worse performing space-type than the one we used as our final results, and that the original space has a performance advantage, but we have chosen to do so to make the results more consistent and specific. We approach these qualitative experiments with the following idea: spaces that perform better on natural domain tasks using decision trees contain unique natural directions that other spaces do not have. 
+We begin by selecting the space that performed well on the genres task for the movies, with the understanding that genres as a key natural classification task will likely make use of good directions that correspond to domain knowledge. After selecting this space, we choose similarly sized spaces from the other space-types, in this case we selected the 200 dimensional MDS space as it performed the best and from there, we selected the 200 dimensional PCA space and AWV space. We also use the same score-type and frequency cut-off as the best performing space-type. In this case, the best performing type for the PCA space was 20000 frequency cutoff and NDCG, and we are comparing to 10000 frequency cutoff. This means that we are sometimes using a slightly worse performing space-type than the one we used as our final results, and that the original space has a performance advantage, but we have chosen to do so to make the results more consistent and specific. We approach these qualitative experiments with the following idea: spaces that perform better on natural domain tasks using decision trees contain unique natural directions that other spaces do not have. 
 
 The commonalities between spaces are much more prevalent than the differences, with natural concepts of the domain being represented in all of the different space types. However, different spaces do perform better than others on natural domain tasks. In this section, we investigate why this occurs and the differences between spaces built using a standard frequency-based approach, word-vectors and doc2vec, which uses a combination of contextual information and word vectors. 
 
-\subsubsection{Comparing reps constructed from PPMI scores (MDS and PCA)}
+\subsubsection{Comparing MDS, AWV and PCA in the Movies domain}
+\begin{landscape}
+	\begin{table}[]
+		\scriptsize
+		\begin{tabular}{llll}
+			MDS                                   & AWV                      & PCA                                     & Common                                  \\
+			berardinelli \textit{(employers, distributor)} & billy \textit{(thrown, dirty)}    & amount \textit{(leaving, pick)}                  & noir \textit{(fatale, femme)}                    \\
+			crawford \textit{(joan, davis)}                & brother \textit{(brothers, boys)} & fails \textit{(fit, pick)}                       & gay \textit{(homosexual, homosexuality)}         \\
+			hitchcocks \textit{(hitchcock, alfred)}        & fonda \textit{(henry, jane)}      & pick \textit{(fails, fit)}                       & prison \textit{(jail, prisoners)}                \\
+			warners \textit{(warner, bros)}                & building \textit{(built, climax)} & stands \textit{(fails, cover)}                   & arts \textit{(rec, robomod)}                     \\
+			nuclear \textit{(weapons, soviet)}             & train \textit{(tracks, thrown)}   & surprisingly \textit{(offer, fit)}               & allens \textit{(woody, allen)}                   \\
+			joan \textit{(crawford, barbara)}              & slaves \textit{(slavery, excuse)} & copyright \textit{(email, compuserve)}           & jokes \textit{(laughs, joke)}                    \\
+			kidnapped \textit{(kidnapping, torture)}       &                          & length \textit{(reflect, expressed)}             & animation \textit{(animated, cartoon)}           \\
+			hop \textit{(hip, rap)}                        &                          & profanity \textit{(reflect, producers)}          & sherlock \textit{(holmes, detective)}            \\
+			kung \textit{(martial, jackie)}                &                          & compuserve \textit{(copyright, internetreviews)} & western \textit{(westerns, wayne)}               \\
+			ballet \textit{(dancers, dancer)}              &                          & talents \textit{(admit, agree)}                  & songs \textit{(song, lyrics)}                    \\
+			gambling \textit{(vegas, las)}                 &                          & admit \textit{(agree, talents)}                  & comedies \textit{(comedic, laughs)}              \\
+			alcoholic \textit{(drunk, alcoholism)}         &                          & developed \textit{(introduced, sounds)}          & workout \textit{(exercise, challenging)}         \\
+			waves \textit{(surfing, wave)}                 &                          & intended \textit{(bother, werent)}               & laughs \textit{(funnier, hilarious)}             \\
+			jaws \textit{(jurassic, godfather)}            &                          & constantly \textit{(putting, sounds)}            & drug \textit{(drugs, addict)}                    \\
+			jungle \textit{(natives, island)}              &                          & tired \textit{(anymore, mediocre)}               & sci \textit{(science, fiction)}                  \\
+			employers \textit{(berardinelli, distributor)} &                          & produced \textit{(spoiler, surprising)}          & documentary \textit{(documentaries, interviews)} \\
+			pot \textit{(weed, stoned)}                    &                          & involving \textit{(believes, belief)}            & students \textit{(student, schools)}             \\
+			canadian \textit{(invasion, cheap)}            &                          & anymore \textit{(continue, tired)}               & thriller \textit{(thrillers, suspense)}          \\
+			murphy \textit{(eddie, comedian)}              &                          & leaving \textit{(fit, pick)}                     & allen \textit{(woody, allens)}                   \\
+			comics \textit{(comedian, comedians)}          &                          & makers \textit{(producers, aspects)}             & funniest \textit{(hilarious, laughing)}          \\
+			kidnapping \textit{(kidnapped, torture)}       &                          & introduced \textit{(developed, considered)}      & gags \textit{(jokes, slapstick)}                 \\
+			subscribe \textit{(email, internetreviews)}    &                          & loses \textit{(climax, suffers)}                 & adults \textit{(children, adult)}                \\
+			vegas \textit{(las, gambling)}                 &                          & negative \textit{(positive, bother)}             & animated \textit{(animation, cartoon)}           \\
+			distributor \textit{(berardinelli, employers)} &                          & expressed \textit{(reflect, opinions)}           & dancing \textit{(dance, dances)}                 \\
+			wave \textit{(waves, surfing)}                 &                          & mildly \textit{(mediocre, forgettable)}          & teen \textit{(teenage, teens)}                   \\
+			rhodes \textit{(internetreviews, email)}       &                          & helped \textit{(putting, allowed)}               & soldiers \textit{(soldier, army)}                \\
+			hippie \textit{(pot, sixties)}                 &                          & reflect \textit{(expressed, opinions)}           & indie \textit{(independent, festival)}           \\
+			weed \textit{(pot, stoned)}                    &                          & opinions \textit{(reflect, expressed)}           & suspense \textit{(suspenseful, thriller)}        \\
+			caribbean \textit{(pirates, island)}           &                          & frequently \textit{(occasionally, consistently)} & creepy \textit{(scary, eerie)}                   \\
+			eddie \textit{(murphy, comedian)}              &                          & content \textit{(agree, proves)}                 & italian \textit{(italy, spaghetti)}              \\
+			sixties \textit{(beatles, hippie)}             &                          & allowed \textit{(helped, werent)}                & jews \textit{(jewish, nazis)}                    \\
+			... 8 More                   		  &                          & suffers \textit{(lacks, loses)}                  & ... 1480 more               
+		\end{tabular}
+		\caption{ok dude}
+	\end{table}
+\end{landscape}
 
-We show terms unique to each domain type above. The terms are contextualized by finding the two closest term directions to the term. Here, we show the terms that are not duplicated in meaning for the other spaces. We can understand that the term 'gay (gays, homosexuality) has a similar meaning to the term 'homosexuality (gays, gay)' despite the term 'homosexuality' being high scored for one space, and the term 'gay' being highly scored for the other space. Almost all of the unique terms were of this variety. To demonstrate instead the unique meanings found in the individual spaces, we filter the results as follows: from the term and its associated descriptive terms found by getting the most similar terms, if those terms or any of the more similar terms occur in any of the terms or more similar terms in the space's top 1000 terms that we are comparing to, do not include those terms.
+%We show terms unique to each domain type above. The terms are contextualized by finding the two closest term directions to the term. Here, we show the terms that are not duplicated in meaning for the other spaces. We can understand that the term 'gay (gays, homosexuality) has a similar meaning to the term 'homosexuality (gays, gay)' despite the term 'homosexuality' being high scored for one space, and the term 'gay' being highly scored for the other space. Almost all of the unique terms were of this variety. To demonstrate instead the unique meanings found in the individual spaces, we filter the results as follows: from the term and its associated descriptive terms found by getting the most similar terms, if those terms or any of the more similar terms occur in any of the terms or more similar terms in the space's top 1000 terms that we are comparing to, do not include those terms.
 
-We find that the 50-dimensional MDS space, which performs 0.04 F1 score higher on the genres task, finds many interesting and unique terms, which can potentially enable more nuanced decisions in the decision trees for classification. On the other hand, in the PCA space, we find terms that relate to metadata, and spanish language words. We argue that this means the MDS is better at finding unique interesting meanings than PCA, in the case of using a frequency-based BOW to create the representation.
+%We find that the 50-dimensional MDS space, which performs 0.04 F1 score higher on the genres task, finds many interesting and unique terms, which can potentially enable more nuanced decisions in the decision trees for classification. On the other hand, in the PCA space, we find terms that relate to metadata, and spanish language words. We argue that this means the MDS is better at finding unique interesting meanings than PCA, in the case of using a frequency-based BOW to create the representation.
 
-\subsubsection{Comparing MDS and AWV}
-
-We perform the same process as above but comparing MDS and AWV, and find that the PPMI-based representations have their own metadata in the representation that is elevated. We can assume that the AWV space does not contain these metadata as there are simply not word-vectors available for these terms. Although, we also find unique terms that are likely to help performance on natural domain tasks for the MDS space, e.g. goodfellas, disgusting, swashbuckling. Interestingly, for the AWV space we find similar spanish-language terms, but also find some new concepts, in particular the 'republican' and 'yoga' directions.
+%We perform the same process as above but comparing MDS and AWV, and find that the PPMI-based representations have their own metadata in the representation that is elevated. We can assume that the AWV space does not contain these metadata as there are simply not word-vectors available for these terms. Although, we also find unique terms that are likely to help performance on natural domain tasks for the MDS space, e.g. goodfellas, disgusting, swashbuckling. Interestingly, for the AWV space we find similar spanish-language terms, but also find some new concepts, in particular the 'republican' and 'yoga' directions. AWV was also originally 20,000 frequency and NDCG.
 
 \subsubsection{Comparing PPMI representations to doc2vec}
 
-The previous two experiments were conducted with the IMDB movies dataset, but the doc2vec space is not available for that dataset, as the original text corpus was not made available by the authors. Because of this, we choose to compare the PCA representation for the sentiment space and the Doc2Vec representation for the sentiment space, as these are still IMDB movie reviews, but instead with reviews as documents rather than compilations of reviews as documents, we can expect different directions to be important but still use our knowledge of movies and reviews to inform us. We take the 100 dimensional D2V space and the 100 dimensional PCA space, both of which perform best using the ndcg scoring type which we do not change.
+\begin{table}[]
+	\scriptsize
+	\begin{tabular}{lll}
+		\textbf{D2V}                                    & \textbf{MDS}                              & \textbf{Common}                                     \\
+		leftover \textit({pizza, brake)}                & hi \textit({folks, everyone)}             & chastity \textit({shameful, soon)}                  \\
+		wk \textit({5173552178, 18084tmibmclmsuedu)}    & looking \textit({spend, rather)}          & n3jxp \textit({gordon, gebcadredslpittedu)}         \\
+		eng \textit({padres, makefile)}                 & need \textit({needs, means)}              & skepticism \textit({gebcadredslpittedu, n3jxp)}     \\
+		porsche \textit({nanao, 1280x1024)}             & post \textit({summary, net)}              & anyone \textit({knows, else)}                       \\
+		diesel \textit({cylinders, steam)}              & find \textit({couldnt, look)}             & gebcadredslpittedu \textit({soon, gordon)}          \\
+		scorer \textit({gilmour, lindros)}              & hello \textit({kind, thank)}              & intellect \textit({soon, gordon)}                   \\
+		parliament \textit({caucasus, semifinals)}      & david \textit({yet, man)}                 & please \textit({respond, reply)}                    \\
+		atm \textit({padres, inflatable)}               & got \textit({mine, youve)}                & thanks \textit({responses, advance)}                \\
+		cryptology \textit({attendees, bait)}           & go \textit({take, lets)}                  & email \textit({via, address)}                       \\
+		intake \textit({calcium, mellon)}               & question \textit({answer, answered)}      & know \textit({let, far)}                            \\
+		433 \textit({366, 313)}                         & interested \textit({including, products)} & get \textit({wait, trying)}                         \\
+		ghetto \textit({warsaw, gaza)}                  & list \textit({mailing, send)}             & think \textit({important, level)}                   \\
+		lens \textit({lenses, ankara)}                  & sorry \textit({guess, hear)}              & good \textit({luck, bad)}                           \\
+		rushdie \textit({sinless, wiretaps)}            & heard \textit({ever, anything)}           & shafer \textit({dryden, nasa)}                      \\
+		immaculate \textit({porsche, alice)}            & cheers \textit({kent, instead)}           & bobbeviceicotekcom \textit({manhattan, beauchaine)} \\
+		keenan \textit({lindros, bosnian)}              & say \textit({nothing, anything)}          & dryden \textit({shafer, nasa)}                      \\
+		boxer \textit({jets, hawks)}                    & number \textit({call, numbers)}           & im \textit({sure, working)}                         \\
+		linden \textit({mogilny, 176)}                  & mailing \textit({list, send)}             & sank \textit({bronx, away)}                         \\
+		candida \textit({yeast, noring)}                & call \textit({number, phone)}             & banks \textit({soon, gordon)}                       \\
+		octopus \textit({web, 347)}                     & thank \textit({thanx, better)}            & like \textit({sounds, looks)}                       \\
+		czech \textit({detectors, kuwait)}              & read \textit({reading, group)}            & shameful \textit({soon, gordon)}                    \\
+		survivor \textit({warsaw, croats)}              & phone \textit({company, number)}          & could \textit({away, bobbeviceicotekcom)}           \\
+		5173552178 \textit({circumference, wk)}         & mail \textit({send, list)}                & would \textit({appreciate, wouldnt)}                \\
+		18084tmibmclmsuedu \textit({circumference, wk)} & doesnt \textit({isnt, mean)}              & beauchaine \textit({bobbeviceicotekcom, away)}      \\
+		3369591 \textit({circumference, wk)}            & lot \textit({big, little)}                & ive \textit({seen, never)}                          \\
+		mcwilliams \textit({circumference, wk)}         & thats \textit({unless, youre)}            & surrender \textit({soon, gebcadredslpittedu)}       \\
+		coldblooded \textit({dictatorship, czech)}      & believe \textit({actually, truth)}        & problem \textit({problems, fix)}                    \\
+		militia \textit({federalist, occupying)}        & youre \textit({unless, theyre)}           & windows \textit({31, dos)}                          \\
+		cbc \textit({ahl, somalia)}                     & send \textit({mail, mailing)}             & gordon \textit({soon, gebcadredslpittedu)}         
+	\end{tabular}
+	\caption{Comparing an MDS sapce to a D2V space for Newsgroups, where a D2V space performed best.}
+\end{table}
 
-The assumption going into this analysis was that, in the same way that the AWV space does not contain metadata that is not present in the word-vectors, as will the Doc2Vec space not be informed especially by that metadata. Further, as in this case the D2V space outperforms the PCA space on the sentiment task, we also expect that by using word-context to produce the representation, we are able to find better sentiment information directions, for example by better understanding sarcasm. Additionally, the benefit of word-vectors is likely to play into this space in a positive way, informing the representation based on global context. 
+%The previous two experiments were conducted with the IMDB movies dataset, but the doc2vec space is not available for that dataset, as the original text corpus was not made available by the authors. Because of this, we choose to compare the PCA representation for the sentiment space and the Doc2Vec representation for the sentiment space, as these are still IMDB movie reviews, but instead with reviews as documents rather than compilations of reviews as documents, we can expect different directions to be important but still use our knowledge of movies and reviews to inform us. We take the 100 dimensional D2V space and the 100 dimensional PCA space, both of which perform best using the ndcg scoring type which we do not change.
 
-When looking at these directions, we can split the terms into two types. The names of things, and conceptual properties about movies. For the doc2vec space, the names largely dominate the unique terms list, which we can understand to mean that these terms used contextually and in the broader global context from the word-vectors is informative enough in the doc2vec space to be usefully represented. For the PCA space, there are still these unique names found, but there are less overall terms and it's a bit more balanced between concepts and names. 
+%The assumption going into this analysis was that, in the same way that the AWV space does not contain metadata that is not present in the word-vectors, as will the Doc2Vec space not be informed especially by that metadata. Further, as in this case the D2V space outperforms the PCA space on the sentiment task, we also expect that by using word-context to produce the representation, we are able to find better sentiment information directions, for example by better understanding sarcasm. Additionally, the benefit of word-vectors is likely to play into this space in a positive way, informing the representation based on global context. 
 
-For some additional examples, we compare the MDS representation for the newsgroups and the Doc2Vec representation. The MDS performed best with F1, but we compare it to NDCG, as that is what the doc2vec space performs best with.
+%When looking at these directions, we can split the terms into two types. The names of things, and conceptual properties about movies. For the doc2vec space, the names largely dominate the unique terms list, which we can understand to mean that these terms used contextually and in the broader global context from the word-vectors is informative enough in the doc2vec space to be usefully represented. For the PCA space, there are still these unique names found, but there are less overall terms and it's a bit more balanced between concepts and names. 
+
+%For some additional examples, we compare the MDS representation for the newsgroups and the Doc2Vec representation. The MDS performed best with F1, but we compare it to NDCG, as that is what the doc2vec space performs best with.
 
 
-
-\subsection{Datasets}
-
-We use five 
+\subsection{What is the value of different score-types?}
 
 \subsection{Producing Semantic Spaces}
 
@@ -384,20 +578,6 @@ We use unsupervised representation learning methods, with the intention to obtai
 
 For the semantic space, we compute the Positive Pointwise Mutual Information (See \ref{bg:PPMI}) scores for the Bag-Of-Words, and use that as input to a variety of different off-the-shelf dimensionality reduction algorithms. We explain these in further detail in Section \ref{ch3:Spaces}. 
 
-\subsubsection{Dimension of the Space}
-
-\subsubsection{Space-type}
-
-\subsubsection{Scoring method}
-
-\subsubsection{Clustering method}
-
-\textbf{The effect of dimensions}
-
-
-\textbf{The effect of space-type}
-
-\textbf{The effect of scoring method}
 
 \subsection{Quantitative Results}
 From a domain, e.g. movie reviews, where each document is a collection of reviews for a movie, we preprocess the text such that it is converted to lower-case, and non-alphanumeric characters are removed. From here, we remove standard English stop words using the NLTK library \cite{Bird}. We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}. From this preprocessed corpus, we obtain a Bag-Of-Words where we count the frequency of each term $BOW_wf$, see \ref{background:BOW}. 
@@ -413,98 +593,6 @@ The difference between single directions and clusters is best highlighted when c
 %	\caption{An example of a hyper-plane and its orthogonal direction in a toy domain of shapes. Green shapes are positive examples and red shapes are negative examples, but despite the problem being binary those closest to the hyper-plane are less defined than those further away, resulting in the orthogonal vector being a direction.}\label{ch3:ComparedTrees}
 %\end{figure}
 
-
-\subsubsection{Datasets}
-
-Vocabulary size/entity size/origin of data/classes
-
-%Naturally, it is sometimes not enough to see a list of terms and understand the property without domain knowledge. However, by examining how classifiers use these directions to classify key domain knowledge we are better able to understand what they are modelling. For example, when classifying if a movie is a sci-fi, we see that if a movie is ranked highly on the term "science, scientist", then it is not a sci-fi movie. However, when classifying if a movie is a biography, we see that if a movie is ranked highly on "science, scientist" then it is a biography movie. From this, we can understand that the property is not about mad scientists, but normal non-fiction science. 
-\subsubsection{Semantic Spaces}
-In this section, we explain how we obtained four different Semantic Spaces. \label{ch3:Method}
-% Basic explanation of why quantitative results are interesting, valuable, good etc
-
-As the newsgroups contained empty documents after removing all words that do not occur in at least 2 documents, we have removed these empty documents, leaving us with 18302 overall documents. Following this, instead of using the train split as determined by previous literature, we did a simple 2/3 train/test split the same as our IMDB dataset.
-
-This section focuses on using linear classifiers to determine how well our method represents domain knowledge compared to standard baselines. We can understand that an accurate representation of domain knowledge will be one that ensures semantically distinct entities are separated, and semantically similar entities are close together. Put another way, if the space is representing domain knowledge well we can expect that the space should be linearly separable for key semantics of the domain. For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, where Horror movies are spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
-
-\begin{figure}[t]
-	\includegraphics[width=\textwidth]{images/genres_separated.png}
-	\centering
-	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{figure:genres_separated}
-\end{figure}
-
-\begin{table}[]
-	\begin{tabular}{ll}
-		& Top PPMI scoring terms                                                \\
-		Example Horror Entity      & Term term term term term term term term term term term term term term \\
-		Similar Horror Entity      & Term term term term term term term term term term term term term term \\
-		Somewhere Inbetween Entity & Term term term term term term term term term term term term term term \\
-		Romance Movie              & Term term term term term term term term term term term term term term \\
-		Similar Romance movie      & Term term term term term term term term term term term term term term
-	\end{tabular}
-\caption{Two of the following entities: Those classified as horror, those classified as horror and romance, and those classified as romance with their associated highest value PPMI terms. We show the highest positive instances here as the representation is sparse, even though we can also expect the terms that are low scoring to be similar too.}
-\label{table:PPMI_example}
-\end{table}
-
-When selecting the parameters to use for the doc2vec space when obtaining directions, we choose the one that scored the highest for its class on a Linear SVM, rather than tuning the entire process around the doc2vecs vectors.
-%We use the kind of multiclass strategy as a hyper-parameter for each class-type in the grid search. We test the OneVsOne classifier method, treating each as binary problems, the OneVsRest method and the OutputCode method.
-We are not able to obtain an MDS space for sentiment or doc2vec spaces for placetypes/movies.
-
-We obtain results with just these spaces as input, and additionally results for a bag-of-words PPMI representation. These results act as our baselines for quantitative results, in addition to a Topic Model. We find results using a Linear SVM, and a Decision Tree with an unlimited depth, a depth of 3, a depth of 2, and a depth of 1. Each SVM is tuned using a grid search for the optimal C value, and whether or not to balance the classes. For all trees we attempt to find the best value between [None, 'auto', 'log2'], and additionally try differnet criterion, either the gini score or the information entropy score. In the same way as the SVM's, we include whether or not to balance the classes in the grid search.
-
-\subsubsection{Word Directions}
-The binary BOW representation for each word that has not been removed by the frequency cut-off is used as a target for a linear SVM, with a Semantic Space as features. We use the scikit-learn libraries LinearSVC implementation with a default C value (1.0). We balance the classes, as many of the binary BOW representations are sparse, and use the primal formulation. %Does this need to be explained more?
-
-We obtain results for the rankings induced from these word directions on Decision Tree's limited to a depth of 3 in-order to select the best parameters when using directions for each class. The parameters that we want to determine are the type of Semantic Space, the size of the space, the frequency threshold and the score threshold. To do so, for each space-type of each size, we use a grid search to find the best frequency and score cut-offs for that sized space-type. Then, we select from these space-types and sizes the best performing one. We can understand there to be a balance between finding words which are useful for creating salient features in our clustering step without including too many words which do not. As our clustering methods are unsupervised, it is important that we try and limit the amount of junk being entered into them, despite the classifiers that use these directions typically being able to filter out those directions which are not suitable to the class. Additionally, as the vocabulary size varies from dataset to dataset, the threshold will naturally be different for each one. 
-
-These results allow us to choose for each class, the best Semantic Space and Scoring-type for that class. For all trees we use grid search to find the best values for the criterion, either the gini score or the information entropy score, the maximum amount of features between [None, 'auto', 'log2'], and additionally, we include whether or not to balance the classes in the grid search.
-
-%What is the importance of the space size?
-%What is the importance of the space type?
-%How do directions perform compared to spaces? Why?
-%What kind of directions do we find for each score type?
-%Why does the score type matter? What score type works best?
-
-
-Next, we test single directions, attempting to find a good amount of directions to cluster and not including words which may hamper the unsupervised classification, as well as the best space-type for each domain. We found that generally, X was the best space and as expected classifiers performed better with more data, so we use 20000 as our frequency cutoff and 2000 as our score cutoff. These single directions typically overfit.
-
-
-\subsubsection{Clustered Directions}
-We continue with the optimal space and score-type chosen by our single direction experiments, and use the same frequency and score thresholds as before. We then experiment with two different clustering algorithms: Derrac and K-Means. As these algorithms select centroids from the top-scoring directions or randomly, we can expect that some clusters may not be salient features of the space. This is because top-scoring directions, e.g. for accuracy could simply infrequent terms that do not have much meaning, and these infrequehnt terms could also be randomly selected. We could use grid-search on the frequency and score cutoffs when obtaining these results in order to avoid terms that may disrupt existing clusters or form cluster centers that are not salient features of the space, but we chose a more standardized process that would rely on the parameters of the clustering algorithms and the ability of the classifiers to filter out clusters that are not informative, so as to not make a time-costly grid search a necessary part of the process.
-
-With that in mind, we use three clustering algorithms.
-
-Mini batch K-means, implemented by scikit-learn \footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}, introduced by \cite{Sculley2010} and kmeans++ to initialize \cite{Arthur}
-
-\subsubsection{Quantitative Results}
-In Figure \ref{IntroDecisionTree}, we demonstrate how depth could affect a Decision Tree that uses salient feature-directions. 
-
-\begin{figure}[t]
-	\includegraphics[width=\textwidth]{images/decisiontree.png}
-	\centering
-	\caption{This figure shows an example tree from one of our classifiers. Here, we can see that the model increases in complexity as it increases in depth. In this case, we end-up getting better F-score with just a depth-one tree, as the tree begins to overfit at depth three.  }\label{IntroDecisionTree}
-\end{figure}
-
-\begin{landscape}
-\begin{table}[]
-	\begin{tabular}{llllllllllll}
-                  & Genres     &       &       & Keywords  &       &       & Ratings  &       &       &  &  \\
-Movies            & D1         & D2    & D3    & D1        & D2    & D3    & D1       & D2    & D3    &  &  \\
-Space             & 0.301      & 0.358 & 0.354 & 0.185     & 0.198 & 0.201 & 0.463    & 0.475 & 0.486 &  &  \\
-Single directions & 0.436      & 0.463 & 0.492 & 0.230     & N/A   & N/A   & 0.466    & N/A   & N/A   &  &  \\
-Clusters          & N/A        & N/A   & 0.518 & N/A       & N/A   & N/A   & N/A      & N/A   & N/A   &  &  \\
-& Newsgroups &       &       & Sentiment &       &       & Reuters  &       &       &  &  \\
-Rep               & 0.251      & 0.366 & 0.356 & 0.705     & 0.770 & 0.773 & 0.328    & 0.413 & 0.501 &  &  \\
-Single dir        & 0.418      & 0.490 & 0.537 & 0.784     & 0.814 & 0.821 & 0.678    & 0.706 & 0.720 &  &  \\
-Cluster           & 0.394      & 0.433 & 0.513 & 0.735     & 0.844 & 0.813 & 0.456    & 0.569 & 0.583 &  &  \\
-& Foursquare &       &       & OpenCYC   &       &       & Geonames &       &       &  &  \\
-Placetypes        & D1         & D2    & D3    & D1        & D2    & D3    & D1       & D2    & D3    &  &  \\
-Rep               & 0.438      & 0.478 & 0.454 & 0.383     & 0.397 & 0.396 & 0.349    & 0.340 & 0.367 &  &  \\
-Single dir        & 0.541      & 0.498 & 0.531 & 0.404     & 0.428 & 0.390 & 0.444    & 0.533 & 0.473 &  &  \\
-Cluster           & 0.462      & 0.507 & 0.496 & 0.413     & 0.420 & 0.429 & 0.444    & 0.458 & 0.470 &  &  \\
-	\end{tabular}\caption{Best-scoring results for each type.}
-\end{table}
-\end{landscape}
 
 
 
