@@ -247,7 +247,7 @@ class RecHParam(MasterHParam):
         self.dir_fn = []
         for i in range(len(self.all_p)):
             if self.hpam_model_type == "d2v":
-                doc2vec_save = SaveLoad(rewrite=self.rewrite_model)
+                doc2vec_save = SaveLoad(rewrite=False)
                 identifier = "_WS_" + str(self.all_p[i]["window_size"]) + "_MC_" + \
                              str(self.all_p[i]["min_count"]) + "_TE_" + str(self.all_p[i]["train_epoch"]) + "_D_"+str(self.all_p[i]["dim"]) + "_D2V"
                 doc2vec_fn = self.file_name + identifier
@@ -274,6 +274,8 @@ class RecHParam(MasterHParam):
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
+                self.rank_fn.append("")
+                self.dir_fn.append("")
             elif self.hpam_model_type == "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue

@@ -405,11 +405,12 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                 dct_unchanged = p_corpus.getBowDct()
 
                 if data_type == "movies" or data_type == "placetypes":
-                    classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
-                    tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                 model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
-                 score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
-                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
+                    if dims[i] == 200 and "MDS" in space_names[s]:
+                        classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
+                        tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
+                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
+                                 mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
                 else:
                     classifier_fn = pipeline_fn + "_" + multiclass
                     tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,

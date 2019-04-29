@@ -280,41 +280,40 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
             raise ValueError("Word list is none")
         classes = p_corpus.getClasses()
 
-        for i in range(len(dims)):
 
-            corp_save = SaveLoad(rewrite=False)
-            p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder,
-                                             bowmin,
-                                             no_below, no_above, True, corp_save)
-            # Reload the dict because gensim is persistent otherwise
-            dct = p_corpus.getBowDct()
-            dct_unchanged = p_corpus.getBowDct()
+        corp_save = SaveLoad(rewrite=False)
+        p_corpus = process_corpus.Corpus(None, classes, name_of_class[ci], pipeline_fn, processed_folder,
+                                         bowmin,
+                                         no_below, no_above, True, corp_save)
+        # Reload the dict because gensim is persistent otherwise
+        dct = p_corpus.getBowDct()
+        dct_unchanged = p_corpus.getBowDct()
 
-            if data_type == "movies" or data_type == "placetypes":
-                classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
-                tsrd = pipeline(pipeline_fn, bow, dct, classes, class_names, word_list, processed_folder,
-                                dims, kfold_hpam_dict, hpam_dict,
-                                model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
-                                remove_stop_words=True,
-                                score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq,
-                                dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci],
-                                classifier_fn=classifier_fn,
-                                mcm=multi_class_method, ppmi=None, dct_unchanged=dct_unchanged,
-                                pipeline_hpam_dict=pipeline_hpam_dict, space_name=None,
-                                data_type=data_type)
-            else:
-                classifier_fn = pipeline_fn + "_" + multiclass
-                tsrd = pipeline(pipeline_fn, bow, dct, classes, class_names, word_list, processed_folder,
-                                dims, kfold_hpam_dict, hpam_dict,
-                                model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
-                                remove_stop_words=True,
-                                score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq,
-                                dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci],
-                                classifier_fn=classifier_fn,
-                                mcm=multi_class_method, ppmi=None, dct_unchanged=dct_unchanged,
-                                pipeline_hpam_dict=pipeline_hpam_dict, space_name=None,
-                                data_type=data_type)
-            tsrds.append(tsrd)
+        if data_type == "movies" or data_type == "placetypes":
+            classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
+            tsrd = pipeline(pipeline_fn, bow, dct, classes, class_names, word_list, processed_folder,
+                            dims, kfold_hpam_dict, hpam_dict,
+                            model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
+                            remove_stop_words=True,
+                            score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq,
+                            dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci],
+                            classifier_fn=classifier_fn,
+                            mcm=multi_class_method, ppmi=None, dct_unchanged=dct_unchanged,
+                            pipeline_hpam_dict=pipeline_hpam_dict, space_name=None,
+                            data_type=data_type)
+        else:
+            classifier_fn = pipeline_fn + "_" + multiclass
+            tsrd = pipeline(pipeline_fn, bow, dct, classes, class_names, word_list, processed_folder,
+                            dims, kfold_hpam_dict, hpam_dict,
+                            model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
+                            remove_stop_words=True,
+                            score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq,
+                            dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci],
+                            classifier_fn=classifier_fn,
+                            mcm=multi_class_method, ppmi=None, dct_unchanged=dct_unchanged,
+                            pipeline_hpam_dict=pipeline_hpam_dict, space_name=None,
+                            data_type=data_type)
+        tsrds.append(tsrd)
         # Make the combined CSV of all the dims of all the space types
         all_r = np.asarray(tsrds).transpose()
         rows = all_r[1]
@@ -327,8 +326,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree3", "DecisionTree2","DecisionTree1"]
-    data_types = ["newsgroups", "reuters"]
+    classifiers = ["DecisionTreeNone", "LinearSVM", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
+    data_types = [ "placetypes","newsgroups", "reuters", "sentiment"]
     doLR = False
     dminf = -1
     dmanf = -1
