@@ -89,7 +89,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
 
     dir_save = SaveLoad(rewrite=rewrite_all)
-    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False, rewrite_words=True)
+    dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
     binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     binary_bow[binary_bow >= 1] = 1
@@ -100,7 +100,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     for i in range(len(words)):
         new_word2id_dict[words[i]] = i
 
-    score_save = SaveLoad(rewrite=True)
+    score_save = SaveLoad(rewrite=rewrite_all)
     score = MultiClassScore(binary_bow, preds, None, file_name + "_" + str(no_below) + "_" + str(no_above) , processed_folder + "directions/score/", score_save, f1=True, auroc=False,
                     fscore=True, kappa=True, acc=True, class_names=words, verbose=False, directions=True, save_csv=True)
     score.process_and_save()
@@ -127,7 +127,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         raise ValueError("Dct has changed shape")
 
     # Get NDCG scores
-    ndcg_save = SaveLoad(rewrite=True)
+    ndcg_save = SaveLoad(rewrite=rewrite_all)
 
     if stream_rankings: #and no_below > 5000) or no_below > 10000:
         ndcg = GetNDCGStreamed(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
@@ -160,7 +160,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     fn_final = []
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
-        gtr_save = SaveLoad(rewrite=True)
+        gtr_save = SaveLoad(rewrite=rewrite_all)
         if stream_rankings:
             gtr = GetTopScoringRanksStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         else:
@@ -429,8 +429,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree3"]
-    data_types = ["placetypes"]
+    classifiers = ["DecisionTree3", "DecisionTree2", "DecisionTree1"]
+    data_types = ["movies"]
     doLR = False
     dminf = -1
     dmanf = -1
