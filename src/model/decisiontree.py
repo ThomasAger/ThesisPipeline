@@ -41,6 +41,8 @@ class DecisionTree(Method.ModelMethod):
         self.class_names = class_names
         self.get_tree_image = get_tree_image
         self.tree_image_fn = tree_image_fn
+        if self.max_depth == None:
+            self.get_tree_image = False
         super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, probability, mcm)
 
     def makePopoArray(self):
