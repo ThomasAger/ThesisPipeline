@@ -125,8 +125,8 @@ def write_csv(csv_fn, col_names, cols_to_add, key):
     df = pd.DataFrame(d, index=key)
     df.to_csv(csv_fn)
 
-def read_csv(csv_fn):
-    csv = pd.read_csv(csv_fn, index_col=0)
+def read_csv(csv_fn, error_bad_lines=True):
+    csv = pd.read_csv(csv_fn, index_col=0, error_bad_lines=error_bad_lines)
     return csv
 
 def csv_pd_to_array(csv_pd):

@@ -274,8 +274,8 @@ class RecHParam(MasterHParam):
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
-                self.rank_fn.append("")
-                self.dir_fn.append("")
+                self.rank_fn.append("a")
+                self.dir_fn.append("a")
             elif self.hpam_model_type == "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
                     continue
@@ -338,7 +338,7 @@ class RecHParam(MasterHParam):
         index_sorted = np.flipud(np.argsort(list_of_scores))[0]
         return index_sorted
 
-    def getTopScoringByMetricDir(self, space, index):
+    def getTopScoringByMetricDir(self, space, index, include_fns=True):
 
         if len(self.feature_names_from_par) != 0:
             self.feature_names = self.feature_names_from_par[index]
@@ -363,13 +363,23 @@ class RecHParam(MasterHParam):
         score.process_and_save()
 
         score_dict = score.get()
-        # This order cannot be changed as this is the order it is imported as.
-        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn", "dir_fn"]
-        avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
-                     score_dict[col_names[2]], score_dict[col_names[3]],
-                     score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
-        self.top_scoring_features.value = space
-        self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+        if include_fns is True:
+            # This order cannot be changed as this is the order it is imported as.
+            col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn", "dir_fn"]
+            avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                         score_dict[col_names[2]], score_dict[col_names[3]],
+                         score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
+            self.top_scoring_features.value = space
+            self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+        else:
+            # This order cannot be changed as this is the order it is imported as.
+            col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall"]
+            avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                         score_dict[col_names[2]], score_dict[col_names[3]],
+                         score_dict[col_names[4]]]
+            self.top_scoring_features.value = space
+            self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+
         print("GOt topscoringdir")
 
     def getTopScoringCluster(self, space, index):
@@ -403,7 +413,7 @@ class RecHParam(MasterHParam):
 
     #If you need other metrics than F1 just do metric = "acc" then index is 0 etc.
     def getTopScoringByMetric(self):
-        self.getTopScoringByMetricDir(*self.getTopScoringSpace())
+        self.getTopScoringByMetricDir(*self.getTopScoringSpace(), include_fns=False)
     """ Potentially repeated code so removed
     def getTopScoringByScore(self, space, index):
         split_ids = split.get_split_ids(self.data_type, self.matched_ids)

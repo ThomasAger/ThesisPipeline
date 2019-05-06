@@ -397,7 +397,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = [ "placetypes", "reuters"]
+    data_type = [ "placetypes", "reuters", "newsgroups", "sentiment"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -425,7 +425,7 @@ def init():
 
         multi_class_method = "OVR"
         bonus_fn = ""
-        rewrite_all = True
+        rewrite_all = False
         print("iterating through classifiers")
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:

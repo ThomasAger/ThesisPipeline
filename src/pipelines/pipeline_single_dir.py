@@ -429,8 +429,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree3", "DecisionTree2", "DecisionTree1"]
-    data_types = ["movies"]
+    classifiers = ["DecisionTreeNone", "LinearSVM"]
+    data_types = ["sentiment", "reuters"]
     doLR = False
     dminf = -1
     dmanf = -1

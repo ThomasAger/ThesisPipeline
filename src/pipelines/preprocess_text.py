@@ -195,13 +195,10 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
 
             # Rewriting a single case of sentiment
-            if len(all_test_result_rows) == 9 and model_type == "DecisionTreeNone":
+            if model_type == "DecisionTree3" and len(all_test_result_rows) == 9 and data_type == "sentiment":
                 hpam_save = SaveLoad(rewrite=True)
-                rewrite_individual = True
             else:
                 hpam_save = SaveLoad(rewrite=rewrite_all)
-                rewrite_individual = False
-
 
             hpam_dict["dim"] = [dims[i]]
             hpam_dict["corpus_fn"] = [corpus_fn]
@@ -209,7 +206,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
             hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
-                                         doc2vec_fn, classify_doc2vec_fn, output_folder + "rep/", hpam_save, probability=probability, rewrite_model=rewrite_individual, dev_percent=dev_percent,
+                                         doc2vec_fn, classify_doc2vec_fn, output_folder + "rep/", hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
                                     data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, mcm=mcm)
             hyper_param.process_and_save()
 
@@ -221,6 +218,13 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     # Make the combined CSV of all the dims of all the space types
     all_r = np.asarray(all_test_result_rows).transpose()
     rows = all_r[1]
+    for i in range(len(rows)):
+        if len(rows[i]) == 7:
+            rows[i] = rows[i][:5]
+
+            if len(rows[i]) != 5:
+                print(len(rows[i]))
+                raise ValueError("No, bro.")
     cols = np.asarray(rows.tolist()).transpose()
     col_names = all_r[0][0]
     key = all_r[2]
@@ -378,8 +382,8 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #xy = sp.load_npz("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/NB_18_NA_0.95num_stw_ppmi.npz")
 if __name__ == '__main__':
     max_depths = [None, None, 3, 2, 1]
-    classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-    data_type = ["sentiment"]
+    classifiers = ["LinearSVM","DecisionTreeNone","DecisionTree3","DecisionTree2","DecisionTree1"]
+    data_type = ["sentiment", "reuters", "placetypes", "newsgroups"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):

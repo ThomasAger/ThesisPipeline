@@ -290,7 +290,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, dir_m
         dct_unchanged = p_corpus.getBowDct()
 
         if data_type == "movies" or data_type == "placetypes":
-            classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
+            classifier_fn = pipeline_fn + "_" + name_of_class[ci] + "_" + multiclass
             tsrd = pipeline(pipeline_fn, bow, dct, classes, class_names, word_list, processed_folder,
                             dims, kfold_hpam_dict, hpam_dict,
                             model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
