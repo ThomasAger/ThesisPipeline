@@ -3,6 +3,8 @@
 single vector space with similarity being the main
 structure of interest. However, recent work by Mikolov et al. (2013b) on a word-analogy task suggests that such spaces may have further use- ful internal regularities. They found that seman- tic differences, such as between big and small, and also syntactic differences, as between big and bigger, were encoded consistently across their space. In particular, they solved the word-analogy problems by exploiting the fact that equivalent re- lations tended to correspond to parallel vector- differences. \cite{Mitchell2015}
 
+There are a number of problems with similarity-based representations. For example, \cite{Murphy} found that PCA dimensions did not typically make sense, and FRAGE \cite{Gong2018} achieved state-of-the-art results by removing the bias that a representation has for frequent words.
+
 %Good paper for literature review
 \cite{Mitchell2015} "Explicitly designing such structure into a neural network model results in rep- resentations that decompose into orthog- onal semantic and syntactic subspaces. We demonstrate that using word-order and morphological structure within En- glish Wikipedia text to enable this de- composition can produce substantial im- provements on semantic-similarity, pos- induction and word-analogy tasks."
 

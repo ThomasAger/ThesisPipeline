@@ -468,12 +468,7 @@ def concatenateDirections(folder_name):
         all_directions.append(lines[0])
         all_names.append(f[:5])
 
-# Get the amount of non-zero occurances for each class in a class-all
-def getNonZero(class_names_fn, file_name):
-    class_names = import1dArray(class_names_fn, "s")
-    class_all = np.asarray(import2dArray(file_name)).transpose()
-    for c in range(len(class_all)):
-        print(np.count_nonzero(class_all[c]))
+
 
 #getNonZero("../data/movies/classify/genres/names.txt", "../data/movies/classify/genres/class-all")
 

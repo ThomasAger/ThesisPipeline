@@ -383,7 +383,7 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 if __name__ == '__main__':
     max_depths = [None, None, 3, 2, 1]
     classifiers = ["LinearSVM","DecisionTreeNone","DecisionTree3","DecisionTree2","DecisionTree1"]
-    data_type = ["sentiment", "reuters", "placetypes", "newsgroups"]
+    data_type = ["sentiment", "reuters", "placetypes","newsgroups"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):

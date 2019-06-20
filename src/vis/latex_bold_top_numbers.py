@@ -1,7 +1,7 @@
 import util.io as io
 import util.py as py
 import math
-csv_name = "../../tex/tables/big results table.csv"
+csv_name = "../../tex/tables/rep and single dir diff.csv"
 latex_name = "../../tex/tables/latex/all_rep_latex.txt"
 
 csv = io.read_csv(csv_name,error_bad_lines=False)
@@ -27,9 +27,10 @@ for j in range(csv.shape[1]):
                 csv.values[i][j] = ""
             if str(csv.values[i][j]) == "nan":
                 continue
-            csv.iloc[i,j] = str(round(float(csv.values[i][j]), 3))
+            csv.iloc[i, j] = str(round(float(csv.values[i][j]), 3))
         except:
             print("")
+
 ids_to_bold = []
 for j in range(csv.shape[1]):
     ids = []

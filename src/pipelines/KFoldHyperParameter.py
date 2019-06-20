@@ -17,6 +17,7 @@ from util import split
 from pipelines import pipeline_single_dir
 from pipelines import pipeline_cluster
 from pipelines import pipeline_topic_model
+from pipelines import pipeline_ft
 
 def get_grid_params(hpam_dict):
     hyperparam_array = list(hpam_dict.values())
@@ -299,6 +300,14 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(cluster_rank)
+            elif self.hpam_model_type == "ft":
+                top_params, top_row_data, cluster_rank =  pipeline_ft.ft_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"])
+                self.top_scoring_params.value.append(top_params)
+                top_scoring_row_data = top_row_data
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
+                self.rank_fn.append(cluster_rank)
             elif self.hpam_model_type == "topic":
                 top_params, top_row_data, new_bow_fn, feature_names = pipeline_topic_model.pipeline_topic_model(*self.hpam_params,top_scoring_freq=self.all_p[i]["top_scoring_freq"],
                                                                                                  topic_word_prior=self.all_p[i]["topic_word_prior"], doc_topic_prior=self.all_p[i]["doc_topic_prior"], n_topics=self.all_p[i]["n_topics"])
@@ -317,7 +326,7 @@ class RecHParam(MasterHParam):
         self.final_arrays.value.append(indexes)
         if self.hpam_model_type == "d2v":
             self.getTopScoringByMetric()
-        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
+        elif self.hpam_model_type == "dir" or self.hpam_model_type == "cluster" or self.hpam_model_type == "topic" or self.hpam_model_type == "ft":
             print("skipped")
             index = self.getTopScoring()
             if self.hpam_model_type == "cluster" or self.hpam_model_type == "topic":
@@ -364,13 +373,24 @@ class RecHParam(MasterHParam):
 
         score_dict = score.get()
         if include_fns is True:
-            # This order cannot be changed as this is the order it is imported as.
-            col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn", "dir_fn"]
-            avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
-                         score_dict[col_names[2]], score_dict[col_names[3]],
-                         score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
-            self.top_scoring_features.value = space
-            self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+            try:
+                # This order cannot be changed as this is the order it is imported as.
+                col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn", "dir_fn"]
+                avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                             score_dict[col_names[2]], score_dict[col_names[3]],
+                             score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
+                self.top_scoring_features.value = space
+                self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+            except:
+                # This order cannot be changed as this is the order it is imported as.
+                col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn"]
+                avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
+                             score_dict[col_names[2]], score_dict[col_names[3]],
+                             score_dict[col_names[4]], self.rank_fn[index]]
+                self.top_scoring_features.value = space
+                self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
+
+
         else:
             # This order cannot be changed as this is the order it is imported as.
             col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall"]

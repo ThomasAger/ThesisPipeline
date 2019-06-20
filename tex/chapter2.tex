@@ -57,7 +57,9 @@ See Section \ref{background:WhySpace}\begin{itemize}
 \subsection{Document Representations}
 \subsubsection{LSA}
 Principal Component Analysis is a dimensionality reduction method that results in dimensions ordered by importance. Starting with a large data matrix, e.g. our TF-IDF values from before, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
-\begin{itemize}
+
+\subsubsection{Dimensionality Reduction Methods}\label{ch2:reps}
+\begin{itemize} 
 	\item PCA %Maybe explain directions a bit here
 	\item MDS
 \end{itemize}
@@ -65,7 +67,7 @@ Principal Component Analysis is a dimensionality reduction method that results i
 a. NNSE
 b. compositional
 c. 2007 paper as wikipedia similarities
-d. Topic models
+d. Topic models\label{bg:TopicModel}
 e. Infogan, etc
 
 \cite{Zhang2012} Sparse PCA (Why not compare lol)

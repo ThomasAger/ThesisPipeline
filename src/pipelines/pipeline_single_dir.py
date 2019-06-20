@@ -430,7 +430,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 if __name__ == '__main__':
     classifiers = ["DecisionTreeNone", "LinearSVM"]
-    data_types = ["sentiment", "reuters"]
+    data_types = ["newsgroups", "placetypes", "sentiment", "reuters"]
     doLR = False
     dminf = -1
     dmanf = -1

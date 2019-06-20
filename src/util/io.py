@@ -588,3 +588,11 @@ def save_csv_from_dict(score_dict, class_names, csv_fn):
     write_csv(csv_fn, col_names, col_data, class_names)
 
 
+if __name__ == '__main__':
+    txt_file = import1dArray("../../data/cherrypicked/movies\some_removed.txt")
+    new_txt_file = []
+    for i in range(len(txt_file)):
+        if len(txt_file[i]) != 0:
+            new_txt_file.append(" ".join(txt_file[i].split()[:4]))
+    write1dArray(new_txt_file, "../../data/cherrypicked/movies\some_removed_fixed.txt")
+    
