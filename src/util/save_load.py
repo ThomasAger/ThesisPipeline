@@ -58,7 +58,7 @@ class SaveLoad:
 def load_by_type(type, file_name):
     try:
         if type == "npy":
-            file = np.load(file_name)
+            file = np.load(file_name, allow_pickle=True)
         elif type == "scipy" or type == "npz":
             file = sp.load_npz(file_name)
         elif type == "dct":

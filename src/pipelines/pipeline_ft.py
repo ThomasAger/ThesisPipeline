@@ -48,7 +48,7 @@ def pipeline(file_name, classes, class_names, processed_folder, kfold_hpam_dict,
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     print(file_name)
@@ -74,9 +74,17 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
                  rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function):
 
     ranking = dt.import2dArray(rank_fn)
+
+
     ranking_names = np.load(ranking_names_fn)
     doc_amt = split.get_doc_amt(data_type)
     dir = np.load(dir_fn).transpose()
+
+    if len(ranking[0]) != doc_amt and len(ranking) != doc_amt:
+        raise ValueError("Rank len does not equal doc amt")
+
+    if len(ranking) == doc_amt:
+        ranking = ranking.transpose()
 
     if len(space) != doc_amt:
         raise ValueError("Space len does not equal doc amt")
@@ -222,6 +230,52 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         space_name = rank_fn.split("/")[-1:][0][:-4]
         space_name_array.append(space_name)
 
+    """ Cluster compatibllity
+    for j in range(len(name_of_class)):
+        if data_type == "newsgroups":
+            if model_type == "DecisionTree3":
+                csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rankreps" + model_type + "_"
+            elif model_type == "DecisionTree2":
+                csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_100_D2V_ndcg_2000_5000_0_rankreps" + model_type + "_"
+            elif model_type == "DecisionTree1":
+                csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_200_MDS_ndcg_2000_10000_0_rankreps" + model_type + "_"
+        elif data_type == "placetypes":
+            if model_type == "DecisionTree3":
+                if name_of_class[j] == "Foursquare":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_PCA_kappa_1000_10000_0_rankreps" + model_type + "_"
+                elif  name_of_class[j] == "OpenCYC":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_rankreps" + model_type + "_"
+                elif  name_of_class[j] == "Geonames":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_100_AWVEmp_ndcg_1000_20000_0_rankreps" + model_type + "_"
+            elif model_type == "DecisionTree2":
+                if name_of_class[j] == "Foursquare":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_AWVEmp_kappa_2000_20000_0_rankreps" + model_type + "_"
+                elif  name_of_class[j] == "OpenCYC":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_100_AWVEmp_ndcg_2000_20000_0_rankreps" + model_type + "_"
+                elif  name_of_class[j] == "Geonames":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_rankreps" + model_type + "_"
+            elif model_type == "DecisionTree1":
+                if name_of_class[j] == "Foursquare":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_200_AWVEmp_ndcg_1000_20000_0_rankreps" + model_type + "_"
+                elif  name_of_class[j] == "OpenCYC":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_100_AWVEmp_ndcg_1000_5000_0_rankreps" + model_type + "_"
+                elif  name_of_class[j] == "Geonames":
+                    csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_AWVEmp_ndcg_1000_10000_0_rankreps" + model_type + "_"
+
+        csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
+        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][rank_id]
+        print(rank_fn)
+        rank_fn_array.append(rank_fn)
+
+        word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
+        print(word_fn)
+        word_fn_array.append(word_fn)
+
+        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][dir_id]
+        dir_fn_array.append(dir_fn)
+        space_name = rank_fn.split("/")[-1:][0][:-4]
+        space_name_array.append(space_name)
+"""
     rank_fns.append(rank_fn_array)
     dir_fns.append(dir_fn_array)
     word_fns.append(word_fn_array)
@@ -327,8 +381,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = [ "reuters", "newsgroups", "sentiment","placetypes"]
+    classifiers = ["DecisionTree3","DecisionTree1","DecisionTree2"]
+    data_type = ["placetypes", "newsgroups",  "sentiment","reuters"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1

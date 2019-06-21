@@ -83,8 +83,6 @@ class PAV(Method):
 
         self.pav_classes.value = []
 
-        if len(self.ranking) > len(self.ranking[0]):
-            self.ranking = self.ranking.transpose()
 
         for f in range(len(self.bag_of_clusters.value)):
             print(self.cluster_names[f])
