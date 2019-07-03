@@ -48,7 +48,7 @@ def pipeline(file_name, classes, class_names, processed_folder, kfold_hpam_dict,
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=rewrite_all)
+    hpam_save = SaveLoad(rewrite=True)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     print(file_name)
@@ -68,10 +68,15 @@ def pipeline(file_name, classes, class_names, processed_folder, kfold_hpam_dict,
     print("END OF SPACE")
     return hyper_param.getTopScoringRowData()
 
+def get_dp(space, direction):
+    ranking = np.empty(len(space))
+    for i in range(len(space)):
+        ranking[i] = np.dot(direction, space[i])
+    return ranking
 
 def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, class_names,
                       kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids,
-                 rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function):
+                 rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function, use_hidden):
 
     ranking = dt.import2dArray(rank_fn)
 
@@ -79,6 +84,10 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
     ranking_names = np.load(ranking_names_fn)
     doc_amt = split.get_doc_amt(data_type)
     dir = np.load(dir_fn).transpose()
+    #int(len(dir)/3)
+
+    if False in (np.isclose(ranking.transpose()[0], get_dp(space, dir[0])))  :
+        raise ValueError("Rankings or space do not match")
 
     if len(ranking[0]) != doc_amt and len(ranking) != doc_amt:
         raise ValueError("Rank len does not equal doc amt")
@@ -95,8 +104,8 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
     boc = pav.getPAV()
 
     ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_"
-    ft_save = SaveLoad(rewrite=rewrite_all)
-    ft = FineTuneNetwork(file_name, processed_folder + "ft/", space, dir, boc, "", hidden_layer_size, epoch, ft_save)
+    ft_save = SaveLoad(rewrite=True)
+    ft = FineTuneNetwork(file_name, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden)
     ft.process_and_save()
     rankings = ft.getRanks()
     ranking_fn = ft.output_ranks.file_name
@@ -203,6 +212,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         csv_fn = processed_folder + "rank/score/csv_final/" + "num_stw_num_stw_50_D2Vreps"+model_type+"_"
 
     space_names = []
+    spaces = []
     # Sometimes directions is last in the csv, otherwise rank is
     if data_type == "movies":
         rank_id = 6
@@ -367,7 +377,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
             epoch = [50, 300, 600]
             hidden_layer_size = [1]
-            activation_function = ["sinh", "tanh", "linear"]
+            activation_function = ["linear", "sinh", "tanh"]
             pipeline_hpam_dict = {"epoch": epoch,
                                   "hidden_layer_size": hidden_layer_size,
                                   "activation_function": activation_function}
@@ -377,12 +387,24 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                             data_type=data_type, space=space, bow=bow, dct=dct, rank_fn=rank_fns[i][j], ranking_names=word_fns[i][j],
                             dir_fn=dir_fns[i][j])
 
+            # Make the combined CSV of all the dims of all the space types
+            all_r = tsrd
+            rows = all_r[1]
+            cols = np.asarray(rows.tolist()).transpose()
+            col_names = all_r[0][0]
+            key = all_r[2]
+            dt.write_csv(
+                processed_folder + "ft/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_" +
+                name_of_class[j] + "_" + ".csv",
+                col_names, cols, key)
+            print("a")
+
 
 
 
 def init():
     classifiers = ["DecisionTree3","DecisionTree1","DecisionTree2"]
-    data_type = ["placetypes", "newsgroups",  "sentiment","reuters"]
+    data_type = [ "reuters","newsgroups","sentiment", "placetypes", ]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1

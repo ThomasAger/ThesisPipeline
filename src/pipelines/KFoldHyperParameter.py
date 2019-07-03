@@ -301,7 +301,7 @@ class RecHParam(MasterHParam):
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(cluster_rank)
             elif self.hpam_model_type == "ft":
-                top_params, top_row_data, cluster_rank =  pipeline_ft.ft_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"])
+                top_params, top_row_data, cluster_rank =  pipeline_ft.ft_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"], use_hidden=self.all_p[i]["use_hidden"])
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
                 averaged_csv_data.append(top_scoring_row_data[1])
