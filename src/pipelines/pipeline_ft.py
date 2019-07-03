@@ -78,6 +78,10 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
                       kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids,
                  rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function, use_hidden):
 
+    if use_hidden is False:
+        hidden_layer_size = 0
+        activation_function = "None"
+
     ranking = dt.import2dArray(rank_fn)
 
 
@@ -103,7 +107,7 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
     pav.process_and_save()
     boc = pav.getPAV()
 
-    ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_"
+    ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_" + str(use_hidden) + "_" + str(activation_function) + "_"
     ft_save = SaveLoad(rewrite=True)
     ft = FineTuneNetwork(file_name, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden)
     ft.process_and_save()
@@ -378,7 +382,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             epoch = [50, 300]
             hidden_layer_size = [1]
             activation_function = ["linear",  "tanh"]
-            use_hidden = [True, False]
+            use_hidden = [True]
             pipeline_hpam_dict = {"epoch": epoch,
                                   "hidden_layer_size": hidden_layer_size,
                                   "activation_function": activation_function,
