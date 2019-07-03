@@ -375,12 +375,14 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     space_names.append(doc2vec_fn)
                     space = d2v_space
 
-            epoch = [50, 300, 600]
+            epoch = [50, 300]
             hidden_layer_size = [1]
-            activation_function = ["linear", "sinh", "tanh"]
+            activation_function = ["linear",  "tanh"]
+            use_hidden = [True, False]
             pipeline_hpam_dict = {"epoch": epoch,
                                   "hidden_layer_size": hidden_layer_size,
-                                  "activation_function": activation_function}
+                                  "activation_function": activation_function,
+                                  "use_hidden": use_hidden}
             tsrd = pipeline(space_names[i][j], classes, class_names, processed_folder, kfold_hpam_dict,
                             model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
                             auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
@@ -403,8 +405,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    classifiers = ["DecisionTree3","DecisionTree1","DecisionTree2"]
-    data_type = [ "reuters","newsgroups","sentiment", "placetypes", ]
+    classifiers = ["DecisionTree3"]
+    data_type = [ "reuters" ]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
