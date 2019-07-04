@@ -195,7 +195,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         if False in np.isclose(fil_rank.transpose()[0], get_dp(space, dir_test[0])):
             raise ValueError("Incorrect order")
         else:
-            raise ValueError("Success!")
+            print("Correct order")
 
 
         split_ids = split.get_split_ids(data_type, matched_ids)
