@@ -61,7 +61,7 @@ class GetTopScoringRanksStreamed(Method.Method):
         super().__init__(file_name, save_class)
 
     def makePopos(self):
-        self.words = SaveLoadPOPO(self.words,
+        self.words = SaveLoadPOPO([],
                                   self.output_folder + "fil/" + self.file_name + "_words.npy", "npy")
         self.rank = SaveLoadPOPO([],
                                  self.output_folder + "fil/" + self.file_name  + "_rank.npy", "npy")
@@ -72,19 +72,29 @@ class GetTopScoringRanksStreamed(Method.Method):
     def process(self):
         inds = np.flipud(np.argsort(self.score_ind))[:self.top_scoring_dir]
         i = 0
+        internal_rank = []
+        internal_mapping = {}
+        amt_added = 0
         word_len = len(self.new_word2id_dict.keys())
         with open(self.rank_fn) as infile:
             for line in infile:
-                if i in inds:
-                    split = line.split()
-                    float_split = np.empty(len(split), dtype=np.float64)
-                    for j in range(len(split)):
-                        float_split[j] = float(split[j])
-                    self.rank.value.append(float_split)
+                for k in range(len(inds)):
+                    if i == inds[k]:
+                        print(k)
+                        split = line.split()
+                        float_split = np.empty(len(split), dtype=np.float64)
+                        for j in range(len(split)):
+                            float_split[j] = float(split[j])
+                        internal_rank.append(float_split)
+                        internal_mapping[inds[k]] = amt_added
+                        amt_added += 1
+                        break
                 i += 1
                 print(i, "/", word_len)
-        self.rank.value = np.asarray(self.rank.value)
-        self.rank.value = self.rank.value.transpose()
+        final_rank_array = []
+        for i in range(len(inds)):
+            final_rank_array.append(internal_rank[internal_mapping[inds[i]]])
+        self.rank.value = np.asarray(final_rank_array).transpose()
         self.words.value = np.asarray(list(self.new_word2id_dict.keys()))[inds]
         super().process()
 

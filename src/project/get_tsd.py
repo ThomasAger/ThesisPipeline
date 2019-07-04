@@ -28,6 +28,12 @@ class GetTopScoringDirs(Method.Method):
 
     def process(self):
         inds = np.flipud(np.argsort(self.score_ind))[:self.top_scoring_dir]
+        """
+        self.dir.value = []
+        for i in range(len(inds)):
+            self.dir.value.append(self.id_to_dir[inds[i]])
+        self.dir.value = np.asarray(self.dir.value).transpose()
+        """
         self.dir.value = self.directions[inds].transpose()
         self.fil_words.value = self.words[inds].transpose()
         super().process()

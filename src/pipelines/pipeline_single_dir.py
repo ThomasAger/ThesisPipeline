@@ -25,6 +25,14 @@ import KFoldHyperParameter
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 last_dct = []
+
+def get_dp(space, direction):
+    ranking = np.empty(len(space))
+    for i in range(len(space)):
+        ranking[i] = np.dot(direction, space[i])
+    return ranking
+
+
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="", space_name="", data_type="",
@@ -91,6 +99,9 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     dir_save = SaveLoad(rewrite=rewrite_all)
     dir = GetDirections(bow, space, words_to_get, new_word_dict, dir_save, no_below, no_above, file_name , processed_folder + "directions/", LR=False)
     dir.process_and_save()
+    # Get rankings on directions save all of them in a word:ranking on entities format, and retrieve if already saved
+    dirs = dir.getDirections()
+
     binary_bow = np.asarray(dir.getNewBow().todense(), dtype=np.int32)
     binary_bow[binary_bow >= 1] = 1
     preds = dir.getPreds()
@@ -106,14 +117,12 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     score.process_and_save()
     s_dict = score.get()
 
-    # Get rankings on directions save all of them in a word:ranking on entities format, and retrieve if already saved
-    dirs = dir.getDirections()
-
     rank_save = SaveLoad(rewrite=rewrite_all)
 
     stream_rankings = False
     if (data_type == "sentiment" and no_below > 5000) or (no_below >= 10000 and data_type != "movies") or no_below > 10000:
         stream_rankings = True
+
 
     if stream_rankings: #and no_below > 5000) or no_below > 10000:
         rank = GetRankingsStreamed(dirs, space, new_word2id_dict,  rank_save,  file_name, processed_folder, no_below, no_above)
@@ -121,6 +130,9 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         rank = GetRankings(dirs, space, new_word2id_dict,  rank_save,  file_name, processed_folder, no_below, no_above)
     rank.process_and_save()
     rankings = rank.getRankings()
+    if len(rankings) < 100:
+        if False in np.isclose(dt.importFirstLineOfTextFileAsFloat(rankings), get_dp(space, dirs[0])):
+            raise ValueError("Rankings do not match")
 
     dct_len_end =  len(dct_unchanged.dfs.keys())
     if dct_len_start != dct_len_end:
@@ -160,7 +172,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     fn_final = []
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
-        gtr_save = SaveLoad(rewrite=rewrite_all)
+        gtr_save = SaveLoad(rewrite=True)
         if stream_rankings:
             gtr = GetTopScoringRanksStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         else:
@@ -175,6 +187,16 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         gtd.process_and_save()
         fil_words = gtd.getWords()
         fil_dir_fn = gtd.dir.file_name
+
+
+        # Chekcing order of dir matching rank
+        dir_test = np.load(fil_dir_fn).transpose()
+
+        if False in np.isclose(fil_rank.transpose()[0], get_dp(space, dir_test[0])):
+            raise ValueError("Incorrect order")
+        else:
+            raise ValueError("Success!")
+
 
         split_ids = split.get_split_ids(data_type, matched_ids)
         x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(fil_rank,
@@ -429,8 +451,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTreeNone", "LinearSVM"]
-    data_types = ["reuters","newsgroups", "placetypes", "sentiment"]
+    classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
+    data_types = ["reuters", "placetypes", "newsgroups", "sentiment"]
     doLR = False
     dminf = -1
     dmanf = -1
@@ -440,8 +462,8 @@ if __name__ == '__main__':
     rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [5000]
-            hp_top_dir = [1000]
+            hp_top_freq = [5000, 10000, 20000]
+            hp_top_dir = [1000, 2000]
         elif data_types[j] == "reuters":
             hp_top_freq = [5000, 10000, 20000]
             hp_top_dir = [1000, 2000]
@@ -449,8 +471,8 @@ if __name__ == '__main__':
             hp_top_freq = [5000, 10000, 20000]
             hp_top_dir = [1000, 2000]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [5000, 10000, 20000]
-            hp_top_dir = [1000, 2000]
+            hp_top_freq = [ 5000, 10000, 20000]
+            hp_top_dir = [ 1000, 2000]
         elif data_types[j] == "movies":
             hp_top_freq = [5000, 10000, 20000]
             hp_top_dir = [1000, 2000]

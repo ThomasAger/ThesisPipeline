@@ -48,7 +48,7 @@ def pipeline(file_name, classes, class_names, processed_folder, kfold_hpam_dict,
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     print(file_name)
@@ -108,7 +108,7 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
     boc = pav.getPAV()
 
     ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_" + str(use_hidden) + "_" + str(activation_function) + "_"
-    ft_save = SaveLoad(rewrite=True)
+    ft_save = SaveLoad(rewrite=rewrite_all)
     ft = FineTuneNetwork(file_name, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden)
     ft.process_and_save()
     rankings = ft.getRanks()
@@ -330,7 +330,10 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     mds_fn = pipeline_fn + mds_identifier
                     import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
                     mds_space = dt.import2dArray(import_fn)
+                    if len(mds_space) < len(mds_space[0]):
+                        mds_space = mds_space.transpose()
                     space = mds_space
+                    #space_names[i].append(mds_fn)
                     """
                     metadata_fn = processed_folder + "bow/metadata/" + "num_stw_remove.npy"
     
@@ -346,6 +349,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                 awv_instance = awv.AWV(None, dim, awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
                 awv_instance.process_and_save()
                 awv_space = awv_instance.getRep()
+                #space_names[i].append(awv_fn)
                 space = awv_space
             elif type == "PCA":
                 pca_identifier = "_" + str(dim) + "_PCA"
@@ -354,7 +358,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                        pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
                 pca_instance.process_and_save()
                 pca_space = pca_instance.getRep()
-                space_names.append(pca_fn)
+                #space_names[i].append(pca_fn)
                 space = pca_space
             elif type == "D2V":
                 if data_type != "movies" and data_type != "placetypes":
@@ -376,7 +380,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                                                 SaveLoad(rewrite=False), data_type=data_type,
                                                                 score_metric=score_metric)
                     d2v_space, __unused = hyper_param.getTopScoringSpace()
-                    space_names.append(doc2vec_fn)
+                    #space_names[i].append(doc2vec_fn)
                     space = d2v_space
 
             epoch = [50, 300]
@@ -395,9 +399,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
             # Make the combined CSV of all the dims of all the space types
             all_r = tsrd
-            rows = all_r[1]
-            cols = np.asarray(rows.tolist()).transpose()
-            col_names = all_r[0][0]
+            cols = all_r[1]
+            col_names = all_r[0]
             key = all_r[2]
             dt.write_csv(
                 processed_folder + "ft/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_" +
@@ -409,8 +412,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    classifiers = ["DecisionTree3"]
-    data_type = [ "reuters" ]
+    classifiers = ["DecisionTree1"]
+    data_type = [ "newsgroups" ]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1

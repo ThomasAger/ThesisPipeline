@@ -227,7 +227,7 @@ def load_dict(file_name):
     return dict
 
 def loadNpyDict(fn):
-    return np.load(fn).item()
+    return np.load(fn, allow_pickle=True).item()
 
 def writeArrayDict(dict, name):
     file = open(name, "w")
@@ -435,6 +435,22 @@ def importValue(file_name, file_type="s"):
             for line in lines:
                 value = line.strip()
     return value
+
+def importFirstLineOfTextFileAsFloat(file_name):
+    first_line = None
+    with open(file_name, "r") as infile:
+        for line in infile:
+            first_line = list(map(float, line.strip().split()))
+            break
+    return [first_line]
+
+def importFirstLineOfTextFileAsFloatTransposed(file_name):
+    first_line = []
+    with open(file_name, "r") as infile:
+        for line in infile:
+            first_line.append( float(line.split()[0]))
+    return first_line
+
 
 def import2dArray(file_name, file_type="f", return_sparse=False):
     if file_name[-4:] == ".npz":
