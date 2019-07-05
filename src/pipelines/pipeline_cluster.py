@@ -398,7 +398,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = ["placetypes"]
+    data_type = ["newsgroups"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1

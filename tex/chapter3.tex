@@ -1,4 +1,4 @@
-\chapter{Converting Vector Spaces into Interpretable Representations}\label{Chapter3}
+\chapter{Re-structuring Vector Spaces into Interpretable Representations}\label{Chapter3}
 
 
 \section{Introduction}\label{chapter3:Introduction}
@@ -8,7 +8,19 @@
 %The main appeal of conceptual spaces stems from the fact that they allow a wide range of cognitive and linguistic phenomena to be modelled in an elegant way. The idea of learning semantic spaces with accurate feature directions can be seen as a first step towards methods for learning conceptual space representations from data, and thus towards the use of more cognitively plausible representations of meaning in computer science. Our method also somewhat relates to the debates in cognitive science on the relationship between similarity and rule based processes  \cite{HAHN1998197}, in the sense that it allows us to explicitly link similarity based categorization methods (e.g.\ an SVM classifier trained on semantic space representations) with rule based categorization methods (e.g.\ the decision trees that we will learn from the feature directions).
 
 
-This chapter introduces a methodology to go from a Vector Space Model (VSM) of text-documents and associated Bag-Of-Words (BOW) to an interpretable document representation. These interpretable representation are demonstrated to be effective in simple linear classifiers on document classification tasks. In this work, a representation is defined as 'interpretable' if each feature is labelled and corresponds to a salient feature of the domain. In the case of the document representations used in this work, salient features correspond to rankings of documents on domain knowledge. Examples of features that rank documents from the method are shown in Table \ref{ch3:ExampleRep}. 
+This chapter introduces a methodology to go from a Vector Space Model (VSM) of text-documents and associated Bag-Of-Words (BOW) representation to an interpretable document representation. Interpretability as an idea has a variety of interpretations and meanings (See \ref{ch2:Interpretability}). In this thesis, an ideal interpretable representation's features have three important properties: First that each feature models an important aspect of the domain, second that these aspects are distinct from each other, such that each feature represents a unique aspect of the domain, and thirdly that each feature is labelled with a cluster of words describing the aspect of the domain the feature is modelling. To give an insight into what kind-of domain knowledge these features represent, examples of word clusters that describe features are shown In Table \ref{ch3:ExampleRep}. 
+
+
+
+
+
+
+
+
+
+
+% These interpretable representation are demonstrated to be effective in simple linear classifiers on document classification tasks. 
+
 
 The method is entirely unsupervised and 'disentangles' an existing vector space model into salient features. The idea of disentanglement is present in representation learning \cite{Bengio2012} e.g. when given a raw video file of a person jumping, ideally a representation would spatially separate the notions of 'jumping', from the 'person', and the 'background'. In this work disentanglement is used to refer to separating an existing vector space into salient features, such that each dimension of the space is a labelled feature. 
 

@@ -92,6 +92,7 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
 
     dir = np.load(dir_fn)
 
+    use_cluster = False
     if len(dir) <= 200 and len(dir[0]) <= 200:
         use_cluster = True
 
@@ -107,7 +108,7 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
 
     if use_cluster is False:
         dir = dir.transpose()
-        if False in (np.isclose(ranking.transpose()[0], get_dp(space, dir[0])))  :
+        if False in (np.isclose(ranking[0], get_dp(space, dir[0])))  :
             raise ValueError("Rankings or space do not match")
     else:
         if False in (np.isclose(ranking[0], get_dp(space, dir[0])))  :
@@ -122,7 +123,7 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
 
     ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_" + str(use_hidden) + "_" + str(activation_function) + "_"
     ft_save = SaveLoad(rewrite=rewrite_all)
-    ft = FineTuneNetwork(file_name, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden)
+    ft = FineTuneNetwork(ft_fn, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden)
     ft.process_and_save()
     rankings = ft.getRanks()
     ranking_fn = ft.output_ranks.file_name
@@ -261,11 +262,11 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         for j in range(len(name_of_class)):
             if data_type == "newsgroups":
                 if model_type == "DecisionTree3":
-                    csv_fn = processed_folder + "clusters/score/csv_final/" + "num_stw_num_stw_200_MDS_ndcg_2000_5000_0_rankreps" + model_type + "_"+ name_of_class[j]
+                    csv_fn = processed_folder + "clusters/score/csv_final/" + "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rankreps" + model_type + "_"+ name_of_class[j]+ "_" + "False"
                 elif model_type == "DecisionTree2":
-                    csv_fn = processed_folder + "clusters/score/csv_final/" + "num_stw_num_stw_200_MDS_ndcg_2000_5000_0_rankreps" + model_type + "_"+ name_of_class[j]
+                    csv_fn = processed_folder + "clusters/score/csv_final/" + "num_stw_num_stw_100_D2V_ndcg_2000_5000_0_rankreps" + model_type + "_"+ name_of_class[j]+ "_" + "False"
                 elif model_type == "DecisionTree1":
-                    csv_fn = processed_folder + "clusters/score/csv_final/" + "num_stw_num_stw_200_MDS_ndcg_2000_5000_0_rankreps" + model_type + "_"+ name_of_class[j]
+                    csv_fn = processed_folder + "clusters/score/csv_final/" + "num_stw_num_stw_200_MDS_ndcg_2000_10000_0_rankreps" + model_type + "_"+ name_of_class[j]+ "_" + "False"
             elif data_type == "placetypes":
                 if model_type == "DecisionTree3":
                     if name_of_class[j] == "Foursquare":
@@ -465,8 +466,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_type = [ "reuters"]
-    use_clusters = [True, False]
+    data_type = [ "newsgroups"]
+    use_clusters = [False, True]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
