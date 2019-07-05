@@ -98,6 +98,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
     # Get the clusters For the cluster input parameters with the directions as input
     cluster.process_and_save()
     cluster_dir = cluster.getCentroids()
+    cluster_dir_name = cluster.getDirName()
     cluster_names = np.asarray(cluster.getClusterNames())
 
     if svm_clusters is True:
@@ -154,7 +155,7 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 
     hyper_param.process_and_save()
     # Get the scores for those rankings
-    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name, cluster_names, dir_fn
+    return hyper_param.getTopScoringParams(), hyper_param.getTopScoringRowData(), rank.rankings.file_name,  cluster_names, dir_fn, cluster_dir_name
 
 
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
@@ -389,15 +390,15 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             cols = np.asarray(rows.tolist()).transpose()
             col_names = all_r[0][0]
             key = all_r[2]
-            dt.write_csv(
-                processed_folder + "clusters/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_" + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
+            dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_"
+                         + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
                 col_names, cols, key)
             print("a")
 
 
 def init():
     classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = [ "placetypes", "reuters", "newsgroups", "sentiment"]
+    data_type = ["placetypes"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1

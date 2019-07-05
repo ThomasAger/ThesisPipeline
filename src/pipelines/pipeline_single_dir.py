@@ -117,7 +117,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     score.process_and_save()
     s_dict = score.get()
 
-    rank_save = SaveLoad(rewrite=rewrite_all)
+    rank_save = SaveLoad(rewrite=True)
 
     stream_rankings = False
     if (data_type == "sentiment" and no_below > 5000) or (no_below >= 10000 and data_type != "movies") or no_below > 10000:
@@ -132,6 +132,10 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     rankings = rank.getRankings()
     if len(rankings) < 100:
         if False in np.isclose(dt.importFirstLineOfTextFileAsFloat(rankings), get_dp(space, dirs[0])):
+            raise ValueError("Rankings do not match")
+    else:
+        print("kay")
+        if False in np.isclose(rankings[0], get_dp(space, dirs[0])):
             raise ValueError("Rankings do not match")
 
     dct_len_end =  len(dct_unchanged.dfs.keys())
@@ -173,6 +177,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     for i in range(len(score_array)):
         dir_fn = file_name + "_" + sc_name_array[i] + "_" + str(top_scoring_dir) + "_" + str(no_below) + "_" + str(no_above)
         gtr_save = SaveLoad(rewrite=True)
+
         if stream_rankings:
             gtr = GetTopScoringRanksStreamed(dir_fn, gtr_save, processed_folder + "rank/", score_array[i], top_scoring_dir, rankings, new_word2id_dict)
         else:
@@ -181,7 +186,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         fil_rank = gtr.getRank()
         fil_rank_fn = gtr.rank.file_name
 
-        gtd_save = SaveLoad(rewrite=rewrite_all)
+        gtd_save = SaveLoad(rewrite=True)
         gtd = GetTopScoringDirs(dir_fn, gtd_save, processed_folder + "directions/", score_array[i], top_scoring_dir,
                                     words, dirs, new_word2id_dict)
         gtd.process_and_save()
@@ -451,8 +456,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_types = ["reuters", "placetypes", "newsgroups", "sentiment"]
+    classifiers = ["DecisionTree1"]
+    data_types = [ "sentiment"]
     doLR = False
     dminf = -1
     dmanf = -1

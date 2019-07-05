@@ -90,6 +90,8 @@ class DerracCluster(Method):
             print(self.cluster_names.value[i])
 
 
+    def getDirName(self):
+        return self.centroids.file_name
 
     def getClusters(self):
         if self.processed is False:

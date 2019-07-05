@@ -291,7 +291,7 @@ class RecHParam(MasterHParam):
                 self.feature_names_from_par.append(feature_names)
                 self.dir_fn.append(top_dir)
             elif self.hpam_model_type == "cluster":
-                top_params, top_row_data, cluster_rank, feature_names, cluster_fn =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
+                top_params, top_row_data, cluster_rank, feature_names, cluster_fn, cluster_dir_fn =  pipeline_cluster.cluster_pipeline(*self.hpam_params, n_init=self.all_p[i]["n_init"], max_iter=self.all_p[i]["max_iter"],tol=self.all_p[i]["tol"], top_dir_amt=self.all_p[i]["top_dir_amt"])
                 self.top_scoring_params.value.append(top_params)
                 self.feature_names_from_par.append(feature_names)
                 self.entered_fn.append(cluster_fn)
@@ -300,6 +300,7 @@ class RecHParam(MasterHParam):
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(cluster_rank)
+                self.dir_fn.append(cluster_dir_fn)
             elif self.hpam_model_type == "ft":
                 top_params, top_row_data, cluster_rank =  pipeline_ft.ft_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"], use_hidden=self.all_p[i]["use_hidden"])
                 self.top_scoring_params.value.append(top_params)
@@ -422,10 +423,10 @@ class RecHParam(MasterHParam):
 
         score_dict = score.get()
         # This order cannot be changed as this is the order it is imported as.
-        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn"]
+        col_names = ["avg_acc", "avg_f1", "avg_kappa", "avg_prec", "avg_recall", "rank_fn", "dir_fn"]
         avg_array = [score_dict[col_names[0]], score_dict[col_names[1]],
                      score_dict[col_names[2]], score_dict[col_names[3]],
-                     score_dict[col_names[4]], self.rank_fn[index]]
+                     score_dict[col_names[4]], self.rank_fn[index], self.dir_fn[index]]
         self.top_scoring_features.value = space
         self.top_scoring_row_data.value = [np.asarray(col_names), np.asarray(avg_array), np.asarray([model_fn])]
         print("GOt cluster")

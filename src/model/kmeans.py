@@ -49,6 +49,8 @@ class KMeansCluster(Method):
         for i in range(len(self.feature_names)):
             self.cluster_dirs.value[labels[i]].append(self.features[i])
 
+    def getDirName(self):
+        return self.centroids.file_name
     def getClusters(self):
         if self.processed is False:
             self.cluster_dirs.value = self.save_class.load(self.cluster_dirs)
