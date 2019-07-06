@@ -20,8 +20,9 @@ class FineTuneNetwork(Method):
     trainer = None
     layer_space = None
     use_hidden = None
+    use_weights = None
 
-    def __init__(self, file_name, output_folder, space, directions, rankings, ppmi_boc, log_dir, hidden_layer_size,  activation, epoch, save_class, use_hidden):
+    def __init__(self, file_name, output_folder, space, directions, rankings, ppmi_boc, log_dir, hidden_layer_size,  activation, epoch, save_class, use_hidden, use_weights):
 
         self.space = space
         self.directions = directions
@@ -33,6 +34,7 @@ class FineTuneNetwork(Method):
         self.hidden_layer_size = int(len(space[0]) * hidden_layer_size)
         self.epoch = epoch
         self.use_hidden = use_hidden
+        self.use_weights = use_weights
         self.trainer = Adagrad(lr=0.01, epsilon=None, decay=0.0)
 
         super().__init__(file_name, save_class)
@@ -63,11 +65,19 @@ class FineTuneNetwork(Method):
                                   write_graph=True, write_images=True)
         """
         self.model = Sequential()
-        if self.use_hidden:
+        if self.use_hidden is True:
             self.model.add(Dense(output_dim=self.hidden_layer_size, input_dim=len(self.space[0]), activation=self.activation, init="glorot_uniform"))
+        elif self.use_hidden is "identity":
+            self.model.add(
+                Dense(output_dim=self.hidden_layer_size, input_dim=len(self.space[0]), activation=self.activation,
+                      init=Identity))
 
-        self.model.add(Dense(output_dim=len(self.ppmi_boc),input_dim=self.hidden_layer_size,  activation="linear",
-                        weights=fine_tune_weights))
+        if self.use_weights:
+            self.model.add(Dense(output_dim=len(self.ppmi_boc),input_dim=self.hidden_layer_size,  activation="linear",
+                            weights=fine_tune_weights))
+        else:
+            self.model.add(Dense(output_dim=len(self.ppmi_boc),input_dim=self.hidden_layer_size,  activation="linear"))
+
 
         self.model.compile(loss=self.loss, optimizer=Adagrad(lr=0.01, epsilon=None, decay=0.0))
 

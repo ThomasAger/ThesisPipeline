@@ -76,7 +76,7 @@ def get_dp(space, direction):
 
 def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, class_names,
                       kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids,
-                 rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function, use_hidden):
+                 rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function, use_hidden, use_weights):
 
     if use_hidden is False:
         hidden_layer_size = 0
@@ -121,9 +121,9 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
     pav.process_and_save()
     boc = pav.getPAV()
 
-    ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_" + str(use_hidden) + "_" + str(activation_function) + "_"
+    ft_fn = file_name + "_"+str(hidden_layer_size) + "_"+str(epoch)+"_" + str(use_hidden) + "_" + str(activation_function) + "_" + str(use_weights) + "_"
     ft_save = SaveLoad(rewrite=rewrite_all)
-    ft = FineTuneNetwork(ft_fn, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden)
+    ft = FineTuneNetwork(ft_fn, processed_folder + "ft/", space, dir, ranking, boc, "", hidden_layer_size, activation_function, epoch, ft_save, use_hidden, use_weights)
     ft.process_and_save()
     rankings = ft.getRanks()
     ranking_fn = ft.output_ranks.file_name
@@ -435,14 +435,17 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     #space_names[i].append(doc2vec_fn)
                     space = d2v_space
 
-            epoch = [50, 300]
+            epoch = [50, 500, 1000]
             hidden_layer_size = [1]
-            activation_function = ["linear",  "tanh"]
-            use_hidden = [True]
+            activation_function = ["linear",  "tanh", "relu"]
+            use_hidden = [True, False, "identity"]
+            use_weights = [True, False]
+
             pipeline_hpam_dict = {"epoch": epoch,
                                   "hidden_layer_size": hidden_layer_size,
                                   "activation_function": activation_function,
-                                  "use_hidden": use_hidden}
+                                  "use_hidden": use_hidden,
+                                  "use_weights": use_weights}
 
             tsrd = pipeline(space_names[i][j], classes, class_names, processed_folder, kfold_hpam_dict,
                             model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
