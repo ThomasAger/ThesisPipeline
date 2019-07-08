@@ -79,8 +79,15 @@ def ft_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, cl
                  rank_fn, dir_fn, ranking_names_fn, bow, dct, hidden_layer_size, epoch, activation_function, use_hidden, use_weights):
 
     if use_hidden is False:
-        hidden_layer_size = 0
+        hidden_layer_size = 1
         activation_function = "None"
+        use_weights = False
+
+    if hidden_layer_size != 1:
+        use_weights = False
+
+    if use_hidden == "identity":
+        hidden_layer_size = 1
 
     ranking = dt.import2dArray(rank_fn)
 
@@ -435,10 +442,10 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     #space_names[i].append(doc2vec_fn)
                     space = d2v_space
 
-            epoch = [50, 500, 1000]
-            hidden_layer_size = [1]
-            activation_function = ["linear",  "tanh", "relu"]
-            use_hidden = [True, False, "identity"]
+            epoch = [50, 500]
+            hidden_layer_size = [1, 0.5, 2]
+            activation_function = ["linear",  "tanh"]
+            use_hidden = [True, False]
             use_weights = [True, False]
 
             pipeline_hpam_dict = {"epoch": epoch,
@@ -470,7 +477,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
     data_type = [ "newsgroups"]
-    use_clusters = [False, True]
+    use_clusters = [True, False]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1

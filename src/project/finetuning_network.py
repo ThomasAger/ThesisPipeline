@@ -66,17 +66,20 @@ class FineTuneNetwork(Method):
         """
         self.model = Sequential()
         if self.use_hidden is True:
+            print("Hidden layer")
             self.model.add(Dense(output_dim=self.hidden_layer_size, input_dim=len(self.space[0]), activation=self.activation, init="glorot_uniform"))
         elif self.use_hidden is "identity":
+            print("Identity layer")
             self.model.add(
-                Dense(output_dim=self.hidden_layer_size, input_dim=len(self.space[0]), activation=self.activation,
-                      init=Identity))
+                Dense(output_dim=self.hidden_layer_size, input_dim=len(self.space[0]), activation=self.activation, init=Identity()))
 
         if self.use_weights:
-            self.model.add(Dense(output_dim=len(self.ppmi_boc),input_dim=self.hidden_layer_size,  activation="linear",
+            print("Output init with directions")
+            self.model.add(Dense(output_dim=len(self.ppmi_boc), input_dim=self.hidden_layer_size,  activation="linear",
                             weights=fine_tune_weights))
         else:
-            self.model.add(Dense(output_dim=len(self.ppmi_boc),input_dim=self.hidden_layer_size,  activation="linear"))
+            print("Output no init")
+            self.model.add(Dense(output_dim=len(self.ppmi_boc), input_dim=self.hidden_layer_size,  activation="linear"))
 
 
         self.model.compile(loss=self.loss, optimizer=Adagrad(lr=0.01, epsilon=None, decay=0.0))
