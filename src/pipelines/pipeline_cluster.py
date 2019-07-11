@@ -395,16 +395,16 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                         cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j][a], space=space, cluster_method=cluster_methods[cm],
                                         svm_clusters=svm_clusters, bow=bow, dct=dct)
                         tsrds.append(tsrd)
-            # Make the combined CSV of all the dims of all the space types
-            all_r = np.asarray(tsrds).transpose()
-            rows = all_r[1]
-            cols = np.asarray(rows.tolist()).transpose()
-            col_names = all_r[0][0]
-            key = all_r[2]
-            dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j] + "reps" + model_type + "_"
-                         + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
-                col_names, cols, key)
-            print("a")
+                # Make the combined CSV of all the dims of all the space types
+                all_r = np.asarray(tsrds).transpose()
+                rows = all_r[1]
+                cols = np.asarray(rows.tolist()).transpose()
+                col_names = all_r[0][0]
+                key = all_r[2]
+                dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j][a] +  str(a) + "reps" + model_type + "_"
+                             + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
+                    col_names, cols, key)
+                print("a")
 
 
 def init():
