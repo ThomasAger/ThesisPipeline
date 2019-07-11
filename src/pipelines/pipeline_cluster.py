@@ -47,7 +47,7 @@ def pipeline(file_name, top_dirs_fn,classes, class_names, processed_folder, kfol
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     print(file_name)
@@ -254,18 +254,28 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     space_name_array = []
     for j in range(len(name_of_class)):
         csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
-        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][rank_id]
-        print(rank_fn)
-        rank_fn_array.append(rank_fn)
+        space_name_internal = []
+        rank_fn_internal =[]
+        word_fn_internal = []
+        dir_fn_internal = []
+        for z in range(len(csv.values)):
+            rank_fn = csv.values[z][rank_id]
+            print(rank_fn)
+            rank_fn_internal.append(rank_fn)
 
-        word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
-        print(word_fn)
-        word_fn_array.append(word_fn)
+            word_fn = "_".join(rank_fn.split("_")[:-1])+ "_words.npy"
+            print(word_fn)
+            word_fn_internal.append(word_fn)
 
-        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][dir_id]
-        dir_fn_array.append(dir_fn)
-        space_name = rank_fn.split("/")[-1:][0][:-4]
-        space_name_array.append(space_name)
+            dir_fn = csv.values[z][dir_id]
+            dir_fn_internal.append(dir_fn)
+
+            space_name = rank_fn.split("/")[-1:][0][:-4]
+            space_name_internal.append(space_name)
+        rank_fn_array.append(rank_fn_internal)
+        word_fn_array.append(word_fn_internal)
+        space_name_array.append(space_name_internal)
+        dir_fn_array.append(dir_fn_internal)
 
     rank_fns.append(rank_fn_array)
     dir_fns.append(dir_fn_array)
@@ -283,107 +293,108 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     print(rank_fns)
     for i in range(len(rank_fns)):
         for j in range(len(name_of_class)):
-            print(j)
-            classes_process = util.classify.ProcessClasses(None, None, pipeline_fn, processed_folder, bowmin, no_below,
-                                                           no_above, classes_freq_cutoff, True, classes_save,
-                                                           name_of_class[j])
+            for a in range(len(space_names[i][j])):
+                print(j)
+                classes_process = util.classify.ProcessClasses(None, None, pipeline_fn, processed_folder, bowmin, no_below,
+                                                               no_above, classes_freq_cutoff, True, classes_save,
+                                                               name_of_class[j])
 
-            class_names = classes_process.getClassNames()
+                class_names = classes_process.getClassNames()
 
-            corp_save = SaveLoad(rewrite=False)
-            p_corpus = process_corpus.Corpus(None, None, name_of_class[j], pipeline_fn, processed_folder,
-                                             bowmin,
-                                             no_below, no_above, True, corp_save)
-            classes = p_corpus.getClasses()
-            bow = p_corpus.getBow()
-            dct = p_corpus.getBowDct()
-            space = None
+                corp_save = SaveLoad(rewrite=False)
+                p_corpus = process_corpus.Corpus(None, None, name_of_class[j], pipeline_fn, processed_folder,
+                                                 bowmin,
+                                                 no_below, no_above, True, corp_save)
+                classes = p_corpus.getClasses()
+                bow = p_corpus.getBow()
+                dct = p_corpus.getBowDct()
+                space = None
 
-            dim = int(rank_fns[i][j].split("/")[-1:][0].split("_")[4])
-            type = rank_fns[i][j].split("/")[-1:][0].split("_")[5]
-            if type == "MDS":
-                if data_type != "sentiment":
-                    mds_identifier = "_" + str(dim) + "_MDS"
-                    mds_fn = pipeline_fn + mds_identifier
-                    import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
-                    mds_space = dt.import2dArray(import_fn)
-                    space = mds_space
-                    """
-                    metadata_fn = processed_folder + "bow/metadata/" + "num_stw_remove.npy"
-    
-                    if len(mds_space) != 18302:
-                        del_ids = np.load(metadata_fn)
-                        mds_space = np.delete(mds_space, del_ids, axis=0)
-                        np.save(import_fn,mds_space)
-                    """
+                dim = int(rank_fns[i][j][a].split("/")[-1:][0].split("_")[4])
+                type = rank_fns[i][j][a].split("/")[-1:][0].split("_")[5]
+                if type == "MDS":
+                    if data_type != "sentiment":
+                        mds_identifier = "_" + str(dim) + "_MDS"
+                        mds_fn = pipeline_fn + mds_identifier
+                        import_fn = processed_folder + "rep/mds/" + mds_fn + ".npy"
+                        mds_space = dt.import2dArray(import_fn)
+                        space = mds_space
+                        """
+                        metadata_fn = processed_folder + "bow/metadata/" + "num_stw_remove.npy"
+        
+                        if len(mds_space) != 18302:
+                            del_ids = np.load(metadata_fn)
+                            mds_space = np.delete(mds_space, del_ids, axis=0)
+                            np.save(import_fn,mds_space)
+                        """
 
-            elif type == "AWVEmp":
-                awv_identifier = "_" + str(dim) + "_AWVEmp"
-                awv_fn = pipeline_fn + awv_identifier
-                awv_instance = awv.AWV(None, dim, awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
-                awv_instance.process_and_save()
-                awv_space = awv_instance.getRep()
-                space = awv_space
-            elif type == "PCA":
-                pca_identifier = "_" + str(dim) + "_PCA"
-                pca_fn = pipeline_fn + pca_identifier
-                pca_instance = pca.PCA(None, None, dim,
-                                       pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
-                pca_instance.process_and_save()
-                pca_space = pca_instance.getRep()
-                space_names.append(pca_fn)
-                space = pca_space
-            elif type == "D2V":
-                if data_type != "movies" and data_type != "placetypes":
-                    doc2vec_identifier = "_" + str(dim) + "_D2V"
-                    doc2vec_fn = pipeline_fn + doc2vec_identifier
-                    classifier_fn = pipeline_fn + "_" + name_of_class[j] + "_"
+                elif type == "AWVEmp":
+                    awv_identifier = "_" + str(dim) + "_AWVEmp"
+                    awv_fn = pipeline_fn + awv_identifier
+                    awv_instance = awv.AWV(None, dim, awv_fn, processed_folder + "rep/awv/", SaveLoad(rewrite=False))
+                    awv_instance.process_and_save()
+                    awv_space = awv_instance.getRep()
+                    space = awv_space
+                elif type == "PCA":
+                    pca_identifier = "_" + str(dim) + "_PCA"
+                    pca_fn = pipeline_fn + pca_identifier
+                    pca_instance = pca.PCA(None, None, dim,
+                                           pca_fn, processed_folder + "rep/pca/", SaveLoad(rewrite=False))
+                    pca_instance.process_and_save()
+                    pca_space = pca_instance.getRep()
+                    #space_names.append(pca_fn)
+                    space = pca_space
+                elif type == "D2V":
+                    if data_type != "movies" and data_type != "placetypes":
+                        doc2vec_identifier = "_" + str(dim) + "_D2V"
+                        doc2vec_fn = pipeline_fn + doc2vec_identifier
+                        classifier_fn = pipeline_fn + "_" + name_of_class[j] + "_"
 
-                    wv_path_d2v = os.path.abspath("../../data/raw/glove/" + "glove.6B.300d.txt")
+                        wv_path_d2v = os.path.abspath("../../data/raw/glove/" + "glove.6B.300d.txt")
 
-                    corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
-                    hpam_dict["dim"] = [dim]
-                    hpam_dict["corpus_fn"] = [corpus_fn]
-                    hpam_dict["wv_path"] = [wv_path_d2v]
+                        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+                        hpam_dict["dim"] = [dim]
+                        hpam_dict["corpus_fn"] = [corpus_fn]
+                        hpam_dict["wv_path"] = [wv_path_d2v]
 
-                    # Have to leave classes in due to messy method
-                    hyper_param = KFoldHyperParameter.RecHParam(None, classes, None, hpam_dict, hpam_dict, "d2v",
-                                                                "LinearSVM",
-                                                                doc2vec_fn, classifier_fn, processed_folder + "rep/",
-                                                                SaveLoad(rewrite=False), data_type=data_type,
-                                                                score_metric=score_metric)
-                    d2v_space, __unused = hyper_param.getTopScoringSpace()
-                    space_names.append(doc2vec_fn)
-                    space = d2v_space
-            tsrds = []
-            for c in range(len(cluster_amt)):
-                for cm in range(len(cluster_methods)):
-                    if cluster_methods[cm] == "kmeans":
-                        n_init = [5, 10, 50]
-                        max_iter = [100, 300, 1000]
-                        tol = [0.001, 0.0001, 0.00001, 0.0]
-                        top_dir_amt = [0]
-                        pipeline_hpam_dict = {"n_init": n_init,
-                                              "max_iter": max_iter,
-                                              "tol": tol,
-                                              "top_dir_amt": top_dir_amt}
-                    elif cluster_methods[cm] == "derrac":
-                        n_init = [0]
-                        max_iter = [0]
-                        tol = [0]
-                        top_dir_amt = orig_top_dir_amt
+                        # Have to leave classes in due to messy method
+                        hyper_param = KFoldHyperParameter.RecHParam(None, classes, None, hpam_dict, hpam_dict, "d2v",
+                                                                    "LinearSVM",
+                                                                    doc2vec_fn, classifier_fn, processed_folder + "rep/",
+                                                                    SaveLoad(rewrite=False), data_type=data_type,
+                                                                    score_metric=score_metric)
+                        d2v_space, __unused = hyper_param.getTopScoringSpace()
+                        #space_names.append(doc2vec_fn)
+                        space = d2v_space
+                tsrds = []
+                for c in range(len(cluster_amt)):
+                    for cm in range(len(cluster_methods)):
+                        if cluster_methods[cm] == "kmeans":
+                            n_init = [5, 10, 50]
+                            max_iter = [100, 300, 1000]
+                            tol = [0.001, 0.0001, 0.00001, 0.0]
+                            top_dir_amt = [0]
+                            pipeline_hpam_dict = {"n_init": n_init,
+                                                  "max_iter": max_iter,
+                                                  "tol": tol,
+                                                  "top_dir_amt": top_dir_amt}
+                        elif cluster_methods[cm] == "derrac":
+                            n_init = [0]
+                            max_iter = [0]
+                            tol = [0]
+                            top_dir_amt = orig_top_dir_amt
 
-                        pipeline_hpam_dict = {"n_init": n_init,
-                                              "max_iter": max_iter,
-                                              "tol": tol,
-                                              "top_dir_amt": top_dir_amt}
-                    print(cluster_amt[c])
-                    tsrd = pipeline(space_names[i][j],  dir_fns[i][j],  classes, class_names,processed_folder, kfold_hpam_dict,
-                                    model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
-                                    auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
-                                    cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j], space=space, cluster_method=cluster_methods[cm],
-                                    svm_clusters=svm_clusters, bow=bow, dct=dct)
-                    tsrds.append(tsrd)
+                            pipeline_hpam_dict = {"n_init": n_init,
+                                                  "max_iter": max_iter,
+                                                  "tol": tol,
+                                                  "top_dir_amt": top_dir_amt}
+                        print(cluster_amt[c])
+                        tsrd = pipeline(space_names[i][j][a],  dir_fns[i][j][a],  classes, class_names,processed_folder, kfold_hpam_dict,
+                                        model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
+                                        auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
+                                        cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j][a], space=space, cluster_method=cluster_methods[cm],
+                                        svm_clusters=svm_clusters, bow=bow, dct=dct)
+                        tsrds.append(tsrd)
             # Make the combined CSV of all the dims of all the space types
             all_r = np.asarray(tsrds).transpose()
             rows = all_r[1]
@@ -398,7 +409,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = ["newsgroups"]
+    data_type = ["placetypes"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
