@@ -101,7 +101,7 @@ class GetRankingsNoSave(Method.Method):
         i = 0
         for key, value in self.words.items():
             self.rankings.value[value] = self.get_dp(self.dirs[value])
-            print(i, "/", len(self.words.keys()), key)
+            #print(i, "/", len(self.words.keys()), key)
             i += 1
         super().process()
 
@@ -178,4 +178,5 @@ class GetRankingsStreamed(Method.Method):
 
 
 if __name__ == '__main__':
+    np.load("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed\placetypes\directions\words/num_stw_50_new_wdct_NB_69_NA_1313.npy", allow_pickle=True)
     print("kay")

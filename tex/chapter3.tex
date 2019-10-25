@@ -1,51 +1,95 @@
-\chapter{Re-structuring Vector Spaces into Interpretable Representations}\label{Chapter3}
+\chapter{Re-organizing Vector Spaces into Interpretable Representations}\label{chapter3}
 
 
 \section{Introduction}\label{chapter3:Introduction}
 %Representing the knowledge present in natural language data is a key task in Natural Language Processing. The most common representation is one based on frequency statistics: the Bag-Of-Words (BOW). This representation has the benefits of being easy to understand on a granular level, as each feature is a distinctly labelled word. However, it does not capture more complex relationships between words at a conceptual level. For example, it may be the case that in a text domain of movie reviews a horror movie frequently mentions the words "scary" "blood" and "gore", and through these terms occurring together we may infer that it is a Horror movie, or that other documents with similar words like "terrifying" or "blood" are similar documents. This is similarity information, which can be induced by taking the frequency vectors of a Bag-Of-Words and interpreting them in terms of relative cosine similarity. However, simply finding the similarity between each document would result in an \textit {N} by \textit {N} representation. Which is obtrusively large. In reality we do not need a dimension per document - it is more likely that a group of documenta e.g. Horror movie reviews from a domain of movies could be used as a "Horror" feature by averaging their dimensions together, the same with romantic movies or particularly cinematographally good ones. This is why typically these similarity representations are obtained with dimensionality reduction methods - with the general rule of thumb being that you want as many salient features as dimensions, where smaller dimensions represent more general concepts (with the most specific amount of dimensions being equivalent to the amount of words). 
 
+
 %\noindent \textbf{Semantic spaces.} Within the field of cognitive science, feature representations and semantic spaces both have a long tradition as alternative, and often competing representations of semantic relatedness \cite{tversky1977features}. Conceptual spaces \cite{gardenfors2004conceptual} to some extent unify these two opposing views, by representing objects as points in vector spaces, one for each facet (e.g.\ color, shape, taste in a conceptual space of fruit), such that the dimensions of each of these vector spaces correspond to primitive features. %Different from other vector space models, however, a conceptual space is typically composed of several vector spaces, each of which intuitively models a single facet from the given domain. For example, a conceptual space of fruit could be composed of vector spaces modelling color, shape, taste, price, size and weight. 
 %The main appeal of conceptual spaces stems from the fact that they allow a wide range of cognitive and linguistic phenomena to be modelled in an elegant way. The idea of learning semantic spaces with accurate feature directions can be seen as a first step towards methods for learning conceptual space representations from data, and thus towards the use of more cognitively plausible representations of meaning in computer science. Our method also somewhat relates to the debates in cognitive science on the relationship between similarity and rule based processes  \cite{HAHN1998197}, in the sense that it allows us to explicitly link similarity based categorization methods (e.g.\ an SVM classifier trained on semantic space representations) with rule based categorization methods (e.g.\ the decision trees that we will learn from the feature directions).
 
-% Why a conceptual space representation? What are entities/properties in that context?
-
-Perception can be boiled down to objects, or entities. These entities can be described using properties. For example, for the property of "tall", there would be object instances of humans relative to each other on a ranking of tallness. A representation that employs this kind of idea can be known as a conceptual space, where entities are represented as points and spatial relations correspond to properties. 
-
-%What kind-of representation are we introducing? / What is a ranking? How would a ranking on properties be useful? Why is that a good problem to solve?
-
-%How is this representation obtained? 
-
-%How is this representation evaluated?
-
-Conceptual spaces are a particular way of viewing semantic spaces, where entities (e.g. documents in the case of a document-based representation, or words in the case of word-vectors) are represented as points in the space. Then, properties are aspects of these documents in the space. 
-
-The spatial structures of semantic spaces have been used in a variety of ways. In \cite{Dai} it was shown that it is possible to perform vector operations on Paragraph Vectors,  e.g. subtracting word-vectors from paragraph vectors, like in the case of a corpus of arxiv papers, a paper titled "Spectral Clustering", could have the word-vector for "Spectal"  subtracted from it to get papers about general clustering. In the case of distributional representations of words \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, found that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. In \cite{kim2013deriving} directional vectors in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{Rothe2016} found directions indicating lexical features such as the frequency of occurrence and polarity of words.
-
-The spatial structures we leverage in this work are found in document representations. In particular, directional vectors that describe a particular feature of a domain. A toy example is shown in Figure \ref{ch3:ToyDirectionsGraphic}. These directions have been applied in a variety of domains. For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model.  Derrac \cite{Derrac2015}  found directions corresponding to properties such as `Scary', `Romantic' or `Hilarious' in a semantic space of movies, for example a direction which goes from a movie that is the least 'Scary' to the most 'Scary'. This chapter builds on their work, with the main contributions of the chapter being application of this method to producing an interpretable representation, deeper and more extensive experimentation, qualitative analysis and application to interpretable classifiers.  %The basic idea of this chapter is that we use these feature-directions to produce a representation where each dimension is a ranking of entities on those feature-direction, and evaluate its effectiveness using simple linear classifiers.
-
-Such feature directions are useful in a wide variety of applications. The most immediate example is perhaps that they allow for a natural way to implement critique-based recommendation systems, where users can specify how their desired result should relate to a given set of suggestions \cite{Viappiani2006}. For instance, \cite{Vig2014} propose a movie recommendation system in which the user can specify that they want to see suggestions for movies that are ``similar to this one, but scarier''. If the property of being scary is adequately modelled as a direction in a semantic space of movies, such critiques can be addressed in a straightforward way. Similarly, in \cite{Kovashka} a system was developed that can find ``shoes like these but shinier'', based on a semantic space representation that was derived from visual features. Semantic search systems can use such directions to interpret queries involving gradual and possibly ill-defined features, such as ``\emph{popular} holiday destinations in Europe'' \cite{Jameel}. While features such as popularity are typically not encoded in traditional knowledge bases, they can often be represented as semantic space directions.  As another application, feature directions can also be used in interpretable classifiers. For example, \cite{Derrac2015} learned rule based classifiers from rankings induced by the feature directions.
-
-This chapter investigates how to make the spatial structure of a semantic space explicit, such that a new representation is formed where each feature models the spatial representation of a property in the domain. These properties are labelled with clusters of words. Example word clusters are shown In Table \ref{ch3:ExampleRep}. 
-
-% Introduce semantic spaces in the context of using them to produce an interpretable representation
+%One paragraph on why the lack of interpretability of document embeddings is an issue (i.e. what are the sorts of things we would like to do with document vectors that we can't do "off-the-shelf" with e.g. doc2vec or MDS representations).
 
 
 
-% Explain the previous work
+%One paragraph to explain that the solution you will consider in this chapter is to learn how you can predict which features a given document from its vector representation. Here you should also explain that the method will be unsupervised and based on the idea that you will first try to predict which words occur in the document from its embedding, and then rely on the assumption that the words for which this is possible are likely to be words that describe important features. You can point out that this method is unsupervised in the sense that the training signal for the classifiers comes from the bag-of-words representation of the documents.
 
-% Explain our work
-
-
+%Then one paragraph about how this chapter builds on earlier work, and how you will in turn build on this chapter in the next one.
 
 
+% Why do we want rankings of documents on domain properties
+
+% First explain what kind of applications you want to tackle, without using words like "salient feature", "direction", "interpretable" or "disentangled". Then further on in the introduction, you should probably explicitly say that what is needed for these applications are rankings of the documents according to some features (+give examples), etc
 
 
-This chapter introduces a methodology to go from a Vector Space Model (VSM) of text-documents and associated Bag-Of-Words (BOW) representation to an interpretable document representation. Interpretability as an idea has a variety of interpretations and meanings (See \ref{ch2:Interpretability}). In this thesis, an ideal interpretable representation's features have three important properties: First that each feature models an important aspect of the domain, second that these aspects are distinct from each other, such that each feature represents a unique aspect of the domain, and thirdly that each feature is labelled with a cluster of words describing the aspect of the domain the feature is modelling. 
+%* One paragraph on why the lack of interpretability of document embeddings is an issue (i.e. what are the sorts of things we would like to do with document vectors that we can't do "off-the-shelf" with e.g. doc2vec or MDS representations).
 
-% These interpretable representation are demonstrated to be effective in simple linear classifiers on document classification tasks. 
+%* One paragraph to explain that the solution you will consider in this chapter is to learn how you can predict which features a given document from its vector representation. Here you should also explain that the method will be unsupervised and based on the idea that you will first try to predict which words occur in the document from its embedding, and then rely on the assumption that the words for which this is possible are likely to be words that describe important features. You can point out that this method is unsupervised in the sense that the training signal for the classifiers comes from the bag-of-words representation of the documents.
+
+%* Then one paragraph about how this chapter builds on earlier work, and how you will in turn build on this chapter in the next one.
+
+% What is our work
+
+%
+
+%The dimensions of vector space models are typically not interpretable, but are flexible,
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Can replace this with disentangled justifications, with small semantic features need less training data to learn and e..g can learn using shallow decision trees, etc, features are still useful even though not interpretable, write more about interpretability as part of the background section
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%One aspect of a good interpretable representation is that each feature can be clearly understood . For example, the features of a bag-of-words (BOW) representation can be easily understood as they are labelled with words and have values that are equal to the frequency of that word. 
+
+Feature-directions = directions that make good features
+Our argument is: directions that make good features are cluster-directions
 
 
-The method is entirely unsupervised and 'disentangles' an existing vector space model into salient features. The idea of disentanglement is present in representation learning \cite{Bengio2012} e.g. when given a raw video file of a person jumping, ideally a representation would spatially separate the notions of 'jumping', from the 'person', and the 'background'. In this work disentanglement is used to refer to separating an existing vector space into salient features, such that each dimension of the space is a labelled feature. 
+Vector space models encode meaning spatially, but their features are typically uninterpretable. This lack of interpretability limits their off-the-shelf application in real-world domains like Medicine, the Criminal Justice System and Financial Markets (discussed in Section \ref{ch2:Interpretability}). However, they achieve strong results in a variety of domains and see widespread use as they  are flexible in how they can be learned, e.g. by integrating word-context  to achieve strong results on sentiment tasks \cite{Pennington2014}, learning visual data alongside word-data to explain the content of images \cite{Mao2014a}, and enforcing grammatical structure to perform better at question answering tasks \cite{Palangi2017}. 
+
+ 
+
+%In the case of this work, we aim to achieve features that rank documents on words.  e.g. In the domain of IMDB movie reviews, a feature would be "Horror", where the associated value would be a ranking of movies on that word. Top movies would be those that are spatially the most representative of this word. 
+
+This chapter is about structuring vector-space representations such that the meaning that is encoded spatially is instead used as features of the representation. To give insight into what kind-of features this method can obtain, we can give an example from a domain where documents are concatenated movie reviews for a particular movie (See Section \ref{datasets:movies}). In this domain, documents would be represented by features like "Scary", which would be how scary a movie is, or "Romantic" which would be how romantic a movie is.
+
+This chapter follows work by Derrac\cite{Derrac2015}, who first introduced the method to achieve this. The method begins with the following assumption: if a vector space can be linearly separated such that documents where a word occurs are separated from those where that word does not occur, that word is semantically important in the domain. This can be achieved in an unsupervised way by training a linear model, e.g. a linear Support Vector Machine (SVM) (See Section \ref{bg:SVM}), to separate documents for words in a bag-of-words, where if a word occurs in a document it is treated as a positive example, and if it does not then it is a negative example. Then, the words that are most semantically important in the domain can be determined by evaluating how well the documents are separated using standard model evaluation metrics like F1-score (see Section \ref{bg:metrics}).
+
+\begin{figure}[t]
+	\includegraphics[width=250px]{images/Toyhyperplane1Direction.png}
+	\centering
+	\caption{An example of a hyper-plane in a toy domain of shapes. The hyper-plane for the word square is the dotted line. Green shapes are positive examples and red shapes are negative examples. Those closest to the hyper-plane are less square than those further away}\label{ch3:HyperPlaneNoDir}
+\end{figure}
+
+
+
+ In the case of a linear SVM, for each model trained trained on a word a hyper-plane is obtained separating documents that contain the word and documents that do not contain it. We show an example of this in a toy domain of shapes in \ref{ch3:HyperPlaneNoDir}, where the dotted line is a hyper-plane. As shown in this example, it can be assumed that documents furthest from the hyperplane on the negative side are the least representative of the thing being separated by the hyper-plane, in this case the 'squareness' of a shape, and the documents that are furthest from the hyper-plane on the positive side are the most representative, while those closest to the hyper-plane are more ambiguous. Given this hyper-plane, a direction can be obtained  that goes from documents that are the most distant from the hyper-plane on the negative side, to those that are most distant from the hyper-plane on the positive side by simply taking the orthogonal vector (the direction shown at the bottom of the example in \ref{ch3:HyperPlaneNoDir}).
+
+By measuring how far up a document is on the orthogonal direction vector for a word, we can obtain a ranking of that document on that word, e.g. how 'Scary' it is relative to the other documents. After repeating this process for all documents on a word direction, we can obtain a ranking of all documents on a word that can be used as a feature for the representation. This forms the basis of our approach towards restructuring a vector space such that the features encoded spatially are used directly as features of the representation. We first obtain hyper-planes for all words based on binary frequency. Then, we identify words which are semantically important (by e.g. F1 Score or accuracy of the hyper-plane). Finally, we obtain orthogonal directions for these word hyperplanes and rank documents on how far up they are on these directions. This ranking is then used as a feature of the new representation.
+
+ However, it can be sometimes unclear what a document being high up on a direction can mean when it's just a single word. For example, in a domain of IMDB movie reviews "numbers" could be referring to musical "numbers" in a broadway musical movie, or the amount of mathematics done by the actors. To resolve this, similar words can be clustered together e.g.  we can give context to the word "numbers" by clustering together similar word directions  "singing songs musical song numbers dance dancing sings sing broadway". This can be done with an off-the-shelf clustering algorithm like K-means (see \ref{bg:clustering}). We show examples of these word cluster labels for the features of our interpretable representation in \ref{ch3:ExampleRep}.
+
+%The original method introduced by Derrac \cite{Derrac2015} used this insight to obtain word-directions, i.e. vectors that go from objects that least have a word to ones that have it most. 
+
+%Conceptual spaces are interpretable vector spaces with features that correspond to key cognitive perceptions of objects, essentially covering the building blocks of the domain. e.g.  in the example of real objects these quality dimensions would be 'temperature, weight, brightness, pitch and the spatial dimensions of height, width and depth'. In these spaces, instances of objects are points, e.g. "toaster", "house", "fork", and properties e.g. "household-appliances", "buildings" are convex regions. 
+
+
+ %Conceptual spaces are representations with dimensions intended to represent various "qualities" of objects \cite{Zenker2015} e.g. in the example of a real object we could represent it in terms of 'temperature, weight, brightness, pitch and the three ordinary spatial dimensions of height, width and depth' \cite{Gardenfors2014}.  
+
+% Ideally, these representations would have dimensions corresponding to clearly defined properties of objects in the domain, e.g. in a domain of IMDB movie reviews, example properties of a movie would be how 'Scary' it is or how 'Funny' it is.
+
+%A representation that models complex relationships and is interpretable could be used in a variety of domains that require interpretability and have difficult tasks, as covered in the previous section \ref{ch2:Interpretability}.
+
+
+ %The relationships embedded spatially can represent information that is difficult to obtain otherwise. 
+ 
+%We give an example of property-directions in a toy domain in \ref{ch3:toy_domain}.  In this example, there are two property-directions 'light' and 'square', with instances of shapes as points. The instances that have the properties the least are in the bottom left of the direction, and instances of shapes that have the properties the most in the top right. In the IMDB movie review domain, the shapes would be movies, represented as points, and the directions would be properties of movies e.g. how "Romantic" it is, with the least 'Romantic' movies at the base of the direction and those the most 'Romantic' at the tip of the direction. 
+
+%These property-directions give a natural way to obtain an interpretable representation of a vector space. First, property-directions are identified in the space, then a ranking is derived from these property-directions where documents that are lower on the property-direction are given lower ranks, and documents that are higher on the property-direction are given a higher rank. Finally, these rankings are taken as features of a new interpretable representation. 
+
+Directions in vector spaces that go from documents that least represent a word, to those that most represent it, can be useful in a wide variety of applications. The most immediate example is perhaps that they allow for a natural way to implement critique-based recommendation systems, where users can specify how their desired result should relate to a given set of suggestions \cite{Viappiani2006}. For instance, \cite{Vig2014} propose a movie recommendation system in which the user can specify that they want to see suggestions for movies that are ``similar to this one, but scarier''. If the direction of being scary is adequately modelled in a vector space of movies, such critiques can be addressed in a straightforward way. Similarly, in \cite{Kovashka} a system was developed that can find ``shoes like these but shinier'', based on a vector space representation that was derived from visual features. Semantic search systems can use such directions to interpret queries involving gradual and possibly ill-defined features, such as ``\emph{popular} holiday destinations in Europe'' \cite{Jameel}. While features such as popularity are typically not encoded in traditional knowledge bases, they can often be represented as semantic space directions.  As another application, directions can also be used in interpretable classifiers. For example, \cite{Derrac2015} learned rule based classifiers from ranks induced by the feature directions.
+
+Other work which has taken advantage of directions in vector spaces has relied on word-embeddings \ref{bg:WordVectors}. For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model.   In \cite{kim2013deriving} directional vectors in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{Rothe2016} found directions indicating lexical features such as the frequency of occurrence and polarity of words.
+
+
 
 \begin{table}[] 
 	\scriptsize
@@ -64,8 +108,80 @@ The method is entirely unsupervised and 'disentangles' an existing vector space 
 		drug drugs dealers dealer                                   & carro shelby 1965 automobiles        & photoshop adobe                      \\
 		inspirational inspiring fiction narrative                   & relax dunes tranquil relaxing        & reboost fusion astronomers galactic 
 	\end{tabular}  
-\caption{Example features of our interpretable representation from three different domains. Each row is a label for a feature from our representation for that domain}\label{ch3:ExampleRep}    
+	\caption{Example features from three different domains, where each cluster of words corresponds to a direction which movies are ranked on}\label{ch3:ExampleRep}    
 \end{table}   
+
+
+This work builds on the original method to find directions in a vector space and rank documents on them introduced by Derrac \cite {Derrac2015}. This chapter differs from that work by first introducing and explaining variants to the method in Section \ref{ch3:method}, then investigating directions qualitatively in Section \ref{ch3:qualitative}, examining how the new variants perform relative to each other, and finally an extensive quantitative examination in section \ref{ch3:quantitative} of all variants across all domains (as described in \ref{chapter3:Introduction}) to determine their usefulness in interpretable classifiers is explored.  Finally, conclusions are made on the contribution of the chapter in section \ref{ch3:conclusion}. Chapter \ref{ch4} builds on this method by applying and investigating its usage with vector spaces obtained from supervised neural networks, and the Chapter \ref{ch5} identifies problems with this method and introduces a novel unsupervised solution to improve performance.
+
+
+
+
+%The way that these features are obtained is by predicting . To  apply this idea to a real domain,  %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity. %Graphical representation of 
+
+
+%\begin{figure}[t]
+%	\includegraphics[width=250px]{images/toy_domain.png}
+%	\centering
+%	\caption{An example of direction in a toy domain of shapes.}\label{ch3:toy_domain}
+%\end{figure}
+
+
+
+%For example, in a domain using the IMDB movie review dataset, the interpretable features would be labelled with how 'Scary' a movie is, and another that corresponds to how 'Funny' it is.
+
+
+
+%This chapter investigates how to make the spatial structure of a semantic space explicit, such that a new representation is formed where each feature models the spatial representation of a property in the domain.
+ 
+
+
+
+
+
+
+%Interpretability as an idea has a variety of interpretations and meanings (See \ref{ch2:Interpretability}). In this thesis, an ideal interpretable representation's features have three important properties: First that each feature models an important aspect of the domain, second that these aspects are distinct from each other, such that each feature represents a unique aspect of the domain, and thirdly that each feature is labelled with a cluster of words describing the aspect of the domain the feature is modelling. The method is entirely unsupervised and 'disentangles' an existing vector space model into salient features. The idea of disentanglement is present in representation learning \cite{Bengio2012} e.g. when given a raw video file of a person jumping, ideally a representation would spatially separate the notions of 'jumping', from the 'person', and the 'background'. In this work disentanglement is used to refer to separating an existing vector space into salient features, such that each dimension of the space is a labelled feature. 
+
+
+
+
+% Why a conceptual space representation? What are entities/properties in that context?
+
+%Perception can be boiled down to objects, or entities. These entities can be described using properties. For example, for the property of "tall", there would be object instances of humans relative to each other on a ranking of tallness. A representation that employs this kind of idea can be known as a conceptual space, where entities are represented as points and spatial relations correspond to properties. 
+
+%What kind-of representation are we introducing? / What is a ranking? How would a ranking on properties be useful? Why is that a good problem to solve?
+
+%How is this representation obtained? 
+
+%How is this representation evaluated?
+
+%Conceptual spaces are a particular way of viewing semantic spaces, where entities (e.g. documents in the case of a document-based representation, or words in the case of word-vectors) are represented as points in the space. Then, properties are aspects of these documents in the space. 
+
+%The spatial structures of semantic spaces have been used in a variety of ways. In \cite{Dai} it was shown that it is possible to perform vector operations on Paragraph Vectors,  e.g. subtracting word-vectors from paragraph vectors, like in the case of a corpus of arxiv papers, a paper titled "Spectral Clustering", could have the word-vector for "Spectal"  subtracted from it to get papers about general clustering. In the case of distributional representations of words \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, found that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks.
+
+%The spatial structures we leverage in this work are found in document representations. In particular, directional vectors that describe a particular feature of a domain. Derrac \cite{Derrac2015}  found directions corresponding to properties such as `Scary', `Romantic' or `Hilarious' in a semantic space of movies, for example a direction which goes from a movie that is the least 'Scary' to the most 'Scary'. 
+
+  %The basic idea of this chapter is that we use these feature-directions to produce a representation where each dimension is a ranking of entities on those feature-direction, and evaluate its effectiveness using simple linear classifiers.
+
+
+% Introduce semantic spaces in the context of using them to produce an interpretable representation
+
+
+
+% Explain the previous work
+
+% Explain our work
+
+
+
+
+
+
+
+% These interpretable representation are demonstrated to be effective in simple linear classifiers on document classification tasks. 
+
+
+
 
  %The intention of this work is to produce interpretable representations and simple interpretable classifiers that use the domain knowledge spatially encoded by any learning method. 
 %Interestingly, the method can even be used to obtain an interpretable representation from neural networks, as they learn vector space models as hidden layers, which is investigated in Chapter \ref{ch5}. %as hidden layers have achieved state-of-the-art results in a majority of NLP tasks e.g. learning using large amounts of data, transferring that data between tasks, or integrating additional constraints.
@@ -108,22 +224,10 @@ The method is entirely unsupervised and 'disentangles' an existing vector space 
 %The relationships in Vector Space Models can be extracted to obtain domain knowledge. %king and queen was parallel to the vector between prince and princess. % NEED TO MAKE THIS REAL
 
 
+%The simple  classifiers that are used to evaluate the method's feature directions are low-depth Decision Trees. In Figure \ref{ch3:DecisionTree} an example is shown of a shallow Decision Tree using the method's interpretable representation. Shallow Decision Trees were chosen because they are effective at evaluating the disentanglement of the representations features. If the features are disentangled, then a low-depth Decision Tree will suffice to classify natural domain tasks. Shallow trees also evaluate the semantic generalizability of the features, as if they are able to classify complex classes using only a single feature then that feature must be semantically coherent and generalizable.% In terms of interpretability, shallow trees have many positive effects for users, like lower response times \cite{Narayanan2018, Huysmans2011}, better question answering and confidence for logical problem questions \cite{Huysmans2011} and higher satisfaction \cite{Narayanan2018}. Although in this work  the superiority of  low-depth Decision Trees in real-world interpretability applications is not in the scope of the evaluation, as the interpretable representations  could be applied to a variety of classifiers.
 
-\begin{figure}[t]
-	\includegraphics[width=250px]{images/toy_domain.png}
-		\centering
-	\caption{An example in a toy domain of shapes.}\label{ch3:ToyDirectionsGraphic}
-\end{figure}
+%The quantitative results for the method show that the method can successfully disentangle a variety of representations even with trees as limited as depth one, and these shallow trees outperform the original representation greatly when compared to deeper trees on the uninterpretable original features. Additionally, the results in most cases are also competitive with Latent Dirchlet Allocation, a baseline interpretable topic model. The method is shown to be an effective way to obtain a disentangled representation that can effectively produce simple interpretable classifiers. The method is verified to work on five different representation types for five different domains, using natural domain tasks for those domains. 
 
-The simple linear classifiers that are used to evaluate the method's feature directions are low-depth Decision Trees. In Figure \ref{ch3:DecisionTree} an example is shown of a shallow Decision Tree using the method's interpretable representation. Shallow Decision Trees were chosen because they are effective at evaluating the disentanglement of the representations features. If the features are disentangled, then a low-depth Decision Tree will suffice to classify natural domain tasks. Shallow trees also evaluate the semantic generalizability of the features, as if they are able to classify complex classes using only a single feature then that feature must be semantically coherent and generalizable. In terms of interpretability, shallow trees have many positive effects for users, like lower response times \cite{Narayanan2018, Huysmans2011}, better question answering and confidence for logical problem questions \cite{Huysmans2011} and higher satisfaction \cite{Narayanan2018}. Although in this work  the superiority of  low-depth Decision Trees in real-world interpretability applications is not in the scope of the evaluation, as the interpretable representations  could be applied to a variety of classifiers.
-
-The quantitative results for the method results show that the method can successfully disentangle a variety of representations even with trees as limited as depth one, and these shallow trees outperform the original representation greatly when compared to deeper trees on the uninterpretable original features. Additionally, the results in most cases are also competitive with Latent Dirchlet Allocation, a baseline interpretable topic model. The method is shown to be an effective way to obtain a disentangled representation that can effectively produce simple interpretable classifiers. The method is verified to work on five different representation types for five different domains, using natural domain tasks for those domains. 
-
-\begin{figure}[t]
-	\includegraphics[width=450px]{images/decision_tree_ex.png}
-	\centering
-	\caption{An example of a Decision Tree classifying if a movie is in the "Sports" genre. Each Decision Tree Node corresponds to a feature, and the threshold T is equal to the ranking of a document on that feature. The most important direction is used twice, referring to sports and resulting in a majority of negative samples. The nodes at depth three are more specific, sometimes overfitting (e.g. in the case of the "Virus" node) }\label{ch3:DecisionTree}
-\end{figure}
 
 
 %Why interpretability for document classification matters:
@@ -206,19 +310,19 @@ The quantitative results for the method results show that the method can success
 %%How does our evaluation of interpretability play into our idea of interpretability outlined in Chapter 1?
 
 
-The interpretable representation that is obtained by this method is composed of in terms of salient features, where each of these features is described using a cluster of natural language terms. This is somewhat similar to Latent Dirichlet Allocation (LDA), which learns a representation of text documents as multinomial distributions over latent topics, where each of these topics corresponds to a multinomial distribution over words \cite{Blei03latentdirichlet}.  Topics tend to correspond to salient features, and are typically labelled with the most probable words according to the corresponding distribution. On the other hand, our work leverages clustering methods to obtain the feature labels. Broadly speaking, in the context of document classification, the main advantage of topic models is that their topics tend to be easily interpretable, while Vector Space Models tend to be more flexible in the kind of meta-data that can be exploited e.g.\ they allow us to use neural representation learning methods to obtain these spaces. The approach proposed in this Chapter aims to combine the best of both worlds, by providing a way to derive interpretable representations from Vector Space Models.  Many extensions of LDA have been proposed to incorporate additional information as well, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors or time stamps \cite{rosen2004author,wang2006topics}. Nonetheless, such techniques for extending LDA offer less flexibility than neural network models, e.g.\ for exploiting numerical attributes or visual features. For comparison, in our experiments the standard topic model algorithm Latent Dirchlet Allocation (LDA) is used as a baseline to  compare to the new methodology that transforms standard Vector Space Model representations. %Topic Models are also entirely probabilistic, while our method relies entirely on the spatial relationships present in the vector space model.
 
 
-There is much work on learning interpretable representations, with one popular way being to introduce sparsity or non-negativity constraints while learning, for example, sparse PCA learned using the l1-norm, \cite{H.Zou2006} \cite{Zhang2012},  or Non-Negative Sparse Embeddings (NNSE)  \cite{Murphy} which are sparse interpretable word-vectors obtained using sparse-matrix factorization and non-negativity constraints. A similar technique can also be applied to distributional word-embeddings by integrating this method with the Skip-Gram model \cite{Luo2015}. However, our approach is not intended to transform the learning processes, but rather be a post-processing step on an existing representation.
 
-Similar to the approach in this chapter, \cite{Faruqui2015} introduce a post-processing method to convert any distributional word-vector into sparse word vectors, which additionally satisfy our idea of disentangled interpretability. However, the representation produced by the method in this work differs from sparse representations in that it is dense, where each feature is salient and interpretable. Another method is to describe a representation, e.g. sense word-embeddings that are linked to synsets \cite{Panchenko2016} in-order to make them interpretable. Although this is a post-processing step similar to our method, this is a linking rather than a transformation of the representation.  
+%Broadly speaking, in the context of document classification, the main advantage of topic models is that their topics tend to be easily interpretable, while Vector Space Models tend to be more flexible in the kind of meta-data that can be exploited e.g.\ they allow us to use neural representation learning methods to obtain these spaces. The approach proposed in this Chapter aims to combine the best of both worlds, by providing a way to derive interpretable representations from Vector Space Models.  
 
-Another method is to integrate grammatical structure into the learning of the representation, for example \cite{Liu2017} obtained a representation learned with attention mechanisms on the dependency structures of sentences, but this differs from the intention of our work, which is not to introduce new structures to the representation to make it more interpretable but instead use the already existing structure to obtain an interpretable representation. For short interpretable documents, \cite{Martinc} introduced tax2vec, which produced interpretable features from word taxonomies, useful for low data models. In \cite{Code} word-vectors were clustered and then used as a bag-of-clusters, where if a word occurs in those word-vector clusters it contributes to the Bag-Of-Words frequency. Although clustering is used in the method, it is not used to create a Bag-Of-Words, instead relying on the spatial relationships in the space as our representation. 
+%Topic Models are also entirely probabilistic, while our method relies entirely on the spatial relationships present in the vector space model.
+
+
 
 %How is the chapter going to play out? Whats going to happen?
 %As our work performs well even at lower-depth trees, this gives potential users more flexibility in how they want to present the information, e.g. to a potential client. Compared to Bag-Of-Words, which loses its representation capabilities the lower the depth.
 
-This chapter continues as follows: First the method is described, making explicit the variations from to the original method in \cite {Derrac2015}. This is followed by a qualitative  and quantitative analysis, finishing with a conclusion on the  benefits and limitations of this approach.
+%This chapter continues as follows: First the method is described, . This is followed by a qualitative  and quantitative analysis, finishing with a conclusion on the  benefits and limitations of this approach.
 
 
 
@@ -260,7 +364,7 @@ This chapter continues as follows: First the method is described, making explici
 % Chapter 2: The background and literature review for interpretable representations.
 % Chapter 3: An introduction on the value of a good interpretable classifier, and the position of our work in that domain and how it can be applied there. What entities, properties are. What a conceptual space is. A literature review on relevant interpretable classifiers.
 
-This section details the methodology to obtain an interpretable representation from only a Vector Space Model and its associated Bag-Of-Words \ref{bg:SemanticSpaces}. %which whose features rank documents on salient semantics, e.g. In a domain of IMDB movie reviews, a movie would be ranked on semantics like  $1: \{Scary, Horror, Bloody\}$ and $2: \{Romantic, Love, Cute\}$, ideally with as many rankings as salient semantics of the domain. 
+This section details the methodology to add structure to a vector space model starting with only itself and its associated Bag-Of-Words \ref{bg:SemanticSpaces}.  The work in this chapter differs from the method introduced by Derrac \cite{Derrac2015} as it focuses on achieving a new representation that can be applied in simple interpretable classifiers. Multiple variations are introduced and experimented on comprehensively.%which whose features rank documents on salient semantics, e.g. In a domain of IMDB movie reviews, a movie would be ranked on semantics like  $1: \{Scary, Horror, Bloody\}$ and $2: \{Romantic, Love, Cute\}$, ideally with as many rankings as salient semantics of the domain. 
 %Make sure features ae explained well earlier 
 
 %\subsection{The Structure of a Vector Space Model}
@@ -269,7 +373,33 @@ This section details the methodology to obtain an interpretable representation f
 % What are directions? How are they encoded? Why are they encoded that way?
 
 
+% Convert to table
+word: $w$
 
+document $d$
+
+vector-space of documents $V_d$ where $d = (x_1, x_2, ..., x_n)$ where $x$ are features and $x(d)$ is equal to the value of a feature for a document
+
+bag-of-words of documents $B_d$ where $d = (wf_1, wf_2, ..., wf_n)$ and $wf(d)$ is equal to the frequency of that word in a document and $n$ is equal to the number of unique words across all documents.
+
+
+model for a word ($M_w$)
+
+hyper-plane for a word = $H_w$
+
+orthogonal direction vector = $\mathcal{D}_w$
+
+ranking of all documents on a word direction  $R_w = ({rw}_{d1}, {rw}_{d2}, ..., {rw}_{dn})$ where ${rw}_{d}$ is equal to the ranking of a document on a word direction
+
+cluster of words $C = (w_1, w_2, ..., w_n)$
+
+cluster direction = $\mathcal{D}_C$
+
+interpretable representation composed of rankings $I_d$ where $d = (R_{w1}, R_{w2}, ..., R_{wn})$ and $R_w(d)$ is equal to the ranking of a document on a word direction
+
+interpretable representation composed of cluster rankings $I_d$ where $d = (R_{c1}, R_{c2}, ..., R_{cn})$ and $R_c(d)$ is equal to the ranking of a document on a cluster direction
+
+ranking of documents on direction
  
 
 %\begin{figure}[t]
@@ -282,31 +412,35 @@ This section details the methodology to obtain an interpretable representation f
 
 
 
-\subsection{Obtaining Directions and Rankings From Words}
+\subsection{Obtaining Directions and Rankings From Words}\label{ch3:LearningInterpretableDirections}
 
 
-We explain the method in terms of document classification.  Assuming a Bag-Of-Words $B_w $ has an associated vocabulary $W_w $, 
-in this section we introduce the first step: how to obtain feature-directions $D_w $ for each word $W_w $, and rankings of documents  on these directions $r_w $, where each word is ranked on every document. For this step, not all words are expected to be salient in the domain. Instead, the first step shows how to obtain an interpretable representation where every document is ranked on every word, and the next step shows how to filter these rankings to only salient features.
+
+ The method starts with a given vector-space $V_D$ induced from text documents $d \in D$ and their associated bag-of-words $B_D$. For the bag-of-words $B_D$ each document is composed of word frequencies $d = ({wf}_1, {wf}_2, ..., {wf}_n)$ where ${wf}(d)$ is equal to the frequency of a word in a document and $n$ is equal to the number of unique words  in the vocabulary $w \in W$.
+  Following the general explanation in the introduction, this section more precisely explains how to obtain a word-direction vector $\mathcal{D}_w$ for all words in the vocabulary $w \in W$, by using a vector found by a linear model $M_w$ that separates documents that have a word and do not have a word. Then, from that direction it explains  how to obtain a ranking of all documents $R_w = ({rw}_{d1}, {rw}_{d2}, ..., {rw}_{dn})$ where ${rw}_{d}$ is equal to the ranking of a document on a word direction and $n$ is the number of documents. The section following this one shows how to remove word directions that are not semantically important by evaluating the quality of the classifier that obtained the direction $M_w$, or the quality of the direction $\mathcal{D}_w$.
+ 
+
 
 %%%%%%%%%%%%Features that are important will be spatially organized in a way that reflects the similarity between the Bag-Of-Words representations they were composed of. In particular, we expect that documents will be arranged in a direction, where generally the higher the PPMI score for a group of words that correspond to a feature (e.g. $Horror, Scary, Gore$) the further away they will be from those that have low PPMI scores for those words. We give examples of this in Figure \ref{ch3:DirectionsGraphic}, by projecting documents into a 2D space of salient features we are able to show that these documents are structured according to directions for these features. Salient features will typically be a more abstract representation which will be natural in the domain, e.g. in a domain of IMDB movie reviews, genres
 
-\noindent \textbf{Obtaining directions for each word} Each document is referred to as a point $d_p $ in the vector space model $S_{d}$. For each word $w$, a hyper-plane is obtained $h_w $ from a Linear Support Vector Machine (See Section \ref{bg:SVM}\footnote{This was also tested using a logistic regression classifier, and achieved similar results}) that is trained on the Bag-Of-Words representation so that document points $d_p $ in the space $V_d$  where the word $w $ occurred more than once  for that document $d_{wf} >= 1$ are separated from those where the word did not occur $d_{wf} == 0$. This process is repeated such that a hyper-plane is found for all words in the vocabulary above a frequency threshold $w_f > T$ where $T$ is chosen such that words which are infrequent enough to cause the classifier to overfit are not included. As this task is unbalanced, i.e. there are typically less documents that contain the word compared to those that do not contain it, the weights of the classifier are balanced such that positive instances are weighted in proportion to how rare they are. 
+\noindent \textbf{Obtaining directions for each word} Each document is represented by a vector $v_d $ in the vector space model $V_D$. For this section, document vectors $v_d$ are treated as points $p_d$ in the space. For each word $w$, a hyper-plane $h_w$ is obtained by training a linear model$\footnote{Tested using a logistic regression classifier and a linear SVM, both achieved similar results}$ $M_w$ on the space $V_D$   so that each document $p_d $ in the space where the word $w $ occurs more than once ${wf}(d) \geq 1$ are separated from those where the word did not occur ${wf}(d) = 0$. We obtain such hyperplanes for all words in the vocabulary above a frequency threshold ${wf}(D) > T$ where ${wf}(D)$ is the frequency of the word in all documents. In practice, the parameter $T$ is determined with hyper-parameter optimization. This task is unbalanced, i.e. there are typically fewer documents that contain the word compared to those that do not contain it, so the weights of the classifier are balanced such that positive instances are weighted in proportion to how rare they are.\footnote{ \href{https://scikit-learn.org/stable/modules/generated/sklearn.utils.class_weight.compute_class_weight.html}{Using scikit-learn, class\_weight:'balanced'}}
 
-As previously mentioned, not all words will be influential on the structure of the representation. Only words that are salient will be well separated. Although the hyperplane $h_w$ learned is binary (either classifying documents $d_p$ as negative or positive), it can  be expected that the distance of the document points $d_p$ from the hyperplane boundary varies, as the space's $V_w$ similarity structure is in degrees rather than hard boundaries. For example in a space constructed from frequency vectors $W_{wf}$, it can be expected that the documents which contain the word more frequently would be further away from the hyper-plane on the positive side. Similarly, in the case of our experiments, the documents with a higher PPMI value will be more distant from the hyper plane on the positive side. This is the insight that informs the method to obtain the direction. 
+Although the hyperplane $h_w$ is classifying a binary class (either classifying documents $d_p$ as negative or positive), the distance between the document vectors $d_p$ and the hyperplane $h_w$ will vary. For example, when separating documents based on the occurrence of a word, it can be expected that the documents which contain the word more frequently would be further away from the hyper-plane on the positive side. We give an example of two directions in Figure \ref{ch3:ToyHyperPlane}. To  apply this idea to a real domain, we can give an example from movie reviews, where the word is 'Scary' and the most 'Scary' movies are at the tip of the direction and those that are least 'Scary' are at the base of the direction. With this understanding, the direction $\mathcal{D}_w$ can be obtained by simply taking the vector perpendicular to the hyperplane $h_w $. This direction goes from documents $d_p$ from those lowest on the direction (at the distance furthest from the hyperplane on the side where documents $d_p $ are classified) to those highest on the direction at the distance furthest from the hyperplane at the positive side. 
 
-The vector $v_w$ perpendicular to the hyperplane $h_w $ is taken as a direction $D_w $ that models documents $d_p$ from the lowest document ranked on the word $w $ (at the distance furthest from the hyperplane on the side where documents $d_p $ are classified) to the highest ranked on the word $w$ at the distance furthest from the hyperplane at the positive side. An example of such a direction $D_w$ is shown in the toy domain in Figure \ref{ch3:ToyHyperPlane}. To  apply this idea to a real domain, we can give an example from movie reviews, where the word is 'Scary' and the most 'Scary' movies are at the tip of the direction and those that are least 'Scary' are at the base of the direction.  %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity. %Graphical representation of 
 
+ %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity. %Graphical representation of 
 
 \begin{figure}[t]
 	\includegraphics[width=250px]{images/ToyHyperplane.png}
 	\centering
-	\caption{An example of a hyper-plane and its orthogonal direction in a toy domain of shapes. Green shapes are positive examples and red shapes are negative examples, but despite the problem being binary those closest to the hyper-plane are less defined than those further away, resulting in the orthogonal vector being a direction}\label{ch3:ToyHyperPlane}
+	\caption{Another example of a hyper-plane in a toy domain of shapes. Here we show multiple directions, one for light and one for square The hyper-plane for the word square is the dotted line. Green shapes are positive examples and red shapes are negative examples for the word square. }\label{ch3:ToyHyperPlane}
 \end{figure}
 
 
+\noindent \textbf{Ranking documents on directions} In this section we specify how to obtain a ranking $R_w$ of all documents on a word direction vector $D_w$. The rank of a document $d$ can be defined by the dot product $\mathcal{D}_w \cdot p_d$ as the ranking ${rw}_{d}$ of the document $d$ for the word $w$. Specifically, ${rw}_{d_1}$ is ranked higher than ${rw}_{d_2}$ if  ${rw}_{d_1} < {rw}_{d_2}$. These rankings measure how relevant the document is in the spatial representation for the word, rather than just frequency e.g.  a document that contains the word "scary" but isn't a scary movie (e.g. if it contained sentences like "it's scary how much money is spent on advertising movies like this") would not be ranked highly on the direction for 'scary', as the word 'scary' is not semantically important for the document. To put it another way, intuitively it can be understood to mean that the document $d_2$ 'has' the feature  to a greater extent than $d_1$, e.g. in a domain of movie reviews if a movie ranked highly on the word 'dull', the movie has more dullness than lesser ranked movies. %Ranking all documents on a word results in a feature that ranks documents on how well they represent that word in their spatial representation.   By obtaining a ranking of all documents for all words,  a feature matrix of size $D_n \times W_n $ is obtained, which is a representation that has a feature for every word in the vocabulary.
 
 
-\noindent \textbf{Ranking documents on directions} Although we do refer to the direction $D_w$ ranking documents on a word $w$, we do not yet have a specific value to represent this ranking. Once a feature-direction vector is obtained for each word $D_w$ the next step is to quantify the degree to which each document $d_p$ has that word, by obtaining a value that corresponds to how far-up it is on the direction vector $D_w$.  If $d_p$ is the representation of a document in the given vector space as a point then the dot product is used between the direction vector for the word $D_w $ and the document vector $D_w \cdot p_d$ as the ranking $r_{dw}$ of the document $d$ for the word $w$, and in particular, we take $r_{d1} < r_{d2}$ to mean that the document $d_2$ 'has' the feature  to a greater extent than $d_1$ (e.g. in a domain of movie reviews if the word is 'cinematography', the movie will likely have notable cinematography). Once the dot product value is obtained in this way for each document on a word, this forms a ranking feature for the word.  By obtaining a ranking of all documents on all words,  a rankings matrix of size $d_n * w_n $ can be obtained. This representation forms the basis of the method, with future steps removing those directions that are not salient, and then clustering similar directions together. %To give an understanding of these rankings and their saliency, we show some examples of features and documents ranked on them for different domains with varying degrees of saliency. In the next section, we show how we measure the saliency of directions and filter those that are not salient out of the representation. %Graphical representation of entities being ranked on a direction vector
+In this section, the methodology to obtain word-directions and their associated rankings was described. These word-rankings are useful as features, and hypothetically we could obtain a representation that has as many features as there are words. However, some words are more semantically important in the domain than others. The next step describes how to remove word directions that are not well predicted by the linear model $M_w$, under the assumption that if they are not spatially important (i.e. easily separable), they are not semantically important. Another problem with word-rankings is that their meaning can be unclear, e.g. the word "serial" could be referring to a series of movies, or a "serial" killer\footnote{The real cluster of words that this example comes from  is "gore gory bloody blood gruesome serial investigate deaths"}. To solve this problem, the final section explains methods to cluster words together. This finally results in a representation where each feature is semantically important and has an associated cluster of words to give context. We gave examples of these clusters of words in the introductory table \ref{ch3:ExampleRep}. %To give an understanding of these rankings and their saliency, we show some examples of features and documents ranked on them for different domains with varying degrees of saliency. In the next section, we show how we measure the saliency of directions and filter those that are not salient out of the representation. %Graphical representation of entities being ranked on a direction vector
 
 
 
@@ -321,41 +455,55 @@ The vector $v_w$ perpendicular to the hyperplane $h_w $ is taken as a direction 
 
 
 
-\subsection{Filtering Words}
+\subsection{Filtering Word-Directions}
 
 %With the rankings $R_r$, we could create a representation of each document $d$, composed of $w_n$ dimensions, where each dimension is a ranking of the document $d$ on that word $r_dw$. However, many of the words are not spatially important enough in the representation to result in a quality ranking - they are not salient features.
 
-In this section, words are filtered that do not influence the structure of the domain. This is done by evaluating them using a scoring metric, and removing the words that are not sufficiently well scored. Originally, only binary features were considered. These binary features were measured  in terms of the performance of the SVM classifier.  If the hyperplane correctly separates the entities well, it must mean that whether word $w$ relates to document $d$ (i.e.\ whether it is used in the description of $d$) is important enough to affect the Vector Space Model representation of $d$.  However, this approach does not consider the quality of the ranking. To consider this, the new metric Normalized Discounted Cumulative Gain was introduced, using the bag-of-words as its target ranking under the assumption that if a ranking matches the ordered score of a PPMI BOW, then it is a good ranking. If this is the case, it can also be assumed that this means the word was strongly influential in the space, as it retains the detail of the Bag-Of-Words information in the space's structure. 
+% Change to good directions are feature directions 
+Although we are able to obtain word directions for every word, not every word is semantically important in the space. Here, we distinguish between word-directions $\mathcal{D}_w$ as directions that are not semantically important in the space, and feature-directions $\mathcal{D}_f$, which are. We define the set of feature directions as $f \in F$. Additionally, we make the distinction between a word-ranking $R_w$ which is a ranking on a word-direction and a feature-ranking which is a ranking on a feature-direction  This section how to filter out word-directions so that only feature-directions remain, in-order for the final representation to be composed of only feature-rankings. Additionally, we refer to the word or cluster of words associated with a feature-ranking as a feature-label for that ranking.
+ 
+The assumption made by Derrac in the original work \cite{Derrac2015} was that if a classifier $M_w$ does not predict the occurrence of a word in a document in its embedding well, it is not semantically important. Put another way, if the documents are separated well, it must mean that the word $w$ being used in the description of $d$ is important enough to affect the Vector Space Model representation of $d$. The occurrence of a word in a document can be evaluated by using a variety of scoring metrics to determine the performance of the classifier $M_w$. This work also introduces a the use of a scoring metric that evaluates the quality of the direction $\mathcal{D}_w$, as even if the documents are well separable, then the ranking induced from the direction may not be correct. This metric compares how well the ranking induced by the hyperplane correlates with a BoW representation. If the ranking does correlate, it can be assumed that this means the word was strongly influential in the space, as the detail of the Bag-Of-Words information is embedded in the space's structure. 
+
+After scoring the words using one of the aforementioned metrics, a simple cut-off is applied where the top scoring words are taken as feature-directions (e.g. the top 2000 scored words). By obtaining these feature-directions, we can rank documents on each of them and use them as features of a  representation $I_{Fr}$ where ${Fr} = ({fr}_{d1}, {fr}_{d2}, ..., {fr}_{dn})$ and ${fr}_d$ is the ranking of a document on a feature-direction. In this representation, each feature is semantically important, however there may be overlap, e.g. the word "Gore" and "Gory" likely have similar rankings. Ideally, the score cut-off would be at the point where the words stop corresponding to semantically important features. However, it is difficult to determine this, so in practice this value is taken as a hyper-parameter determined by a classifier on some domain task.
 
 \noindent
 
-\noindent \textbf{Cohen's Kappa}. This is the metric used in the work that originally introduced this method \cite{Derrac2015}. This is a binary feature evaluation metric that deals with the problem that these words are often very imbalanced. In particular, for very rare words, a high accuracy might not necessarily imply that the corresponding direction is accurate. For this reason, they proposed to use Cohen's Kappa score instead. In our experiments, however, it was found that this can be too restrictive, allowing us to sometimes obtain better results with the more simple accuracy metric.\smallskip %This is basically copy pasted.
+\noindent \textbf{Cohen's Kappa}. This is the only metric used in the work by Derrac \cite{Derrac2015}. This metric evaluates the performance of the classifier, and also deals with the problem that these words are often very imbalanced. In particular, for very rare words, a high accuracy might not necessarily imply that the corresponding direction is accurate, as if there are a large number of negative examples (as is the case with infrequent words) the classifier could simply predict that all documents do not contain the word to achieve a high score. For this reason, they proposed to use Cohen's Kappa score instead. In our experiments, however, it was found that this can be too restrictive, allowing us to sometimes obtain better results with the more simple accuracy metric.\smallskip %This is basically copy pasted.
 
 
- \textbf{Classification accuracy}. If a model has high accuracy for a word $w$, it seems reasonable to assume that $w$ describes a salient property for the given domain. However, despite balancing the weights of the original SVM used to obtain the hyper-plane, the value this metric places on correctly predicting negative classification often results in noise particular to this metric being identified, e.g. metadata like a reviewers name that only occurs in a few reviews being given a high accuracy score as the method, as it overfit to only predict negative instances.%This is basically copy pasted.
+ \textbf{Classification accuracy}. If a model has high accuracy for a word $w$, it seems reasonable to assume that $w$ describes a salient property for the given domain. However, despite balancing the weights of the original SVM used to obtain the hyper-plane, the value this metric places on correctly predicting negative classification  compared to Kappa, it might favour rare words as it tends to be easier to obtain a high accuracy for these words.%often results in noise particular to this metric being identified, e.g. metadata like a reviewers name that only occurs in a few reviews being given a high accuracy score as the method, as it overfit to only predict negative instances.%This is basically copy pasted.
 \smallskip
 
 
-\noindent \textbf{Normalized Discounted Cumulative Gain} % MATHEMATICS NEEDS TO BE REWRITTEN
-This is a standard metric in information retrieval which evaluates the quality of a ranking w.r.t.\ some given relevance scores \cite{jarvelin2002cumulated}. It favours initial documents over later ones.  Some alternative metrics were tried that did not prioritize the top rankings being correct more, but this came with two problems. First, PPMI has a large number of zero scores. This makes the lower dot product documents have an uneven comparison, disrupting the score based on them being given a non-zero ranking score by the method. The second is that the documents without many occurrences of the word are less prioritized in the space, and largely influenced by other words, making their ranking less reliable.  In our case, the rankings $r_d$ of the document $d$ are those induced by the dot products $v_w \cdot d$ and the relevance scores are determined by the Pointwise Positive Mutual Information (PPMI) score $\textit{PPMI}(w,d)$, of the word $w$ in the BoW representation of entity $d$ where
-$\textit{PPMI}(w,d) = \max \big(0, \log\big(\frac{p_{wd}}{p_{w*} \cdotp p_{*d}}\big)\big)$, and
+\noindent \textbf{Normalized Discounted Cumulative Gain}\label{ch3:NDCG} % MATHEMATICS NEEDS TO BE REWRITTEN 
+This is the metric chosen to evaluate the quality of the rankings induced by the direction $R_w$. In-order to do so, two rankings are compared: one defined by the rankings and one defined by PPMI scores.  The metric found to work best was Normalized Discounted Cumulative Gain (NDCG) which is a standard metric in information retrieval that evaluates the quality of a ranking w.r.t.\ some given relevance scores \cite{jarvelin2002cumulated}.  NDCG is mostly affected by the ranking position of the documents for which PPMI is highest.  Spearman Rho, Gini, and Kendall Tau as alternative metrics  do not favour higher ranked documents as much, but this comes with two problems. First, PPMI (See section \ref{bg:ppmi}) leads to a large number of zero scores. If we assume that all documents that have a zero frequency are ranked the same, then the dot products rankings will be greatly different for lower-ranked documents as they instead are ranked according to their spatial representation. This disrupts the score too much to be useful when lower ranked documents are given equal importance to higher ranked ones. In this case, the rankings $R_w$ of the document $d$ are those induced by the dot products $\mathcal{D}_w \cdot p_d$. The relevance scores are determined by the Pointwise Positive Mutual Information (PPMI) score $\textit{PPMI}(w,d)$, of the word $w$ in the BoW representation of document $d$ (See section \ref{bg:ppmi}), under the assumption that they correspond to a good baseline for what we consider to be important for an entity. 
+% Taken directly from the journal paper
 \begin{align*}
-p_{wd} &= \frac{n(w, d)}{\sum_{w'} \sum_{d'} n(w', d')}
-\end{align*}
-where $n(w,d)$ is the number of occurrences of $w$ in the BoW representation of object $d$, $p_{w*} = \sum_{e'} p_{wd'}$ and $p_{*d} = \sum_{w'} p_{w'd}$. %This is basically copy pasted.
-\smallskip
+\text{DCG}_{R}^{w} &= \sum_{i=1}^{{pr}_d}\frac{\textit{ppmi}_{i}^{w}}{log_{2}(i + 1)} \\
+\text{IDCG}_{R}^{w} &= \sum^{|\textit{documents}|}_{i=1} \frac{2^{\textit{ppmi}_{i}^{w}}-1}{log_{2}(i + 1)} \\
+\text{nDCG}_{R}^{w} &= \frac{\text{DCG}_{R}^{w}}{\text{IDCG}_{R}^{w}}
+\end{align*}  
 
-By scoring the words on these features, a simple cut-off is applied (e.g. the top 2000 scored words) to obtain the most salient words. Ideally, this cut-off would be at the point where the words stop corresponding to salient features. However, it is difficult to determine this, so in practice this value is taken as a hyper-parameter.
+To define NDCG, we can first define Discounted Cumulative Gain (DCG), where ${prw}_{d}$ is equal to a position in the ranking of documents on a direction $\mathcal{D}_w$, and $ppmi_{p_{i}}^{w}$ is equal to the PPMI score for a word at position $i$ in the ranking. Then, we can define the Ideal Discounted Cumulative Gain (IDCG), which is the best possible DCG for a position ${prw}_{d}$, where $|documents|$ are the documents for the term ordered by their relevance up to position ${prw}_{d}$. nDCG is then simply the DCG normalized by the iDCG.
+  %Below, we show the top 20 highest scoring properties that are not in the top 100 properties when using the other scoring method. As there are a few duplicates between both methods, this is simply to highlight the different kinds of properties each one obtains.
+%We show the top scoring terms found by each scoring type below in Table \ref {X}.
 
-In principal, NDCG should be better suited for gradual features. In practice, however, there was not such a clear pattern in the differences between the words chosen by these metrics despite often finding different words. Put another way, it is difficult to say if the words highly scored by NDCG are more gradual than other scoring metrics.%We show the top scoring terms found by each scoring type below in Table \ref {X}.
+\subsection{Clustering Features}\label{ch3:LabellingWords}
+A representation composed only of rankings of single words could be used, however that comes with two issues. The first is that there may be too many dimensions, so a  classifier like a Decision Tree (See Section \ref{bg:trees})  needs to be deep to classify well. The second is that it can sometimes be ambiguous what a feature-ranking means when it is labelled with only a single word, e.g. the word "courage" is a feature-direction, but what it represents can only be understood in the context of its cluster "courage students teaches student schools teacher teach classes practice training learning overcome conflict teaching" showing that it is about courageous teachers and students overcoming challenges. There are two ways to solve this problem. The first is that the most similar directions (using cosine similarity) can be found and concatenated with the original word. However, this does not reduce the amount of features. By labelling feature-directions like this, we can rank documents on each of these directions to obtain  associated labels for each feature that have context ${Fr}_{wl}$ where ${wl} = ({wl}_{fr1}, {wl}_{fr2}, ..., {wl}_{frn})$ and ${wl}_{fr}$ is a group of words to label a feature.
 
-\subsection{Labelling Words}\label{ch3:LabellingWords}
-Although the rankings of single words are informative for models, it is difficult for a human to grasp the meaning of a word without context. This can be resolved simply by finding the $n$ most similar directions to each word's direction.
+By obtaining these feature-directions, we can rank documents on each of them and use them as features of 
 
-Another approach is to use a clustering method like k-means. For these clustering method, the aim is to go from single word directions $D_w$ to clusters of these single word directions $C_d$ labelled by the words clustered together $C_w$.
-If we consider two directions, "Blood" and "Gore", both of these are approximating a similar feature of movies, they both relate to how much blood a movie contains. Because of this, their directions will be very similar to each other. This is the first idea behind using a clustering method on these directions. It  resolves the issue of repetition in the directions, and if the clustered directions are averaged then that clustered direction will balance between documents that used the word 'Bloody' to describe the bloodiness of the movie and the word 'Gore'. Some films may be 'Bloody', but may not necessarily have the term 'Gore' in their reviews, and vice versa. Or, a review may favour one term over the other. By using a clustering method, a direction could be obtained that more accurately represents the semantics of a bloody film more than either of the terms individually. 
+The second is that the directions themselves can be clustered, such that feature-directions are clustered together and  a new representation $I_{Cr}$ is taken composed of rankings on feature cluster-directions  ${Cr_i} = ({cr}_{d1}, {cr}_{d2}, ..., {cr}_{dn})$ where ${cr}_d$ is the ranking of a document on a cluster feature-direction. Associated labels are obtained by simply concatenating the words of the feature-directions that are clustered together These clustered feature-directions can be obtained for example by averaging all feature-directions that are clustered together.The benefits of this are that first, the number of features are reduced. Second, the words from the associated feature-directions that are clustered together can be used as feature-labels. Finally,  two directions that describe a similar feature of movies can be clustering together  e.g. the feature-directions for the words "Bloody" and "Gorey". Both are words in movie reviews to describe how much blood a movie contains, so if these feature directions are averaged then the cluster direction can be used to produce a more balanced ranking for how much blood there is in films.  Essentially, the cluster feature-direction could more accurately represent the semantics of a bloody  film, compared to what is possible when considering either feature-direction individually.
 
-It is not always the case that this new clustered direction will perform better than a single relevant direction for a class. In fact, its possible that when clustering many terms together, the ranking can be more disrupted than helped. For example given a cluster  $\{Romance, Love\}$ and a cluster $\{Blood, Gore\}$ the direction for $\{Cute\}$ is clearly more relevant to the former rather than the latter, and likely has been used in the reviews for romance movies. But it has also likely been used in reviews for movies containing cute animals. This would make the new clustered direction $\{Romance, Love, Cute\}$ perform worse at classifying the movie genre "Romance", but a bit better at classifying animal movies. Ideally, this feature would form a new cluster - but a balance must be held between retaining the precision of the rankings and introducing new rankings that are appropiately disentangled from the existing ones, without repeating existing concepts. In the quantitative results, sometimes clustering performed worse than single directions, and not being able to find this balance for the specific classes in question can be attributed as to why.
+
+On the other hand, its possible that when clustering many words together the cluster feature-direction no longer represents a semantically important feature. For example given the associated label for a cluster feature-direction $\{Romance, Love\}$ and a cluster feature-direction $\{Bloody, Gorey\}$ the feature-direction for $\{Cute\}$ is more relevant to the former rather than the latter, and  has been used in reviews for romance movies. But it has also been used in reviews for movies containing cute animals. This would make the new clustered direction $\{Romance, Love, Cute\}$ perform worse at classifying the movie genre "Romance", but a bit better at classifying if a movie contains animals. It might thus be preferable to keep \textit{Cute} in a separate cluster for animal movies - but a balance must be struck between finding the most semantically important clusters in the space and creating new clusters that may not be as semantically important because that word does not easily fit into a cluster. In the quantitative results, sometimes clustering performed worse than single directions, and not being able to find this balance for the specific classes in question can be attributed as to why, specifically because clusters were not semantically important enough or were disrupted by clustering together words that do not fit.
+
+%  ${Cr}_{cl}$ where ${cl} = ({cl}_{cr1}, {cl}_{cr2}, ..., {cl}_{crn})$ and ${cl}_{cr}$ is the cluster of labels for a feature.
+
+%If we consider two directions, "Blood" and "Gore", both of these are approximating a similar feature of movies, they both relate to how much blood a movie contains. Because of this, their directions will be very similar to each other. This is the first idea behind using a clustering method on these directions. It  resolves the issue of repetition in the directions, and if the clustered directions are averaged then that clustered direction will balance between documents that used the word 'Bloody' to describe the bloodiness of the movie and the word 'Gore'. Some films may be 'Bloody', but may not necessarily have the term 'Gore' in their reviews, and vice versa. Or, a review may favour one term over the other. By using a clustering method, a direction could be obtained that more accurately represents the semantics of a bloody film more than either of the terms individually. 
+
+
+
 %What are we doing with clustering
  %Similarly, obtaining a hyper plane using a Logistic Regression classifier that uses occurences of both and either of these terms as positive would be similar to this averaged direction.
 
@@ -366,19 +514,21 @@ It is not always the case that this new clustered direction will perform better 
 
 %The final benefit to clustering the words is that linear classifiers are generally suited better to 'disentangled' representations \cite{Bengio2012}. In this case, we refer to disentanglement in the sense of obtaining a feature vector where each dimension is distinct, rather than the Vector Space Model being naturally clustered. Additionally, if our representation is dense and disentangled into the natural features of the domain, it is unlikely to overfit and will be able to generalize more easily. 
 
-The previous work's clustering method is used, and additionally k-means is experimented with:
+We will experiment with two different clustering methods: k-means and a variant of k-means that was proposed in the work by Derrac \cite{Derrac2015}:
+
+\noindent \textbf{K-Means} In the experimental results, it was found that Derrac's variation relies too much on its initial directions, meaning if a noisy direction is chosen as the first cluster centre, then key directions may be missed. Avoiding this is difficult without extensive and sometimes arbitrary hyper-parameter optimization. For this reason, it was decided to also consider K-Means as an alternative clustering algorithm. K-means traditionally begins with $K$ centroids $c$ randomly placed into the space. In our case, these centers are weighted according to the squared distance from the closest center already chosen. \cite{Arthur} %This intialization is improved by XXX method.  
+Then, the distance between each point $d_p$ and centroid $c$ is calculated. In-order for Euclidean distance to be meaningful, directions are normalized making Euclidean   distance the same as cosine similarity. Each point $p$ is then assigned to its closest centroid $c$. Then, the centroids are recomputed to be the mean of their assigned points. This process starting with the distance calculation is repeated until the points assigned to the centroids do not change. 
 
 \noindent \textbf{Derrac's K-Means Variation} This is the clustering method used in the work this method was introduced in \cite{derrac2015}. As input to the clustering algorithm, it considers the $N$ best-scoring candidate feature directions $v_w$, where $N$ is a hyperparameter. The main idea underlying their approach is to select the cluster centers such that (i) they are among the top-scoring candidate feature directions, and (ii) are as close to being orthogonal to each other as possible. 
  
 The output of this step is a set of clusters $C_1,...,C_K$, where each cluster $C_j$ is identified with a set of words.
-Furthermore  $v_{C_j}$ will be written to denote the centroid of the directions corresponding to the words in the cluster $C_j$, which can be computed as $v_{C_j}= \frac{1}{|C_j|} \sum_{w_l\in C_j} v_l$ provided that the vectors $v_w$ are all normalized. These centroids $v_{C_1},...,v_{C_k}$ are the feature directions that are identified by the method. 
+In the following, we will write   $v_{C_j}$ will be written to denote the centroid of the directions corresponding to the words in the cluster $C_j$, which can be computed as $v_{C_j}= \frac{1}{|C_j|} \sum_{w_l\in C_j} \frac{v_l}{\| v_l \|} $ provided that the vectors $v_w$ are all normalized. 
 
-The first cluster centroid is chosen by taking the top-scoring direction for its associated metric. Then, centroids are selected until the desired amount is reached by taking the maximum of the summed absolute cosine similarity of all current centroids, in other words taking the most dissimilar direction to all of the current directions. Once the centroids are selected, for each remaining direction the centroid is found it is most similar to, and the centroid is updated once the direction has been added. 
+The first cluster centroid is chosen by taking the top-scoring direction for a scoring metric. Then, centroids are selected until the desired number is reached by taking the maximum of the summed absolute cosine similarity of all current centroids, in other words taking the most dissimilar direction to all of the current directions. Once the centroids are selected, for each remaining direction the centroid is found it is most similar to, and the centroid is updated once the direction has been added. 
 
-Cluster centroids are taken as cluster directions, and the representation is obtained by ranking documents on this cluster direction. It is also possible to rank documents on the initial direction only, and use the cluster names as descriptions if the clusters are too noisy.
+Meaning that the key is to rank documents on the initial direction only, and only use the remaining features in each cluster to provide a more informative label if the clusters are too noisy.
 
-\noindent \textbf{K-Means} Although the previous method does have a method for selecting cluster centres, typically it was found that it relies too much on its initial directions, meaning if a noisy direction is chosen as the first cluster centre, then key directions may be missed. Avoiding this is difficult without extensive and sometimes arbitrary hyper-parameter optimization. For this reason, it was decided to try K-Means as a clustering algorithm. K-means traditionally begins with $K$ centroids $c$ randomly placed into the space. In our case, these centers are weighted according to the squared distance from the closest center already chosen. \cite{Arthur} %This intialization is improved by XXX method.  
-Then, the distance between each point $d_p$ and centroid $c$ is calculated. In-order for euclidian distance to be meaningful, directions are normalized making euclidian distance the same as cosine similarity. Each point $p$ is then assigned to its closest centroid $c$. Then, the centroids are recomputed to be the mean of their assigned points. This process starting with the distance calculation is repeated until the points assigned to the centroids do not change. 
+
 
 %We show some examples of clusters from each of these methods in Table \ref {XY}.
 
@@ -396,38 +546,9 @@ Then, the distance between each point $d_p$ and centroid $c$ is calculated. In-o
 %Our overall aim is to find directions in the Vector Space Model that model salient features of the considered domain. For example, given a Vector Space Model of movies, we would like to find a direction that models the extent to which each movie is scary, among others. Such a direction would then allow us to rank movies from the least scary to the most scary. We will refer to such directions as \emph{feature directions}. Formally, each feature direction will be modelled as a vector $v_f$. However, we refer to \emph{directions} rather than \emph{vectors} to emphasize their intended ordinal meaning: feature directions are aimed at ranking objects rather than e.g.\ measuring degrees of similarity. 
 
 \section{Qualitative Results}
-
+In principle, NDCG should be better suited for gradual features. For example, a binary feature would be 'Gore', where a film is either gory or not gory. A gradual feature would be "rating", referring to the age rating for films and gradually increasing. In practice, however, there was not such a clear pattern in the differences between the words chosen by these metrics despite often finding different words. Put another way, it is difficult to say if the words highly scored by NDCG are more gradual than other scoring metrics.
 \subsection{Datasets}\label{ch3:datasets}
 
-The experiments are using five different domains. To begin, the properties of these domains are explained to try to give an insight into the kind of text stored within them. This is to better inform analysis of our qualitative results. Examples are shown in three domains in Table \ref{ch3:TextExamples}.
-
-\begin{table}[] 
-	\scriptsize
-	\begin{tabular}{lp{6.75cm}p{6.75cm}}
-		Data Type  & Unprocessed                                                                                                                                                                                                                                                                                                                                                                               & Processed       \\
-		\midrule[\heavyrulewidth]
-		Newsgroups & morgan and guzman will have era's 1 run higher than last year, and  the cubs will be idiots and not pitch harkey as much as hibbard.  castillo won't be good (i think he's a stud pitcher)                                                                                                                                                                                                & morgan guzman eras run higher last year cubs idiots pitch harkey much hibbard castillo wont good think hes stud pitcher                            \\
-		Sentiment  & All the world's a stage and its people actors in it--or something like that. Who the hell said that theatre stopped at the orchestra pit--or even at the theatre door? 
-		Why is not the audience participants in the theatrical experience, including the story itself?<br /><br />This film was a grand experiment that said: "Hey! the story is you and it 
-		needs more than your attention, it needs your active participation"". ""Sometimes we bring the story to you, sometimes you have to go to the story.""<br /><br />Alas no one listened, 
-		but that does not mean it should not have been said." & worlds stage people actors something like hell said theatre stopped orchestra pit even theatre door audience participants
-		theatrical experience including  story film grand experiment said hey story needs attention needs active participation sometimes bring story sometimes go story alas one listened mean
-		said \\
-		Reuters    & U.K. MONEY MARKET SHORTAGE FORECAST REVISED DOWN The Bank of England said it had revised its forecast of the shortage in the money market down to 450 mln stg before taking account of its morning operations. At noon the bank had estimated the shortfall at 500 mln stg.                                                                                                               & uk money market shortage forecast revised bank england said revised forecast shortage money market 450 mln stg taking account morning operations noon bank estimated shortfall 500 mln stg     \\
-		
-	\end{tabular}
-	\caption{Text examples from the first three domains}\label{ch3:TextExamples}
-\end{table}
-
-\textbf{20 Newsgroups\footnote{http://qwone.com/~jason/20Newsgroups/}} Obtained from scikit-learn. \footnote{https://scikit-learn.org/0.19/modules/generated/sklearn.datasets.fetch\textunderscore20newsgroups.html\#sklearn.datasets.fetch\textunderscore20newsgroups} Where documents are discussions from one of twenty different groups, specifically Atheism, Computer Graphics, Microsoft Windows, IBM PC Hardware, Mac Hardware, X-Window (GUI Software), Automobiles, Motorcycles, Baseball, Hockey, Cryptography, Electronics, Medicine, Space, Christianity, Guns, The Middle East, General Politics and General Religion. These also act as the classes for the dataset. Originally containing 18,846 documents, in this work it is preprocessed using sklearn to remove headers, footers and quotes. Then, empty and duplicate documents are removed, resulting in 18302 documents. The vocabulary size (unique words) is 141,321. The data is not shuffled. After filtering out terms that did not occur in at least two documents, ending up with a vocabulary of size 51,064. The number of positive instances averaged across all classes is 942, around 5\%.
-
-\textbf{IMDB Sentiment} Obtained from Keras \footnote{https://keras.io/datasets/} Where documents are IMDB movie reviews, containing 50,000 documents with a vocabulary size of 78588. After removing terms that did not occur in at least two documents, ending up with a vocabulary of size 55384. This is a smaller change than the newsgroups, which began with a larger vocabulary than sentiment, but ended vocabularies about the same. This means that newsgroups contained many terms that were not relevant to a majority of the documents, likely because the 20 different newsgroups spread across so many topics. The corpus is split half and half between positive and negative reviews, with the task being to identify the sentiment of the review, so the number of positive instances in the classes is 25,000.
-
-\textbf{Reuters-21578, Distribution 1.0} Obtained from NLTK\footnote{https://www.nltk.org/book/ch02.html}. Documents from the Reuters financial newswire service in 1987,  originally containing 10788 documents. After removing empty and duplicate documents, ending up with 10655 documents. It originally contained 90 classes, but as they were extremely unbalanced all classes that did not have at least 100 positive instances were removed, resulting in 21 classes. These classes are Trade, Grain, Natural Gas (nat-gas), Crude Oil (crude), Sugar, Corn, Vegetable Oil (veg-oil), Ship, Coffee, Wheat, Gold, Acquisitions (acq), Interest, Money/Foreign Exchange (money-fx), Soybean, Oilseed, Earnings and Earnings Forecasts (earn), BOP, Gross National Product (gnp), Dollar (dlr) and Money-Supply.   The original vocabulary size is 51,0001, and after removing all words that do not occur in at least two documents, the vocabulary size is 22542. The number of positive instances averaged across all classes is 541, around 5\%. 
-
-\textbf{Placetypes} Taken from work by Derrac \cite{Derrac2015}. Documents are composed of concatenated flickr tags, where each document, named after a flickr tag, is composed of all flickr tags where that tag occurred. A minimum of 1,000 photos for each tag was a requirement, and the tags selected were taken from three different taxonomies (Geonames, Foursquare and the site category for the common-sense knowledge base OpenCYC).  It originally has a vocabulary size of 746,527 and 1383 documents. This is a very large vocabulary size to document ratio. The end vocabulary for this space was 100,000, which is used as a hard limit. This is roughly equivalent to removing all documents that would not be in at least 6 documents. As most classes in this domain are extremely sparse (less than 100 positive instances) no classes are deleted. There are three tasks, generated from three different place type taxonomies. The Foursquare taxonomy, classifying the 9 top-level categories from Foursquare in September 2013, Arts and Entertainment, College and University, Food, Professional and Other Places, Nightlife Spot, Parks And Outdoors, Shops and Service, Travel and Transport and Residence. the GeoNames taxonomy where 7 of 9 categories were used, Stream/Lake, Parks/Area, Road/Railroad, Spot/Building/Farm, Mountain/Hill/Rock, Undersea, and Forest/Heath. The OpenCYC Taxonomy, where 93 categories were used by Derrac, but it was only possible to match 25 of those classes to the representations. As 8 of these remaining classes had a low number of positive occurrences, OpenCYC classes are removed that do not have positive instances for at least 30 documents, leaving us with 17, Aqueduct, Border, Building, Dam, Facility, Foreground, Historical Site, Holy Site, Landmark, Medical Facility, Medical School, Military Place, Monsoon Forest, National Monument, Outdoor Location, Rock Formation, and Room. Naturally as these tasks were derived from taxonomies they are multi-label.
-
-\textbf{Movies} Taken from work by Derrac \cite{Derrac2015}. A dataset where each document is a movie represented by all of its reviews concatenated across a number of sources (Rotten Tomatoes, IMDB, Amazon Reviews). It starts off with a vocabulary size of 551,080 and a document size of 15,000. However, after investigating the data made available by the authors, it was found that there were a number of duplicate documents. After removing these duplicate documents, there are 13978 documents. In the same way as the place-types, the vocabulary is limited at size 100,000. Three tasks are used to evaluate, 23 movie genres, specifically Action, Adventure, Animation, Biography, Comedy, Crime, Documentary, Drama, Family, Fantasy, Film-Noir, History, Horror, Music, Musical, Mystery, Romance, Sci-Fi, Short, Sport, Thriller, War, Western. 100 of the most common IMDB plot keywords (See Appendix \ref{app:ClassNames}) and Age Ratings from the UK and US, USA-G, UK-12-12A, UK-15, UK-18, UK-PG, USA-PG-PG13, USA-R.
 
 
  For each domain, we filter out terms that do not occur in at least two documents, and additionally limit the maximum number of words in a vocabulary to 100,000. For all of these datasets, we split them into a 2/3 training data, 1/3 test data split. We additionally remove the end 20\% of the training data and use that as development data for our hyper-parameters, which is then not used for the final models verified using test data.  For the movies and place-type domains, the original text was not available.
@@ -655,6 +776,9 @@ Now in Table \label{ch3:compared2vmds} a comparison is shown between a time when
 \section{Quantitative Results}
 
 
+
+ For all of these datasets, we split them into a 2/3 training data, 1/3 test data split. We additionally remove the end 20\% of the training data and use that as development data for our hyper-parameters, which is then not used for the final models verified using test data.  
+
 \subsection{Evaluation Method}
 
 Primarily the effectiveness of a representation is evaluated on its ability to perform in low-depth Decision Trees, specifically CART Decision Trees (See Background Section \ref{bg:trees}) with a limited depth of one, two and three. This evaluation has a few assumptions: A good interpretable representation disentangles salient domain knowledge into its dimensions, and natural domain tasks (e.g. classifying genres of movies using their reviews) can be evaluated effectively using that salient domain knowledge. Put another way, if the space is representing domain knowledge well it can be expected that the space is linearly separable for key semantics of the domain. In spatial terms, a representation will be capable of being linearly transformed by our method into these distinct relevant concepts if semantically distinct entities are spatially separated, and semantically similar entities are close together.
@@ -662,6 +786,12 @@ Primarily the effectiveness of a representation is evaluated on its ability to p
 If only the the quality of the representation was being evaluated, only Linear SVM's could be used to find the hyper-planes that effectively separate these spatial representations for the class. However, the representations that encode this spatial information are not interpretable, so a linear classifier although able to separate the documents that contain the class and do not contain them will not be interpretable either. It is our main interest to evaluate how well a representation encodes these key semantics while also being restricted by the requirement to be disentangled into words or clusters, in other words how well it represents the information while also being interpretable.
 
 Given these assumptions, low-depth Decision Trees can give an estimation of how good an interpretable representation is. If the representation cannot perform for a class at a one-depth tree, then it is not disentangled such that it contains a single salient dimension that effectively evaluates a class. If a representation cannot perform well on two-depth trees, then the representation is not disentangled into three concepts that can sufficiently determine that class, and if a representation cannot perform well on three-depth trees, it has not disentangled the representation such that there are nine relevant concepts that are relevant to that class. To see what these different trees look like see Figure \ref{DecisionTree}. A comparison to put this in better perspective is to an unbounded tree. Unbounded trees select a large amount of dimensions in order to achieve a performance difference on development data, but when applied to test data the models do not generalize well. This is because they overfit, rather than using the key semantics of the space to classify.
+
+\begin{figure}[t]
+	\includegraphics[width=450px]{images/decision_tree_ex.png}
+	\centering
+	\caption{An example of a Decision Tree classifying if a movie is in the "Sports" genre. Each Decision Tree Node corresponds to a feature, and the threshold T is the required ranking of a document on that feature to traverse right down the tree instead of left. One interesting point to note is that the most important direction is used twice, the "coach, sports, team, sport, football" cluster and results in a majority of negative samples. Another point is that the nodes at depth three are more specific, sometimes overfitting (e.g. in the case of the "Virus" node, likely overfitting to a single movie about a virus) }\label{ch3:DecisionTree}
+\end{figure}
 
 
 
@@ -969,7 +1099,7 @@ Derrac      & 0.678                           & \textbf{0.449} & 0.74           
 
 
 %\subsection{Quantitative Results}
-%From a domain, e.g. movie reviews, where each document is a collection of reviews for a movie, we preprocess the text such that it is converted to lower-case, and non-alphanumeric characters are removed. From here, we remove standard English stop words using the NLTK library \cite{Bird}. We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}. From this preprocessed corpus, we obtain a Bag-Of-Words where we count the frequency of each term $BOW_wf$, see \ref{background:BOW}. 
+%From a domain, e.g. movie reviews, where each document is a collection of reviews for a movie,  We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}. From this preprocessed corpus, we obtain a Bag-Of-Words where we count the frequency of each term $BOW_wf$, see \ref{background:BOW}. 
 
 %The difference between single directions and clusters is best highlighted when comparing their use in simple interpretable classifiers. In figure \ref{ch3:ComparedTrees} we demonstrate this.
 
