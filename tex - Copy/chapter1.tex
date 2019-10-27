@@ -17,6 +17,13 @@ Problems that machine-learning can solve can be split into two distinct categori
 
 One example of an unsupervised machine-learning task is to transform data into a representation that can be learned from by the 
 
+\section{Representations}
+
+Our intuitive understanding of how things behave and what they are in a domain are a representation of reality. This representation is adjusted by our experience with those things in the real world. Each person is constantly adjusting to some degree their representation of what different things are, and this construction and transformation of our personal representations is what we call learning. However, a machine given only text data has no representation. We can understand machines to be numerical reasoners, that can produce things using mathematics from representations. So how can we get a good numerical representation of text so that machines can understand it?
+
+This is the fundamental question we attempt to answer in this section. There are a variety of different ways to achieve a representation of raw text data, and each one is suited for a different task. For example, the task of sentiment analysis can be achieved using a bag-of-words, but as it does not understand context then some things will not be represented well, e.g. a sentence like "This was so good I want to rip my eyes out." although sarcastic, would still count towards the amount of times the word "good" appeared in the document. To achieve better results on this task, it would be better to instead use a representation that can represent context somehow.
+
+
 \section{Motivation}
 %What is text? How is it motivating?
 
