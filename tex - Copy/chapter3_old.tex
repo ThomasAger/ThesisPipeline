@@ -1,0 +1,864 @@
+\chapter{Converting Vector Spaces into Interpretable Representations}\label{Chapter3}
+
+
+\section{Introduction}\label{chapter3:Introduction}
+
+%Semantic spaces, current situation with those, etc.
+%
+
+%What is the importance of similarit
+Representing natural language knowledge and finding an appropriate model to solve natural language tasks with those representations are two key problems Semantic Spaces where semantic relationships are encoded spatially have entered widespread use due to their ability to densely model complex relationships. These representations, obtained through frequency statistics, distributional neural learning, or extracted from a neural network have achieved strong results in X, Y, Z. However, this means that the features of the representation typically do not correspond to distinct semantics, in contrast to text-models like Topic Models where each feature of the representation has a labelled semantic meaning. In representation learning a good representation is one that 'disentangles the factors of variation' \cite{Bengio2013} i.e., distinctly separates the key semantics of the space spatially. In this Chapter, we approach the idea of disentangling the representation in a different way - as in a topic model or bag-of-words, we consider a representation to be disentangled if each dimension has a distinct labelled semantic meaning. This kind of disentangled representation has the benefit of being  easily applied to a variety of different interpretable linear models \cite{Ustun2014}. from an existing semantic space and bag-of-words, we intend to 'disentangle' that space so that it separates the key semantics of the domain into labelled dimensions. We give an example of the dimensions of a 'disentangled' representation in \ref{ch3:disentangled}. and our experiments in this chapter focus on the performance of a disentangled representation in this context. Further, the methods we investigate are entirely unsupervised, needing only a bag-of-words and an existing semantic space. 
+
+Interpretable models are generally in three categories, 
+%But these topic models do not contain the rich spatial relationships found in semantic spaces, and their representations cannot be augmented by additional data or grammatical information in exactly the same way.  %Frequency statistics and distributional neural embeddings like word-vectors have achieved strong performance on X by doing B, Y by doing N, Z by doing K. 
+%For example, a good vector space in the domain of movies constructed from IMDB movie reviews should contain a natural separation of entities into genres, where Horror movies are spatially distant from Romance movies, and movies that are Romantic Horrors would be somewhere inbetween. We can see an example in Figure \ref{figure:genres_separated}. For a Bag-Of-Words, we can expect similar entities to have similarly scoring terms \ref{PPMI table:PPMI_example}.
+
+%\begin{figure}[t]
+%	\includegraphics[width=\textwidth]{images/genres_separated.png}
+%	\centering
+%	\caption{A conceptual space of movies, where regions correspond to properties and entities are points.}\label{figure:genres_separated}
+%\end{figure}
+
+The relationships in semantic spaces can be extracted to obtain domain knowledge. %king and queen was parallel to the vector between prince and princess. % NEED TO MAKE THIS REAL
+For example \cite{TomasMikolovWen-tauYih2013} found that "equivalent relations tended to correspond to parallel vector differences" \cite{Mitchell2015}, and \cite{Mitchell2015}, found that by decomposing representations into orthogonal semantic and syntactic subspaces they were able to produce substantial improvements on various tasks. Additionally, they have also been found to hold inherent gender bias  \cite{Garg2017} as word distances between gendered words (e.g. male, female, she, her) and occupational words e.g. (nurse, programmer) were correlated to the percentage of occupation that gender had for that role in different time periods. 
+
+
+Our focus in this chapter is on directions in semantic spaces. For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model. Similarly, in \cite{kim2013deriving} directions in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{DBLP:conf/acl/RotheS16} found directions indicating lexical features such as the frequency of occurrence and polarity of words. Our work specifically follows the relationships extracted by Derrac \cite{Derrac2015}, who found features in domain-specific document representations that correspond to directions. These features typically correspond to properties of those documents, for example a direction which goes from a movie that is the least 'Scary' to the most 'Scary'. We show an example in a toy domain in \ref{ch3:ToyDirectionsGraphic}. The basic idea of this chapter is that we use these feature-directions to produce a representation where each dimension is a ranking of entities on a feature-direction, and evaluate its effectiveness in simple linear classifiers.
+
+
+%\begin{figure}[t]
+%	\includegraphics[width=250px]{images/toy_domain.png}
+%	\centering
+%	\caption{An example in a toy domain of shapes.}\label{ch3:ToyDirectionsGraphic}
+%\end{figure}
+
+The linear classifier that we focus on are low-depth decision trees. This is because they are effective at evaluating the saliency and disentanglement of our representations dimensions. If our dimensions are salient and disentangled, then a low-depth decision tree will suffice to classify natural domain tasks. We find that on low-depth decision trees, the method outperforms the original representation greatly, demonstrating that we are able to disentangle the salient semantics of the domain. Additionally, our results in most cases are also competitive with Latent Dirchlet Allocation, a baseline interpretable topic model. From this, we conclude that this method is an effective way to obtain a disentangled representation that can effectively produce simple interpretable classifiers.
+
+
+%Why interpretability for document classification matters:
+
+%What semantic spaces are there that perform well at tasks:
+
+%What document classification tasks are important:
+
+%What methods are there for interpretable document classification:
+
+%Derrac \cite{Derrac2015} introduced an unsupervised method to go from a semantic space and its associated bag-of-words to a representation where each dimension is a ranking of documents on a feature of the domain. For example, in the domain of movie reviews genres would be a feature, and the dimension would have a numeric value for each document corresponding to the degree it is a particular genre. The contribution of this Chapter is an analysis and experimentation on the quality of these features applied to document classification. The main insight from our work is that these interpretable features do not suffer a performance drop in a non-linear classifier compared to the original representation, and can outperform the original representation and a baseline interpretable representation in a linear classifier. In addition, we find that if a dimension ranks documents on a feature relevant to the task, it can be competitive with more complex models using a single decision tree node. We show an example of the representation from a domain of IMDB movie reviews in \ref{ch3:TreeAndRep}. 
+
+%\begin{figure}[t]
+%	\includegraphics[width=\textwidth]{images/tree and rep.png}
+%	\centering
+%	\caption{Example movies and selected associated dimensions, chosen according to their relevance to the genre task.}\label{ch3:TreeAndRep}
+%\end{figure}
+
+%Semantic spaces encode semantic relationships
+
+%What are the applications of semantic relationships? What is the power of a semantic relationship? Why are semantic relationships important in a space?
+%prolly need more about
+
+%What are directions? Why are directions important? What have they been used for? What is a feature direction?
+
+
+% How can I apply directions to produce an interpretable space? Why is this valuable? What makes this interesting? What are feature rankings?
+
+
+%%What are the advantages, disadvantages of the previous work?
+
+
+
+%Why do this work? What is the value of this work?  How is this relevant to the readers interests?
+
+
+%\subsection{Using a Property Representation in a Linear Classifier}
+
+
+%Our method can use any vector space that linearly separates entities, and so it has potential longevity. This means that our method is relying on structure in the space that does not directly correspond to our desired representation -  we can view our approach as a linear transformation of the space. We address this problem in Chapter \ref{chapter:finetuning}. However, we have the capability to leverage many different methods to construct a vector space for our representation, so as long as dense representations of entities exist it will be possible to use our method, and as they are improved the results that our method can achieve will be improved too. This kind of flexibility also gives us the potential to combine the resultant representations from different vector spaces for classification, e.g. concatenating the vectors from different spaces.
+
+%Topic models such as Latent Dirichlet Allocation (LDA) represent documents as multinomial distributions over latent topics, where each of these topics corresponds to a multinomial distribution over words \cite{Blei2003}. These topics tend to correspond to semantically meaningful concepts, hence topic models tend to be rather interpretable \cite{Chang2009}. To characterize the semantic concepts associated with the learned topics, topics are typically labelled with the most probable words according to the corresponding distribution. 
+
+% What is a semantic space? Why is a semantic space valuable?
+
+
+
+
+% 
+
+
+
+
+
+%%What is the previous work?
+ %What is a direction
+
+
+
+
+%Finally, \cite{derracAIJ} found salient properties as direction vectors in a semantic space of entities (e.g. Movies in a domain of IMDB movie reviews), and labelled them with clusters of words (e.g. $p_1 = {Scary, Horror, Gore}, p_2 = {Funny, Laughter, Hilarious}$).  We show a toy example in Figure \ref{ToyDirection}. %Copied from CONLL 
+
+
+
+
+%%What is our contribution towards those disadvantages in this chapter?
+ %"Decision Trees, Decision Tables and Textual descriptions of rules are logically equivalent in the sense that one type of representation can be automatically translated to another (albeit in a simpler or more complex form), while preserving the predictive behaviour of the original model"
+% has many positive effects for its users, like lower response times \cite{Narayanan2018, Huysmans2011}, better question answering and confidence for logical problem questions \cite{Huysmans2011} and higher satisfaction \cite{Narayanan2018}.
+
+
+%%What are some real world scenarios that you could see our work taking effect in?
+%In a case study by  \cite{Veale2017}, giving the business users the option between a model with higher classification score but more input variables and a lower classification score but less input variables resulted in more buy-in for system designers. By accurately representing salient concepts in the domain, we are also able to offer a similar option; less nodes in the decision tree in exchange for more accuracy. % Potentially this citation sucks
+
+
+%How is the work evaluated? How can you justify the evaluation? 
+%%What are some alternative interpretable classifiers? What are some approaches to interpretable classification?
+
+%%How does our work fit into the niche of interpretable classifiers?
+
+%%What kind of tasks are these interpretable classifiers usually on? How do we compare in terms of evaluation?
+
+%%How does our evaluation of interpretability play into our idea of interpretability outlined in Chapter 1?
+
+
+
+
+%How is the chapter going to play out? Whats going to happen?
+%As our work performs well even at lower-depth trees, this gives potential users more flexibility in how they want to present the information, e.g. to a potential client. Compared to bag-of-words, which loses its representation capabilities the lower the depth.
+
+This chapter continues as follows: We begin by describing the method, making explicit the variations we have introduced for our experimental work. We follow this with the results of our experiments accompanied by qualitative examples and explanations, and finish with a conclusion on the  benefits and limitations of this approach.
+
+
+
+%\section{Related Work}
+%Sparse word vectors
+%Adapted to composition \cite{Fyshe2015}
+%\subsection{Semantic Relations \& Their Applications}
+
+%Our method uses the relationships inherent in a semantic space. Other work has formalized the relationships found in semantic spaces, for example in word-vectors, linear analogies (see Section \ref{WordVectors, Ethayarajh2018}, were found where the vector between  %Copy pasted from this 
+%[ENTIRE SECTION COPY PASTED FROM PREVIOUS PAPER]
+%\textbf{Linear Classifiers}
+%Decision trees, linear SVM's, logistic regression, decision tables, IF Then rules.
+
+%What are the available options for interpretable linear classification?
+
+%How have each of these methods been measured or validated in the literature in regards to interpretability? How about application to real world situations?
+
+%\textbf{Non linear classifiers}
+%What non linear classifiers networks are interpretable? How have they done it? How have they measured it? How does it compare to a linear method?
+
+%\textit {Neural networks}Approximating w/linear model, Interpretable nodes/weights
+
+%\textit {Other Stuff}
+
+%\subsection{Interpretable Representations}
+
+
+%There are two ways in which topic models can be used for document classification. First, a supervised topic model can be used, in which the underlying graphical model is explicitly extended with a variable that represents the class label \cite{Blei2010}. Second, the parameters of the multinomial distribution corresponding to a given document can be used as a feature vector for a standard classifier, such as a Support Vector Machine (SVM) or Decision Tree. LDA has been extended by many approaches, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors \cite{rosen2004author} or time stamps \cite{wang2006topics}.
+
+
+%Broadly speaking, in the context of document classification, the main advantage of topic models is that their topics tend to be easily interpretable, while vector space models tend to be more flexible in the kind of meta-data that can be exploited. The approach we propose in this paper aims to combine the best of both worlds, by providing a way to derive interpretable representations from vector space models.
+
+% One of the more popular models for text representation that labels features in a similar way to our method are Topic Models.
+
+
+\section{Method}
+% Assumed understanding at this point
+% Chapter 1: Why interpretability is important. The value of a good interpretable representation. What directions are and what they mean.
+% Chapter 2: The background and literature review for interpretable representations.
+% Chapter 3: An introduction on the value of a good interpretable classifier, and the position of our work in that domain and how it can be applied there. What entities, properties are. What a conceptual space is. A literature review on relevant interpretable classifiers.
+
+This section details the methodology to obtain features from a Semantic Space \ref{bg:SemanticSpaces} which rank documents on salient semantics, e.g. In a domain of IMDB movie reviews, a movie would be ranked on semantics like  $1: \{Scary, Horror, Bloody\}$ and $2: \{Romantic, Love, Cute\}$, ideally with as many rankings as salient semantics of the domain. 
+%Make sure features ae explained well earlier 
+
+%\subsection{The Structure of a Semantic Space}
+
+%Salient features of the domain are encoded in the structure of a semantic space. 
+% What are directions? How are they encoded? Why are they encoded that way?
+
+
+
+ %Features that are important will be spatially organized in a way that reflects the similarity between the bag-of-words representations they were composed of. In particular, we expect that documents will be arranged in a direction, where generally the higher the PPMI score for a group of words that correspond to a feature (e.g. $Horror, Scary, Gore$) the further away they will be from those that have low PPMI scores for those words. We give examples of this in Figure \ref{ch3:DirectionsGraphic}, by projecting documents into a 2D space of salient features we are able to show that these documents are structured according to directions for these features. Salient features will typically be a more abstract representation which will be natural in the domain, e.g. in a domain of IMDB movie reviews, genres. 
+
+%\begin{figure}[t]
+%%	\includegraphics[width=\textwidth]{images/DirectionsGraphic.png}
+%	\centering
+%	\caption{Original And Converted.}\label{ch3:DirectionsGraphic}
+%\end{figure}
+%The method to obtain interpretable feature-vectors is an extension of the work by \cite{derracAIJ}. This previous work showed how to, filter out words, cluster words to get features, and obtain rankings of documents on those features. In this section, we further analyse and extend this work, in particular by testing a variety of additional filtering methods and clustering methods, and demonstrating how these feature-vectors can produce simple linear interpretable classifiers. 
+%To begin, we filter out terms that will not be well represented in the space, and in-turn will not result in good feature rankings. We do so by first removing all terms below a frequency threshold. Then, for each word we obtain a direction in the space that can induce a ranking of documents on that word, and evaluate how well represented that word is in the space and remove those below a threshold. We can consider the terms remaining to be candidate feature-directions, as they are all well represented in the space and are unlikely to be highly scored as representative due to being infrequent. However, it is possible that they may not represent different information from each other, e.g. "blood" and "bloody" are likely quite similar. Additionally, we can understand that a good feature will not correspond directly to a term, but instead to a more abstract concept, e.g. "Blood, Gore, Horror". To obtain these more abstract feature-directions, and ensure the feature-directions are distinct rather than representing the same information, we cluster together similar feature-directions and obtain their feature-rankings to obtain our final representation. Each of these feature-rankings can be labelled with the cluster of words they are composed of. 
+
+
+
+\subsection{Obtaining Directions and Rankings From Words}
+
+
+
+In this section we show how to obtain directions for words, and explain how to obtain document representations by ranking documents on these directions. For this step, we do not expect all words to be features of the domain.  In the next sections, we aim to filter these words to obtain salient features.
+
+\noindent \textbf{Obtaining directions for each word} For each word $w$, a Support Vector Machine (See Section \ref{bg:SVM}) classifier is trained on the binary Bag-Of-Words representation of that word, where words are labelled as positive if they occurred more than once $w_f >= 1$ and negative otherwise. Although the separation of documents is binary, we can expect that the degree to which they are classified as the word varies. For example in a space constructed from frequency vectors, we can expect that the documents which contain the word more frequently would be further away from the hyper-plane in the positive direction. Following this, we can consider the vector $v_w$ perpendicular to the hyperplane as the direction that models documents from least relevant at the distance furthest from the hyperplane on the negative side to most relevant for the word $w$ at the distance furthest from the hyperplane at the positive side. We show an example of this in the toy domain in Figure \ref{ch3:ToyHyperPlane}. %Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity. %Graphical representation of 
+
+
+\begin{figure}[t]
+	\includegraphics[width=250px]{images/ToyHyperplane.png}
+	\centering
+	\caption{An example of a hyper-plane and its orthogonal direction in a toy domain of shapes. Green shapes are positive examples and red shapes are negative examples, but despite the problem being binary those closest to the hyper-plane are less defined than those further away, resulting in the orthogonal vector being a direction.}\label{ch3:ToyHyperPlane}
+\end{figure}
+
+
+
+
+\noindent \textbf{Ranking documents on directions} Once we have obtained a direction vector for each word $v_w$ the next step is to quantify the degree to which each document has that word, by obtaining a value that corresponds to how far-up it is on the direction vector. These are our rankings of documents on words, if $p_d$ is the representation of a document in the given vector space as a point then we can think of the dot product between the hyper-plane and the document vector $H_w \cdot p_d$ as the ranking $r_dw$ of the document $d$ for the word $w$, and in particular, we take $r_d1 < r_d2$ to mean that $d_2$ has the property labelled with the word $w$ to a greater extent than $e_1$. Below, we show some examples of features and documents ranked on them for different domains. %Graphical representation of entities being ranked on a direction vector
+
+
+
+
+
+
+%\begin{figure}[t]
+%	\includegraphics[width=\textwidth]{images/genres_separated.png}
+%	\centering
+%	\caption{Original And Converted.}\label{ch3:OrigAndConverted}
+%\end{figure}
+
+
+
+\subsection{Filtering Words}
+
+With the rankings $R_r$, we could create a representation of each document $d$, composed of $w_n$ dimensions, where each dimension is a ranking of the document $d$ on that word $r_dw$. However, many of the words are not spatially important enough in the representation to result in a quality ranking - they are not salient features. In this section, we aim to filter the words that are not separable, we evaluate them using a scoring metric, and remove the words that are not sufficiently well scored. We use three different metrics:
+
+\noindent \textbf{Classification accuracy}. Evaluating the quality in terms of the accuracy of the SVM classifier: if this classifier is sufficiently accurate, it must mean that whether word $w$ relates to document $d$ (i.e.\ whether it is used in the description of $d$) is important enough to affect the semantic space representation of $d$. In such a case, it seems reasonable to assume that $w$ describes a salient property for the given domain.%This is basically copy pasted.
+\smallskip
+
+\noindent \textbf{Cohen's Kappa}. One-kind of feature we find in these domains are binary labels of documents, for example a movie either is or isn't a movie with "Gore". We can expect that the more salient a binary feature, the more linearly separable it will be in the space. One problem with accuracy as a scoring function is that these classification problems are often very imbalanced. In particular, for very rare words, a high accuracy might not necessarily imply that the corresponding direction is accurate. For this reason, \cite{Derrac2015} proposed to use Cohen's Kappa score instead. In our experiments, however, we found that accuracy sometimes yields better results, so we retain Kappa as an alternative metric. %This is basically copy pasted.
+\smallskip
+
+\noindent \textbf{Normalized Discounted Cumulative Gain} % MATHEMATICS NEEDS TO BE REWRITTEN
+This is a standard metric in information retrieval which evaluates the quality of a ranking w.r.t.\ some given relevance scores \cite{jarvelin2002cumulated}.  In our case, the rankings $r_d$ of the document $d$ are those induced by the dot products $v_w \cdot d$ and the relevance scores are determined by the Pointwise Positive Mutual Information (PPMI) score $\textit{ppmi}(w,d)$, of the word $w$ in the BoW representation of entity $d$ where
+$\textit{ppmi}(w,d) = \max \big(0, \log\big(\frac{p_{wd}}{p_{w*} \cdotp p_{*d}}\big)\big)$, and
+\begin{align*}
+p_{wd} &= \frac{n(w, d)}{\sum_{w'} \sum_{d'} n(w', d')}
+\end{align*}
+where $n(w,d)$ is the number of occurrences of $w$ in the BoW representation of object $d$, $p_{w*} = \sum_{e'} p_{wd'}$ and $p_{*d} = \sum_{w'} p_{w'd}$. %This is basically copy pasted.
+\smallskip
+
+By scoring the words on these features, we can apply a simple cut-off (e.g. the top 2000 scored words) to obtain the most salient words. Ideally, this cut-off would be at the point where the words stop corresponding to salient features. However, it is difficult to determine this. In principle, we may expect that accuracy and Kappa are best suited for binary features, as they rely on a hard separation in the space between objects that have the word in their BoW representation and those that do not, while NDCG should be better suited for gradual features. In practice, however, we could not find such a clear pattern in the differences between the words chosen by these metrics despite often finding different words. 
+
+\subsection{Labelling Words}\label{ch3:LabellingWords}
+Although single directions are informative for models, it is difficult for a human to grasp the meaning of a word without context. To resolve this simply, we could just find the $n$ most similar words and display them next to the single directions. Another approach is to use a standard clustering method like k-means. In the former case, we would not be changing the ranking or direction, instead just giving some insight into what words are associated with the single direction. In the latter, we would also cluster the directions and obtain new rankings on an average of all the labelled words. 
+
+%What are we doing with clustering
+If we consider two directions, "Blood" and "Gore", both of these are approximating a similar feature of movies, they both relate to how much blood a movie contains. Because of this, their directions will be very similar to each other. This is the first idea behind clustering these directions, if these directions are averaged a direction is obtained that is a balance between documents that used the word 'Bloody' to describe the blood and the word 'Gore'. Some films may be 'Bloody', but may not necessarily have the term 'Gore' in their reviews, and vice versa. Or, a review may favour one term over the other. By using a clustering method, we could obtain a direction that more accurately represents the semantics of a bloody film more than either of the terms individually. However, it is not always the case that a clustered direction will perform better than a single relevant direction for a class. In fact, its possible that when clustering many terms together, we end-up disrupting the representation more than helping it. For example given a cluster  $\{Romance, Love\}"$ and a cluster $\{Blood, Gore\}"$ the direction for $\{Cute\}$ is clearly more relevant to the former rather than the latter, and likely has been used in the reviews for romance movies. But it has also likely been used in reviews for movies containing cute animals. This would make the new clustered direction $\{Romance, Love, Cute\}$ perform worse at classifying the movie genre "Romance".     %Similarly, obtaining a hyper plane using a Logistic Regression classifier that uses occurences of both and either of these terms as positive would be similar to this averaged direction.
+
+% When is clustering useful? When does clustering outperform single directions? When are single directions useful?
+
+%What is the value of a cluster label?
+
+
+%The final benefit to clustering the words is that linear classifiers are generally suited better to 'disentangled' representations \cite{Bengio2012}. In this case, we refer to disentanglement in the sense of obtaining a feature vector where each dimension is distinct, rather than the semantic space being naturally clustered. Additionally, if our representation is dense and disentangled into the natural features of the domain, it is unlikely to overfit and will be able to generalize more easily. 
+
+We approach clustering the directions with a variety of methods:
+
+\noindent \textbf{K-Means} K-Means is a clustering algorithm that starts with determining the amount of clusters, $K$. To begin, $K$ centroids $c$ are randomly placed into the space. Then, the distance between each point $p$ and centroid $c$ (in our case, points are determined by rankings) is calculated. Each point $p$ is then assigned to its closest centroid $c$. Then, the centroids are recomputed to be the mean of their assigned points. This process starting with the distance calculation is repeated until the points assigned to the centroids do not change. 
+
+\noindent \textbf{Derrac's K-Means Variation} This is the clustering method used in the previous work \cite{derracAIJ}. As input to the clustering algorithm, we consider the $N$ best-scoring candidate feature directions $v_w$, where $N$ is a hyperparameter. The main idea underlying their approach is to select the cluster centers such that (i) they are among the top-scoring candidate feature directions, and (ii) are as close to being orthogonal to each other as possible. 
+ 
+The output of this step is a set of clusters $C_1,...,C_K$, where we will identify each cluster $C_j$ with a set of words.
+We will furthermore write $v_{C_j}$ to denote the centroid of the directions corresponding to the words in the cluster $C_j$, which can be computed as $v_{C_j}= \frac{1}{|C_j|} \sum_{w_l\in C_j} v_l$ provided that the vectors $v_w$ are all normalized. These centroids $v_{C_1},...,v_{C_k}$ are the feature directions that are identified by our method. 
+
+We choose our first cluster centroid by taking the top-scoring direction for its associated metric. Then, we select centroids until we have reached the desired amount by taking the maximum of the summed absolute cosine similarity of all current centroids, in other words taking the most dissimilar direction to all of the current directions. Once we have selected the centroids, for each remaining direction we find the centroid it is most similar to, and the centroid is updated once the direction has been added. 
+
+We take cluster centroids as cluster directions, and obtain our representation by ranking documents on this cluster direction as before.
+%Although we are able to find the words that are most salient, the properties in the domain may not correspond directly to words. Further, the properties may not be well described by their associated word. In-order to find better representations of properties, we cluster together similar vectors $v_w$, following the assumption that those vectors which are similar are representing some property more general than their individual words, and we can find it between them.
+%As the final step, we cluster the best-scoring candidate feature directions $v_w$. Each of these clusters will then define one of the feature directions to be used in applications. The purpose of this clustering step is three-fold: it will ensure that the feature directions are sufficiently different (e.g.\ in a space of movies there is little point in having \emph{funny} and \emph{hilarious} as separate features), it will make the features easier to interpret (as a cluster of terms is more descriptive than an individual term), and it will alleviate sparsity issues when we want to relate features with the BoW representation, which will play an important role for the fine-tuning method described in the next section.
+
+
+%Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtained for three of the datasets that will be used in the experiments, modelling respectively movies, place-types and newsgroup postings. For each dataset, we used the scoring function that led to the best performance on development data(see Section \ref{secExperiments}). Only the first four words whose direction is closest to the centroid $v_C$ are shown.
+%\noindent \textbf{K-Means}
+%\noindent \textbf{Derrac's K-Means Variation}
+%\noindent \textbf{Mean-shift}
+%\noindent \textbf{Hdbscan}
+
+%Our overall aim is to find directions in the semantic space that model salient features of the considered domain. For example, given a semantic space of movies, we would like to find a direction that models the extent to which each movie is scary, among others. Such a direction would then allow us to rank movies from the least scary to the most scary. We will refer to such directions as \emph{feature directions}. Formally, each feature direction will be modelled as a vector $v_f$. However, we refer to \emph{directions} rather than \emph{vectors} to emphasize their intended ordinal meaning: feature directions are aimed at ranking objects rather than e.g.\ measuring degrees of similarity. 
+
+\section{Qualitative Results}
+
+\subsection{Datasets}\label{ch3:datasets}
+
+We use five different domains.
+
+\textbf{20 Newsgroups\footnote{http://qwone.com/~jason/20Newsgroups/}} Obtained from scikit-learn. \footnote{https://scikit-learn.org/0.19/modules/generated/sklearn.datasets.fetch\textunderscore20newsgroups.html\#sklearn.datasets.fetch\textunderscore20newsgroups} Where documents are discussions from one of twenty different groups, specifically Atheism, Computer Graphics, Microsoft Windows, IBM PC Hardware, Mac Hardware, X-Window (GUI Software), Automobiles, Motorcycles, Baseball, Hockey, Cryptography, Electronics, Medicine, Space, Christianity, Guns, The Middle East, General Politics and General Religion. These also act as the classes for the dataset. Originally containing 18,846 documents, in this work it is preprocessed using sklearn to remove headers, footers and quotes. Then, empty and duplicate documents are removed, resulting in 18302 documents. The vocabulary size (unique words) is 141,321. The data is not shuffled. After filtering out terms that did not occur in at least two documents, we end up with a vocabulary of size 51,064. The number of positive instances averaged across all classes is 942, around 5\%.
+
+\textbf{IMDB Sentiment} Obtained from Keras \footnote{https://keras.io/datasets/} Where documents are IMDB movie reviews, containing 50,000 documents with a vocabulary size of 78588. After removing terms that did not occur in at least two documents, we ended up with a vocabulary of size 55384. This is a smaller change than the newsgroups, which began with a larger vocabulary than sentiment, but ended vocabularies about the same. This means that newsgroups contained many terms that were not relevant to a majority of the documents, likely because the 20 different newsgroups spread across so many topics. The corpus is split half and half between positive and negative reviews, with the task being to identify the sentiment of the review, so the number of positive instances in the classes is 25,000.
+
+\textbf{Reuters-21578, Distribution 1.0} Obtained from NLTK\footnote{https://www.nltk.org/book/ch02.html}. Documents from the Reuters financial newswire service in 1987,  originally containing 10788 documents. After removing empty and duplicate documents, we end-up with 10655 documents. It originally contained 90 classes, but as they were extremely unbalanced we removed all classes that did not have at least 100 positive instances, resulting in 21 classes. These classes are Trade, Grain, Natural Gas (nat-gas), Crude Oil (crude), Sugar, Corn, Vegetable Oil (veg-oil), Ship, Coffee, Wheat, Gold, Acquisitions (acq), Interest, Money/Foreign Exchange (money-fx), Soybean, Oilseed, Earnings and Earnings Forecasts (earn), BOP, Gross National Product (gnp), Dollar (dlr) and Money-Supply.   The original vocabulary size is 51,0001, and after removing all words that do not occur in at least two documents, the vocabulary size is 22542. The number of positive instances averaged across all classes is 541, around 5\%. The new 
+
+\textbf{Placetypes} Taken from work by Derrac \cite{Derrac2015}. Documents are composed of concatenated flickr tags, where each document, named after a flickr tag, is composed of all flickr tags where that tag occurred. A minimum of 1,000 photos for each tag was a requirement, and the tags selected were taken from three different taxonomies (Geonames, Foursquare and the site category for the common-sense knowledge base OpenCYC).  It originally has a vocabulary size of 746,527 and 1383 documents. This is a very large vocabulary size to document ratio. The end vocabulary for this space was 100,000, which we used as a hard limit. This is roughly equivalent to removing all documents that would not be in at least 6 documents. As most classes in this domain are extremely sparse (less than 100 positive instances) we do not delete any classes. There are three tasks, generated from three different place type taxonomies. The Foursquare taxonomy, classifying the 9 top-level categories from Foursquare in September 2013, Arts and Entertainment, College and University, Food, Professional and Other Places, Nightlife Spot, Parks And Outdoors, Shops and Service, Travel and Transport and Residence. the GeoNames taxonomy where 7 of 9 categories were used, Stream/Lake, Parks/Area, Road/Railroad, Spot/Building/Farm, Mountain/Hill/Rock, Undersea, and Forest/Heath. The OpenCYC Taxonomy, where 93 categories were used by Derrac, but it was only possible to match 25 of those classes to the representations. As 8 of these remaining classes had a low number of positive occurrences, we remove OpenCYC classes that do not have positive instances for at least 30 documents, leaving us with 17, Aqueduct, Border, Building, Dam, Facility, Foreground, Historical Site, Holy Site, Landmark, Medical Facility, Medical School, Military Place, Monsoon Forest, National Monument, Outdoor Location, Rock Formation, and Room. Naturally as these tasks were derived from taxonomies they are multi-label.
+
+\textbf{Movies} Taken from work by Derrac \cite{Derrac2015}. A dataset where each document is a movie represented by all of its reviews concatenated across a number of sources (Rotten Tomatoes, IMDB, Amazon Reviews). It starts off with a vocabulary size of 551,080 and a document size of 15,000. However, after investigating the data made available by the authors, we found that there were a number of duplicate documents. After removing these duplicate documents, we end-up with 13978 documents. In the same way as the place-types, we limit the vocabulary size at 100,000. We evaluate using three tasks, 23 movie genres, specifically Action, Adventure, Animation, Biography, Comedy, Crime, Documentary, Drama, Family, Fantasy, Film-Noir, History, Horror, Music, Musical, Mystery, Romance, Sci-Fi, Short, Sport, Thriller, War, Western. 100 of the most common IMDB plot keywords (See Appendix \ref{app:ClassNames}) and Age Ratings from the UK and US, USA-G, UK-12-12A, UK-15, UK-18, UK-PG, USA-PG-PG13, USA-R.
+
+
+ For each domain, we filter out terms that do not occur in at least two documents, and additionally limit the maximum number of words in a vocabulary to 100,000. For all of these datasets, we split them into a 2/3 training data, 1/3 test data split. We additionally remove the end 20\% of the training data and use that as development data for our hyper-parameters, which is then not used for the final models verified using test data. We show examples of the first three domains in Table \ref{ch3:TextExamples}. For the movies and place-type domains, the original text was not available.
+
+\begin{table}[] \label{ch3:TextExamples}
+	\scriptsize
+	\begin{tabular}{lp{6.75cm}p{6.75cm}}
+		Data Type  & Unprocessed                                                                                                                                                                                                                                                                                                                                                                               & Processed       \\
+		\midrule[\heavyrulewidth]
+		Newsgroups & morgan and guzman will have era's 1 run higher than last year, and  the cubs will be idiots and not pitch harkey as much as hibbard.  castillo won't be good (i think he's a stud pitcher)                                                                                                                                                                                                & morgan guzman eras run higher last year cubs idiots pitch harkey much hibbard castillo wont good think hes stud pitcher                            \\
+		Sentiment  & All the world's a stage and its people actors in it--or something like that. Who the hell said that theatre stopped at the orchestra pit--or even at the theatre door? 
+		Why is not the audience participants in the theatrical experience, including the story itself?<br /><br />This film was a grand experiment that said: "Hey! the story is you and it 
+		needs more than your attention, it needs your active participation"". ""Sometimes we bring the story to you, sometimes you have to go to the story.""<br /><br />Alas no one listened, 
+		but that does not mean it should not have been said." & worlds stage people actors something like hell said theatre stopped orchestra pit even theatre door audience participants
+		 theatrical experience including  story film grand experiment said hey story needs attention needs active participation sometimes bring story sometimes go story alas one listened mean
+		  said \\
+		Reuters    & U.K. MONEY MARKET SHORTAGE FORECAST REVISED DOWN The Bank of England said it had revised its forecast of the shortage in the money market down to 450 mln stg before taking account of its morning operations. At noon the bank had estimated the shortfall at 500 mln stg.                                                                                                               & uk money market shortage forecast revised bank england said revised forecast shortage money market 450 mln stg taking account morning operations noon bank estimated shortfall 500 mln stg     \\
+
+	\end{tabular}
+	\caption{Text examples from the first three domains}
+\end{table}
+
+\subsection{Space Types}
+
+Below we explain our choices for the semantic spaces that are formally described in Section \ref{bg:SemanticSpaces}:
+
+\textbf{Multi-Dimensional Scaling (MDS)}: A non-linear transformation that we can use to evaluate the quality of representations when built from a standard BOW-PPMI. Performed well in previous papers.
+\textbf{Principal Component Analysis (PCA)}: A standard dimensionality reduction technique. 
+\textbf{Doc2Vec (D2V)}: For the Doc2Vec space, we additionally tune hyper-parameters for the $window_size (5, 10, 15)$, the $min_count (1, 5, 10)$ and the $epochs (50, 100, 200)$ for each size space. The process with our two-part hyperparameter optimization as in this case is as follows: We use grid search to select the parameters for the representation, then find the most suitable model (e.g. Decision Tree, SVM) for that representation. 
+\textbf{Average Word Vectors (AWV)}: A simple representation that we can use to evaluate the ability of word-vectors to correctly represent domain concepts when averaged.
+
+
+\subsection{The best-performing directions for each domain}
+
+To give an understanding of the kind-of directions we find for each domain, we present the top-scoring ones in table \ref{ch3:TopScoringQua}. These are arranged from highest scoring to least scoring, with the score-type and space-type chosen by performance. These are not clusters, but rather single directions with the two most similar directions in brackets beside them for context. This is the alternative way of presenting these directions as mentioned at the start of Section \ref{ch3:LabellingWords}. There is a large and interesting difference between the sentiment directions and the movies directions. Both of these domains are composed of movie reviews, but the documents in the former are a concatenation of a number of reviews across different sources, while the latter are individual reviews. This has resulted in the more general concepts that apply to many movies being salient in the movies domain, but are less important than the names of actors and actresses in the sentiment domain. For the newsgroups domain, we see a number of directions that are likely to only belong to a certain newsgroups, e.g. you would find the word 'celestial' more often in the religious sections than the others, and the word 'diesel' more often in the automobile section but not others. The place-types section generally describes either aspects of the camera (e.g. canon60d), aspects of the photo (greyscale) or features found in the photo (gardening). The former likely relates to the degree to which filters or editing has been applied to the photo, while the latter makes more sense for our classification task. For the reuters dataset, the highest scored semantics seem to generally be related to dates (1st, may, june), however we also see some business jargon (quarterly, avg, dlr). 
+
+\begin{landscape}
+	\begin{table}[]\label{ch3:TopScoringQua}
+		\scriptsize
+		\begin{tabular}{lllll}
+			\textbf{Movies} \textit{(50 MDS NDCG)}        & \textbf{Sentiment} \textit{(100 D2V NDCG)}   & \textbf{Newsgroups} \textit{(50 D2V NDCG)} 			  & \textbf{Place-types} \textit{(50 PCA Kappa)}	 						 & \textbf{Reuters} \textit{(200 MDS NDCG)}       \\
+			horror (scares, scary)               & glenda (glen, matthau)         & karabag (iranian, turkiye)                 & blackcountry (listed, westmidlands)     & franklin (fund, mthly)            \\
+			hilarious (funniest, hilarity)       & scarlett (gable, dalton)       & leftover (flaming, vancouver)              & ears (stare, adorable)                  & quarterly (shearson, basis)       \\
+			bollywood (hindi, india)             & giallo (argento, fulci)        & wk (5173552178, 18084tmibmclmsuedu)        & spagna (espanha, colores)               & feb (28, splits)                  \\
+			laughs (funnier, funniest)           & bourne (damon, cusack)         & 1069 (mlud, wibbled)                       & oldfashioned (winery, antiques)         & 22 (booked, hong)                 \\
+			jokes (gags, laughs)                 & piper (omen, knightley)        & providence (norris, ahl)                   & gardening (greenhouse, petals)          & april (monthly, average)          \\
+			comedies (comedic, laughs)           & casper (dolph, damme)          & celestial (interplanetary, bible)          & pagoda (hindu, carved)                  & sets (principally, precious)      \\
+			hindi (bollywood, india)             & norris (chuck, rangers)        & mlud (wibbled, 1069)                       & artificial (saturation, cs4)            & 16 (creditor, trillion)           \\
+			war (military, army)                 & holmes (sherlock, rathbone)    & endif (olwm, ciphertext)                   & inner (curved, rooftops)                & 1st (qtr, pennsylvania)           \\
+			western (outlaw, unforgiven)         & rourke (mickey, walken)        & gd3004 (35894, intergraph)                 & celebrate (festive, celebrity)          & 26 (approve, inadequate)          \\
+			romantic (romance, chemistry)        & ustinov (warden, cassavetes)   & rtfmmitedu (newsanswers, ieee)             & vietnamese (ethnic, hindu)              & 23 (offsetting, weekly)           \\
+			songs (song, tunes)                  & scooby (doo, garfield)         & eng (padres, makefile)                     & cn (elevated, amtrak)                   & prior (recapitalization, payment) \\
+			sci (science, outer)                 & doo (scooby, garfield)         & pizza (bait, wiretap)                      & mannequin (bags, jewelry)               & avg (shrs, shr)                   \\
+			funniest (hilarious, funnier)        & heston (charlton, palance)     & porsche (nanao, mercedes)                  & falcon (r, 22)                          & june (july, venice)               \\
+			noir (noirs, bogart)                 & homer (pacino, macy)           & gebcadredslpittedu (n3jxp, skepticism)     & jewish (monuments, cobblestone)         & march (31, day)                   \\
+			documentary (documentaries, footage) & welles (orson, kane)           & scsi2 (scsi, cooling)                      & canon60d (kitlens, 600d)                & regular (diesel, petrol)          \\
+			animation (animated, animators)      & frost (snowman, damme)         & playback (quicktime, xmotif)               & reflective (curved, cropped)            & 4th (qtr, fourth)                 \\
+			adults (adult, children)             & streisand (bridget, salman)    & 35894 (gd3004, medin)                      & mason (edward, will)                    & 27 (chemlawn, theyre)             \\
+			creepy (spooky, scary)               & davies (rhys, marion)          & diesel (volvo, shotguns)                   & aerialview (manmade, largest)           & 14 (borrowing, borrowings)        \\
+			gay (gays, homosexuality)            & cinderella (fairy, stepmother) & evolutionary (shifting, hulk)              & shelf (rack, boxes)                     & 11 (chapter, ranged)              \\
+			workout (intermediate, instruction)  & boll (uwe, belushi)            & techniciandr (obp, 144k)                   & monroe (raleigh, jefferson)             & may (probably, however)           \\
+			thriller (thrillers, suspense)       & rochester (eyre, dalton)       & 8177 (obp, 144k)                           & litter (fujichrome, e6)                 & 38 (33, strong)                   \\
+			funnier (laughs, funniest)           & edie (soprano, vertigo)        & shaw (medicine, ottoman)                   & streetlights (streetlamp, headlights)   & m1 (m2, m3)                       \\
+			suspense (suspenseful, thrillers)    & scarecrow (zombies, reese)     & scorer (gilmour, lindros)                  & carlzeiss (f2, voigtlander)             & dlr (writedown, debt)             \\
+			arts (hong, chan)                    & kramer (streep, meryl)         & xwd (xloadimage, openwindows)              & manmade (aerialview, below)             & five (years, jones)               \\
+			christianity (religious, religion)   & marty (amitabh, goldie)        & ee (275, xloadimage)                       & demolished (neglected, rundown)         & bushels (soybeans, ccc)           \\
+			musical (singing, sing)              & columbo (falk, garfield)       & com2 (com1, v32bis)                        & wald (berge, wildflower)                & revs (net, 3for2)                 \\
+			gore (gory, blood)                   & kidman (nicole, jude)          & examiner (corpses, brass)                  & arquitetura (exposition, cidade)        & 29 (175, include)                 \\
+			animated (animation, cartoon)        & juliet (romeo, troma)          & migraine (ama, placebo)                    & greyscale (highcontrast, monochromatic) & acquisition (make, usairs)        \\
+			gags (jokes, slapstick)              & garland (judy, lily)           & parliament (parliamentary, armored)        & alameda (monday, marin)                 & payable (div, close)              \\          
+			
+		\end{tabular}
+		\caption{Table}
+	\end{table}
+\end{landscape}
+
+
+\subsection{How Domain Directions Differ}
+
+For the single directions, arrange them by score where the highest scoring directions are at the top. For the clusters, there is no convenient way to organize them without bias, so clusters that are interesting are selected.
+
+
+
+\subsubsection{Comparing Space Types}
+
+To select these quantitative examples for  comparing score types, we first decided to demonstrate it on the movies domain to be consistent with the previous results. However, as this does not contain the doc2vec space, we provide some additional results in the next section for the newsgroups. We use the space that performed well on the genres task for the movies, with the understanding that genres as a key natural classification task will likely give good example directions that correspond to domain knowledge. After selecting this space, we choose the same sized spaces from the other space-types (size 200). We also use the same score-type and frequency cut-off as the best performing space-type. In this case, the best performing type for the PCA space was 20000 frequency cutoff and NDCG. So even though sometimes a different frequency cut-off performed better for the other space-types, we choose to equalize this variable so that the words are the same. This means that we are sometimes using a slightly worse performing space-type than the one we used as our final results, and that the original space has a performance advantage, but we have chosen to do so to make the results more consistent and specific. We approach these qualitative experiments with the following idea: spaces that perform better on natural domain tasks using decision trees contain unique natural directions that other spaces do not have. 
+
+The commonalities between spaces are much more prevalent than the differences, with natural concepts of the domain being represented in all of the different space types. However, different spaces do perform better than others on natural domain tasks. For this reason, we show the directions which are unique to each space-type.
+
+The common terms are all general concepts relevant to the domain. However, MDS has the most unique general concepts relevant to the domain that others do not have. AWV contains names, and concepts which are interesting but more related to specific aspects than gerne (train, slaves). PCA seems to prioritize words in the reviews that are not concepts but rather parts of sentences (surprisingly, admit, talents, tired, anymore). However, both PCA and MDS contain unique noisy terms as well. The term 'berardinelli' and 'rhodes' for MDS as well as 'compuserve' for PCA are artifacts of the data being obtained from the web. Despite this, it seems that MDS does contain more interesting unique directions than PCA, and as it performed best on the genres task, this makes sense.
+
+\subsubsection{Comparing MDS, AWV and PCA in the Movies domain}
+\begin{landscape}
+	\begin{table}[]
+		\scriptsize
+		\begin{tabular}{llll}
+			MDS                                   & AWV                      & PCA                                     & Common                                  \\
+			berardinelli \textit{(employers, distributor)} & billy \textit{(thrown, dirty)}    & amount \textit{(leaving, pick)}                  & noir \textit{(fatale, femme)}                    \\
+			crawford \textit{(joan, davis)}                & brother \textit{(brothers, boys)} & fails \textit{(fit, pick)}                       & gay \textit{(homosexual, homosexuality)}         \\
+			hitchcocks \textit{(hitchcock, alfred)}        & fonda \textit{(henry, jane)}      & pick \textit{(fails, fit)}                       & prison \textit{(jail, prisoners)}                \\
+			warners \textit{(warner, bros)}                & building \textit{(built, climax)} & stands \textit{(fails, cover)}                   & arts \textit{(rec, robomod)}                     \\
+			nuclear \textit{(weapons, soviet)}             & train \textit{(tracks, thrown)}   & surprisingly \textit{(offer, fit)}               & allens \textit{(woody, allen)}                   \\
+			joan \textit{(crawford, barbara)}              & slaves \textit{(slavery, excuse)} & copyright \textit{(email, compuserve)}           & jokes \textit{(laughs, joke)}                    \\
+			kidnapped \textit{(kidnapping, torture)}       &                          & length \textit{(reflect, expressed)}             & animation \textit{(animated, cartoon)}           \\
+			hop \textit{(hip, rap)}                        &                          & profanity \textit{(reflect, producers)}          & sherlock \textit{(holmes, detective)}            \\
+			kung \textit{(martial, jackie)}                &                          & compuserve \textit{(copyright, internetreviews)} & western \textit{(westerns, wayne)}               \\
+			ballet \textit{(dancers, dancer)}              &                          & talents \textit{(admit, agree)}                  & songs \textit{(song, lyrics)}                    \\
+			gambling \textit{(vegas, las)}                 &                          & admit \textit{(agree, talents)}                  & comedies \textit{(comedic, laughs)}              \\
+			alcoholic \textit{(drunk, alcoholism)}         &                          & developed \textit{(introduced, sounds)}          & workout \textit{(exercise, challenging)}         \\
+			waves \textit{(surfing, wave)}                 &                          & intended \textit{(bother, werent)}               & laughs \textit{(funnier, hilarious)}             \\
+			jaws \textit{(jurassic, godfather)}            &                          & constantly \textit{(putting, sounds)}            & drug \textit{(drugs, addict)}                    \\
+			jungle \textit{(natives, island)}              &                          & tired \textit{(anymore, mediocre)}               & sci \textit{(science, fiction)}                  \\
+			employers \textit{(berardinelli, distributor)} &                          & produced \textit{(spoiler, surprising)}          & documentary \textit{(documentaries, interviews)} \\
+			pot \textit{(weed, stoned)}                    &                          & involving \textit{(believes, belief)}            & students \textit{(student, schools)}             \\
+			canadian \textit{(invasion, cheap)}            &                          & anymore \textit{(continue, tired)}               & thriller \textit{(thrillers, suspense)}          \\
+			murphy \textit{(eddie, comedian)}              &                          & leaving \textit{(fit, pick)}                     & allen \textit{(woody, allens)}                   \\
+			comics \textit{(comedian, comedians)}          &                          & makers \textit{(producers, aspects)}             & funniest \textit{(hilarious, laughing)}          \\
+			kidnapping \textit{(kidnapped, torture)}       &                          & introduced \textit{(developed, considered)}      & gags \textit{(jokes, slapstick)}                 \\
+			subscribe \textit{(email, internetreviews)}    &                          & loses \textit{(climax, suffers)}                 & adults \textit{(children, adult)}                \\
+			vegas \textit{(las, gambling)}                 &                          & negative \textit{(positive, bother)}             & animated \textit{(animation, cartoon)}           \\
+			distributor \textit{(berardinelli, employers)} &                          & expressed \textit{(reflect, opinions)}           & dancing \textit{(dance, dances)}                 \\
+			wave \textit{(waves, surfing)}                 &                          & mildly \textit{(mediocre, forgettable)}          & teen \textit{(teenage, teens)}                   \\
+			rhodes \textit{(internetreviews, email)}       &                          & helped \textit{(putting, allowed)}               & soldiers \textit{(soldier, army)}                \\
+			hippie \textit{(pot, sixties)}                 &                          & reflect \textit{(expressed, opinions)}           & indie \textit{(independent, festival)}           \\
+			weed \textit{(pot, stoned)}                    &                          & opinions \textit{(reflect, expressed)}           & suspense \textit{(suspenseful, thriller)}        \\
+			caribbean \textit{(pirates, island)}           &                          & frequently \textit{(occasionally, consistently)} & creepy \textit{(scary, eerie)}                   \\
+			eddie \textit{(murphy, comedian)}              &                          & content \textit{(agree, proves)}                 & italian \textit{(italy, spaghetti)}              \\
+			sixties \textit{(beatles, hippie)}             &                          & allowed \textit{(helped, werent)}                & jews \textit{(jewish, nazis)}                    \\
+			... 8 More                   		  &                          & suffers \textit{(lacks, loses)}                  & ... 1480 more               
+		\end{tabular}
+		\caption{Unique terms between space-types}
+	\end{table}
+\end{landscape}
+
+\subsubsection{Score Types}
+
+There are unique directions for each different space type from the movies domain, each suitable to different tasks. Obtained in the same way as before, this time we used the 200 MDS space that performed the best on the genres task and found those unique to it. Once again, we see that the most understandable and general concepts are those that are common to all score-types. NDCG performed the best on most tasks, and we can see that a lot of new concepts are introduced in NDCG compared to the other scoring types. F1 by and large seems is difficult to understand, referring to names or specific aspects of the scene, and accuracy has as similar theme. Kappa has some unique sentiment related terms, as as well as some aspects of the presentation of the film (featurette, critic, technical), but as to the others it does not contain unique general concepts the way NDCG does. We can surmise that as NDCG contains these unique conceptual directions, it is able to perform better than other score-types.
+\begin{landscape}
+	\begin{table}[]
+		\scriptsize
+		\begin{tabular}{lllll}
+			\textbf{NDCG}                     & \textbf{F1}            		     & \textbf{Accuracy}    				   & \textbf{Kappa}                     & \textbf{Common}                               \\
+			gay \textit{(homosexuality, sexuality)}    & company \textit{(sell, pay)}              & kennedy \textit{(republic, elected)}             & definately \textit{(alot, awesome)}         & horror \textit{(scares, scares)}              \\
+			arts \textit{(hong, chan)}                 & street \textit{(city, york)}              & bags \textit{(listened, salvation)}              & guns \textit{(gun, shoot)}                  & laughs \textit{(funnier, funnier)}            \\
+			sports \textit{(win, players)}             & red \textit{(numerous, fashion)}          & summers \textit{(verge, medieval)}               & flawless \textit{(perfection, brilliantly)} & jokes \textit{(gags, gags)}                   \\
+			apes \textit{(remembered, planet)}         & project \textit{(creating, spent)}        & revolve \textit{(sincerely, historian)}          & mail \textit{(reviewed, rated)}             & comedies \textit{(comedic, comedic)}          \\
+			german \textit{(germans, europe)}          & mark \textit{(favor, pull)}               & locale \textit{(foster, sharply)}                & garbage \textit{(crap, horrible)}           & sci \textit{(scifi, alien)}                   \\
+			satire \textit{(parody, parodies)}         & lady \textit{(actress, lovely)}           & cooler \textit{(downward, reports)}              & featurette \textit{(featurettes, extras)}   & funniest \textit{(hilarious, hilarious)}      \\
+			band \textit{(rock, vocals)}               & fire \textit{(ground, force)}             & spades \textit{(ralph, medieval)}                & complaint \textit{(extra, added)}           & creepy \textit{(spooky, spooky)}              \\
+			crude \textit{(offensive, offended)}       & post \textit{(essentially, purpose)}      & filmography \textit{(ralph, experiments)}        & mission \textit{(enemy, saving)}            & thriller \textit{(thrillers, thrillers)}      \\
+			dancing \textit{(dance, dances)}           & heads \textit{(large, throw)}             & quentin \textit{(downward, anime)}               & ruin \textit{(wondering, heck)}             & funnier \textit{(laughs, laughs)}             \\
+			restored \textit{(print, remastered)}      & water \textit{(land, large)}              & employers \textit{(finishes, downward)}          & wars \textit{(forces, enemy)}               & suspense \textit{(suspenseful, suspenseful)}  \\
+			drugs \textit{(drug, abuse)}               & road \textit{(drive, trip)}               & formal \textit{(victory, kennedy)}               & prefer \textit{(compare, added)}            & gore \textit{(gory, gory)}                    \\
+			church \textit{(religious, jesus)}         & brother \textit{(son, dad)}               & tube \textit{(esta, muscle)}                     & heroes \textit{(packed, hero)}              & gags \textit{(jokes, jokes)}                  \\
+			sexuality \textit{(sexual, sexually)}      & party \textit{(decide, hot)}              & woefully \textit{(restless, knockout)}           & necessarily \textit{(offer, draw)}          & science \textit{(sci, sci)}                   \\
+			sexually \textit{(sexual, sexuality)}      & badly \textit{(awful, poorly)}            & scientists \textit{(hilarity, locale)}           & portray \textit{(portrayed, portraying)}    & gory \textit{(gore, gore)}                    \\
+			england \textit{(british, english)}        & limited \textit{(aspect, unlike)}         & overboard \textit{(civilized, cinderella)}       & critic \textit{(reviewed, net)}             & government \textit{(political, political)}    \\
+			ocean \textit{(sea, boat)}                 & impression \textit{(instance, reasons)}   & rumors \textit{(homosexuality, characteristics)} & reviewed \textit{(rated, mail)}             & suspenseful \textit{(suspense, suspense)}     \\
+			marry \textit{(married, marriage)}         & trip \textit{(journey, road)}             & salvation \textit{(bags, cooler)}                & saving \textit{(carry, forced)}             & frightening \textit{(terrifying, terrifying)} \\
+			campy \textit{(cult, cheesy)}              & michael \textit{(producers, david)}       & actively \textit{(assassination, overcoming)}    & technical \textit{(digital, presentation)}  & military \textit{(army, army)}                \\
+			christian \textit{(religious, jesus)}      & memory \textit{(forgotten, memories)}     & stretching \textit{(victory, hideous)}           & statement \textit{(exist, critical)}        & slapstick \textit{(gags, gags)}               \\
+			melodrama \textit{(dramatic, tragedy)}     & james \textit{(robert, michael)}          & downward \textit{(cooler, crawling)}             & shocked \textit{(hate, warning)}            & scary \textit{(scare, scare)}                 \\
+			sing \textit{(singing, sings)}             & thin \textit{(barely, flat)}              & rocked \textit{(staple, demented)}               & flying \textit{(air, force)}                & blu \textit{(unanswered, ray)}                \\
+			sentimental \textit{(touching, sappy)}     & pre \textit{(popular, include)}           & affectionate \textit{(esta, muscle)}             & danger \textit{(dangerous, edge)}           & internetreviews \textit{(rhodes, rhodes)}     \\
+			depressing \textit{(bleak, suffering)}     & faces \textit{(constant, unlike)}         & protest \textit{(protective, assassination)}     &                                    & cgi \textit{(computer, computer)}             \\
+			evidence \textit{(investigation, accused)} & values \textit{(exception, wise)}         & confined \textit{(cooler, downward)}             &                                    & email \textit{(web, web)}                     \\
+			adorable \textit{(cute, sweet)}            & unusual \textit{(odd, seemingly)}         & inhabit \textit{(quentin, drawback)}             &                                    & thrilling \textit{(thrill, exciting)}         \\
+			episodes \textit{(episode, television)}    & lovers \textit{(lover, lovely)}           & latin \textit{(communities, mount)}              &                                    & web \textit{(email, email)}                   \\
+			teenager \textit{(teen, teenage)}          & frame \textit{(image, effect)}            & reception \textit{(como, finishes)}              &                                    & horror \textit{(scares, scares)}              \\
+			magical \textit{(fantasy, lovely)}         & mans \textit{(ultimate, sees)}            & uptight \textit{(suspensful, stalked)}           &                                    & laughs \textit{(funnier, funnier)}            \\
+			health \textit{(medical, suffering)}       & efforts \textit{(generally, nonetheless)} & brink \textit{(inexplicable, freddy)}            &                                    & suspense \textit{(suspenseful, suspenseful)} 
+		\end{tabular}
+		\caption{Different score types}
+	\end{table}
+\end{landscape}
+
+%We show terms unique to each domain type above. The terms are contextualized by finding the two closest term directions to the term. Here, we show the terms that are not duplicated in meaning for the other spaces. We can understand that the term 'gay (gays, homosexuality) has a similar meaning to the term 'homosexuality (gays, gay)' despite the term 'homosexuality' being high scored for one space, and the term 'gay' being highly scored for the other space. Almost all of the unique terms were of this variety. To demonstrate instead the unique meanings found in the individual spaces, we filter the results as follows: from the term and its associated descriptive terms found by getting the most similar terms, if those terms or any of the more similar terms occur in any of the terms or more similar terms in the space's top 1000 terms that we are comparing to, do not include those terms.
+
+%We find that the 50-dimensional MDS space, which performs 0.04 F1 score higher on the genres task, finds many interesting and unique terms, which can potentially enable more nuanced decisions in the decision trees for classification. On the other hand, in the PCA space, we find terms that relate to metadata, and spanish language words. We argue that this means the MDS is better at finding unique interesting meanings than PCA, in the case of using a frequency-based BOW to create the representation.
+
+%We perform the same process as above but comparing MDS and AWV, and find that the PPMI-based representations have their own metadata in the representation that is elevated. We can assume that the AWV space does not contain these metadata as there are simply not word-vectors available for these terms. Although, we also find unique terms that are likely to help performance on natural domain tasks for the MDS space, e.g. goodfellas, disgusting, swashbuckling. Interestingly, for the AWV space we find similar spanish-language terms, but also find some new concepts, in particular the 'republican' and 'yoga' directions. AWV was also originally 20,000 frequency and NDCG.
+
+
+
+\subsubsection{Comparing PPMI representations to doc2vec}
+
+We now show a comparison between a time when doc2vec was the highest performing representation for the newsgroups and MDS. This is to see if doc2vec, by making use of word-vectors and word-context can find interesting unique directions compared to MDS, which was obtained from a PPMI BOW. In general, we find that MDS contains a lot more irrelevant words than D2V, specifically related to parts-of-words. It seems that doc2vec was better at recognizing these words as noise and uninteresting compared to PPMI, which must have prioritized these words. Doc2Vec also brings up some interesting concepts, e.g. cryptology, which is very relevant to the 20 newsgroup subtype of cryptography. We expect that in general by using word vectors, doc2vec will be able to more easily identify interesting words and de-prioritize words which are common to the english language despite potentially being more rare in a smaller dataset.
+
+\begin{table}[]
+	\scriptsize
+	\begin{tabular}{lll}
+		\textbf{D2V}                                    & \textbf{MDS}                              & \textbf{Common}                                     \\
+		leftover \textit({pizza, brake)}                & hi \textit({folks, everyone)}             & chastity \textit({shameful, soon)}                  \\
+		wk \textit({5173552178, 18084tmibmclmsuedu)}    & looking \textit({spend, rather)}          & n3jxp \textit({gordon, gebcadredslpittedu)}         \\
+		eng \textit({padres, makefile)}                 & need \textit({needs, means)}              & skepticism \textit({gebcadredslpittedu, n3jxp)}     \\
+		porsche \textit({nanao, 1280x1024)}             & post \textit({summary, net)}              & anyone \textit({knows, else)}                       \\
+		diesel \textit({cylinders, steam)}              & find \textit({couldnt, look)}             & gebcadredslpittedu \textit({soon, gordon)}          \\
+		scorer \textit({gilmour, lindros)}              & hello \textit({kind, thank)}              & intellect \textit({soon, gordon)}                   \\
+		parliament \textit({caucasus, semifinals)}      & david \textit({yet, man)}                 & please \textit({respond, reply)}                    \\
+		atm \textit({padres, inflatable)}               & got \textit({mine, youve)}                & thanks \textit({responses, advance)}                \\
+		cryptology \textit({attendees, bait)}           & go \textit({take, lets)}                  & email \textit({via, address)}                       \\
+		intake \textit({calcium, mellon)}               & question \textit({answer, answered)}      & know \textit({let, far)}                            \\
+		433 \textit({366, 313)}                         & interested \textit({including, products)} & get \textit({wait, trying)}                         \\
+		ghetto \textit({warsaw, gaza)}                  & list \textit({mailing, send)}             & think \textit({important, level)}                   \\
+		lens \textit({lenses, ankara)}                  & sorry \textit({guess, hear)}              & good \textit({luck, bad)}                           \\
+		rushdie \textit({sinless, wiretaps)}            & heard \textit({ever, anything)}           & shafer \textit({dryden, nasa)}                      \\
+		immaculate \textit({porsche, alice)}            & cheers \textit({kent, instead)}           & bobbeviceicotekcom \textit({manhattan, beauchaine)} \\
+		keenan \textit({lindros, bosnian)}              & say \textit({nothing, anything)}          & dryden \textit({shafer, nasa)}                      \\
+		boxer \textit({jets, hawks)}                    & number \textit({call, numbers)}           & im \textit({sure, working)}                         \\
+		linden \textit({mogilny, 176)}                  & mailing \textit({list, send)}             & sank \textit({bronx, away)}                         \\
+		candida \textit({yeast, noring)}                & call \textit({number, phone)}             & banks \textit({soon, gordon)}                       \\
+		octopus \textit({web, 347)}                     & thank \textit({thanx, better)}            & like \textit({sounds, looks)}                       \\
+		czech \textit({detectors, kuwait)}              & read \textit({reading, group)}            & shameful \textit({soon, gordon)}                    \\
+		survivor \textit({warsaw, croats)}              & phone \textit({company, number)}          & could \textit({away, bobbeviceicotekcom)}           \\
+		5173552178 \textit({circumference, wk)}         & mail \textit({send, list)}                & would \textit({appreciate, wouldnt)}                \\
+		18084tmibmclmsuedu \textit({circumference, wk)} & doesnt \textit({isnt, mean)}              & beauchaine \textit({bobbeviceicotekcom, away)}      \\
+		3369591 \textit({circumference, wk)}            & lot \textit({big, little)}                & ive \textit({seen, never)}                          \\
+		mcwilliams \textit({circumference, wk)}         & thats \textit({unless, youre)}            & surrender \textit({soon, gebcadredslpittedu)}       \\
+		coldblooded \textit({dictatorship, czech)}      & believe \textit({actually, truth)}        & problem \textit({problems, fix)}                    \\
+		militia \textit({federalist, occupying)}        & youre \textit({unless, theyre)}           & windows \textit({31, dos)}                          \\
+		cbc \textit({ahl, somalia)}                     & send \textit({mail, mailing)}             & gordon \textit({soon, gebcadredslpittedu)}         
+	\end{tabular}
+	\caption{Comparing an MDS sapce to a D2V space for Newsgroups, where a D2V space performed best.}
+\end{table}
+
+\subsubsection{The best performing clusters from each domain}
+
+
+
+\subsubsection{Comparing clustering methods}
+
+%The previous two experiments were conducted with the IMDB movies dataset, but the doc2vec space is not available for that dataset, as the original text corpus was not made available by the authors. Because of this, we choose to compare the PCA representation for the sentiment space and the Doc2Vec representation for the sentiment space, as these are still IMDB movie reviews, but instead with reviews as documents rather than compilations of reviews as documents, we can expect different directions to be important but still use our knowledge of movies and reviews to inform us. We take the 100 dimensional D2V space and the 100 dimensional PCA space, both of which perform best using the ndcg scoring type which we do not change.
+
+%The assumption going into this analysis was that, in the same way that the AWV space does not contain metadata that is not present in the word-vectors, as will the Doc2Vec space not be informed especially by that metadata. Further, as in this case the D2V space outperforms the PCA space on the sentiment task, we also expect that by using word-context to produce the representation, we are able to find better sentiment information directions, for example by better understanding sarcasm. Additionally, the benefit of word-vectors is likely to play into this space in a positive way, informing the representation based on global context. 
+
+%When looking at these directions, we can split the terms into two types. The names of things, and conceptual properties about movies. For the doc2vec space, the names largely dominate the unique terms list, which we can understand to mean that these terms used contextually and in the broader global context from the word-vectors is informative enough in the doc2vec space to be usefully represented. For the PCA space, there are still these unique names found, but there are less overall terms and it's a bit more balanced between concepts and names. 
+
+%For some additional examples, we compare the MDS representation for the newsgroups and the Doc2Vec representation. The MDS performed best with F1, but we compare it to NDCG, as that is what the doc2vec space performs best with.
+
+\section{Quantitative Results}
+
+
+\subsection{Evaluation Method}
+
+We primarily examine the effectiveness of a representation on its ability to perform in low-depth Decision Trees, specifically CART Decision Trees (See Background Section \ref{bg:trees}) with a limited depth of one, two and three. We enter this evaluation with a few assumptions: A good interpretable representation disentangles salient domain knowledge into its dimensions, and natural domain tasks (e.g. classifying genres of movies using their reviews) can be evaluated effectively using that salient domain knowledge. Put another way, if the space is representing domain knowledge well we can expect that the space is linearly separable for key semantics of the domain. In spatial terms, a representation will be capable of being linearly transformed by our method into these distinct relevant concepts if semantically distinct entities are spatially separated, and semantically similar entities are close together. 
+
+If we only wanted to evaluate the quality of the representation, we could use Linear SVM's to find the hyper-planes that effectively separate these spatial representations for the class. However, the representations that encode this spatial information are not interpretable, so a linear classifier although able to separate the documents that contain the class and do not contain them will not be interpretable either. It is our main interest to evaluate how well a representation encodes these key semantics while also being restricted by the requirement to be disentangled into words or clusters, in other words how well it represents the information while also being interpretable.
+
+Given these assumptions, low-depth decision trees can give an estimation of how good an interpretable representation is. If the representation cannot perform for a class at a one-depth tree, then it is not disentangled such that it contains a single salient dimension that effectively evaluates a class. If a representation cannot perform well on two-depth trees, then the representation is not disentangled into three concepts that can sufficiently determine that class, and if a representation cannot perform well on three-depth trees, it has not disentangled the representation such that there are nine relevant concepts that are relevant to that class. To see what these different trees look like see figure \ref{IntroDecisionTree}. A comparison to put this in better perspective is to an unbounded tree. Unbounded trees select a large amount of dimensions in order to achieve a performance difference on development data, but when applied to test data the models do not generalize well. This is because they overfit, rather than using the key semantics of the space to classify.
+
+\begin{figure}[t]
+	\includegraphics[width=\textwidth]{images/decisiontree.png}
+	\centering
+	\caption{This figure shows an example tree from one of our classifiers. Here, we can see that the model increases in complexity as it increases in depth. In this case, we end-up getting better F-score with just a depth-one tree, as the tree begins to overfit at depth three.  }\label{IntroDecisionTree}
+\end{figure}
+
+We look primarily at the F1-score to determine if a classifier is good or not. This is because many of the classes are unbalanced so accuracy is not a good metric, as high accuracy could be achieved by predicting only zeros.  All of the results shown in this section are the end-product of a two-part hyper-parameter optimization. Each Decision Tree has its own set of hyper-parameters that are optimized as does each representation-type. These are the models trained on the training data and scored on the test data, with the highest performing in terms of F1-score parameters from hyper-parameter optimization on the development data. For ease of comparison, we provide some results with SVM's and unbounded Decision Trees, as well as a baseline Topic Model, which we use as a reference for a standard interpretable representation. Below, we list the parameters that we optimize for each of these model types:
+
+\textbf{Linear Support Vector Machines (SVM's)}: C parameters and gamma parameters. $C 1.0, 0.01, 0.001, 0.0001$, $Gamma 1.0, 0.01, 0.001, 0.0001$.
+\textbf{Topic Models}: $doc_topic_prior (0.001, 0.01, 0.1)$, $topic_word_prior = (0.001, 0.01, 0.1)$
+\textbf{CART Decision Trees }: The number of features to consider when looking for the best split. $(None, auto, log2)$, $criterion: (gini, entropy)$
+	
+For our baselines, we use four different semantic spaces, a bag-of-words of PPMI (BOW-PPMI) scores and a standard Latent Dirchlet Allocation (LDA) Topic Model. As well as the original filtering done to the representations, for the BOW-PPMI we additionally filter out all terms that do not occur in at least $(doc_size / 1000)$ documents. Otherwise, there would be too many irrelevant terms to be a fair comparison. We compare different dimension amounts of size $(50, 100, 200)$. We use the semantic space types described in 
+We are not able to obtain an MDS space for sentiment or doc2vec spaces for placetypes/movies, as we only had access to the bag-of-words representation.
+
+When obtaining the single word directions, we take all of the baseline representations and vocabularies, and filter the vocabularies according to a hyper-parameter that we tune. As the doc2vec has already been hyper-parameter optimized, we use the optimal doc2vec space that scored the highest for its class on a Linear SVM, rather than tuning the entire process around the doc2vecs vectors. So for example, when we are evaluating the Keywords task for the movies, we would obtain directions from the doc2vec space that performed best for a linear SVM on the Keywords task following the previous experiments. 
+
+
+
+
+\begin{table}[]
+	\begin{tabular}{ll}
+		& Top PPMI scoring terms                                                \\
+		Example Horror Entity      & Term term term term term term term term term term term term term term \\
+		Similar Horror Entity      & Term term term term term term term term term term term term term term \\
+		Somewhere Inbetween Entity & Term term term term term term term term term term term term term term \\
+		Romance Movie              & Term term term term term term term term term term term term term term \\
+		Similar Romance movie      & Term term term term term term term term term term term term term term
+	\end{tabular}
+	\caption{Two of the following entities: Those classified as horror, those classified as horror and romance, and those classified as romance with their associated highest value PPMI terms. We show the highest positive instances here as the representation is sparse, even though we can also expect the terms that are low scoring to be similar too.}
+	\label{table:PPMI_example}
+\end{table}
+
+
+We obtain results for the rankings induced from these word directions on Decision Tree's limited to a depth-three in-order to select the best parameters when using directions for each class. The parameters that we want to determine are the type of Semantic Space, the size of the space, the frequency threshold and the score threshold. To do so, for each space-type of each size, we use a grid search to find the best frequency and score cut-offs for that sized space-type. Then, we select from these space-types and sizes the best performing one. We can understand there to be a balance between finding words which are useful for creating salient features in our clustering step without including too many words which do not. As our clustering methods are unsupervised, it is important that we try and limit the amount of junk being entered into them, despite the classifiers that use these directions typically being able to filter out those directions which are not suitable to the class. Additionally, as the vocabulary size varies from dataset to dataset, the threshold will naturally be different for each one. 
+
+These results allow us to choose for each class, the best Semantic Space and Scoring-type for that class.
+Next, we test single directions, attempting to find a good amount of directions to cluster and not including words which may hamper the unsupervised classification, as well as the best space-type for each domain. We found that generally, X was the best space and as expected classifiers performed better with more data, so we use 20000 as our frequency cutoff and 2000 as our score cutoff. 
+
+We continue with the optimal space and score-type chosen by our single direction experiments, and use the same frequency and score thresholds as before. We then experiment with two different clustering algorithms: Derrac and K-Means. As these algorithms select centroids from the top-scoring directions or randomly, we can expect that some clusters may not be salient features of the space. This is because top-scoring directions, e.g. for accuracy could simply infrequent terms that do not have much meaning, and these infrequehnt terms could also be randomly selected. We could use grid-search on the frequency and score cutoffs when obtaining these results in order to avoid terms that may disrupt existing clusters or form cluster centers that are not salient features of the space, but we chose a more standardized process that would rely on the parameters of the clustering algorithms and the ability of the classifiers to filter out clusters that are not informative, so as to not make a time-costly grid search a necessary part of the process.
+
+
+For K-means clustering, we use Mini batch K-means, implemented by scikit-learn \footnote{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}, introduced by \cite{Sculley2010} and kmeans++ to initialize \cite{Arthur}
+
+\subsection{Summary of all Results}
+
+To begin, we compare the original dimensions of the space, the rankings on single words, the rankings on cluster directions, a bag-of-words of PPMI scores and topic models. We find that single directions or clusters outperform our baselines in most cases, with the exceptions being in the place-types domain and the keywords task for the movies. For the keywords task, the natural explanation is that in a depth-1 tree, finding words which are directly corresponding to particular keywords is easier than if using directions, not only because certain words may have been filtered out, but also because they may not be well-represented in the space. In this case, the PPMI representation is perfect, as it can find 1-1 matches with the classes without the representations of those words being spatially influenced by other similar words, as we can expect them to be in the space. However, this changes when going from depth-one to depth-two and depth-three, and we understand that to be due to overfitting in the case of the PPMI representation. We sometimes see decision trees of depth-two outperform those of depth-one, but generally depth-three trees perform best.  In the case of the place-types, although topic models and ppmi representations were indeed the best it is not by a wide-margin. Meanwhile when the single directions perform the best in these domains for other tree types they perform much better than the other approaches. Additionally, place-types is our most unbalanced domain with the least documents, so it is possible that our single directions were victim to overfitting in this case. 
+
+
+
+
+\begin{landscape}
+	\begin{table}[]
+		\begin{tabular}{llll@{\hskip 0.25in}lll@{\hskip 0.25in}lllll}
+			& Genres                          &              &               & Keywords                        &                 &                       & Ratings                         &                      &                     &  & \\
+			Movies            & D1                              & D2                              & D3                              & D1                              & D2                              & D3                              & D1                              & D2                              & D3                              &             &             \\
+			\toprule[\heavyrulewidth]
+			Space             & 0.301                           & 0.358                           & 0.354                           & 0.185                           & 0.198                           & 0.201                           & 0.463                           & 0.475                           & 0.486                           &             &             \\
+			Single directions & \textbf{0.436} & 0.463                           & 0.492                           & 0.23                            & \textbf{0.233} & \textbf{0.224} & 0.466                           & 0.499                           & 0.498                           &             &             \\
+			Clusters          & 0.431                           & \textbf{0.513} & \textbf{0.506} & 0.215                           & 0.22                            & 0.219                           & \textbf{0.504} & \textbf{0.507} & \textbf{0.513} &             &             \\
+			PPMI              & 0.429                           & 0.443                           & 0.483                           & \textbf{0.243} & 0.224                           & 0.224                           & 0.47                            & 0.453                           & 0.453                           &             &             \\
+			Topic             & 0.415                           & 0.472                           & 0.455                           & 0.189                           & 0.05                            & 0.075                           & 0.473                           & 0.243                           & 0.38                            &             &             \\
+			& Newsgroups                      &                                 &                                 & Sentiment                       &                                 &                                 & Reuters                         &                                 &                                 &             &             \\
+			& D1                              & D2                              & D3                              & D1                              & D2                              & D3                              & D1                              & D2                              & D3                              &             &             \\
+			
+			\toprule[\heavyrulewidth]
+			Rep               & 0.251                           & 0.366                           & 0.356                           & 0.705                           & 0.77                            & 0.773                           & 0.328                           & 0.413                           & 0.501                           &             &             \\
+			Single dir        & 0.418                           & \textbf{0.49}  & \textbf{0.537} & 0.784                           & 0.814                           & \textbf{0.821} & \textbf{0.678} & \textbf{0.706} & 0.72                            &             &             \\
+			Cluster           & 0.394                           & 0.433                           & 0.513                           & 0.735                           & \textbf{0.844} & 0.813                           & 0.456                           & 0.569                           & 0.583                           &             &             \\
+			PPMI              & 0.33                            & 0.407                           & 0.444                           & 0.7                             & 0.719                           & 0.73                            & 0.616                           & 0.699                           & \textbf{0.723} &             &             \\
+			Topic             & \textbf{0.431} & 0.423                           & 0.444                           & \textbf{0.79}  & 0.791                           & 0.811                           & 0.411                           & 0.527                           & 0.536                           &             &             \\
+			& Foursquare                      &                                 &                                 & OpenCYC                         &                                 &                                 & Geonames                        &                                 &                                 &             &             \\
+			Placetypes        & D1                              & D2                              & D3                              & D1                              & D2                              & D3                              & D1                              & D2                              & D3                              &             &             \\
+			\toprule[\heavyrulewidth]
+			Rep               & 0.438                           & 0.478                           & 0.454                           & 0.383                           & 0.397                           & 0.396                           & 0.349                           & 0.34                            & 0.367                           &             &             \\
+			Single dir        & \textbf{0.541} & 0.498                           & \textbf{0.531} & 0.404                           & \textbf{0.428} & 0.39                            & \textbf{0.444} & \textbf{0.533} & \textbf{0.473} &             &             \\
+			Cluster           & 0.462                           & 0.507                           & 0.496                           & \textbf{0.413} & 0.42                            & \textbf{0.429} & 0.444                           & 0.458                           & 0.47                            &             &             \\
+			PPMI              & 0.473                           & \textbf{0.512} & 0.491                           & 0.371                           & 0.351                           & 0.352                           & 0.361                           & 0.301                           & 0.242                           &             &             \\
+			Topic             & 0.488                           & 0.433                           & 0.526                           & 0.365                           & 0.271                           & 0.313                           & 0.365                           & 0.3                             & 0.219                           &             &             \\   
+		\end{tabular}
+		\caption{summary of all results}
+	\end{table}
+\end{landscape}
+
+\subsection{Baseline Representations}
+
+To begin, we show in Table \ref{ch3:ng} all variations of the baseline representations used directly as input to Decision Trees and SVM's. These examples that do not apply our methodology, serve as a reference point for what is possible using standard linear models without the need for interpretability. There is a big performance drop when going from depth three trees to depth one trees. These kind of performance drops are expected for these representations, as they do not have dimensions that correspond to key semantics, so it is unlikely that a smaller tree will be able to use the available dimensions to classify well. In this full table we include the precision and recall scores for clarity, mainly to explain why the high recall scores occur. This is because we balanced the weights as one of our hyper-parameters, and when the weight is balanced so that positive instances are weighted more heavily, the model prioritizes recall over precision. When this high recall score doesn't occur, that means that not balancing the weights performed better on the development data.
+
+The size of the space is not as influential as the representation type in these results for the Decision Trees. For this reason we show only the best performing representation of each type in Table \ref{ch3:represults}. Out of the space-types, PCA performed much better than its counterparts for reuters, newsgroups and sentiment.  We see that the MDS representation performs comparably well using a unrestricted depth tree or an SVM, which shows that with a classifier that can make use of all the dimensions, the performance does not decrease as much. This is likely due to the way that PCA orders its dimensions in importance,  resulting in key semantics in its first dimensions, giving it an advantage in low-depth decision trees. However, this does not necessarily mean that it contains better directions. In the single directions results, PCA is outperformed by MDS and other representations in F1 score for low decision tree depths in any of these domains, with the exception of the depth-two trees for sentiment. Despite MDS often encoding the key semantics across more dimensions than other representations, our method is still able find meaningful directions from this space. There is little link between performance on the raw dimensions of the space and performance with rankings on directions in low-depth decision trees.  This is somewhat counterintuitive, as it would be normal to expect that a representation which performs poorly when used directly as input to a classifier would have similar performance after a linear transformation, but the reason that it works in our case is because low-depth decision trees rely on key semantics being disentangled into individual dimensions. Despite the information encoded in the space, if it is not disentangled then the classifier will not perform well.
+
+
+
+\begin{landscape}
+\begin{table}[]
+	\scriptsize
+	\begin{tabular}{lllll@{\hskip 0.25in}llll@{\hskip 0.25in}llll@{\hskip 0.25in}llll@{\hskip 0.25in}lllll}
+		Newsgroups & D1                              &                                 &                                 &                                 & D2                              &                                 &                                 &                                 & D3                              &                                 &                                 &                                 & DN                              &                                 &                                 &                                 & SVM                             &                                 &                                 &                                 &                                 \\
+& ACC                             & F1                              & Prec                            & Rec                             & ACC                             & F1                              & Prec                            & Rec                             & ACC                             & F1                              & Prec                            & Rec                             & ACC                             & F1                              & Prec                            & Rec                             & ACC                             & F1                              & Prec                            & Rec                             &                                 \\
+\toprule[\heavyrulewidth]
+PCA 200    & 0.701                           & 0.251                           & 0.148                           & 0.811                           & 0.843                           & 0.366                           & 0.245                           & 0.719                           & 0.956                           & 0.355                           & 0.54                            & 0.265                           & 0.946                           & 0.44                            & 0.45                            & 0.432                           & 0.969                           & 0.612                           & 0.746                           & 0.519                           &                                 \\
+PCA 100    & 0.698                           & 0.247                           & 0.146                           & 0.813                           & 0.835                           & 0.362                           & 0.241                           & 0.731                           & 0.957                           & 0.356                           & 0.576                           & 0.257                           & 0.948                           & 0.451                           & 0.465                           & 0.438                           & 0.969                           & 0.586                           & 0.768                           & 0.474                           &                                 \\
+PCA 50     & 0.68                            & 0.24                            & 0.141                           & 0.829                           & 0.834                           & 0.355                           & 0.234                           & 0.735                           & 0.957                           & 0.329                           & 0.472                           & 0.253                           & 0.947                           & 0.45                            & 0.462                           & 0.438                           & 0.966                           & 0.52                            & 0.745                           & 0.399                           &                                 \\
+\midrule[\heavyrulewidth]
+AWV 200    & 0.687                           & 0.217                           & 0.126                           & 0.781                           & 0.758                           & 0.256                           & 0.156                           & 0.718                           & 0.764                           & 0.26                            & 0.157                           & 0.751                           & 0.937                           & 0.339                           & 0.352                           & 0.328                           & 0.961                           & 0.468                           & 0.641                           & 0.369                           &                                 \\
+AWV 100    & 0.677                           & 0.21                            & 0.122                           & 0.775                           & 0.78                            & 0.275                           & 0.173                           & 0.683                           & 0.746                           & 0.25                            & 0.149                           & 0.769                           & 0.934                           & 0.324                           & 0.332                           & 0.317                           & 0.865                           & 0.4                             & 0.265                           & 0.812                           &                                 \\
+AWV 50     & 0.696                           & 0.219                           & 0.127                           & 0.772                           & 0.777                           & 0.272                           & 0.168                           & 0.71                            & 0.743                           & 0.25                            & 0.149                           & 0.786                           & 0.935                           & 0.325                           & 0.335                           & 0.316                           & 0.842                           & 0.362                           & 0.233                           & 0.819                           &                                 \\
+\midrule[\heavyrulewidth]
+MDS 200    & 0.581                           & 0.184                           & 0.103                           & \textbf{0.837} & 0.742                           & 0.262                           & 0.16                            & 0.729                           & 0.719                           & 0.236                           & 0.139                           & 0.785                           & 0.935                           & 0.327                           & 0.332                           & 0.323                           & 0.965                           & 0.501                           & \textbf{0.802} & 0.364                           &                                 \\
+MDS 100    & 0.586                           & 0.187                           & 0.105                           & 0.833                           & 0.754                           & 0.261                           & 0.159                           & 0.727                           & 0.705                           & 0.236                           & 0.138                           & \textbf{0.808} & 0.935                           & 0.33                            & 0.338                           & 0.321                           & 0.878                           & 0.439                           & 0.308                           & 0.765                           &                                 \\
+MDS 50     & 0.593                           & 0.153                           & 0.087                           & 0.647                           & 0.716                           & 0.25                            & 0.15                            & \textbf{0.756} & 0.736                           & 0.243                           & 0.144                           & 0.774                           & 0.935                           & 0.324                           & 0.335                           & 0.313                           & 0.854                           & 0.394                           & 0.259                           & 0.821                           &                                 \\
+\midrule[\heavyrulewidth]
+D2V 200    & 0.682                           & 0.205                           & 0.119                           & 0.746                           & 0.802                           & 0.268                           & 0.169                           & 0.646                           & 0.77                            & 0.269                           & 0.164                           & 0.75                            & 0.94                            & 0.366                           & 0.389                           & 0.346                           & 0.961                           & 0.468                           & 0.641                           & 0.369                           &                                 \\
+D2V 100    & 0.682                           & 0.208                           & 0.12                            & 0.762                           & 0.792                           & 0.268                           & 0.168                           & 0.662                           & 0.786                           & 0.268                           & 0.164                           & 0.727                           & 0.94                            & 0.376                           & 0.392                           & 0.361                           & \textbf{0.971} & \textbf{0.628} & 0.761                           & 0.535                           &                                 \\
+D2V 50     & 0.683                           & 0.207                           & 0.12                            & 0.764                           & 0.809                           & 0.294                           & 0.187                           & 0.694                           & 0.782                           & 0.28                            & 0.172                           & 0.761                           & 0.943                           & 0.394                           & 0.415                           & 0.376                           & 0.97                            & 0.601                           & 0.758                           & 0.497                           &                                 \\
+\midrule[\heavyrulewidth]
+PPMI       & \textbf{0.948} & 0.33                            & \textbf{0.532} & 0.239                           & 0.947                           & 0.407                           & 0.511                           & 0.338                           & 0.944                           & \textbf{0.444} & 0.506                           & 0.396                           & \textbf{0.951} & \textbf{0.494} & \textbf{0.496} & \textbf{0.492} & 0.962                           & 0.613                           & 0.627                           & 0.599                           &                                 \\
+\midrule[\heavyrulewidth]
+Topic      & 0.852                           & \textbf{0.431} & 0.304                           & 0.743                           & \textbf{0.96}  & \textbf{0.423} & \textbf{0.604} & 0.326                           & \textbf{0.961} & 0.444                           & \textbf{0.606} & 0.35                            & 0.944                           & 0.432                           & 0.434                           & 0.429                           & 0.879                           & 0.46                            & 0.318                           & \textbf{0.835} &                                 \\
+	\end{tabular}
+\caption{Full results for the newsgroups.}\label{ch3:ng}
+\end{table}
+\end{landscape}
+
+
+
+
+\begin{landscape}
+\begin{table}\label{ch3:represults}
+	\centering
+	\scriptsize
+	\caption{Results for all other domains for the representations.}
+	\begin{tabular}{ll@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.1in}lll@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}l@{\hskip 0.15in}l@{\hskip 0.2in}lll}
+		Reuters    & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                 &  & Sentiment & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                  \\
+		& ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              &  &           & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1               \\ 
+
+\cmidrule[\heavyrulewidth]{1-11}\cmidrule[\heavyrulewidth]{13-23}
+		PCA        & 0.847           & 0.328           & 0.917           & 0.413           & 0.978           & 0.501           & 0.978           & 0.565           & 0.989           & 0.761           &  & PCA       & 0.745           & 0.705           & 0.755           & 0.77            & 0.778           & 0.773           & \textbf{0.781}  & \textbf{0.779}  & \textbf{0.891}  & \textbf{0.893}   \\
+		AWV        & 0.782           & 0.252           & 0.971           & 0.328           & 0.974           & 0.417           & 0.973           & 0.495           & 0.987           & 0.719           &  & AWV       & 0.642           & 0.652           & 0.643           & 0.694           & 0.695           & 0.717           & 0.66            & 0.663           & 0.827           & 0.829            \\
+		MDS        & 0.791           & 0.263           & 0.9             & 0.357           & 0.979           & 0.489           & 0.976           & 0.522           & 0.988           & 0.67            &  & D2V       & 0.642           & 0.664           & 0.66            & 0.707           & 0.702           & 0.7             & 0.711           & 0.708           & 0.878           & 0.878            \\
+		D2V        & 0.818           & 0.268           & 0.867           & 0.298           & 0.974           & 0.445           & 0.971           & 0.482           & 0.986           & 0.724           &  & PPMI      & 0.616           & 0.7             & 0.655           & 0.719           & 0.675           & 0.73            & 0.712           & 0.71            & 0.887           & 0.888            \\
+		PPMI       & \textbf{0.975}  & \textbf{0.616}  & \textbf{0.978}  & \textbf{0.699}  & \textbf{0.98}   & \textbf{0.723}  & \textbf{0.984}  & \textbf{0.746}  & \textbf{0.99}   & \textbf{0.8}    &  & Topic     & \textbf{0.793}  & \textbf{0.79}   & \textbf{0.794}  & \textbf{0.791}  & \textbf{0.81}   & \textbf{0.811}  & 0.733           & 0.73            & 0.815           & 0.822            \\
+		Topic      & 0.92            & 0.411           & 0.977           & 0.527           & 0.977           & 0.536           & 0.977           & 0.56            & 0.95            & 0.513           &  &           &                 &                 &                 &                 &                 &                 &                 &                 &                 &                  \\
+		&                 &                 &                 &                 &                 &                 &                 &                 &                 &                 &  &           &                 &                 &                 &                 &                 &                 &                 &                 &                 &                  \\
+		Placetypes & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                 &  & Movies    & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                  \\
+		OpenCYC    & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              &  & Genres    & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1               \\ 
+		\cmidrule[\heavyrulewidth]{1-11}\cmidrule[\heavyrulewidth]{13-23}
+		PCA        & 0.586           & 0.346           & 0.708           & 0.343           & 0.695           & 0.342           & 0.832           & 0.309           & 0.847           & 0.474           &  & PCA       & 0.722           & 0.301           & 0.755           & 0.339           & 0.717           & 0.321           & 0.884           & 0.372           & \textbf{0.925}  & 0.518            \\
+		AWV        & 0.625           & \textbf{0.383}  & 0.651           & 0.376           & 0.728           & \textbf{0.396}  & \textbf{0.844}  & \textbf{0.362}  & 0.85            & 0.466           &  & AWV       & 0.679           & 0.29            & 0.774           & 0.321           & 0.756           & 0.343           & 0.873           & 0.312           & 0.922           & 0.496            \\
+		MDS        & 0.624           & 0.364           & 0.7             & \textbf{0.397}  & 0.731           & 0.374           & 0.843           & 0.305           & 0.861           & \textbf{0.476}  &  & MDS       & 0.679           & 0.298           & 0.79            & 0.358           & 0.773           & 0.354           & 0.887           & 0.385           & 0.875           & \textbf{0.532}   \\
+		PPMI       & \textbf{0.728}  & 0.371           & 0.75            & 0.351           & 0.739           & 0.352           & 0.843           & 0.323           & \textbf{0.9}    & 0.366           &  & PPMI      & \textbf{0.852}  & \textbf{0.429}  & \textbf{0.91}   & 0.443           & \textbf{0.912}  & \textbf{0.483}  & 0.882           & \textbf{0.416}  & 0.923           & 0.526            \\
+		Topic      & 0.708           & 0.365           & \textbf{0.87}   & 0.271           & \textbf{0.87}   & 0.313           & 0.831           & 0.313           & 0.808           & 0.407           &  & Topic     & 0.767           & 0.415           & 0.905           & \textbf{0.472}  & 0.912           & 0.455           & \textbf{0.889}  & 0.415           & 0.843           & 0.491            \\
+		&                 &                 &                 &                 &                 &                 &                 &                 &                 &                 &  &           &                 &                 &                 &                 &                 &                 &                 &                 &                 &                  \\
+		Placetypes & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                 &  & Movies    & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                  \\
+		Foursquare & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              &  & Keywords  & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1               \\ 
+		\cmidrule[\heavyrulewidth]{1-11}\cmidrule[\heavyrulewidth]{13-23}
+		PCA        & 0.731           & 0.342           & 0.823           & 0.393           & 0.86            & 0.388           & 0.887           & 0.398           & 0.896           & 0.568           &  & PCA       & 0.647           & 0.185           & 0.644           & 0.193           & 0.677           & 0.199           & 0.846           & 0.161           & 0.787           & 0.272            \\
+		AWV        & 0.767           & 0.401           & 0.828           & 0.478           & 0.85            & 0.452           & 0.905           & \textbf{0.505}  & 0.923           & \textbf{0.622}  &  & AWV       & 0.5             & 0.16            & 0.641           & 0.179           & 0.595           & 0.174           & 0.853           & 0.141           & 0.717           & 0.23             \\
+		MDS        & \textbf{0.915}  & 0.438           & 0.804           & 0.427           & 0.86            & 0.454           & 0.893           & 0.462           & 0.932           & 0.619           &  & MDS       & 0.633           & 0.179           & 0.69            & 0.198           & 0.674           & 0.201           & 0.84            & 0.163           & 0.788           & \textbf{0.28}    \\
+		PPMI       & 0.889           & 0.473           & 0.915           & \textbf{0.512}  & 0.904           & 0.491           & 0.881           & 0.31            & \textbf{0.938}  & 0.567           &  & PPMI      & \textbf{0.818}  & \textbf{0.243}  & 0.745           & \textbf{0.224}  & 0.739           & \textbf{0.224}  & 0.847           & \textbf{0.17}   & \textbf{0.921}  & 0.217            \\
+		Topic      & 0.864           & \textbf{0.488}  & \textbf{0.916}  & 0.433           & \textbf{0.917}  & \textbf{0.526}  & \textbf{0.907}  & 0.464           & 0.916           & 0.569           &  & Topic     & 0.629           & 0.189           & \textbf{0.932}  & 0.05            & \textbf{0.93}   & 0.075           & \textbf{0.857}  & 0.152           & 0.678           & 0.21             \\
+		&                 &                 &                 &                 &                 &                 &                 &                 &                 &                 &  &           &                 &                 &                 &                 &                 &                 &                 &                 &                 &                  \\
+		Placetypes & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                 &  & Movies    & D1              &                 & D2              &                 & D3              &                 & DN              &                 & SVM             &                  \\
+		Geonames   & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              &  & Ratings   & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1              & ACC             & F1               \\ 
+		\cmidrule[\heavyrulewidth]{1-11}\cmidrule[\heavyrulewidth]{13-23}
+		PCA        & 0.502           & 0.301           & 0.69            & 0.305           & 0.68            & 0.295           & 0.821           & 0.243           & 0.844           & 0.401           &  & PCA       & \textbf{0.65}   & 0.463           & 0.681           & \textbf{0.475}  & 0.684           & \textbf{0.486}  & 0.744           & 0.408           & 0.771           & 0.58             \\
+		AWV        & 0.657           & 0.326           & 0.755           & 0.323           & 0.842           & \textbf{0.367}  & 0.813           & 0.332           & 0.865           & \textbf{0.514}  &  & AWV       & 0.601           & 0.423           & 0.618           & 0.433           & 0.596           & 0.448           & 0.736           & 0.372           & 0.73            & 0.532            \\
+		MDS        & 0.626           & 0.349           & 0.695           & \textbf{0.34}   & 0.796           & 0.272           & \textbf{0.845}  & 0.295           & 0.638           & 0.397           &  & MDS       & 0.592           & 0.437           & 0.635           & 0.449           & 0.631           & 0.452           & \textbf{0.752}  & \textbf{0.412}  & 0.773           & \textbf{0.589}   \\
+		PPMI       & \textbf{0.808}  & 0.361           & 0.732           & 0.301           & 0.76            & 0.242           & 0.83            & 0.283           & \textbf{0.894}  & 0.312           &  & PPMI      & 0.583           & 0.47            & 0.635           & 0.453           & 0.605           & 0.453           & 0.73            & 0.384           & \textbf{0.825}  & 0.536            \\
+		Topic      & 0.771           & \textbf{0.365}  & \textbf{0.863}  & 0.3             & \textbf{0.85}   & 0.219           & 0.828           & \textbf{0.348}  & 0.819           & 0.349           &  & Topic     & 0.575           & \textbf{0.473}  & \textbf{0.789}  & 0.243           & \textbf{0.789}  & 0.38            & 0.739           & 0.375           & 0.704           & 0.501           
+	\end{tabular}
+\end{table}
+\end{landscape}
+
+
+
+
+
+\subsection{Word Directions}
+Although Linear SVM's perform the best on these representations without the need for interpretability, other results will be for low-depth decision trees in-order to easily distinguish the degree to which key semantics correspond to dimensions in the representations.
+
+ The main takeaway from this section is that in most cases performance greatly increases compared to the original representations used directly as input to the model (For the exact differences, see Appendix \ref{app:repandsingdirdiff}). 
+ 
+ Interestingly, there was also more variance in the difference between space-type sizes, making it an important hyper-parameter for the single directions. The best space type also varied across domains. Either the different dimensions and space types found different salient directions or they found similar directions but had better rankings on those directions (e.g. For the movies both contain the direction 'Horror' but MDS ranks entities on that direction better). We see that generally, the best space type is the same across a variety of tasks in the same domain, AWV is the best for the place-types but MDS is best for the movies (despite a marginal difference in the ratings). We can take this to mean that performance on one natural task will generalize well to the others, so the space-type/size of the space that we identify contains the key semantics for that domain rather than that task. 
+ 
+ NDCG was selected as the best score-type for Sentiment, Newsgroups, Reuters, Movies Genres, Movies Keywords in depth-3 Decision Trees. Place-types foursquare used F1-score, but the classes are very unbalanced and there are few documents. 
+ %To investigate why space-types perform better than others for each domain, we compare the decision trees where there is the most difference. For the genres, MDS outperforms PCA and AWV on the genres task by 0.03. 
+
+%What is the importance of the space size?
+%What is the importance of the space type?
+%How do directions perform compared to spaces? Why?
+%What kind of directions do we find for each score type?
+%Why does the score type matter? What score type works best?
+
+%These single directions typically overfit.
+
+\begin{landscape}
+\begin{table}[]
+	\centering
+	\scriptsize
+	\begin{tabular}{llllllllllllll}
+Newsgroups & D1                              &                  &                &                       & D2                              &                     &                    &      & D3                              &                &                &         &                    \\
+& ACC                             & F1                              & Prec                            & Rec                             & ACC                             & F1                              & Prec                            & Rec                             & ACC                             & F1                              & Prec                            & Rec                             &                                 \\
+PCA 200    & 0.955                           & 0.348                           & 0.521                           & 0.261                           & 0.959                           & 0.424                           & 0.678                           & 0.309                           & 0.96                            & 0.454                           & 0.674                           & 0.343                           &                                 \\
+PCA 100    & 0.957                           & 0.382                           & 0.491                           & 0.313                           & 0.961                           & 0.474                           & 0.679                           & 0.364                           & \textbf{0.963} & 0.512                           & 0.694                           & 0.406                           &                                 \\
+PCA 50     & 0.957                           & 0.373                           & 0.417                           & 0.337                           & \textbf{0.963} & 0.478                           & 0.621                           & 0.388                           & 0.963                           & 0.506                           & 0.7                             & 0.396                           &                                 \\
+AWV 200    & 0.832                           & 0.35                            & 0.226                           & 0.777                           & 0.957                           & 0.383                           & 0.517                           & 0.305                           & 0.958                           & 0.445                           & 0.598                           & 0.354                           &                                 \\
+AWV 100    & 0.83                            & 0.343                           & 0.219                           & 0.785                           & 0.823                           & 0.36                            & 0.233                           & \textbf{0.792} & 0.956                           & 0.387                           & 0.563                           & 0.295                           &                                 \\
+AWV 50     & 0.807                           & 0.341                           & 0.215                           & 0.816                           & 0.833                           & 0.361                           & 0.236                           & 0.762                           & 0.954                           & 0.392                           & 0.511                           & 0.318                           &                                 \\
+MDS 200    & \textbf{0.959} & \textbf{0.418} & \textbf{0.543} & 0.339                           & 0.962                           & 0.465                           & 0.669                           & 0.357                           & 0.962                           & 0.493                           & \textbf{0.707} & 0.379                           &                                 \\
+MDS 100    & 0.857                           & 0.365                           & 0.244                           & 0.725                           & 0.959                           & 0.428                           & 0.624                           & 0.326                           & 0.96                            & 0.453                           & 0.644                           & 0.349                           &                                 \\
+MDS 50     & 0.821                           & 0.324                           & 0.206                           & 0.762                           & 0.842                           & 0.386                           & 0.258                           & 0.77                            & 0.957                           & 0.398                           & 0.596                           & 0.299                           &                                 \\
+D2V 200    & 0.831                           & 0.343                           & 0.22                            & 0.784                           & 0.96                            & 0.47                            & \textbf{0.683} & 0.358                           & 0.962                           & 0.494                           & 0.69                            & 0.385                           &                                 \\
+D2V 100    & 0.844                           & 0.374                           & 0.243                           & 0.803                           & 0.961                           & \textbf{0.49}  & 0.642                           & 0.396                           & 0.962                           & 0.517                           & 0.67                            & 0.421                           &                                 \\
+D2V 50     & 0.845                           & 0.388                           & 0.252                           & \textbf{0.844} & 0.962                           & 0.488                           & 0.639                           & 0.395                           & 0.963                           & \textbf{0.537} & 0.673                           & \textbf{0.446} &                                 \\
+&                                 &                                 &                                 &                                 &                                 &                                 &                                 &                                 &                                 &                                 &                                 &                                 &                                 \\
+Reuters    & D1                              &                                 & D2                              &                                 & D3                              &                                 & Sentiment                       & D1                              &                                 & D2                              &                                 & D3                              &                                 \\
+& ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              &                                 & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              \\
+PCA        & 0.976                           & 0.658                           & 0.979                           & 0.679                           & 0.977                           & 0.467                           & PCA                             & 0.739                           & 0.759                           & \textbf{0.797} & \textbf{0.814} & 0.802                           & 0.805                           \\
+AWV        & 0.975                           & 0.598                           & 0.979                           & 0.656                           & 0.98                            & 0.66                            & AWV                             & 0.7                             & 0.699                           & 0.711                           & 0.736                           & 0.723                           & 0.735                           \\
+MDS        & 0.975                           & \textbf{0.678} & \textbf{0.98}  & \textbf{0.706} & \textbf{0.982} & \textbf{0.72}  & D2V                             & \textbf{0.776} & \textbf{0.784} & 0.782                           & 0.801                           & \textbf{0.822} & \textbf{0.821} \\
+D2V        & \textbf{0.977} & 0.583                           & 0.979                           & 0.664                           & 0.98                            & 0.632                           &                                 &                                 &                                 &                                 &                                 &                                 &                                 \\
+Placetypes & D1                              &                                 & D2                              &                                 & D3                              &                                 & Movies                          & D1                              &                                 & D2                              &                                 & D3                              &                                 \\
+OpenCYC    & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              & Genres                          & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              \\
+PCA        & 0.632                           & 0.371                           & 0.704                           & 0.381                           & 0.735                           & 0.365                           & PCA                             & 0.824                           & 0.412                           & 0.82                            & 0.441                           & 0.913                           & 0.463                           \\
+AWV        & \textbf{0.66}  & \textbf{0.404} & \textbf{0.734} & \textbf{0.428} & \textbf{0.755} & \textbf{0.39}  & AWV                             & 0.81                            & 0.421                           & 0.837                           & 0.436                           & 0.912                           & 0.457                           \\
+MDS        & 0.658                           & 0.374                           & 0.711                           & 0.385                           & 0.746                           & 0.35                            & MDS                             & \textbf{0.849} & \textbf{0.446} & \textbf{0.839} & \textbf{0.463} & \textbf{0.918} & \textbf{0.495} \\
+Foursquare & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              & Keywords                        & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              \\
+PCA        & 0.785                           & 0.477                           & \textbf{0.907} & 0.474                           & 0.869                           & \textbf{0.531} & PCA                             & 0.737                           & 0.225                           & 0.727                           & 0.227                           & \textbf{0.709} & 0.22                            \\
+AWV        & \textbf{0.918} & \textbf{0.541} & 0.881                           & \textbf{0.498} & 0.889                           & 0.466                           & AWV                             & 0.656                           & 0.201                           & 0.672                           & 0.203                           & 0.652                           & 0.2                             \\
+MDS        & 0.82                            & 0.416                           & 0.879                           & 0.482                           & \textbf{0.897} & 0.485                           & MDS                             & \textbf{0.745} & \textbf{0.23}  & \textbf{0.74}  & \textbf{0.233} & 0.708                           & \textbf{0.224} \\
+Geonames   & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              & Ratings                         & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              \\
+PCA        & 0.665                           & 0.348                           & 0.754                           & 0.342                           & 0.743                           & 0.306                           & PCA                             & \textbf{0.647} & \textbf{0.466} & \textbf{0.721} & \textbf{0.499} & 0.681                           & 0.492                           \\
+AWV        & \textbf{0.711} & \textbf{0.444} & \textbf{0.795} & \textbf{0.533} & \textbf{0.802} & \textbf{0.473} & AWV                             & 0.646                           & 0.463                           & 0.692                           & 0.474                           & 0.677                           & 0.483                           \\
+MDS        & 0.591                           & 0.289                           & 0.772                           & 0.333                           & 0.764                           & 0.352                           & MDS                             & 0.62                            & 0.463                           & 0.692                           & 0.489                           & \textbf{0.686} & \textbf{0.498}
+	\end{tabular}
+	\caption{ all dirs}
+\end{table}
+\end{landscape}
+
+
+\subsection{Clustered Directions}
+
+These results were obtained by taking the single directions that performed the best in the previous results and clustering them with a variety of hyper-parameters for the clusters. The first thing that is extremely relevant to our interests in these results is that K-means usually outperforms derrac by a wide margin across all domains.
+
+
+\begin{landscape}
+\begin{table}[]
+	\footnotesize
+	\begin{tabular}{lllllllllllllllllllll}
+		Newsgroups  & D1                              &                     &                      &                   & D2                              &         &                  &                     & D3                              &                    &                   &                  \\
+		\toprule
+		K-means 200 & \textbf{0.852} & \textbf{0.394} & \textbf{0.261} & 0.795                           & \textbf{0.958} & \textbf{0.433} & \textbf{0.58} & 0.345                           & \textbf{0.963} & \textbf{0.513} & \textbf{0.704} & 0.403                           &                                 &             &             &             &     &             &             &             \\
+		K-means 100 & 0.842                           & 0.388                           & 0.257                           & 0.791                           & 0.958                           & 0.366                           & 0.516                          & 0.284                           & 0.962                           & 0.5                             & 0.635                           & \textbf{0.412} &                                 &             &             &             &     &             &             &             \\
+		K-means 50  & 0.834                           & 0.381                           & 0.248                           & \textbf{0.819} & 0.815                           & 0.336                           & 0.212                          & \textbf{0.81}  & 0.961                           & 0.485                           & 0.612                           & 0.402                           &                                 &             &             &             &     &             &             &             \\
+		\midrule
+		Derrac 200  & 0.803                           & 0.313                           & 0.202                           & 0.693                           & 0.797                           & 0.306                           & 0.191                          & 0.781                           & 0.958                           & 0.409                           & 0.605                           & 0.309                           &                                 &             &             &             &     &             &             &             \\
+		Derrac 100  & 0.792                           & 0.305                           & 0.197                           & 0.667                           & 0.791                           & 0.287                           & 0.179                          & 0.721                           & 0.957                           & 0.374                           & 0.56                            & 0.281                           &                                 &             &             &             &     &             &             &             \\
+		Derrac 50   & 0.769                           & 0.26                            & 0.162                           & 0.661                           & 0.768                           & 0.237                           & 0.143                          & 0.693                           & 0.955                           & 0.315                           & 0.47                            & 0.237                           &                                 &             &             &             &     &             &             &             \\
+		&                                 &                                 &                                 &                                 &                                 &                                 &                                &                                 &                                 &                                 &                                 &                                 &                                 &             &             &             &     &             &             &             \\
+		Reuters     & D1                              &                                 & D2                              &                                 & D3                              &                                 & Sentiment                      & D1                              &                                 & D2                              &                                 & D3                              &                                 &             &             &             &     &             &             &             \\
+		& ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              &                                & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              &             &             &             &     &             &             &             \\
+		\toprule
+		K-means     & \textbf{0.875} & \textbf{0.338} & \textbf{0.975} & \textbf{0.54}  & 0.973                           & \textbf{0.58}  & K-means                        & 0.623                           & 0.674                           & \textbf{0.837} & \textbf{0.844} & 0.658                           & 0.707                           &             &             &             &     &             &             &             \\
+		\midrule
+		Derrac      & 0.797                           & 0.291                           & 0.973                           & 0.402                           & \textbf{0.974} & 0.485                           & Derrac                         & \textbf{0.712} & \textbf{0.735} & 0.802                           & 0.82                            & \textbf{0.803} & \textbf{0.813} &             &             &             &     &             &             &             \\
+		
+		&                                 &                                 &                                 &                                 &                                 &                                 &                                &                                 &                                 &                                 &                                 &                                 &                                 &             &             &             &     &             &             &             \\
+		Placetypes  & D1                              &                                 & D2                              &                                 & D3                              &                                 & Movies                         & D1                              &                                 & D2                              &                                 & D3                              &                                 &             &             &             &     &             &             &             \\
+		OpenCYC     & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              & Genres                         & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              &             &             &             &     &             &             &             \\
+		\toprule
+		K-means     & \textbf{0.641} & \textbf{0.413} & \textbf{0.735} & \textbf{0.405} & 0.75                            & \textbf{0.43}  & K-means                        & \textbf{0.813} & \textbf{0.431} & \textbf{0.913} & \textbf{0.513} & \textbf{0.913} & \textbf{0.506} &             &             &             &     &             &             &             \\
+		\midrule
+		Derrac      & 0.605                           & 0.39                            & 0.672                           & 0.392                           & \textbf{0.755} & 0.391                           & Derrac                         & 0.759                           & 0.341                           & 0.789                           & 0.431                           & 0.911                           & 0.432                           &             &             &             &     &             &             &             \\
+		&                                 &                                 &                                 &                                 &                                 &                                 &                                &                                 &                                 &                                 &                                 &                                 &                                 &             &             &             &     &             &             &             \\
+		Foursquare  & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              & Keywords                       & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              &             &             &             &     &             &             &             \\
+		\toprule
+		K-means     & \textbf{0.913} & \textbf{0.462} & \textbf{0.911} & \textbf{0.5}   & \textbf{0.891} & \textbf{0.511} & K-means                        & 0.667                           & 0.208                           & 0.648                           & 0.202                           & 0.678                           & 0.213                           &             &             &             &     &             &             &             \\
+		\midrule
+		Derrac      & 0.768                           & 0.392                           & 0.835                           & 0.445                           & 0.805                           & 0.425                           & Derrac                         & \textbf{0.726} & \textbf{0.215} & \textbf{0.745} & \textbf{0.22}  & \textbf{0.707} & \textbf{0.219} &             &             &             &     &             &             &             \\
+		&                                 &                                 &                                 &                                 &                                 &                                 &                                &                                 &                                 &                                 &                                 &                                 &                                 &             &             &             &     &             &             &             \\
+		Geonames    & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              & Ratings                        & ACC                             & F1                              & ACC                             & F1                              & ACC                             & F1                              &             &             &             &     &             &             &             \\
+		\toprule
+		K-means     & \textbf{0.772} & 0.43                            & \textbf{0.774} & 0.407                           & \textbf{0.819} & \textbf{0.472} & K-means                        & \textbf{0.671} & \textbf{0.504} & 0.638                           & \textbf{0.507} & \textbf{0.686} & \textbf{0.513} &             &             &             &     &             &             &             \\
+		
+		Derrac      & 0.678                           & \textbf{0.449} & 0.74                            & \textbf{0.411} & 0.807                           & 0.415                           & Derrac                         & 0.651                           & 0.445                           & \textbf{0.669} & 0.463                           & 0.627                           & 0.479                           &             &             &             &     &             &             &            
+	\end{tabular}
+	\caption{All clustering results}
+\end{table}
+\end{landscape}
+
+
+%\subsection{What is the value of different score-types?}
+
+%\subsection{Producing Semantic Spaces}
+
+%We use unsupervised representation learning methods, with the intention to obtain a representation that represents all salient features of the domain and can adapt to a variety of tasks. 
+
+%For the semantic space, we compute the Positive Pointwise Mutual Information (See \ref{bg:PPMI}) scores for the Bag-Of-Words, and use that as input to a variety of different off-the-shelf dimensionality reduction algorithms. We explain these in further detail in Section \ref{ch3:Spaces}. 
+
+
+%\subsection{Quantitative Results}
+%From a domain, e.g. movie reviews, where each document is a collection of reviews for a movie, we preprocess the text such that it is converted to lower-case, and non-alphanumeric characters are removed. From here, we remove standard English stop words using the NLTK library \cite{Bird}. We show an example of a review's original and converted formats in Figure \ref{ch3:OrigAndConverted}. From this preprocessed corpus, we obtain a Bag-Of-Words where we count the frequency of each term $BOW_wf$, see \ref{background:BOW}. 
+
+%The difference between single directions and clusters is best highlighted when comparing their use in simple interpretable classifiers. In figure \ref{ch3:ComparedTrees} we demonstrate this.
+
+%1. Negative directions (e.g. church for horror)
+%2. Non-contextualized, non-direct ways of classifying, versus clustering which finds salient properties which almost directly correspond to these natural tasks.
+
+%\begin{figure}[t]
+%	\includegraphics[width=\textwidth]{images/ComparedTrees.png}
+%	\centering
+%	\caption{An example of a hyper-plane and its orthogonal direction in a toy domain of shapes. Green shapes are positive examples and red shapes are negative examples, but despite the problem being binary those closest to the hyper-plane are less defined than those further away, resulting in the orthogonal vector being a direction.}\label{ch3:ComparedTrees}
+%\end{figure}
+
+
+
+
+% Deeper explanation of our methodology and approach
+
+\subsection{Conclusion}

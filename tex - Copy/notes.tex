@@ -1,0 +1,116 @@
+%General talk about the work by Derrac and how we differ
+%Previously, \cite{Derrac2015} introduced a method of finding salient properties labelled by clusters of words in a semantic space of entities. This work is entirely unsupervised, and we aim to develop the methods introduced in this work. We do so by thoroughly investigating the applicability of the work to different entity representations, experimenting with new ways of finding properties, and experimenting with new ways of labelling properties with clusters of words. However, the main contribution of this work is the evaluation in terms of interpretability of these more thorough representations by using Decision Trees and user tests. 
+
+
+%The previous way of explaining our work, in terms of disentanglement rather than interpretability
+%Having distinct, labelled dimensions are beneficial when producing an interpretable classifier, e.g. a Decision Tree classifier that uses this representation: As each ranking being distinct, each node of the tree acts as a step in the reasoning of why an entity was classified a certain way, and that node is appropriately labelled so that we are able to understand it. We show an example tree in \ref{Figure1} Interestingly, we find that if a property is relevant enough to a classification task, classifying using a single ranking performs better than using multiple rankings - as these rankings generalize to new entities.  % Demonstrate these concepts in the form of graphs, pictures, etc.
+
+%The main focus of our quantitative experimentation is to demonstrate that the rankings our representation is composed of correspond to domain knowledge. To do so, we use Decision Trees as described in section \ref{DecisionTrees}, which we constrain by depth, forcing the classifier to use only a limited amount of dimensions. We can understand our approach to be suitable if the classifier performs well with use of only a few properties, as we know that these properties are able to represent important concepts in the domain. We compare these to the original representations, which are typically less disentangled, as well as to topic models, another approach towards representing the domain. 
+
+%We also evaluate the method qualitatively and in terms of interpretability, specifically evaluating the ability of classifiers to appropriately describe how they concluded that a particular entity belongs to a class. The qualitative investigation focuses on demonstrating how different parameters of the method affect the representation through use of examples and analysis.
+
+
+%%% Old paper stuff
+
+In response, recently many authors have looked at the problem of making black-box models more interpretable, for example by trying to explain individual predictions \cite{Arras2017,Ribeiro2016} or by generating visualizations \cite{Dou2013,Li2016a,Chaney2012}.
+%, or by extracting simpler models \cite{Bastani2017}. 
+While such approaches can provide valuable insights, they cannot offer us any guarantees about how the model will behave in new situations, and may not allow users to create a mental model of their system \cite{Kayande2009}.  One solution is to rely on classification models which are simple enough such that their components can be easily inspected and understood, such as small decision trees, decision lists and linear models \cite{Ustun2014}. The transparency offered by such models is crucial in many real-world applications. While that usually means giving up some accuracy, it also allows users to tweak models according to their needs, e.g.\ to adapt to changing circumstances. For instance, \cite{Veale2017} describes the scenario of reducing the threshold of a ``possibility of crime" node in a decision tree predicting crime in a neighborhood after the government have arranged locks to be changed. As another example, under the European Union's planned `right-to-explanation', companies will need to ensure that their systems are not discriminatory \cite{Goodman2016}, and will need to be able to provide users with explanations about algorithmic decisions that affect them.
+
+These findings suggest the following strategy for learning an interpretable text classifier: (i) learn a low-dimensional vector space representation of the documents of interest, (ii) identify directions in this vector space that correspond to salient and interpretable properties, and (iii) train a classifier that uses these directions, rather than the actual dimensions of the space, as features. 
+
+%% Lit review
+
+The most commonly used representations for text classification are bag-of-words representations, topic models, and vector space models. Bag-of-words representations are interpretable in principle, but because the considered vocabularies typically contain tens (or hundreds) of thousands of words, the resulting learned models are nonetheless difficult to inspect and understand. Topic models and vector space models are two alternative approaches for generating low-dimensional document representations.
+
+\textbf{Topic models} such as Latent Dirichlet Allocation (LDA) represent documents as multinomial distributions over latent topics, where each of these topics corresponds to a multinomial distribution over words \cite{Blei2003}. These topics tend to correspond to semantically meaningful concepts, hence topic models tend to be rather interpretable \cite{Chang2009}. To characterize the semantic concepts associated with the learned topics, topics are typically labelled with the most probable words according to the corresponding distribution. 
+
+There are two ways in which topic models can be used for document classification. First, a supervised topic model can be used, in which the underlying graphical model is explicitly extended with a variable that represents the class label \cite{Blei2010}. Second, the parameters of the multinomial distribution corresponding to a given document can be used as a feature vector for a standard classifier, such as a Support Vector Machine (SVM) or Decision Tree. LDA has been extended by many approaches, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors \cite{rosen2004author} or time stamps \cite{wang2006topics}.
+
+\textbf{Vector space models} typically use a form of matrix factorization to obtain low-dimensional document representations. By far the most common approach is to use Singular Value Decomposition \cite{ASI:ASI1}, although other approaches have been advocated as well. 
+Instead of matrix factorization, another possible strategy is to use a neural network or least squares optimization approach. This is commonly used for generating word embeddings \cite{DBLP:conf/nips/MikolovSCCD13,glove2014}, but can similarly be used to learn representations of (entities that are described using) text documents \cite{DBLP:journals/corr/DaiOL15,van2016learning,DBLP:conf/sigir/JameelBS17}. Compared to topic models, such approaches have the advantage that various forms of domain-specific structured knowledge can easily be taken into account. Some authors have also proposed hybrid models, which combine topic models and vector space models. For example, the Gaussian LDA model represents topics as multivariate Gaussian distributions over a word embedding \cite{DBLP:conf/acl/DasZD15}. Beyond document representation, topic models have also been used to improve word embedding models, by learning a different vector for each topic-word combination \cite{DBLP:conf/aaai/LiuLCS15}.
+
+Broadly speaking, in the context of document classification, the main advantage of topic models is that their topics tend to be easily interpretable, while vector space models tend to be more flexible in the kind of meta-data that can be exploited. The approach we propose in this paper aims to combine the best of both worlds, by providing a way to derive interpretable representations from vector space models.
+
+%% Related to fine-tuning moreso
+
+One limitation of this basic strategy is that the interpretable directions are emerging from a vector space representation that was not explicitly learned to model the corresponding properties.
+
+When learning vector space representations, there can be a trade-off between preserving similarity structure and having directions which faithfully model salient properties. Since standard methods for learning vector space representations are essentially based on preserving the similarity structure, we argue that a post-processing step is needed to obtain high-quality directions. To this end, we propose a simple neural network model which is aimed at fine-tuning the initial vector space representation w.r.t.\ the chosen interpretable directions. Importantly, the whole process of identifying interpretable directions and fine-tuning the vector space remains completely unsupervised, with the neural network being trained based on statistics collected from the bag-of-words representations of the documents. 
+
+%% Disentangling the factors of variation and unsupervised learning
+
+A fundamental challenge in understanding sensory data is learning to disentangle the underlying
+factors of variation that give rise to the observations [1]. For instance, the factors of variation involved
+in generating a speech recording include the speaker’s attributes, such as gender, age, or accent, as
+well as the intonation and words being spoken. Similarly, the factors of variation underlying the image
+of an object include the object’s physical representation and the viewing conditions. The difficulty
+of disentangling these hidden factors is that, in most real-world situations, each can influence the
+observation in a different and unpredictable way. It is seldom the case that one has access to rich
+forms of labeled data in which the nature of these influences is given explicitly.\cite{Mathieu2016}
+Often times, the purpose for which a dataset is collected is to further progress in solving a certain
+supervised learning task. This type of learning is driven completely by the labels. The goal is for
+the learned representation to be invariant to factors of variation that are uninformative to the task
+at hand. While recent approaches for supervised learning have enjoyed tremendous success, their
+performance comes at the cost of discarding sources of variation that may be important for solving
+30th Conference on Neural Information Processing Systems (NIPS 2016), Barcelona, Spain.
+arXiv:1611.03383v1 [cs.LG] 10 Nov 2016\cite{Mathieu2016}
+other, closely-related tasks. Ideally, we would like to be able to learn representations in which the
+uninformative factors of variation are separated from the informative ones, instead of being discarded.
+Many other exciting applications require the use of generative models that are capable of synthesizing
+novel instances where certain key factors of variation are held fixed. Unlike classification, generative
+modeling requires preserving all factors of variation. But merely preserving these factors is not
+sufficient for many tasks of interest, making the disentanglement process necessary. For example,
+in speech synthesis, one may wish to transfer one person’s dialog to another person’s voice. Inverse
+problems in image processing, such as denoising and super-resolution, require generating images that
+are perceptually consistent with corrupted or incomplete observations.\cite{Mathieu2016}
+
+% Why start from a vector space? What are the advantages/disadvantages?
+Vector space representations of entities can be constructed in many different ways, e.g. through cosine similarity [ref pca?], matrix factorization [ref mds], distributional approaches [doc2vec], and a variety of neural networks [ref old workshop paper? needs more explanation?]. These methods can make-sense of large volumes of unstructured data, %ref
+as well as having the potential to leverage supervised data. %ref
+They have applications as... %List appplications
+Although these representations differ in methodology, their common goal is to construct a space wherein spatial relationships correspond to semantics. The degree to which these vector spaces are able to linearly separate entities according to domain knowledge varies. % Expand on with specific notes
+For example, a doc2vec space that takes into account the order of words and entities will produce a different representation than PCA, which only considers frequency statistics. Further, a vector space obtained from a neural network with a supervised objective to classify entities for one binary class would split the space into one main linearly seperable property: the class.
+
+
+%Other
+Usually, a well specified topic should be cohesive in the
+semantic space[13][5] 
+[13] http://www-personal.umich.edu/~qmei/pub/www2014-lin.pdf
+[5] https://www.cs.cmu.edu/~jgc/publication/PublicationPDF/Sparse_Latent_Semantic_Analysis.pdf
+
+
+% Questions about score types etc
+
+
+Start chucking in real world examples here.
+
+Do certain spaces perform better across multiple domains?
+What are the differences between spaces in terms of the features they represent? How does that relate to their domain performance?
+What are the differences between score types? How does that relate to their domain performance?
+How does performance on pure representation dimensions relate to performance on single dirs/clusters?
+What kind of similarities are there between domains? What kind of differences?
+What similarities are there between score types?
+What are the differences in directions between domains? Do we find different kinds of properties? How does it relate to vocabulary size or document amount?
+How do the directions in particular between a doc2vec space, trained on context, differ from one trained on PPMI?
+
+
+What are the domain(s?) that best conveys the differences and similarities between different space types?
+Movies, unless...
+Do different domains have more differences between space types? Theories:
+1. Large differences in scoring for a particular domain will be indicative
+
+1. Find the domain which has the largest score differences between two reasonably scoring space types (so not AWV..)
+2. Compare and contrast the directions found in those space types. 
+
+What are the domain(s?) and space type(s?) that best conveys the differences and similarities between different score types?
+
+1. Find the domain with the largest differences between score types
+2. Compare and contrast directions in those score types for that domain
+
+
+
+What are the differences and similarities between the clustering algorithms?
+
+1. Find domain with the largest difference between clustering options
+
+IF directions are non informative, then use clustering to label them

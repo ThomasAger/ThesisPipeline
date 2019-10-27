@@ -1,0 +1,189 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\title{thesis}
+\author{agert }
+\date{June 2018}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+%[Mostly notes up here]
+
+%What is text? How does text contain information?  What are some applications of this information? How can we represent this information? What is the value of a representation? What are some applications of representations, why are they useful in the world? What are some different ways to represent information? What are their advantages and disadvantages? What is our goal representation? What is interpretability? Examples? What techniques are we using to obtain good representations? What are ways that we improve the knowledge of these representations? What is the general result of our approach? What can people expect in the coming chapters?aaaaaaaaaaaaaa
+
+%Representations of documents like Bag-Of-Words (BOW) described in section \ref{BOW} are characterized by two main features: They are granular, where each dimension of the feature corresponds to a single word, meaning that each dimension has a meaning that can usually be clearly understood by a human versed in the method of representation, they are sparse, meaning that each document has many irrelevant words and a relatively few relevant ones. On the other hand, Unsupervised vector spaces of documents as described in Section \ref{VectorSpaceRepresentations} are dense, meaning that each dimension contains a lot of meaning, typically one that cannot be traced back easily to a single word, %Although there are methods that do this, which I can describe here...
+%and that there are fewer dimensions for each document. We can understand this transition to be from a granular and specific representation, where everything is clearly outlined, to a more abstract and conceptual representation, where the dimensions no longer have a distinct meaning, but carry with them some meaning that is a combination of different specific things. 
+
+%In the field of representation learning, the ideal model is one that is disentangled, e.g. where entities are grouped in the space such that all entities that are in some group like scary movies are distinct from entities that belong to another group like romantic movies. We can understand an interpretable representation to be one that has disentangled and labelled dimensions, e.g. each dimension of the vector space corresponds to its particular concept, and the value within that dimension is the degree to which the document 'has' that concept. So when reading the representation manually, we can see the degrees to which it has these conceptual properties, and by understanding these properties we can derive our own knowledge of what is represented, e.g. if a movie has a high value in the dimension for scary, and a high value in the dimension for funny, we can understand it to be a scary and funny movie. 
+
+%%In this section, we use and expand on the methods outlined by \cite{Derrac2015} to obtain, from a given text-based vector-space representation where entities are represented as points, a disentangled and interpretable representation where each dimension is a ranking on some conceptual property labelled using a cluster of words, e.g. a dimension corresponding to rankings of movies labelled as ['Scary', 'Horror', 'Gore'], and another corresponding to ['Funny', 'Laughter', 'Hilarious']. 
+
+%Vector spaces can be understood as a way to represent the semantics of the domain spatially, such that similar entities are closer together. This representation naturally contains abstract relationships between entities that correspond to domain knowledge, e.g. In a vector space learned from IMDB movie reviews scary movies would be close together, funny movies would be close together, and scary and funny movies would be somewhere inbetween. We can understand entities as points in the space, and these relationships as directional lines, e.g. a direction starting from the least-scary movie and ending at the most-scary movie%, where the dot-product of entity points on the direction line are equivalent to a ranking of entities on that direction. 
+%In our work, we obtain directions that correspond to clusters of conceptually similar words, e.g. one .
+
+
+%Vector spaces spatially represent semantic similarity, resulting in a representation that contains complex relationships between entities that correspond to domain knowledge. In standard vector space methods like Principal Component Analysis (PCA) described in section \ref{PCA}, these relationships are not made explicit, and the dimensions of these representations do not explicitly relate to some domain knowledge. 
+
+%There have been many approaches to formalizing the relationships in vector-spaces, [CITE/LIST], and finding directions in the space that correspond to clusters of words \cite{Derrac2015}, e.g. in a domain of IMDB movie reviews, finding a direction from the movie that has the properties [Scary, Horror, Gore] the least, to the one that has them the most.
+
+%This chapter focuses on describing, developing and experimenting on the approach outlined by, with the intention to understand how, without supervision, we are able to represent the domain knowledge in vector spaces in a disentangled and interpretable way. We evaluate both the ability of this representation to classify domain tasks, as well as the interpretabiltiy of the representation and its associated classification models. 
+
+\section{Background}
+\subsection{Clustering Methods}
+\subsubsection{K-means}
+\subsubsection{Mean-shift}
+\subsubsection{Hdbscan}
+\subsection{Scoring Methods}
+\subsubsection{Accuracy}
+\subsubsection{Normalized Discounted Cumulative Gain}
+\subsubsection{Cohen's Kappa}
+\subsection{Classification Models}
+\subsubsection{Decision Trees}\label{DecisionTrees}
+\subsubsection{Logistic Regression}
+\subsubsection{SVM's}
+\subsection{Bag-Of-Words}\label{BOW}
+\subsection{Vector Space Representations}\label{VectorSpaceRepresentations}
+\subsubsection{PCA}\label{PCA}
+\section{Directions in Unsupervised Vector Spaces}
+\subsection{Introduction}
+%What is domain-specific? What is domain knowledge?
+On the web there is a large volume of raw text data, e.g. Reviews of products, movies, anime, books, music, social posts by individuals, self-descriptive text about a website or product, and so on. These are categorized into domains; each domain has its own quirks, knowledge, and method of being brought about. Although a movie review may sound similar to a book review, they typically differ hugely in the distribution of words used.
+
+%What is a symbolic approach? 
+One approach to making sense of these domains is to produce rules from expert knowledge. An expert in movies would tell you that if the review talks about it being a "cannibal horror film", we can understand that it is likely a scary movie and is related to the original 'Cannibal Holocaust' movie. Encoding this kind of knowledge is difficult, time-consuming, and hard to automate reliably.
+
+%What are distributional models?
+Most successful approaches in recent times, like vector-spaces, word-vectors, and others, rely on the distributional model of semantics. This model relies on encoding unstructured text e.g. of a movie review, as a vector, where each dimension corresponds to how frequent each word is, we are able to calculate how similar the entities are, e.g. we know that if two movies have a similar distribution of words in their reviews, like frequent use of the word 'scary', or 'horror', then they would have a higher similarity value. These models, also known as 'semantic spaces' encode this similarity information spatially.
+
+%What is a conceptual space? What are entities?  What are properties? What is commonsense reasoning?
+A domain-specific semantic space contains a lot of domain knowledge that is not made explicit. One approach towards understanding how these spaces represent information is a conceptual space \cite{Gardenfors2014}. In this space, we can understand domain entities, e.g. movies in a domain of IMDB movie reviews, to be represented as points, and domain properties to be in regions around these points. The relationships between these regions have been formalized in terms of  similarity reasoning and commonsense reasoning.
+
+In this chapter, we focus on further experimenting with one relationship that was formalized in \cite{Derrac2015}: a ranking of entities on properties. In particular, we use this method of building a representation of entities as a way to convert a vector space into an interpretable representation, for use in an interpretable classifier. The reason that we chose this representation to expand on is because by representing each entity $e$ with a vector $v$ that corresponds to a ranking $r$, the meaning of each dimension is distinct, and we are able to find labels composed of clusters of words for these dimensions. Here, we make the distinction between a property and a word, a property is a natural property of the space that exists in terms of a ranking of entities, and words are the labels we use to describe this property.
+
+Having distinct, labelled dimensions are beneficial when producing an interpretable classifier, e.g. a Decision Tree classifier that uses this representation: As each ranking being distinct, each node of the tree acts as a step in the reasoning of why an entity was classified a certain way, and that node is appropriately labelled so that we are able to understand it. We show an example tree in \ref{Figure1} Interestingly, we find that if a property is relevant enough to a classification task, classifying using a single ranking performs better than using multiple rankings - as these rankings generalize to new entities.  % Demonstrate these concepts in the form of graphs, pictures, etc.
+
+The main focus of our quantitative experimentation is to demonstrate that the rankings our representation is composed of correspond to domain knowledge. To do so, we use Decision Trees as described in section \ref{DecisionTrees}, which we constrain by depth, forcing the classifier to use only a limited amount of dimensions. We can understand our approach to be suitable if the classifier performs well with use of only a few properties, as we know that these properties are able to represent important concepts in the domain. We compare these to the original representations, which are typically less disentangled, as well as to topic models, another approach towards representing the domain. 
+
+We also evaluate the method qualitatively and in terms of interpretability, specifically evaluating the ability of classifiers to appropriately describe how they concluded that a particular entity belongs to a class. The qualitative investigation focuses on demonstrating how different parameters of the method affect the representation through use of examples and analysis.
+
+This chapter continues as follows: We begin by describing the work related to this method, giving valuable context for the utility and potential of our approach. This is followed by an explanation of the method, including the variations we have adopted for our experimental work. We follow this with our qualitative experimentation, explaining how these variations affect the results, as well as the interpretability of the method, and we end with a quantitative analysis on how well we can represent domain knowledge using decision trees constrained to a limited depth.
+
+
+
+\subsection{Related Work}
+There are many approaches towards improving document representations. 
+
+Probabilistic approaches like topic models.
+
+Matrix factorization approaches.
+
+
+
+\subsection{Method}
+The goal of this method is to obtain a representation composed of salient properties, starting with a domain-specific vector space $S_e$ and its associated bag-of-words (BOW) representation $B_w$. To obtain these properties, we use a variant of the unsupervised method proposed in \cite{derracAIJ}, which we explain in this section. 
+\subsubsection{Rankings entities on words}
+ We can understand that only some words will be properties, as only some correspond to domain knowledge, e.g. in a domain of IMDB movies, the word "the" does not correspond to a property of the domain, but the word "horror" does. Initially, we obtain rankings of entities for each word in the space. 
+
+As an initial filtering step, we remove words that do not meet a frequency threshold, with the understanding that words that do not occur in a minimum amount of documents are unlikely to correspond to properties as they are too specific to a subset of movies, which would make them difficult to learn. This leaves us with $w_n$ words. We show the kind of words that would be poorly represented  in \ref{Table2}.%Table of most frequent words compared with words that are low frequency
+
+Then, for each considered word $w$, a logistic regression classifier is trained to find a hyperplane $H_w$ in the space that separates entities $e$ which contain $w$ in their BOW $B_e$ representation from those that do not. %
+The vector $v_w$ perpendicular to this hyperplane is then taken as a direction that models the word $w$. In \ref{Figure2a}, we show an example of this in a toy domain. %Graphical representation of hyper-plane seperating a BoW with a direction orthogonal 
+%Although these directions do formally correspond to vectors, we refer to them as directions to emphasize their intended ordinal meaning: feature directions are aimed at ranking entities rather than e.g.\ measuring degrees of similarity.  %Provide graphical intuition
+To rank the objects on the entity, if $e$ is the representation of an entity in the given vector space $S_e$ then we can think of the dot product $v_w \cdot e$ as the value $r_ew$ of object $e$ for vector $v_w$, and in particular, we take $r_e1 < r_e2$ to mean that $e_2$ has the property labelled with the word $w$ to a greater extent than $e_1$. The result of this is shown in \ref{}. Example entities, with their associated highest and lowest ranking properties, are shown in \ref{}. %Graphical representation of entities being ranked on a direction vector
+
+\subsubsection{Filtering directions to obtain salient properties}
+With the rankings $R_r$, we could create a representation of each entity $Se$,   composed of $w_n$ dimensions, where each dimension is a ranking of the entity $e$ on that word $w_re$. However, many of the words do not correspond to salient properties. In-order to filter these words out, we evaluate them using a scoring metric, and remove the words that are not sufficiently well scored. We use three different metrics:
+
+\noindent \textbf{Classification accuracy}. Evaluating the quality in terms of the accuracy of the logistic regression classifier: if this classifier is sufficiently accurate, it must mean that whether word $w$ relates to object $o$ (i.e.\ whether it is used in the description of $o$) is important enough to affect the semantic space representation of $o$. In such a case, it seems reasonable to assume that $w$ describes a salient property for the given domain.%This is basically copy pasted.
+\smallskip
+
+\noindent \textbf{Cohen's Kappa}. One problem with accuracy as a scoring function is that these classification problems are often very imbalanced. In particular, for very rare words, a high accuracy might not necessarily imply that the corresponding direction is accurate. For this reason, X proposed to use Cohen's Kappa score instead. In our experiments, however, we found that accuracy sometimes yields better results, so we keep this as an alternative metric. %This is basically copy pasted.
+\smallskip
+
+\noindent \textbf{Normalized Discounted Cumulative Gain}
+This is a standard metric in information retrieval which evaluates the quality of a ranking w.r.t.\ some given relevance scores \cite{jarvelin2002cumulated}.  In our case, the rankings $r_e$ of the entity $e$ are those induced by the dot products $v_w \cdot e$ and the relevance scores are determined by the Pointwise Positive Mutual Information (PPMI) score $\textit{ppmi}(w,e)$, of the word $w$ in the BoW representation of entity $e$ where
+$\textit{ppmi}(w,e) = \max \big(0, \log\big(\frac{p_{we}}{p_{w*} \cdotp p_{*o}}\big)\big)$, and
+\begin{align*}
+p_{wo} &= \frac{n(w, o)}{\sum_{w'} \sum_{o'} n(w', o')}
+\end{align*}
+where $n(w,e)$ is the number of occurrences of $w$ in the BoW representation of object $e$, $p_{w*} = \sum_{e'} p_{we'}$ and $p_{*e} = \sum_{w'} p_{w'e}$. %This is basically copy pasted.
+\smallskip
+
+In principle, we may expect that accuracy and Kappa are best suited for binary features, as they rely on a hard separation in the space between objects that have the word in their BoW representation and those that do not, while NDCG should be better suited for gradual features. In practice, however, we could not find such a clear pattern in the differences between the words chosen by these metrics despite often finding different words. In Table \ref{Table4}, we show examples of properties scored highly for each domain.
+
+\subsubsection{Clustering salient properties}
+Although we are able to find the words that are most salient, the properties in the domain may not correspond directly to words. Further, the properties may not be well described by their associated word. In-order to find better representations of properties, we cluster together similar vectors $v_w$, following the assumption that those vectors which are similar are representing some property more general than their individual words, and we can find it between them.
+As the final step, we cluster the best-scoring candidate feature directions $v_w$. Each of these clusters will then define one of the feature directions to be used in applications. The purpose of this clustering step is three-fold: it will ensure that the feature directions are sufficiently different (e.g.\ in a space of movies there is little point in having \emph{funny} and \emph{hilarious} as separate features), it will make the features easier to interpret (as a cluster of terms is more descriptive than an individual term), and it will alleviate sparsity issues when we want to relate features with the BoW representation, which will play an important role for the fine-tuning method described in the next section.
+
+As input to the clustering algorithm, we consider the $N$ best-scoring candidate feature directions $v_w$, where $N$ is a hyperparameter. To cluster these $N$ vectors, we have followed the approach proposed in \cite{derracAIJ}, which we found to perform slightly better than $K$-means. The main idea underlying their approach is to select the cluster centers such that (i) they are among the top-scoring candidate feature directions, and (ii) are as close to being orthogonal to each other as possible. We refer to \cite{derracAIJ} for more details. 
+%To cluster these $N$ vectors, we have used a version of} the standard $K$-means clustering algorithm for this purpose, \blue{where cosine similarity is used instead of Euclidean distance}.  
+The output of this step is a set of clusters $C_1,...,C_K$, where we will identify each cluster $C_j$ with a set of words.
+We will furthermore write $v_{C_j}$ to denote the centroid of the directions corresponding to the words in the cluster $C_j$, which can be computed as $v_{C_j}= \frac{1}{|C_j|} \sum_{w_l\in C_j} v_l$ provided that the vectors $v_w$ are all normalized. These centroids $v_{C_1},...,v_{C_k}$ are the feature directions that are identified by our method. 
+
+Table \ref{tabKappaNDCG} displays some examples of clusters that have been obtained for three of the datasets that will be used in the experiments, modelling respectively movies, place-types and newsgroup postings. For each dataset, we used the scoring function that led to the best performance on development data(see Section \ref{secExperiments}). Only the first four words whose direction is closest to the centroid $v_C$ are shown.
+\noindent \textbf{K-Means}
+\noindent \textbf{Derrac's K-Means Variation}
+\noindent \textbf{Mean-shift}
+\noindent \textbf{Hdbscan}
+
+%Our overall aim is to find directions in the semantic space that model salient features of the considered domain. For example, given a semantic space of movies, we would like to find a direction that models the extent to which each movie is scary, among others. Such a direction would then allow us to rank movies from the least scary to the most scary. We will refer to such directions as \emph{feature directions}. Formally, each feature direction will be modelled as a vector $v_f$. However, we refer to \emph{directions} rather than \emph{vectors} to emphasize their intended ordinal meaning: feature directions are aimed at ranking objects rather than e.g.\ measuring degrees of similarity. 
+
+
+\subsection{Quantitative Results}
+We demonstrate the effectiveness of our approach on five datasets, each with their associated tasks.
+\begin{itemize} % Add how balanced the classes are, how, the datasets were obtained, how they are going to be split for the evaluation.
+  \item The IMDB Movie Dataset: 15,000 movies represented by aggregated reviews. On the tasks of Movie Genres, 100 IMDB Keywords, and UK + US Age Certificates.
+  \item Flickr Place-types: 1,383 place-types. On the tasks of three different place-types, Foursquare, Geonames and OpenCYC.
+  \item The 20-Newsgroups dataset: 18,846 newsgroup posting in 20 different categories. On the task of identifying which of the 20 categories the posting is from.
+  \item The IMDB Sentiment Dataset: 50,000 movie reviews, with binary tags for either positive or negative. On the task of identifying if the review is positive or negative.
+  \item The Reuters Dataset: 10655 News articles. On the task of identifying the category of the article.
+\end{itemize}
+ To test the ability of the identified directions to accurately represent domain concepts in a ranking, we use low-depth decision-trees. Although these classifiers are not intended to be competitive with more complex classifiers like unbounded decision trees or SVM's, we find that our rankings are sometimes able to outperform these approaches using only a single decision node (equivalent to finding the best cutoff in a single ranking for classification). We use the F1 metric for our experiments, as almost all classes in each dataset are unbalanced. 
+ 
+ 
+ We obtain the unsupervised representations as follows:
+ 
+ \begin{itemize}
+    \item To obtain the PPMI representation, we first remove terms from the corpus that do not appear at least (length of the corpus * 0.01) documents, and then trim all entities that were exclusively composed of these terms. We then we apply standard PPMI based on the implementation from svdmi \footnote{https://github.com/Bollegala/svdmi/blob/master/src/svdmi.py}.
+     \item We obtain the MDS spaces for the movies, place-types and wines datasets from the data made available by \cite{Derrac2015}, to obtain the MDS spaces for the other datasets, we use the same method as \cite{Derrac2015} and using default parameters for the MDSJ library. For each domain, we obtain 20, 50, 100 and 200 dimensional spaces.
+     \item So that we can use the sparse PPMI matrices when obtaining the space, we the TruncatedSVD method from scikit-learn method\footnote{https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.htm} with default parameters. For each domain, we obtain 20, 50, 100 and 200 dimensional spaces. % "this estimator does not center the data before computing the singular value decomposition." Explain what this means for the folks at home.
+     \item For the averaged word-vectors (AWV) and the weighted averaged word vectors (AWVw), we average the glove 6B word-vectors\footnote{https://nlp.stanford.edu/projects/glove/} obtained from the Wikipedia 2014 + Gigaword 5 corpuses. As these are only available in size 50, 100 and 200, and there are not many other commonly used pre-trained word-vectors that offer multiple dimension sizes, differing from other methods we only obtain AWV and AWVw representations of size 50, 100 and 200. As these dimension sizes are hyper-parameters, we can consider average word vectors to be disadvantaged on some tasks, but as it is unlikely that there is too much benefit in training our own word-vectors from the relatively small domains, we opted to simplify the process and simply remove this as a hyper-parameter for this method, as well as the averaged method. The averaged word vectors are obtained by multiplying the vectors by the PPMI values, and finding the weighted average of all vectors multiplied in this way. % Add mathematical notation that describes the process of obtaining AWV and AWVw
+     \item For the Doc2Vec vectors, we use hyperparameter optimization to select the appropriate parameters, as the quality of the end space is typically reliant on well-tuned hyperparameters for the dataset. We use \cite{Lau2014} as a guideline for which parameters to optimize, re-using the parameters that stayed constant for both their datasets in their tests, specificially the dbow method, glove6B pre-trained 300-dimensional word-vectors, training those word vectors while training the representation, a sub-sampling of 10(-5), and a negative sample of 5. We tune and select between the values of the window size {5, 15, 50}, the minimum frequency count {1, 5, 20}, and epoch size {20, 40, 100}, and as in the other methods, we obtain vectors of size {20, 50, 100, 200}, but the hyperparameters for each of these is found individually, as the different space sizes are later evaluated on how well they can produce good directions. We evaluate the quality of the space using a Gaussian SVM on a selected task for each dataset, in the case of Reuters, Newsgroups and Sentiment, we use their associated tasks, for Movies we use the Genres task and Place-types the Foursquare task, as these tasks represent essential concepts in the domain. 
+     
+     
+\end{itemize}
+ 
+ Table 1 shows how well unsupervised representations perform. Topic models are included to demonstrate the difference between other simple and interpretable approaches, and Random Forest's are included to demonstrate the difference between our simple but interpretable approach and a model that typically performs well at the task \cite{Fern2014}, but is  difficult to interpret.
+ 
+ Table 2 demonstrates the difference between unsupervised representations and salient properties, and Table 3 demonstrates the difference between salient properties and clustered salient properties.
+ \subsection{Interpretability Results}
+ 
+ \section{Fine-tuning Representations to Better Model Directions}
+ \subsection{Introduction}
+% Although these directions do effectively model features in the domain, the vector spaces that these directions were obtained from do not effectively model rankings. Through an unsupervised fine-tuning process on these vector spaces we are able to trade-off similarity information for better rankings, and improve the results of our previous method.
+ \subsection{Quantitative Results}
+ %We show that an unsupervised process of fine-tuning unsupervised vector spaces can consistently improve the performance of rankings in low-depth decision trees.
+ 
+\section{Directions in Neural Networks}
+\subsection{Introduction}
+%Neural networks effectively classify information using a supervised signal, and we want to obtain directions learned using this supervised signal from these neural networks. We find that we are able to obtain these supervised directions and they do perform very well and can make neural networks essentially interpretable through this conversion process without much loss of performance. We demonstrate that we can apply our fine-tuning technique to the learning process of neural networks to obtain better directions, and that we can improve the embedding process of a neural network to obtain more salient embeddings by fine-tuning that embedding.
+\subsection{Directions in Classifier Networks}
+%LSTM's, Feedforward networks, Fasttext, all just filter out results.
+\subsection{Fine-tuning Classifier Networks}
+%If we use fine-tuning in the classification process, it changes things like this.
+\subsection{Directions in Embedding Networks}
+%The directions in embedding networks get weird and we can connect them together like this.
+\subsection{Using Fine-tuning to improve embeddings}
+%If we keep fine-tuning the representation in an embedding network we can keep it from going off-track even at lower depths.
+\subsection{Quantitative Results}
+%We evaluate the ability of directions obtained from neural networks to accurately represent domain concepts using low-depth decision-trees. We compare these interpretable classifiers to the neural networks that the rankings were obtained from, and find that we are usually able to achieve the same scores, sometimes by only using the some directions.
+
+
+
+
+\end{document}

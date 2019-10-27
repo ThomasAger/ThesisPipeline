@@ -1,0 +1,89 @@
+We use the data provided by \cite{Derrac2015}, but differ from them in a few ways. First, rankings are done differently (we combine them differently or something?), as well as duplicates being removed from the data. This makes it difficult to directly compare our results to theirs, although they are sometimes similar.
+
+"Second, as the classification problems are heavily imbalanced, most methods are able to achieve a similar accuracy score. Differences between the F1 score, on the other hand, are more pronounced. Overall," \cite{Derrac2015}
+
+We demonstrate the effectiveness of our approach on five datasets, each with their associated tasks. In table \ref{table:DatasetStats} we show the vocabulary and document size for each dataset. For the IMDB and place-type spaces, we take them as-is, with the exception of removing empty or duplicated documents. For the other datasets, we remove all terms that do not occur in at least 2 documents, remove all punctuation and convert them to lower case. We retain numbers. The data labelled "After preprocessing" is the data used to create the vector spaces. 
+
+For our bag-of-words representation, we further filter the corpus by removing terms that do not appear at least (length of the corpus * 0.001) documents. We additionally remove any terms that are in (length of corpus * 0.95) documents. Unlike when finding directions, we are not interested in finding salient properties, rather we simply want to remove noise from the dataset. For some corpuses, this means that we end-up with some empty entities that contained only infrequent terms. We show the vocabulary changes in \ref{table:BowStats}.
+
+The classes are also filtered so that any classes without 100 positive instances are removed. One exception is the place-types classes, as these only have a very limited amount of entities to begin with. Additionally, some classes do not contain all documents - we show the stats for all classes in Table \label{table:ClassStats}.
+
+Place-types and IMDB Movies are both already limited to 100,000 vocabulary terms initially.
+
+\begin{table}[]
+	\begin{tabular}{lllll}
+		& Data as received &                 & Preprocessed for vector spaces &                 \\
+		Dataset     & Vocabulary size  & Amt of entities & Vocabulary size                & Amt of entities \\
+		IMDB Movies & 100,000          & 15,000          & 100,000                        &                 \\
+		Sentiment   &                  & 50,000          &                                &                 \\
+		Placetypes  &                  & 1383            &                                &                 \\
+		Newsgroups  &                  & 18846           &                                &                 \\
+		Reuters     &                  &                 &                                &                
+	\end{tabular}
+	\caption{We use the preprocessed datasets for the rest of the paper, including to make the vector spaces. This includes removing stopwords, deleting empty spaces, removing punctuation, converting everything to lowercase, and removing terms that do not occur in at least 2 documents.}  
+	\label{table:DatasetStats}
+\end{table}
+
+\begin{table}[]
+	\begin{tabular}{lllll}
+		& Data as received &                 & Preprocessed for bag-of-words &                 \\
+		Dataset     & Vocabulary size  & Amt of entities & Vocabulary size                & Amt of entities \\
+		IMDB Movies & 100,000          & 15,000          & 100,000                        &                 \\
+		Sentiment   &                  & 50,000          &                                &                 \\
+		Placetypes  &                  & 1383            &                                &                 \\
+		Newsgroups  &                  & 18846           &                                &                 \\
+		Reuters     &                  &                 &                                &                
+	\end{tabular}
+	\caption{This table shows the preprocessing of the datasets that produce the bag-of-words that we use directly on the classifier. In this case, infrequent terms and extremely frequent terms were removed.}
+	\label{table:BowStats}
+\end{table}
+
+\begin{table}[]
+	\begin{tabular}{lllll}
+		& Data as received &                 & Preprocessed   &                 \\
+		Dataset               & Amt of classes   & Amt of entities & Amt of classes & Amt of entities \\
+		IMDB Genres           &                  &                 &                &                 \\
+		IMDB Ratings          &                  &                 &                &                 \\
+		IMDB Keywords         &                  &                 &                &                 \\
+		Placetypes Foursquare &                  &                 &                &                 \\
+		Placetypes OpenCYC    &                  &                 &                &                 \\
+		Placetypes Geonames   &                  &                 &                &                 \\
+		Sentiment             &  1                &                 &                &                 \\
+		20 Newsgroups         &                  &                 &                &                 \\
+		Reuters               &                  &                 &                &                
+	\end{tabular}
+\caption{Classes vary in the amount of entities they cover for some classes. Additionally, in the preprocessed section we delete classes that do not have at least 100 positive instances.}
+\label{table:ClassStats}
+\end{table}
+
+
+
+\subsection{Results for vector space's and bag-of-words}
+We use Decision Trees (DT) of size (3, 2, 1, N), where N means that the tree was unbounded and SVM's to classify on a Positive-Pointwise Mutual Information (PPMI) Bag-Of-Words (BOW), Principal Component Analysis (PCA), Averaged Word Vectors (AWV), Multi-Dimensional Scaling (MDS) and Doc2Vec (D2V) \cite{Le2014}. 
+
+\begin{itemize} % Add how balanced the classes are, how, the datasets were obtained, how they are going to be split for the evaluation.
+	\item The IMDB Movie Dataset: 15,000 movies represented by aggregated reviews. On the tasks of Movie Genres, 100 IMDB Keywords, and UK + US Age Certificates. However, the data made available only gave a mapping for 13978 entities, so we use those instead in this case. As with all datasets, we remove terms that do not occur in at least 13 documents. This resulted in 12 entities left empty, so these entities were also removed, leaving us with 13966 entities. This corpus was already limited to only contain 100,000 vocabulary terms. As with all datasets, we remove all terms that are not included in at least 2 entities. As the basic text representation was not available, we did not obtain the doc2vec vectors.
+	\item Flickr Place-types: 1,383 place-types. On the tasks of three different place-types, Foursquare, Geonames and OpenCYC. As the basic text representation was not available, we did not obtain the doc2vec vectors.
+	\item The 20-Newsgroups dataset: 18,846 newsgroup posting in 20 different categories. On the task of identifying which of the 20 categories the posting is from.
+	\item The IMDB Sentiment Dataset: 50,000 movie reviews, with binary tags for either positive or negative. On the task of identifying if the review is positive or negative.
+	\item The Reuters Dataset: 10655 News articles. On the task of identifying the category of the article.
+\end{itemize}
+To test the ability of the identified directions to accurately represent domain concepts in a ranking, we use low-depth decision-trees. Although these classifiers are not intended to be competitive with more complex classifiers like unbounded decision trees or SVM's, we find that our rankings are sometimes able to outperform these approaches using only a single decision node (equivalent to finding the best cutoff in a single ranking for classification). We use the F1 metric for our experiments, as almost all classes in each dataset are unbalanced. 
+
+
+We obtain the unsupervised representations as follows:
+
+\begin{itemize}
+	\item For the averaged word-vectors (AWV) and the weighted averaged word vectors (AWVw), we average the glove 6B word-vectors\footnote{https://nlp.stanford.edu/projects/glove/} obtained from the Wikipedia 2014 + Gigaword 5 corpuses. As these are only available in size 50, 100 and 200, and there are not many other commonly used pre-trained word-vectors that offer multiple dimension sizes, differing from other methods we only obtain AWV and AWVw representations of size 50, 100 and 200. As these dimension sizes are hyper-parameters, we can consider average word vectors to be disadvantaged on some tasks, but as it is unlikely that there is too much benefit in training our own word-vectors from the relatively small domains, we opted to simplify the process and simply remove this as a hyper-parameter for this method, as well as the averaged method. The averaged word vectors are obtained by multiplying the vectors by the PPMI values, and finding the weighted average of all vectors multiplied in this way. We obtain size 50, 100 and 200 dimensional spaces for all other space-types to keep it consistent with AWV. % Add mathematical notation that describes the process of obtaining AWV and AWVw
+	\item PPMI (Put it above)
+	\item We obtain the MDS spaces for the movies, place-types and wines datasets from the data made available by \cite{Derrac2015}, to obtain the MDS spaces for the other datasets, we use the same method as \cite{Derrac2015} and using default parameters for the MDSJ library. For all domains apart from sentiment, we obtain 50, 100 and 200 dimensional spaces. For the sentiment domain, we do not obtain an MDS space due to memory constraints (as it has 50,000 docs). This is a limitation of classic MDS.
+	\item So that we can use the sparse PPMI matrices when obtaining the space, we the TruncatedSVD method from scikit-learn method\footnote{https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.htm} with default parameters. For each domain, we obtain 50, 100 and 200 dimensional spaces. % "this estimator does not center the data before computing the singular value decomposition." Explain what this means for the folks at home.
+	
+	\item For the Doc2Vec vectors, we use hyperparameter optimization to select the appropriate parameters, as the quality of the end space is typically reliant on well-tuned hyperparameters for the dataset. We use \cite{Lau2014} as a guideline for which parameters to optimize, re-using the parameters that stayed constant for both their datasets in their tests, specificially the dbow method, glove6B pre-trained 300-dimensional word-vectors, training those word vectors while training the representation, a sub-sampling of 10(-5), and a negative sample of 5. We tune and select between the values of the window size {5, 15, 50}, the minimum frequency count {1, 5, 20}, and epoch size {20, 40, 100}, and as in the other methods, we obtain vectors of size {50, 100, 200}, but the hyperparameters for each of these is found individually, as the different space sizes are later evaluated on how well they can produce good directions. We evaluate the quality of the space using a Gaussian SVM on a selected task for each dataset, in the case of Reuters, Newsgroups and Sentiment, we use their associated tasks, for Movies we use the Genres task and Place-types the Foursquare task, as these tasks represent essential concepts in the domain. 
+	
+	
+\end{itemize}
+
+Table 1 shows how well unsupervised representations perform. Topic models are included to demonstrate the difference between other simple and interpretable approaches, and Random Forest's are included to demonstrate the difference between our simple but interpretable approach and a model that typically performs well at the task \cite{Fern2014}, but is  difficult to interpret.
+
+Table 2 demonstrates the difference between unsupervised representations and salient properties, and Table 3 demonstrates the difference between salient properties and clustered salient properties.
