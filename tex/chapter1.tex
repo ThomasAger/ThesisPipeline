@@ -1,10 +1,28 @@
 \chapter{Introduction}
+
+% Introduction to the internet, data, basic text representations
+% Introduction to machine learning, benefits of data for machine learning, machine learning representations
+% Problems with machine learning, interpretability, lack of interpretability in machine learningg
+% We introduce a series of methods for transforming uninterpretable machine learning representations into interpretable ones
+% Finding directions in vector spaces and using those to produce interpretable representations
+% Fine-tuning these directions to get a better result
+% Interpreting and investigating neural networks with these directions
+
+
+Smartphones and other devices that keep people connected to the internet are prevalent, resulting in a deluge of publicly available data. In particular, applications that enable user-generated content e.g. Social Media sites (Facebook, Twitter), Review sites (IMDB, Rotten Tomatoes, Amazon) and content-aggregation sites (Reddit, Tumblr) produce a lot of text data e.g. in posts and comments. Research into how it can be used to solve a variety of problems has been conducted, e.g. using text data to identify if social media posts, or product reviews, are positive or negative \cite{Burel2018}, to identify social media posts that happen during crises and identify those that are useful to crisis responders \cite{Burel2018}, or even to predict depression in social media users \cite{Aldarwish2017}. 
+
+The methods to solve these problems are a result of machine-learning, which uses a large amount of data to learn how to solve some specific problem. Machine-learning is a force that has began to take-part in our day-to-day interactions with both the online and offline space, in the online world through content recommendation, targeted marketing and advertisement, and a variety of businesses that have sprung up with some machine-learning tool at the center. In the offline world, self-driving cars, face recognition on CCTV, behaviour prediction of crowds among others have started taking place across the world. Essentially, these tools are able to succeed because of the availability of data.
+
+Problems that machine-learning can solve can be split into two distinct categories, supervised and unsupervised. Supervised problems have some data that is labelled, and some that is not labelled. The goal of a supervised task is to assign labels to the data that is not labelled, by learning with the data that is labelled. Unsupervised problems do not have any labels, and instead try to solve a problem just from unlabelled data. The learning method to solve the problem is called a machine-learning model. In a supervised task this model  learns using the labelled examples, and then is used to label the unlabelled examples.
+
+One example of an unsupervised machine-learning task is to transform data into a representation that can be learned from by the 
+
 \section{Motivation}
 %What is text? How is it motivating?
 
 %What are the desiradata of a good representation?
 % Unsupervised
-With the rise of services on the web that enable large-scale user-generation of text data, e.g. Social Media sites (Facebook, Twitter), Review sites (IMDB, Rotten Tomatoes, Amazon) and content-aggregation sites (Reddit, Tumblr), the internet has become largely populated by text posts that are related to some specific, niche topic within a domain. For example, a review on Amazon for a product is specially tailored text for that product within the domain of Amazon reviews. Taken from a closer lens, we could even argue that each review-type has its own domain, e.g. Product reviews, Food reviews, Movie reviews. However, the text posts themselves are largely unstructured semantically. Humans can have an intuitive understanding of the semantics that are present in unstructured text, but machines do not. 
+
 
 One task of Natural Language Processing is to obtain this semantic understanding from text by obtaining a machine-readable representation that contains domain knowledge. A basic approach to obtain a representation of this text is to represent entities (e.g. reviews, text-posts) by the frequency of their words, see \ref{Bag-of-words-example}.
 
@@ -22,6 +40,10 @@ One task of Natural Language Processing is to obtain this semantic understanding
 	\centering
 	\caption{Example properties  }\label{IntroDecisionTree}
 \end{figure}
+
+\subsection{Machine Learning}
+% what is machine learning? why do i care?
+
 
 % Granular
 We can understand these properties to have a degree to which they apply, for example the size of the clothing might be "XXL", "XL", "L", "M" or "S", or the quality may be "Very good", "Good", "Ok", "Bad" or "Very bad". For the former, we may rely on the metadata available from the site itself, but for the latter the way to obtain this information is less clear. Although we may infer that the rating has some indication of these properties, it does not describe the properties or the degree to which the review refers to them. This kind of information is valuable for making sense of the world of unstructured text, and has broad applications, e.g. The most immediate example is perhaps that they allow for a natural way to implement critique-based recommendation systems, where users can specify how their desired result should relate to a given set of suggestions \cite{viappiani2006preference}. For instance, \cite{Vig:2012:TGE:2362394.2362395} propose a movie recommendation system in which the user can specify that they want to see suggestions for movies that are ``similar to this one, but scarier''. If the property of being scary is adequately modelled as a direction in a semantic space of movies, such critiques can be addressed in a straightforward way. Similarly, in \cite{kovashka2012whittlesearch} a system was developed that can find ``shoes like these but shinier'', based on a semantic space representation that was derived from visual features. Semantic search systems can use such directions to interpret queries involving gradual and possibly ill-defined features, such as ``\emph{popular} holiday destinations in Europe'' \cite{DBLP:conf/sigir/JameelBS17}. While features such as popularity are typically not encoded in traditional knowledge bases, they can often be represented as semantic space directions.  %Copied from CONLL
@@ -51,7 +73,7 @@ Simple linear classifiers built from a representation composed of rankings on pr
 
 %
 
-\section{Interpretability}
+\section{Interpretability}\label{ch1:interpret}
 
 %What is interpretability? How is the value of interpretability measured in the real world?
 

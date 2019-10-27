@@ -37,6 +37,7 @@
 %\usepackage{rotating}
 %\usepackage{amssymb}
 \usepackage{multibib}
+\usepackage{booktabs}
 % Fonts, encoding, etc.
 \usepackage{type1cm}
 \usepackage[latin1]{inputenc}
@@ -50,6 +51,7 @@
 \usepackage[noend]{algorithmic}
 %\usepackage{rotating}
 \usepackage{multirow}
+\usepackage{lscape}
 \usepackage{float}
 %\usepackage{subfigure}
 % Line spacing
@@ -65,7 +67,7 @@
 % Page dimensions
 \usepackage{vmargin}
 \setpapersize{A4}
-\setmarginsrb{40mm}{20mm}{25mm}{30mm}{14.5pt}{8mm}{0pt}{11mm}
+\setmarginsrb{25mm}{20mm}{25mm}{10mm}{14.5pt}{8mm}{0pt}{11mm}
 
 % Footer and header
 \usepackage{afterpage}
@@ -199,6 +201,7 @@
 \usepackage{rotating}
 \usepackage{psfrag}
 \usepackage{epic}
+\usepackage{tabularx}
 \usepackage{eepic}
 
 % Algorithm environment
@@ -417,10 +420,11 @@ We produce interpretable representations, and demonstrate their applicability in
 %begin each chapter chapter1.tex by \Chapter{chapter1}, for example, then the sections and so on...
 \input{chapter1}
 \input{chapter2}
+\input{chapter25}
 \input{chapter3}
 \input{chapter4}
 \input{chapter5}
-
+\input{appendix}
 \backmatter
 
 \def\baselinestretch{1}\normalfont

@@ -1,22 +1,32 @@
 from common.SaveLoadPOPO import SaveLoadPOPO
 from common.Method import Method
-class MethodName(Method):
+from sklearn import preprocessing
+class NormalizeZeroMean(Method):
     popo_example = None
-    param_example = None
+    output_folder = None
+    multidim_array = None
+    normalized_output = None
 
-    def __init__(self, param_example, save_class):
+    def __init__(self, multidim_array, file_name, output_folder, save_class):
 
-        self.param_example = param_example
+        self.output_folder = output_folder
+        self.multidim_array = multidim_array
 
         super().__init__(file_name, save_class)
 
-
     def makePopos(self):
-        self.popo_example = SaveLoadPOPO(self.popo_example, "filename", "npy")
+        self.normalized_output = SaveLoadPOPO(self.normalized_output, self.output_folder + self.file_name + ".npy", "npy")
 
     def makePopoArray(self):
-        self.popo_array = []
+        self.popo_array = [self.normalized_output]
 
     def process(self):
         # Process
+        self.normalized_output.value = preprocessing.scale(self.multidim_array)
+        print("completed")
         super().process()
+
+    def getNormalized(self):
+        if self.processed is False:
+            self.normalized_output.value = self.save_class.load(self.normalized_output)
+        return self.normalized_output.value

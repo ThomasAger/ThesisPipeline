@@ -1,7 +1,8 @@
 import os
 from collections import OrderedDict
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from scipy import sparse as sp
 
 def write2dCSV(array, name):
@@ -124,12 +125,8 @@ def write_csv(csv_fn, col_names, cols_to_add, key):
     df = pd.DataFrame(d, index=key)
     df.to_csv(csv_fn)
 
-def read_csv(csv_fn):
-    csv = pd.read_csv(csv_fn, index_col=0)
-    for col in range(0, len(csv)):
-        for val in range(len(csv.iloc[col])):
-            if np.isnan(csv.iloc[col][val] ):
-                print("!NAN!", col, val)
+def read_csv(csv_fn, error_bad_lines=True):
+    csv = pd.read_csv(csv_fn, index_col=0, error_bad_lines=error_bad_lines)
     return csv
 
 def csv_pd_to_array(csv_pd):
@@ -230,7 +227,7 @@ def load_dict(file_name):
     return dict
 
 def loadNpyDict(fn):
-    return np.load(fn).item()
+    return np.load(fn, allow_pickle=True).item()
 
 def writeArrayDict(dict, name):
     file = open(name, "w")
@@ -327,8 +324,7 @@ def getFns(folder_path):
     file_names = []
     onlyfiles = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
     for i in onlyfiles:
-        if i != "class-all" and i != "nonbinary" and i != "low_keywords" and i != "class-All" and i != "archive" and i != "fns" and i!="fns.txt" and i!="class-all-200":
-            file_names.append(i)
+        file_names.append(i)
     return file_names
 
 
@@ -439,6 +435,22 @@ def importValue(file_name, file_type="s"):
             for line in lines:
                 value = line.strip()
     return value
+
+def importFirstLineOfTextFileAsFloat(file_name):
+    first_line = None
+    with open(file_name, "r") as infile:
+        for line in infile:
+            first_line = list(map(float, line.strip().split()))
+            break
+    return [first_line]
+
+def importFirstLineOfTextFileAsFloatTransposed(file_name):
+    first_line = []
+    with open(file_name, "r") as infile:
+        for line in infile:
+            first_line.append( float(line.split()[0]))
+    return first_line
+
 
 def import2dArray(file_name, file_type="f", return_sparse=False):
     if file_name[-4:] == ".npz":
@@ -590,3 +602,13 @@ def save_csv_from_dict(score_dict, class_names, csv_fn):
 
     class_names = np.append(class_names, "AVERAGE")
     write_csv(csv_fn, col_names, col_data, class_names)
+
+
+if __name__ == '__main__':
+    txt_file = import1dArray("../../data/cherrypicked/movies\some_removed.txt")
+    new_txt_file = []
+    for i in range(len(txt_file)):
+        if len(txt_file[i]) != 0:
+            new_txt_file.append(" ".join(txt_file[i].split()[:4]))
+    write1dArray(new_txt_file, "../../data/cherrypicked/movies\some_removed_fixed.txt")
+    

@@ -35,7 +35,8 @@ class PPMI(Method):
 
     def process(self):
         print("Begin processing")
-        self.checkFrequencyMatrix(self.doc_amt)
+        if self.doc_amt != -1:
+            self.checkFrequencyMatrix(self.doc_amt)
         orig_ppmi_matrix = convertPPMISparse(self.frequency_matrix)
         self.ppmi_matrix.value = sp.csr_matrix(orig_ppmi_matrix).transpose()
         super().process()

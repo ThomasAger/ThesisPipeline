@@ -1,4 +1,4 @@
-from util import check
+from util import check_util
 from common.SaveLoadPOPO import SaveLoadPOPO
 
 # Can have many ways to define filenames
@@ -10,12 +10,14 @@ class Method:
     processed = False
 
     def __init__(self, file_name, save_class):
+        print("initializing")
         self.save_class = save_class
         self.file_name = file_name
         self.makePopos()
         self.makePopoArray()
 
     def process_and_save(self):
+        print("processing and saving")
         popo_array = self.popo_array
         if self.save_class.exists(popo_array) is False:
             if self.save_class.verbose:
@@ -30,15 +32,6 @@ class Method:
             if self.save_class.verbose:
                 print(self.__class__.__name__, "Already exists (lazy loading enabled)")
 
-    def makePopos(self):
-        __empty = 0
-
-    def makePopoArray(self):
-        __empty = 0
-
-    def process(self):
-        __empty = 0
-
     def save(self):
         if self.process:
             self.save_class.save(self.popo_array)
@@ -47,6 +40,15 @@ class Method:
 
     def load(self):
         self.save_class.load(self.popo_array)
+
+    def makePopos(self):
+        __empty = 0
+
+    def makePopoArray(self):
+        __empty = 0
+
+    def process(self):
+        __empty = 0
 
 # Only saves one thing, its predictions, and always uses x_train, y_train, y_test, x_test splits.
 class ModelMethod(Method):
@@ -68,7 +70,7 @@ class ModelMethod(Method):
         self.probability = probability
         self.mcm = mcm
 
-        check.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
+        check_util.check_splits(self.x_train, self.y_train, self.x_test, self.y_test)
         super().__init__(file_name, save_class)
 
     def makePopos(self):

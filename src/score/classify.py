@@ -9,7 +9,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from common import Method
 from util import io as dt
 from common.SaveLoadPOPO import SaveLoadPOPO
-from util import check
+from util import check_util
 from util import py
 import scipy.sparse as sp
 
@@ -74,7 +74,7 @@ class MasterScore(Method.Method):
         super().__init__(file_name, save_class)
 
     def process(self):
-        check.check_y(self.true_targets, self.predictions)
+        check_util.check_y(self.true_targets, self.predictions)
         if np.count_nonzero(self.true_targets) < 1:
             auroc = False
             print("Auroc has been automatically disabled as the true targets (len)", len(self.true_targets),
@@ -86,7 +86,10 @@ class MasterScore(Method.Method):
         if sp.issparse(self.predictions):
             print("Shape is:", self.predictions.shape)
         else:
-            print("Shape is:", len(self.predictions), len(self.predictions[0]))
+            if py.isArray(self.predictions[0]):
+                print("Shape is:", len(self.predictions), len(self.predictions[0]))
+            else:
+                print("Shape is:", len(self.predictions))
         if self.auroc:
             self.calc_auroc()
         if self.f1:
@@ -212,10 +215,13 @@ class MasterScore(Method.Method):
 
 def selectScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=True, auroc=False,
                  fscore=True, kappa=True, acc=True, class_names=None, verbose=True, save_csv=False, directions=False):
-    if true_targets is None or py.isArray(true_targets[0]):
+    if true_targets is None or py.isArray(true_targets[0]) and len(predictions) > 1:
         return MultiClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
                  fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, directions=directions, save_csv=save_csv)
     else:
+        # Predictions are usually put into a class array, this circumvents that for single class arrays
+        if len(predictions) == 1:
+            predictions = predictions[0]
         return SingleClassScore(true_targets, predictions, pred_proba, file_name, output_folder, save_class, f1=f1, auroc=auroc,
                  fscore=fscore, kappa=kappa, acc=acc, class_names=class_names, verbose=verbose, directions=directions, save_csv=save_csv)
 

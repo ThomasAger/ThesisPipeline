@@ -3,9 +3,9 @@ import cProfile
 import numpy as np
 import numbers
 from util import py
-import scipy.sparse as sp
-
 # Data structure management tasks
+
+
 
 def transIfRowsLarger(mat):
     if mat is not None:
@@ -220,9 +220,24 @@ def reverseArrays(md_array):
     for a in md_array:
         reversed_array.append(a[::-1])
     return reversed_array
+import sys
+def aminId(array):
+    min = 2147000000
+    min_id = 0
+    for i in range(len(array)):
+        if array[i] < min:
+            min = array[i]
+            min_id = i
+    return min_id
 
-
-
+def amaxId(array):
+    max = -2147000000
+    max_id = 0
+    for i in range(len(array)):
+        if array[i] > max:
+            max = array[i]
+            max_id = i
+    return max_id
 if __name__ == '__main__':
     """
     parameter_list_string = io.import1dArray("../../data/parameter_list_string.txt")

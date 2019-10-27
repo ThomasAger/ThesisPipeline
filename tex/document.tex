@@ -1,0 +1,32 @@
+\documentclass{article}
+% Comment the following line to NOT allow the usage of umlauts
+\usepackage[utf8]{inputenc}
+% Uncomment the following line to allow the usage of graphics (.png, .jpg)
+%\usepackage{graphicx}
+
+% Start the document
+\begin{document}
+
+% Create a new 1st level heading
+\section{Main Heading}
+
+This method section is as follows: First, it is explained how to obtain target rankings from PPMI scores. Then, the neural network that uses these target rankings to improve the vector space and its associated feature-directions is described.
+
+
+
+FEATURE-DIRECTIONS ARE CLUSTER DIRECTIONS
+
+%The feature-directions used to investigate this process are cluster-directions, which are each associated with a cluster of words. These cluster directions are used over word-directions for a couple of reasons. First, the objective of this work is to show how the method can be improved for performance in simple interpretable classifiers. Cluster directions are more suitable for this format as they give better context over a single word to inform what the feature is. They also represent more abstract features, which should generalize better for key domain tasks. If the word-directions are trained in the network, noisy terms or duplicate terms may be prioritized. 
+
+Each feature-direction needs a corresponding ranking. However, feature-directions each have an associated cluster of words. The first problem to solve is how to achieve a ranking for multiple words from the bag-of-words representation. This is done by re-obtaining PPMI scores, adding together the frequency values. We can expect that this will help avoid prioriting infrequent or noisy terms that are clustered with the direction, as their importance is naturally scaled with their frequency in this case. 
+
+WHICH TERMS ARE CONSIDERED? ALL OR JUST CLUSTER TERMS? WHY WOULD THAT WORK WITH JUST CLUSTER TERMS? (ASK STEVEN?)
+
+
+
+
+% Uncomment the following two lines if you want to have a bibliography
+%\bibliographystyle{alpha}
+%\bibliography{document}
+
+\end{document}

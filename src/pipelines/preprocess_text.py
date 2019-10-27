@@ -1,3 +1,5 @@
+import util.classify
+import util.text_utils
 from util import io as dt
 import numpy as np
 from sklearn.datasets import fetch_20newsgroups
@@ -16,7 +18,7 @@ from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCo
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
-             no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False,
+             no_below_fraction, no_above, classes_freq_cutoff, model_type, dev_percent,data_type, rewrite_all=False,
              remove_stop_words=False,  auroc=False, score_metric="avg_f1", corpus_fn="", name_of_class="", mcm=MultiOutputClassifier, classifier_fn=""):
 
 
@@ -28,8 +30,8 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
     classes_save = SaveLoad(rewrite=rewrite_all)
-    classes_process = process_corpus.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
-                                         no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
+    classes_process = util.classify.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
+                                                   no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
     classes_process.process_and_save()
     classes = classes_process.getClasses()
     class_names = classes_process.getClassNames()
@@ -37,9 +39,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     # Process and save corpus
     corpus_save = SaveLoad(rewrite=rewrite_all)
     if data_type == "placetypes" or data_type == "movies":
+        print("Processing corpus")
         p_corpus = process_corpus.StreamedCorpus(classes, name_of_class,  file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save, corpus_fn_to_stream=corpus_fn)
     else:
+        print("Processing corpus")
         p_corpus = process_corpus.Corpus(corpus,  classes,name_of_class, file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
@@ -78,16 +82,16 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_classes, split_ids, dev_percent_of_train=dev_percent)
 
     all_test_result_rows = []
-    """
+
     hpam_save = SaveLoad(rewrite=rewrite_all)
     hyper_param = HParam(class_names,  kfold_hpam_dict, model_type, classify_ppmi_fn,
-                                      output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                                      output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
                          y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
                          mcm=mcm)
     hyper_param.process_and_save()
     
     all_test_result_rows.append(hyper_param.getTopScoringRowData())
-    """
+
     # Creating and testing spaces, MDS not included in the creation process
     for i in range(len(dims)):
         pca_save = SaveLoad(rewrite=rewrite_all)
@@ -97,7 +101,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_pca_fn,
-                             output_folder=output_folder, save_class=hpam_save, rewrite_model=rewrite_all,
+                             output_folder=output_folder + "rep/", save_class=hpam_save, rewrite_model=rewrite_all,
                              score_metric=score_metric, mcm=mcm)
         if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
@@ -113,7 +117,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(class_names,
                                           kfold_hpam_dict, model_type, classify_pca_fn,
-                                     output_folder, hpam_save, probability, rewrite_model=rewrite_all,
+                                     output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all,
                              x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
                              mcm=mcm)
         hyper_param.process_and_save()
@@ -133,7 +137,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             hpam_save = SaveLoad(rewrite=rewrite_all)
             hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_awv_fn,
-                                 output_folder=output_folder, save_class=hpam_save, rewrite_model=rewrite_all,
+                                 output_folder=output_folder + "rep/", save_class=hpam_save, rewrite_model=rewrite_all,
                                  score_metric=score_metric, mcm=mcm)
             if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
@@ -149,7 +153,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             hpam_save = SaveLoad(rewrite=rewrite_all)
             hyper_param = HParam(class_names,
                                               kfold_hpam_dict, model_type, classify_awv_fn,
-                                         output_folder, hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                                         output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
                                  y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
                                  mcm=mcm)
             hyper_param.process_and_save()
@@ -162,21 +166,25 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 classify_mds_fn = classifier_fn + mds_identifier
                 import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
 
-                hpam_save = SaveLoad(rewrite=rewrite_all)
+                ####HERE TEMP CODE
+                rewrite_mds = rewrite_all
+                ##################
+
+                hpam_save = SaveLoad(rewrite=rewrite_mds)
                 hyper_param = HParam( hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_mds_fn,
-                                      output_folder=output_folder, save_class=hpam_save,rewrite_model=rewrite_all, score_metric=score_metric,
+                                      output_folder=output_folder + "rep/", save_class=hpam_save,rewrite_model=rewrite_mds, score_metric=score_metric,
                                       mcm=mcm)
                 if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
-                    mds = dt.import2dArray(import_fn)
+                    mds = np.load(import_fn)
 
                     split_ids = split.get_split_ids(data_type, matched_ids)
                     x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(mds,
                                                                                       p_classes, split_ids,
                                                                                       dev_percent_of_train=dev_percent)
 
-                hpam_save = SaveLoad(rewrite=rewrite_all)
-                hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder, hpam_save,
-                                     probability, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train, x_test=x_test,
+                hpam_save = SaveLoad(rewrite=rewrite_mds)
+                hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder + "rep/", hpam_save,
+                                     probability, rewrite_model=rewrite_mds, x_train=x_train, y_train=y_train, x_test=x_test,
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())
@@ -186,7 +194,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             classify_doc2vec_fn = classifier_fn + doc2vec_identifier
 
 
-            hpam_save = SaveLoad(rewrite=rewrite_all)
+            # Rewriting a single case of sentiment
+            if model_type == "DecisionTree3" and len(all_test_result_rows) == 9 and data_type == "sentiment":
+                hpam_save = SaveLoad(rewrite=True)
+            else:
+                hpam_save = SaveLoad(rewrite=rewrite_all)
 
             hpam_dict["dim"] = [dims[i]]
             hpam_dict["corpus_fn"] = [corpus_fn]
@@ -194,9 +206,11 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
             hyper_param = RecHParam(None, p_classes, class_names,  hpam_dict, kfold_hpam_dict, "d2v", model_type,
-                                         doc2vec_fn, classify_doc2vec_fn, output_folder, hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
+                                         doc2vec_fn, classify_doc2vec_fn, output_folder + "rep/", hpam_save, probability=probability, rewrite_model=rewrite_all, dev_percent=dev_percent,
                                     data_type=data_type, score_metric=score_metric, auroc=auroc, matched_ids=matched_ids, mcm=mcm)
             hyper_param.process_and_save()
+
+
             all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
 
@@ -204,6 +218,13 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     # Make the combined CSV of all the dims of all the space types
     all_r = np.asarray(all_test_result_rows).transpose()
     rows = all_r[1]
+    for i in range(len(rows)):
+        if len(rows[i]) == 7:
+            rows[i] = rows[i][:5]
+
+            if len(rows[i]) != 5:
+                print(len(rows[i]))
+                raise ValueError("No, bro.")
     cols = np.asarray(rows.tolist()).transpose()
     col_names = all_r[0][0]
     key = all_r[2]
@@ -221,12 +242,13 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         classes = newsgroups.target
         class_names = newsgroups.target_names
         name_of_class = "Newsgroups"
+        print("newsgroups!")
     elif data_type == "sentiment":
         corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
         (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=0, skip_top=0, index_from=0, seed=113)
         corpus = np.asarray(np.concatenate((x_train, x_test), axis=0))
         classes = np.asarray(np.concatenate((y_train, y_test), axis=0))
-        corpus = np.asarray(process_corpus.makeCorpusFromIds(corpus, imdb.get_word_index()))
+        corpus = np.asarray(util.text_utils.makeCorpusFromIds(corpus, imdb.get_word_index()))
         class_names = ["sentiment"]
         classes_freq_cutoff = 0
         name_of_class = "Sentiment"
@@ -334,13 +356,15 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
             pipeline(corpus, classes[i], class_names[i], pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
                  no_below,
-                 no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True,
+                 no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=False, remove_stop_words=True,
                  score_metric=score_metric, auroc=False, corpus_fn=corpus_fn, name_of_class=name_of_class[i], classifier_fn=classifier_fn, mcm=multi_class_method)
     else:
         classifier_fn = pipeline_fn + "_" + multiclass
         pipeline(corpus, classes, class_names, pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
-             no_above, classes_freq_cutoff, model_type, dev_percent, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
+             no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
                  corpus_fn=corpus_fn, name_of_class=name_of_class, classifier_fn=classifier_fn, mcm=multi_class_method)
+print(len(np.load("../../data/processed/reuters/classes/num_stwReuters_fil_classes.npy")))
+
 """
 fifty = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.txt")
 hundy = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.txt")
@@ -349,13 +373,21 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.npy", fifty)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.npy", hundy)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy)
 """
+#opencyc = np.load("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data_request\Lucas email 1\data\classes/num_stwOpenCYC_classes.npy")
 #mds = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
 #np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", mds)
-max_depths = [None, None, 3, 2, 1]
-classifiers = ["LinearSVM", "DecisionTreeNone", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-data_type = "newsgroups"
+
+#x = np.load("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups\corpus/num_stw_corpus_processed.npy")
+#import scipy.sparse as sp
+#xy = sp.load_npz("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/NB_18_NA_0.95num_stw_ppmi.npz")
 if __name__ == '__main__':
-    for i in range(len(classifiers)):
-        main(data_type, "../../data/raw/"+data_type+"/",  "../../data/processed/"+data_type+"/", proj_folder="../../data/proj/"+data_type+"/",
-                                grams=0, model_type=classifiers[i], no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
-                                score_metric="avg_f1", max_depth=max_depths[i], multiclass="OVR")
+    max_depths = [None, None, 3, 2, 1]
+    classifiers = ["LinearSVM","DecisionTreeNone","DecisionTree3","DecisionTree2","DecisionTree1"]
+    data_type = ["sentiment", "reuters", "placetypes","newsgroups"]
+    if __name__ == '__main__':
+        for j in range(len(data_type)):
+            for i in range(len(classifiers)):
+                print(data_type[j])
+                main(data_type[j], "../../data/raw/"+data_type[j]+"/",  "../../data/processed/"+data_type[j]+"/", proj_folder="../../data/proj/"+data_type[j]+"/",
+                                        grams=0, model_type=classifiers[i], no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
+                                        score_metric="avg_f1", max_depth=max_depths[i], multiclass="OVR")

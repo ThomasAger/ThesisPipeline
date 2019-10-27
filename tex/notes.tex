@@ -70,3 +70,47 @@ as well as having the potential to leverage supervised data. %ref
 They have applications as... %List appplications
 Although these representations differ in methodology, their common goal is to construct a space wherein spatial relationships correspond to semantics. The degree to which these vector spaces are able to linearly separate entities according to domain knowledge varies. % Expand on with specific notes
 For example, a doc2vec space that takes into account the order of words and entities will produce a different representation than PCA, which only considers frequency statistics. Further, a vector space obtained from a neural network with a supervised objective to classify entities for one binary class would split the space into one main linearly seperable property: the class.
+
+
+%Other
+Usually, a well specified topic should be cohesive in the
+semantic space[13][5] 
+[13] http://www-personal.umich.edu/~qmei/pub/www2014-lin.pdf
+[5] https://www.cs.cmu.edu/~jgc/publication/PublicationPDF/Sparse_Latent_Semantic_Analysis.pdf
+
+
+% Questions about score types etc
+
+
+Start chucking in real world examples here.
+
+Do certain spaces perform better across multiple domains?
+What are the differences between spaces in terms of the features they represent? How does that relate to their domain performance?
+What are the differences between score types? How does that relate to their domain performance?
+How does performance on pure representation dimensions relate to performance on single dirs/clusters?
+What kind of similarities are there between domains? What kind of differences?
+What similarities are there between score types?
+What are the differences in directions between domains? Do we find different kinds of properties? How does it relate to vocabulary size or document amount?
+How do the directions in particular between a doc2vec space, trained on context, differ from one trained on PPMI?
+
+
+What are the domain(s?) that best conveys the differences and similarities between different space types?
+Movies, unless...
+Do different domains have more differences between space types? Theories:
+1. Large differences in scoring for a particular domain will be indicative
+
+1. Find the domain which has the largest score differences between two reasonably scoring space types (so not AWV..)
+2. Compare and contrast the directions found in those space types. 
+
+What are the domain(s?) and space type(s?) that best conveys the differences and similarities between different score types?
+
+1. Find the domain with the largest differences between score types
+2. Compare and contrast directions in those score types for that domain
+
+
+
+What are the differences and similarities between the clustering algorithms?
+
+1. Find domain with the largest difference between clustering options
+
+IF directions are non informative, then use clustering to label them

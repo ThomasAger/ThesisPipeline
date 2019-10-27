@@ -1,0 +1,12 @@
+newsgroups 141321, 18302
+placetypes 746257, 1383
+reuters 51001, 10655
+sentiment 78588, 50000
+movies 551080, 13978
+
+filtered
+newsgroups 51064, 18302
+placetypes 100000, 1383
+movies 100000, 13978
+reuters 22542, 10655
+sentiment 55384, 50000
