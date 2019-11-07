@@ -9,19 +9,37 @@
 % Interpreting and investigating neural networks with these directions
 
 
-Smartphones and other devices that keep people connected to the internet are prevalent, resulting in a deluge of publicly available data. In particular, applications that enable user-generated content e.g. Social Media sites (Facebook, Twitter), Review sites (IMDB, Rotten Tomatoes, Amazon) and content-aggregation sites (Reddit, Tumblr) produce a lot of text data e.g. in posts and comments. Research into how it can be used to solve a variety of problems has been conducted, e.g. using text data to identify if social media posts, or product reviews, are positive or negative \cite{Burel2018}, to identify social media posts that happen during crises and identify those that are useful to crisis responders \cite{Burel2018}, or even to predict depression in social media users \cite{Aldarwish2017}. 
+Applications that enable user-generated content e.g. Social Media sites (Facebook, Twitter), Review sites (IMDB, Rotten Tomatoes, Amazon) and content-aggregation sites (Reddit, Tumblr) contain a deluge of text data e.g. in posts and comments. Research has shown methods using this data can solve a variety of problems, e.g. using text data to identify if social media posts, or product reviews, are positive or negative \cite{Burel2018}, to identify social media posts that happen during crises and identify those that are useful to crisis responders \cite{Burel2018}, or even to predict depression in social media users \cite{Aldarwish2017}. 
 
-The methods to solve these problems are a result of machine-learning, which uses a large amount of data to learn how to solve some specific problem. Machine-learning is a force that has began to take-part in our day-to-day interactions with both the online and offline space, in the online world through content recommendation, targeted marketing and advertisement, and a variety of businesses that have sprung up with some machine-learning tool at the center. In the offline world, self-driving cars, face recognition on CCTV, behaviour prediction of crowds among others have started taking place across the world. Essentially, these tools are able to succeed because of the availability of data.
+The methods to solve these problems are a result of machine-learning, which uses a large amount of data to learn how to solve some specific problem. Machine-learning is a force that has began to take-part in our day-to-day interactions with both the online and offline space, in the online world through content recommendation, targeted marketing and advertisement, and a variety of businesses that have sprung up with some machine-learning tool at the center. In the offline world, self-driving cars, face recognition on CCTV, behaviour prediction of crowds among others have started taking place across the world. Essentially, these tools are able to succeed because of the availability of this data.
 
-Problems that machine-learning can solve can be split into two distinct categories, supervised and unsupervised. Supervised problems have some data that is labelled, and some that is not labelled. The goal of a supervised task is to assign labels to the data that is not labelled, by learning with the data that is labelled. Unsupervised problems do not have any labels, and instead try to solve a problem just from unlabelled data. The learning method to solve the problem is called a machine-learning model. In a supervised task this model  learns using the labelled examples, and then is used to label the unlabelled examples.
+%Interpretability, etc
 
-One example of an unsupervised machine-learning task is to transform data into a representation that can be learned from by the 
+However, concerns are growing about the difficulty of humans to interpret how these machine-learning models solve these problems. 
+
+\noindent \textbf{Semantic spaces.} Within the field of cognitive science, feature representations and semantic spaces both have a long tradition as alternative, and often competing representations of semantic relatedness \cite{tversky1977features}. Conceptual spaces \cite{gardenfors2004conceptual} to some extent unify these two opposing views, by representing objects as points in vector spaces, one for each facet (e.g.\ color, shape, taste in a conceptual space of fruit), such that the dimensions of each of these vector spaces correspond to primitive features. %Different from other vector space models, however, a conceptual space is typically composed of several vector spaces, each of which intuitively models a single facet from the given domain. For example, a conceptual space of fruit could be composed of vector spaces modelling color, shape, taste, price, size and weight.
+ 
+The main appeal of conceptual spaces stems from the fact that they allow a wide range of cognitive and linguistic phenomena to be modelled in an elegant way. The idea of learning semantic spaces with accurate feature directions can be seen as a first step towards methods for learning conceptual space representations from data, and thus towards the use of more cognitively plausible representations of meaning in computer science. Our method also somewhat relates to the debates in cognitive science on the relationship between similarity and rule based processes  \cite{HAHN1998197}, in the sense that it allows us to explicitly link similarity based categorization methods (e.g.\ an SVM classifier trained on semantic space representations) with rule based categorization methods (e.g.\ the decision trees that we will learn from the feature directions).
+
+% Our work is...
+
+\section{Relationships}
+
+Vector spaces are representations that reduce the dimensionality of sparse representations like bag-of-words into dense spaces where semantic relationships e.g. two movies being similar to one another, are represented spatially. However, upon reducing this dimensionality the features are no longer interpretable.  One way to interpret what these vector spaces mean follows Conceptual Spaces \ref{????}, where entities in the domain e.g. movies in a domain of movie reviews are represented as points, and properties in the domain are represented as convex regions. The work in Chapter \ref{ch3} details a process where the vector space is transformed so that these properties are used as features, creating an interpretable but dense representation. The introduction goes into further detail about these properties.
+% Conceptual spaces
+
+% properties
+
+% using properties as features
+
+\section{Contributions}\label{ch1:contributions}
+
+% chapter 3 does this
+%etc
 
 \section{Representations}
 
-Our intuitive understanding of how things behave and what they are in a domain are a representation of reality. This representation is adjusted by our experience with those things in the real world. Each person is constantly adjusting to some degree their representation of what different things are, and this construction and transformation of our personal representations is what we call learning. However, a machine given only text data has no representation. We can understand machines to be numerical reasoners, that can produce things using mathematics from representations. So how can we get a good numerical representation of text so that machines can understand it?
 
-This is the fundamental question we attempt to answer in this section. There are a variety of different ways to achieve a representation of raw text data, and each one is suited for a different task. For example, the task of sentiment analysis can be achieved using a bag-of-words, but as it does not understand context then some things will not be represented well, e.g. a sentence like "This was so good I want to rip my eyes out." although sarcastic, would still count towards the amount of times the word "good" appeared in the document. To achieve better results on this task, it would be better to instead use a representation that can represent context somehow.
 
 
 \section{Motivation}
