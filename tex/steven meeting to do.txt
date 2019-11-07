@@ -1,0 +1,14 @@
+Background atm is just a slow guide from start to finish for nlp, covering documents, bag-of-words, representations, etc. is that ok?
+
+Get diagnosis
+Chapter 6 based on workshop paper
+Disentangled representation learning
+Explicit semantic analysis ijcai 2007
+nasari interpretable but high dimensional based on wiki pages
+Conceptual spaces? - properties = features, entities = objects
+CAn probably use entities
+Domain of discourse
+Decision tree approximates region of property by cutting it apart
+Properties are quality dimensions
+Try and convey what the work is
+No rules, consistency important tho, logical structure in the amount of time spent on different things (amount of pages), and logical structure in how its ordered
