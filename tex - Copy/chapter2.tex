@@ -14,39 +14,47 @@
 
 \section{Introduction}
 
-% Why is this section here? What am I using it for?
+To begin the Chapter, we  explain the general process required to go from raw text data to solving complex tasks with machine-learning. The steps of this process are expanded on in the later sections.
 
-This section focuses on providing background and context for the specific problems that this thesis solves. It begins with a gentle introduction to some terminology and the general flow of how problems are solved using machine-learning and text representations.
+For humans, our understanding of how things behave and what they are is a representation of reality,   produced from our experience with those things in the real world. Each person is constantly adjusting to some degree their representation of what different things are, and this construction and transformation of our personal representations is what we call learning.  Machines are computational and can process large amounts of information, but it must be in a suitable representation for them to use it. This is the first step of solving a machine-learning problem, a representation of the data must be obtained that contains the information necessary to solve the task. For tasks in the domain, e.g. categorizing Amazon product reviews into positive sentiment or negative sentiment, it is usually required that the representation encodes fundamental domain knowledge. Put in terms of human intelligence, it is akin to how we must have some fundamental representation of the domain before we can appropiately act in it.
 
-% Why text data? Why data? What is data?
+%In this thesis the data used is raw text, so a scalable computational representation of the meaning of text data is required.  There are a variety of methods to achieve representations of raw text data, and each one leaves out some information from the domain and prioritizes other parts. This makes each suited to solving a different problem. For example, the bag-of-words representation is called as such because word-context is ignored, but on a task of sentiment analysis word context is important, e.g. a review for a movie that contains the sentence "This was so good I want to rip my eyes out." although sarcastic, would still count as a compliment. To achieve better results on this task, it would be better to instead use a representation that can represent context somehow. In section \ref{ch2:representations} we cover how to obtain different kinds of representations and explain how they work.
 
-%The data is often not structured so that it can be easily understood by machines, instead typically being just raw text. 
+Determining  sentiment of e.g. an Amazon product review is one of many domain tasks that machine-learning can solve. This is specifically the task of categorization or "classification" that naturally occurs in many domains. For both humans and machines, the essential question when making these decisions is if the representation we have of the entities in the domain is accurate to the reality, i.e. if it represents Amazon product views well. As with the methods, there are many different ways to classify using machine-learning given a representation. However, there is no way a machine-learning classifier can perform well on a task without a good representation. Different classifiers that are used in this thesis are covered in section \ref{ch2:classifiers}.
 
-% What are different text representations? Word representations versus document represnetations? So on
+Growing up learning a language, people learn the complexities of that language intuitively and can recognize if something is wrong without necessarily being able to verbalize why. This is the problem of a representation that is difficult to express, and in-turn difficult to understand. In a similar way, representations for machines that can e.g. capture the context of words precisely can be difficult to understand for humans, as it is difficult to encode this complex information in a simple way. This is the problem of interpretability, taking representations and classifiers that are only intelligible to machines and making them understandable for humans as well. There are a variety of ways that more complex information can be represented interpretably, and this is covered in Section \ref{ch2:interpretability}. 
 
-Not all rules that govern the meaning of text data are universal. The text data available from a domain is unique to that domain in many ways, for example on the social media site Facebook text data can be formatted into posts and comments, and is posted by users. Although a movie review by a critic could on the surface have the same structure - a post with comments below, the rules governing what is contained in the post are clearly not the same. One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. %EXAMpLES SOURCE ETC
 
-The main point here is not that these domains are completely different, but rather to achieve good results on some particular task in the domain, it is important to make the distinction between text from the domain and text outside of it. Of-course, although there are clearly different rules for each domain, that does not mean that there are not common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data. This thesis  focuses on solving domain-specific problems.
 
-The corpus of text obtained from a domain is usually arranged to reflect the task to be solved. For example, in a machine-learning task that attempts to determine what genre a movie is automatically using the text from movie reviews, the corpus would be formatted such that all the reviews for one movie would be used in the same document. Arranging the corpus into documents like this from raw text is necessary when attempting to determine the differences between objects in the domain, like movies in a domain of movie reviews, or people in the domain of facebook. Generally, a distinction is made between document-based tasks and other tasks. In the case of this thesis, we look at document-based domain-specific tasks.
 
-There are a variety of ways to add additional structure to raw text, one-such way is to label parts-of-speech (known as POS tagging) like nouns, adjectives, or other grammatical constructs. This can be done automatically with reasonable accuracy, however there are not many datasets with this kind-of structured information available, and it is difficult to achieve reliable results without experts annotating the data, which is costly and time-consuming. This thesis focuses on how to use raw text without adding additional structure or information. Using raw text without additional structure enables the method will have broad applicability and allows easy comparison with other work.
 
-%The terminology, grammar and meaning of the text is specific to the domain that the data comes from, e.g. the word "Upvote" on the social media site Reddit means that the user has contributed towards the content being more visible, but the meaning of this word outside of the domain is unclear. To solve problems specific to a domain, e.g. if a machine needed to figure out if a user would like a text-post by another user based on its text data, it is important that the meaning of the word in the domain is not muddied by how it is used in other domains. This is why typically, the text data from different domains (e.g. Reddit, Twitter, IMDB Movies) is separated. %composed of "documents" which are collections of text from that domain e.g. raw text from a movie review site split into documents that are movies where each document is composed of all of its IMDB movie reviews. 
-
-% Why split data into documents?
-
-Humans can have an intuitive understanding of the semantics that are present in unstructured text, but machines do not.  To obtain a machine intelligible representation of raw text it is not necessary to  annotate grammar and meaning symbolically, rather a simple representation that can scale to an extreme amount of data erforms well. When looking to achieve state-of-the-art results, representations that are more complex are usually used. However although a representation may be simple, with enough examples even a basic representation usually has enough information to clearly distinguish between types of objects in a domain for a task. 
-
-One of the most common representations is a bag-of-words (BOW) which ignores word context, instead taking the words that occur in each document and assigning a value to them in a matrix, e.g. where each word in a document is assigned a value for  its frequency in that document. For example, a short document of text like "there was a dog, and a man, and the man, and the dog" would be translated into word frequencies "there: 1, was: 1, a: 2, and: 3, the: 2, man: 2, dog: 2". This representation is simple, and ignores word context, grammar and punctuation but is highly effective when using machines to solve problems using a large amount of unstructured text documents. This thesis uses a representations that rely on the bag-of-words in some form, despite its simplicity.
 
 %There are a variety of different text representations, but the most common is the bag-of-words. A bag-of-words ignores word-context, instead using the frequency of terms in a document as its text representation. This representation is a matrix, where each column is a word in the vocabulary of the domain and each row is a document. 
 
-Representation are  used to learn how to separate different kinds of objects in a domain. This is called a classification problem which can be described as follows: given some labelled documents $D_l$ (e.g., movie reviews labelled as having positive sentiment or negative sentiment), predict the label of an unlabelled document $d$. If the classifier performs well, and can predict a variety of unlabelled documents $d = d_l$, the representation must somehow contain the knowledge of what sentiment is. In the case of a bag-of-words, we can understand that the frequencies of sentiment-related words, like "good", "bad", and "thrilling" would be good enough to achieve reasonable performance, as a machine-learning classifier could determine rules based on the frequency of these relevant words, e.g. "IF good > 30, and thrilling > 20, THEN positive sentiment". The tasks that are solved in this thesis are all classification tasks. 
 
-Simple rules are a good basis for an interpretable classifier. However, this is only possible when the features (e.g. the word frequencies in a bag-of-words) are clearly defined. This forms the basis of what an interpretable representation is viewed as in this thesis. If the features correspond to some meaningful property in the domain, e.g. "good" or "thrilling", then that is treated as an interpretable representation. In this sense, a bag-of-words is an interpretable representation, however the problem solved in this thesis is about achieving a representation that uses  complex relations but  is still  interpretable. 
+%\subsection{Classification Problems}
 
-This Chapter informs the reader of the fundamentals behind obtaining a representation from text data and using it to solve machine-learning problems, as well as explaining how interpretable representations are used in the literature. Section \ref{ch2:data} covers data preprocessing and management in preparation for obtaining a representation. Then, Section \ref{ch2:reps} describes the process of obtaining different kinds of representations from this data. To complete a basic pipeline, Section \ref{ch2:ml} covers different machine-learning methods to solve problems. Finally, interpretable representations and classifiers are covered in Section \ref{ch2:interpetable} to give context in the literature for the work in the next three Chapters. 
+
+
+
+
+%One example of an unsupervised machine-learning task is to transform data into a representation that can be learned from by the 
+
+
+
+%\subsection{Interpretablility}
+
+%Simple rules are a good basis for an interpretable classifier. However, this is only possible when the features (e.g. the word frequencies in a bag-of-words) are clearly defined. This forms the basis of what an interpretable representation is viewed as in this thesis. If the features correspond to some meaningful property in the domain, e.g. "good" or "thrilling", then that is treated as an interpretable representation. In this sense, a bag-of-words is an interpretable representation, despite the approach in this thesis being different from the methods a bag-of-words employs.
+
+
+%\subsection{Vector Spaces}
+
+
+
+
+%\subsection{Conclusion}
+
+As mentioned in Section \ref{ch1:contributions} the main focus of this thesis is in transforming these uninterpretable representations into interpretable ones while retaining their information. This Chapter introduces the process of obtaining a representation from text data and using it to solve machine-learning problems, as well as explaining how interpretable representations are used in the literature. To outline the process, first as covered in Section \ref{ch2:data} the data is preprocessed so that unnessecary information is removed. Then some basic representations are obtained in Section \ref{bg:BOW} and this is followed up by more complex vector space representations \ref{ch2:vectorspaces}. To complete the process, Section \ref{ch2:classifiers} covers different machine-learning methods to solve problems using these representations. Finally, interpretable representations and classifiers are covered in Section \ref{ch2:interpetable} to give context in the literature for the work in the next three Chapters. 
 
 %With the rise of services on the web that enable large-scale user-generation of text data,, the internet has become largely populated by text posts that are related to some specific, niche topic within a domain. For example, a review on Amazon for a product is specially tailored text for that product within the domain of Amazon reviews. Taken from a closer lens, we could even argue that each review-type has its own domain, e.g. Product reviews, Food reviews, Movie reviews. However, the text posts themselves are largely unstructured semantically. 
 
@@ -98,25 +106,31 @@ This Chapter informs the reader of the fundamentals behind obtaining a represent
 
 %Accuracy and F1
 
+\section{Text Data}
+
+This thesis attempts to solve specific problems with text data using interpretable representations and classifiers. In this section, the basics of what the text data is, terminology associated with it and how it is preprocessed is described.
+
+\subsection{Text Domains}
+
+Not all rules that govern the meaning of text data are universal. The text data available from a domain is unique to that domain in many ways, for example on the social media site Facebook text data can be formatted into posts and comments, and is posted by users. Although a movie review by a critic could on the surface have the same structure - a post with comments below, the rules governing what is contained in the post are clearly not the same. One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. %EXAMpLES SOURCE ETC
+
+The main point here is not that these domains are completely different, but rather to achieve good results on some particular task in the domain, it is important to make the distinction between text from the domain and text outside of it. Although there are different rules for each domain, there are still common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data. This thesis  focuses on solving domain-specific problems.
 
 
+\subsection{Text Documents}
 
-\section{Text Representations}\label{ch2:representations}
+The corpus of text obtained from a domain is usually arranged to reflect the task to be solved. For example, in a machine-learning task that attempts to determine what genre a movie is automatically using the text from movie reviews, the corpus would be formatted such that all the reviews for one movie would be used in the same document. Arranging the corpus into documents like this from raw text is necessary when attempting to determine the differences between objects in the domain, like movies in a domain of movie reviews, or people in the domain of facebook. Generally, a distinction is made between document-based tasks and other tasks. In the case of this thesis, we look at document-based domain-specific tasks.
 
-% What is a text representation? Why is it usefl? What is a representation?
-
-
-
-In the next Chapter of the thesis, as well as in section \ref{ch2:interpretability} we discuss how to make a representation that both humans and machines can understand, but this section  focuses on representations that are useful to machines when used for machine-learning, rather than being interpretable.
+There are a variety of ways to add additional structure to raw text, one-such way is to label parts-of-speech (known as POS tagging) like nouns, adjectives, or other grammatical constructs. This can be done automatically with reasonable accuracy, however there are not many datasets with this kind-of structured information available, and it is difficult to achieve reliable results without experts annotating the data, which is costly and time-consuming. This thesis focuses on how to use raw text without adding additional structure or information. Using raw text without additional structure enables the method will have broad applicability and allows easy comparison with other work.
 
 
-\subsection{Preprocessing}\label{ch2:data}
+\subsection{Pre-processing Text Data}\label{ch2:data}
 
-To obtain a representation of a corpus, the text data must first be processed so that the representation does not contain any superflous information - or "noise" that would disrupt it. What exactly noisy data is depends on the representation and the task, but for this thesis it can be seen as parts of the text data that are not meaningful when distinguishing between types of objects in the domain. For example,  a word starting with an uppercase or lowercase letter is probably not relevant for determing the genre of a movie from  its movie review text. This is noise that if retained in the representation would harm it more than help it. Another example of noise that you would ideally like to remove is metadata, e.g. if the email of a movie reviewer was retained in their review text, that will not be useful information for a task related to the movie.
+To obtain a good representation of a corpus, the text data must first be processed so that the representation is built with as little noise as possible. What exactly noisy data is depends on the representation and the task, but for this thesis it can be seen as parts of the text data that are not meaningful when distinguishing between types of objects in the domain. Noisy text data can have a knock-on effect on the representations that are built from it, resulting in a much worse representation. If the email of a movie reviewer was retained in the review text, that will not be useful information for a task related to the movie. Additionally, you could also see  a word starting with an uppercase or lowercase as noise, as it is not information that will benefit the representation. %that if retained in the representation would harm it more than help it. Another example of noise that you would ideally like to remove is metadata,
 
 % noise versus not noise - what does it mean?
 
-Specifically, when representating for a domain a way to begin is to build a  vocabulary $V_w$, composed of unique words $w \in V$. In this vocabulary, it is important that words which have the same meaning are not treated as different words e.g. if the word "Dog" was considered to be different to the word "dog." then the vocabulary would be too noisy. There are standard methods for removing noise in a dataset. We describe them in the following bullet-points: %In Table !!! we show some examples of noise in a domain.  %examles of noies!!!!
+The first stage of obtaining a bag-of-words is building a vocabulary $W_w$, composed of unique words $w \in W$ from the corpus. In this vocabulary, it is important that words which have the same meaning are not treated as different words e.g. if the word "Dog" was considered to be different to the word "dog." then the vocabulary would be too noisy. There are standard methods for removing noise in a dataset. We describe them in the following bullet-points: %In Table !!! we show some examples of noise in a domain.  %examles of noies!!!!
 
 \begin{itemize}
 	\item  Convert all text to lower-case, e.g. "The man and The Dog" converted to "the man and the dog"
@@ -131,7 +145,7 @@ Specifically, when representating for a domain a way to begin is to build a  voc
 
 
 
- %When using a bag-of-words as a representation in a classification task, that threshold is usually set higher, as it is more important to remove noise that would not naturally be removed when using the bag-of-words to create another representation. 
+%When using a bag-of-words as a representation in a classification task, that threshold is usually set higher, as it is more important to remove noise that would not naturally be removed when using the bag-of-words to create another representation. 
 
 %One way to remove noisy words is to apply a filter where words that are not frequent enough are removed. %Typically when creating a representation the threshold $T$ for this filter is low, e.g. two or one, so that only truly noisy words are removed. 
 
@@ -143,6 +157,18 @@ Specifically, when representating for a domain a way to begin is to build a  voc
 
 It can be assumed that for all of the methods that are described in this section, the  rules above are applied to the corpus beforehand. In terms of removing words that were not frequent enough, words that did not occur more than once are removed.  Although these rules are not universal, they are a good basis for computational methods of representing text data that do not rely on word-context and grammar. In the next section, we cover a variety of methods for text representation and explain their basic utilities.  %EXAMLES
 
+\section{Text Representations}\label{ch2:representations}
+
+% What is a text representation? Why is it usefl? What is a representation?
+
+
+
+In the next Chapter of the thesis, as well as in section \ref{ch2:interpretability} how to make a representation that both humans and machines can understand is discussed, but this section  focuses on representations that are useful to machines when used for machine-learning, rather than being interpretable. In particular this section covers preprocessing data \ref{ch2:data}, sparse bag-of-words representations \ref{ch2:BOW} and obtaining vector spaces \ref{ch2:vectorspaces}.
+
+
+
+
+
 %rom here, we can assume that 
 
 
@@ -152,28 +178,44 @@ It can be assumed that for all of the methods that are described in this section
 %Text data, for example forum posts, amazon product reviews, or news articles have become readily available as the digital infrastructure that supports our lives has grown. This data largely is unstructured, and cannot be readily processed by Artificial Intelligence tools without being reformatted. For example, if the text is separated into documents e.g. the raw text for one news article is put into a separate document from another.
 
 %Need to write about the concept of salient features of a domain here.
-\subsection{Bag-of-words}\label{bg:BOW}
+\subsection{Bag-Of-Words}\label{bg:BOW}
 
-As mentioned in the previous section, unnessecary parts of the data that are not  meaningful for the task should be removed. The bag-of-words is a representation that comes with the following assumption: the context of words does not need to be retained to perform well on the task. How correct this assumption is depends on the task, but despite this view being overly-simplistic the application and use of the bag-of-words (BOW) is broad. There are multiple ways to represent words in the BOW format, but the most common is by the frequency of the words in a document.
+Humans can have an intuitive understanding of the semantics that are present in unstructured text, but machines do not.  To obtain a machine intelligible representation of raw text it is not necessary to  annotate grammar and meaning symbolically, rather a simple representation that can scale to an extreme amount of data performs well. However when looking to achieve state-of-the-art results, representations that are more complex are usually used. However although a representation may be simple, with enough examples even a basic representation can have enough information to clearly distinguish between types of objects in a domain for a task. 
+
+One of the most common representations is a bag-of-words (BOW) which ignores word context, instead taking the words that occur in each document and assigning a value to them in a matrix, e.g. where each word in a document is assigned a value for  its frequency in that document. For example, a short document of text like "there was a dog, and a man, and the man, and the dog" would be translated into word frequencies "there: 1, was: 1, a: 2, and: 3, the: 2, man: 2, dog: 2". This representation is simple, and ignores word context, grammar and punctuation but is highly effective when using machines to solve problems using a large amount of unstructured text documents. The bag-of-words is an important part of the work of this thesis, serving as the foundation of more complex and interpretable representations. 
+
+As mentioned in the previous section, unnessecary parts of the data that are not  meaningful for the task should be removed. The bag-of-words is a representation that comes with the following assumption: the context of words is an unnessecary part of the data to perform well on the task. How correct this assumption is depends on the task, but despite this view being overly-simplistic the application and use of the bag-of-words (BOW) is broad. There are multiple ways to represent words in the BOW format, but the most common is by the frequency of the words in a document.
 
 The natural structure for this kind of representation is that of a matrix, where rows are documents and columns are words in the domain as defined by their vocabulary. Specifically,  text documents in a domain $d \in D$ have an associated vocabulary of unique words across all documents $w \in W$. The bag-of-words $B_D$ is a matrix where each document is a row, and each column is a word, where the value of each word for a document is the word!!!s frequency in that document $d = ({wf}_1, {wf}_2, ..., {wf}_n)$ where ${wf}(d)$ is equal to the frequency of a word in a document and $n$ is equal to the number of unique words  in the vocabulary for all documents $w \in W$.
 
+Given these vectors we can determine the similarity between two documents or two words by the similarity between their frequency vectors or document vectors. %!!!!!!!!!EXamles???
+
 \subsubsection{Term Frequency Inverse Document Frequency (TF-IDF)}
 
-There are two main problems of using frequency is that words which are frequent in the domain are given a higher value than words which are used frequently only in a single document. First, longer documents result in overall higher values than shorter ones. Second, words that are frequent in many documents are given equal importantance to those that are frequent only in some documents. However, we are concerned with what distinguishes documents from each other so giving equal importantance  for example, in the domain of movie-reviews, to the word "movie" does not accurately represent how important it is for the meaning of the movie. Rather, we would be interested in terms that are frequent for only that movie review, as for example if the term "gore" was frequent in only five different movies out of 15,000 then it is clearly important for those movies. 
+There are two main problems of using frequency is that words which are frequent in the domain are given a higher value than words which are used frequently only in a single document. First, longer documents result in overall higher values than shorter ones. So for example if a Amazon product review was very long and repeated the word "good" 15 times, but the word "bad" 1 time, then compared to a short review that only used the word "good" one time the first product review is fifteen times as good as the second one. When building representations that use vector similarity (e.g. where the bag-of-words vectors are compared in similarity to each other) these kind of value adjustments are very meaningful, as the documents need to be normalized relative to each other.
+
+
+ The second problem is that words that are frequent in many documents are given equal importantance to those that are frequent only in some documents. However, we are concerned with what distinguishes documents from each other so giving equal importantance  for example, in the domain of movie-reviews, to the word "movie" does not accurately represent how important it is for the meaning of the movie. Rather, we would be interested in terms that are frequent for only that movie review, as for example if the term "gore" was frequent in only five different movies out of 15,000 then it is clearly important for those movies. 
 
 
 The idea that words which are infrequent overall but frequent for some documents are important can be applied to a bag-of-words using the Term Frequency Inverse Document Frequency (TF-IDF) formulae. The first part of TF-IDF is Term Frequency $TF_d,w$, which is a normalization of frequency that solves the first problem of larger documents being treated as more important than shorter ones. 
 
-$TF_{(w, d)} =  \frac{{wf}(d)}{\sum_{n} {wf}_n(d)} $
+\begin{align*}
+TF_{(w, d)} =  \frac{{wf}(d)}{\sum_{n} {wf}_n(d)} 
+\end{align*}
 
-Where ${wf}(d)$ is the number of occurrences of word $w$ in document $d$ and $n$ is the number of words overall in the vocabulary. The next part of TF-IDF is Inverse Document Frequency, which is a measure that rewards terms that have a low Document Frequency. 
+Where ${wf}(d)$ is the number of occurrences of word $w$ in document $d$ and $n$ is the number of words overall in the vocabulary. Note that frequency is still important, its just that it is not important how frequent it is relative to other documents.  The next part of TF-IDF is Inverse Document Frequency, which is a measure that rewards terms that have a low Document Frequency. 
 
-$IDF_{w} =  \frac{d_n}{{df}(w)} $
+\begin{align*}
+IDF_{w} =  \frac{d_n}{{df}(w)} 
+\end{align*}
 
 Where ${df}(w)$ is the amount of documents the word $w$ has occurred in and $d_n$ is the amount of documents in the corpus. Note that while Term Frequency measures the frequency of a term in a document relative to that documents length, Document Frequency measures the overall occurrences of the term across all documents, relative to the number of documents. Essentially, it measures how rare that term is for a document, rather than how rare it is for a word. Finally, the TF-IDF is just the Term Frequency multiplied by the Inverse Document Freqency.
 
-${TF-IDF} = TF \times IDF$
+\begin{align*}
+{TF-IDF} = TF \times IDF
+\end{align*}
+
 
 \subsubsection{Positive Pointwise Mutual Information (PPMI)}
 
@@ -187,27 +229,54 @@ ${TF-IDF} = TF \times IDF$
 
 %Using simple frequency has its problems. Even when grammar is removed, noisy words which are widely used can still be the most frequent for a document. For example, in a domain of movie reviews, the word "movie" would be the highest frequency for a variety of documents, which is not informative. This is solved by the following approaches:
 
+Pointwise Mutual Information (PMI) comes from probability theory and information theory, and is a metric that measures how dependent  two variables are i.e. what is the difference between the chance that both variables occur at the same time independently. In this case, it can be used to measure how dependent a word is on a document. Obviously it is not possible to determine a precise probability that a word will occur, so in practice the frequency of the word is treated as an approximation of the chance it will occur. In application, we can understand that the word "the" is not independent from the document - it is a word that is just as likely to occur in one document than another because its occurrence is not dependent on the document. However, in a domain of movie reviews a word like "thrilling" would be more dependent on its associated text document, as it would only occur for movies which are thrilling. The pmi value for a word $w$ in a document  $d$ is given by:
 
-Positive Pointwise Mutual Information (PPMI): Follows the same idea as TF-IDF. 	PPMI is defined  as 
-
-\begin{align*}
-\textit{ppmi}(w,d) = \max \big(0, \log\big(\frac{p_{wd}}{p_{w*} \cdotp p_{*d}}\big)\big)
-\end{align*}
-
-where
 
 \begin{align*}
-P_{wd} &= \frac{{wf}(d)}{\sum_{w'} \sum_{d'} {wf'}(d')}
+\textit{pmi}(w, d) = \log\big(\frac{p_{{wf}(d)}}{p_{wf} \cdotp p_{d}}\big)
 \end{align*}
-where ${wf}(d)$ is the number of occurrences of word $w$ in document $d$, and
+
+where $P_{{wf}(d)}$ is equal to the chance of the word occurring in the document assuming they are dependent on each other 
+
+
+
 \begin{align*}
-P_{w*} &= \sum_{d'} P_{wd'} &
-P_{*d} &= \sum_{w'} P_{w'd}
+P_{{wf}(d)} &= \frac{{wf}(d)}{\sum_{wf} \sum_{d} {wf}(d)}
 \end{align*}
+
+and ${wf}(d)$ is the frequency of a word for a document. To calculate the chance that a word will occur, we simply take the chance the word will occur in any document (estimated by its summed frequency) over all frequencies, and for the document we take the chance that the document  will occur (represented by the sum of the  frequencies of all words that occur in it) over all frequencies:
+ 
+ \begin{align*}
+ P_{wf} &= \frac{\sum_{d} {wf}(d)}{\sum_{wf} \sum_{d} {wf}(d)} &
+ P_{d} &= \frac{\sum_{wf} {wf}(d)}{\sum_{wf} \sum_{d} {wf}(d)} &
+ \end{align*}
+ 
+
+
+As this value can sometimes be negative when words are less correlated than expected, we use Positive Pointwise Mutual Information (PPMI), as we are only interested in words which are positively correlated.
+
+\begin{align*}
+\textit{ppmi}_{{wf}(d)} = \max \big(0, pmi)
+\end{align*}
+
+
+\subsection{Dimensionality Reduction Techniques}\label{ch2:vectorspaces}
+
+The most common representation is one based on frequency statistics: the Bag-Of-Words (BOW). This representation has the benefits of being easy to understand on a granular level, as each feature is a distinctly labelled word. However, it does not capture more complex relationships between words at a conceptual level. For example, it may be the case that in a text domain of movie reviews a horror movie frequently mentions the words "scary" "blood" and "gore", and through these terms occurring together we may infer that it is a Horror movie, or that other documents with similar words like "terrifying" or "blood" are similar documents. This is similarity information, which can be induced by taking the frequency vectors of a Bag-Of-Words and interpreting them in terms of relative cosine similarity. However, simply finding the similarity between each document would result in an \textit {N} by \textit {N} representation. Which is obtrusively large. In reality we do not need a dimension per document - it is more likely that a group of documenta e.g. Horror movie reviews from a domain of movies could be used as a "Horror" feature by averaging their dimensions together, the same with romantic movies or particularly cinematographally good ones. This is why typically these similarity representations are obtained with dimensionality reduction methods - with the general rule of thumb being that you want as many salient features as dimensions, where smaller dimensions represent more general concepts (with the most specific amount of dimensions being equivalent to the amount of words). 
+
+Bag-of-words representations are sparse, meaning that they take-up a lot of memory and need specialized machine-learning algorithms and data-structures to cater to them so that they are effective \cite{Sebastiani}. Dimensionality reduction is about reducing the number of dimensions while retaining the information. This is typically achieved by encoding the data in a bag-of-words in a low-dimensional vector space, where the location of the documents in that space is determined by their relative similarity to the other documents, so documents with similar ppmi vectors are closer together. 
+
+In these vector spaces, regions form that describe properties in the domain. 
+
+
 
 \subsection{Principal Component Analysis}
 
-Principal Component Analysis is a dimensionality reduction method that results in dimensions ordered by importance. In application to text-processing, this matrix could be the document by word matrix of PPMI values. Essentially, we want to go from the extremely large and sparse PPMI matrix to a dense matrix of our own specified size. To do so, we can apply singular value decomposition (SVD) of a matrix that has been normalized. This method can only model linear relationships.
+Principal Component Analysis is a dimensionality reduction method that results in dimensions ordered by importance. 
+
+
+
+In application to text-processing, this matrix could be the document by word matrix of PPMI values. Essentially, we want to go from the extremely large and sparse PPMI matrix to a dense matrix of our own specified size. To do so, we can apply singular value decomposition (SVD) of a matrix that has been normalized. This method can only model linear relationships.
 
 
 %Starting with a large data matrix, e.g. the PPMI bag-of-words, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
@@ -227,7 +296,18 @@ Principal Component Analysis is a dimensionality reduction method that results i
 
 The goal of multi-dimensional scaling is to create a space that spatially represents the dissimilarity between documents. So if two text documents are very dissimilar, they will be spatially distant from each other. The same as PCA, this is a dimensionality reduction where the amount of dimensions are specified, but it requires a $D_n x D_n$ dissimilarity matrix, which can consume a lot of memory when being applied. Instead of PCA, where dimensions are ordered by importance, the resulting dimensions of MDS are not as clearly meaningful. However, this method can model non-linear relationships.
 
-\section{Classification and Regression}\label{ch2:ml}
+\section{Text Document Classification}\label{ch2:classifiers}
+
+Problems that machine-learning can solve can be split into two distinct categories, supervised and unsupervised. Supervised problems have some data that is labelled, and some that is not labelled. The goal of a supervised task is to assign labels to the data that is not labelled, by learning with the data that is labelled. Unsupervised problems do not have any labels, and instead try to solve a problem just from unlabelled data. The learning method to solve the problem is called a machine-learning model. In a supervised task this model  learns using the labelled examples, and then is used to label the unlabelled examples.
+
+Representation are  used to learn how to separate different kinds of objects in a domain. This is called a classification problem which can be described as follows: given a set of possible labels $c \in C$, documents $D$ and document/label pairs assigned a binary truth value $(d, c) = {0, 1}$ find a function with a classifier $FUNCT$ that assigns unlabelled documents $d \in D$ labels $(d, p) $ approximates an unknown target function that can accurately label any document. For example, in a domain of movie reviews labelled with if that review is positive or negative, find a function that can determine if unlabelled movie reviews are positive or negative. In this case we use classifier to refer to the method to obtain the function.
+
+If the classifier performs well, and can predict a variety of unlabelled documents  the representation must represent enough domain knowledge  to produce that function. This is why classification tasks can measure how good a representation is, if they can perform on key domain tasks like predicting the genre of a movie based on its movie reviews then they clearly represent fundamental semantic information about movies.  As an example,  the bag-of-words can be considered a good representation if the frequencies of sentiment-related words, like "good", "bad", and "thrilling" would be good enough to achieve reasonable performance, as a machine-learning classifier could determine rules based on the frequency of these relevant words, e.g. "IF good > 30, and thrilling > 20, THEN positive sentiment". The tasks that are solved in this thesis are all classification tasks. 
+
+
+\subsection{Binary Classification}
+\subsection{Multi-Label Classification}
+\subsection{Training, Testing, Validation Sets}
 
 When using a bag-of-words as a representation in a classification task, that threshold is usually set higher, as it is more important to remove noise that would not naturally be removed when using the bag-of-words to create another representation. 
 
@@ -305,6 +385,8 @@ Decision Trees are a model that produce a tree of decisions, composed of nodes. 
 \subsection{Derrac's K-means Variation}
 
 \section{Interpretable Representations}
+
+Although dimensionality reduction does achieve similar results on tasks as sparse representations, the dense vector space representations usually no longer have features which are meaningful to humans. This is a trade-off when going from a sparse representation to a dense representation, the features are no longer meaningful. Interpretable representations are those representations where the features are meaningful, which bag-of-words is a part of. However, this work instead focuses on obtaining dense fine-grained interpretable features that retain the dimensionality reduction quality. In this case, fine-grained means that the features are rich rather than sparse, detailing exact differences between documents according to features e.g. in a ranking. For this reason, we do not include representations in this section that claim interpretability but are sparse, instead focusing on those methods that are able to achieve a similarly dense representation that also has interpretable features.
 
 \subsection{Topic Models}\label{bg:TopicModels}
 
