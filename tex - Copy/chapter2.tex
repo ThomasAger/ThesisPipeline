@@ -21,9 +21,9 @@ Similar to how it would not be possible for a human to solve a problem without a
 
 As the task is to separate entities, after data collection the first step of solving the task is to separate the corpus of text into a document for each entity. Then, the text is pre-processed so that noise is removed, noise in this thesis being information in the text that is unnessecary to represent when solving its associated document classification tasks. For example, metadata like the e-mail of a movie reviewer in movie review text, or unnessecary punctuation and grammar. It's important to remove this information at this stage as raw text data is easy to manipulate and the the result of any modifications can be clearly seen. If we tried to remove this kind-of information after obtaining a representation, it would be a much more complex process.
 
-One popular and simple representation is the bag-of-words. The bag-of-words  represents an entity as a vector where each element corresponds to a unique word in the corpus. The values of these elements are usually some statistic related to the words importance in the document, ignoring the context of other words e.g. word frequency where if a word occurs five times in a document the value is five. One disadvantage of this representation is that it doesn't retain the context of words, another is that it is sparse, as each vector has an element for every word in the corpus and only some of them will have a frequency above zero. This means that the to store it and process it in memory efficiently, specialized data structures and machine-learning techniques must be used. However, it has the advantage of being easy to understand for humans as each element of the vector representation for each entity corresponds to a word. 
+One popular and simple representation is the bag-of-words. The bag-of-words  represents an entity as a vector where each element corresponds to a unique word in the corpus. The values of these elements are usually some statistic related to the words importance in the document e.g. word frequency where if a word occurs five times in a document the value is five. One disadvantage of this representation is that it doesn't retain the context of words, another is that it is sparse, as each vector has an element for every word in the corpus and only some of them will have a frequency above zero. This means that the to store it and process it in memory efficiently, specialized data structures and machine-learning techniques must be used. However, it has the advantage of being easy to understand for humans as each element of the vector representation for each entity corresponds to a word. 
 
-Ideally the number of dimensions would be reduced while retaining the information. One method of doing this would be some basic feature selection, where words which are not meaningful are not included as an element. However,  a lot useful information can be lost for the size of the data structure to be manageable. An alternative approach is to produce a low-dimensional vector space, where entities are encoded  such that their semantic similarity matches their spatial similarity  e.g. entities with similar BOW vectors are closer together.  In this space, the vectors that correspond to entities are just co-ordinates in a e.g. 2000 dimensional vector space. However, this results in vectors whose elements are no longer interpretable in the sense the bag-of-words is,  information is stored in the similarity relationships in the vector space.
+Ideally the number of dimensions would be reduced while retaining the information. One method of doing this would be some basic feature selection, where words which are not meaningful are not included as an element. However,  if this is automated a lot useful information can be lost to make the size of the data manageable, and if it is done manually it would take a large amount of time and require expert knowledge. An alternative approach is to use the vector similarity between entities, e.g. the similarity between their frequency BOW vectors, to produce a low-dimensional vector space, where entities are encoded  such that their semantic similarity matches their spatial similarity.  In this space, the vectors that correspond to entities are just co-ordinates in a e.g. 2000 dimensional vector space. However, this results in vectors whose elements are no longer interpretable in the sense the bag-of-words is, instead information is stored as similarity relationships between entities in the vector space.
 
 
 
@@ -67,7 +67,7 @@ Ideally the number of dimensions would be reduced while retaining the informatio
 
 %\subsection{Conclusion}
 
-As mentioned in Section \ref{ch1:contributions} the main focus of this thesis is in transforming these uninterpretable representations into interpretable ones while retaining their information. This Chapter introduces the process of obtaining a representation from text data and using it to solve machine-learning problems, as well as explaining how interpretable representations are used in the literature. To outline the process, first as covered in Section \ref{ch2:data} the data is preprocessed so that unnessecary information is removed. Then some basic representations are obtained in Section \ref{bg:BOW} and this is followed up by more complex vector space representations \ref{ch2:vectorspaces}. To complete the process, Section \ref{ch2:classifiers} covers different machine-learning methods to solve problems using these representations. Finally, interpretable representations and classifiers are covered in Section \ref{ch2:interpetable} to give context in the literature for the work in the next three Chapters. 
+As mentioned in Section \ref{ch1:contributions} the main focus of this thesis is in transforming vector spaces into interpretable representations while retaining their information. This Chapter introduces the process of obtaining a representation from text data and using it to solve machine-learning problems, as well as giving a general introduction to related work. To outline the process, first as covered in Section \ref{ch2:data} the data is preprocessed so that unnessecary information is removed. Then some basic representations are obtained in Section \ref{bg:BOW} and this is followed up by more complex vector space representations \ref{ch2:vectorspaces}. To complete the process, Section \ref{ch2:classifiers} covers different machine-learning methods to solve problems using these representations. Finally, interpretable representations and classifiers are covered in Section \ref{ch2:interpetable} to give context in the literature for the work in the next three Chapters. 
 
 %With the rise of services on the web that enable large-scale user-generation of text data,, the internet has become largely populated by text posts that are related to some specific, niche topic within a domain. For example, a review on Amazon for a product is specially tailored text for that product within the domain of Amazon reviews. Taken from a closer lens, we could even argue that each review-type has its own domain, e.g. Product reviews, Food reviews, Movie reviews. However, the text posts themselves are largely unstructured semantically. 
 
@@ -121,16 +121,55 @@ As mentioned in Section \ref{ch1:contributions} the main focus of this thesis is
 
 \section{Text Data}
 
-This thesis attempts to solve specific problems with text data using interpretable representations and classifiers. In this section, the basics of what the text data is, terminology associated with it and how it is preprocessed is described.
+This thesis is focused on producing interpretable representations from text data, and solving specific problems in text domains. In this section, the basics of what the text data is, terminology associated with it and how it is preprocessed is described.
 
 \subsection{Text Domains}
 
-Not all rules that govern the meaning of text data are universal. The text data available from a domain is unique to that domain in many ways, for example on the social media site Facebook text data can be formatted into posts and comments, and is posted by users. Although a movie review by a critic could on the surface have the same structure - a post with comments below, the rules governing what is contained in the post are clearly not the same. One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. %EXAMpLES SOURCE ETC
+Not all rules that govern the meaning of text data are universal. What constitutes a text domain is largely determined by the task required to be solved. For example, all Facebook posts could be their own domain, separate from the Twitter domain if there were two tasks, one to identify positive sentiment Facebook posts and another to identify  positive sentiment Twitter posts, but if the task was instead to identify sentiment in social media overall, it could be treated as a single "Social Media" domain.
 
-The main point here is not that these domains are completely different, but rather to achieve good results on some particular task in the domain, it is important to make the distinction between text from the domain and text outside of it. Although there are different rules for each domain, there are still common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data. This thesis  focuses on solving domain-specific problems.
+One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. 
+
+
+ text data available from a domain is unique to that domain in many ways, for example on the social media site Facebook text data can be formatted into posts and comments, and is posted by users. Although a movie review by a critic could on the surface have the same structure - a post with comments below, the rules governing what is contained in the post are clearly not the same. 
+
+
+
+The main point here is not that these domains are completely different, but rather that there are meaningful differences between between text from the domain and text outside of it, and although there are different rules for each domain there are still common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data.
+
+
+% Text from different domains is formatted differently, e.g. posts and comments
+% Corpus are usually split into documents because of its associated tasks, give examples?
+% Text from different domains differ in language
+% Tasks in different domains are different
+% Text from different domains perform better using different representations and classifiers
+% There are similarities between domains that is taken advantage of e.g. using word-vectors
+
+
+% Building a vocabulary
+% What parts of text data do we want to keep?, % What is noisy data?
+% There are many ways to preprocess raw text data using expert knowledge, but we focus on an unsupervised and machine-learning approach
+% Standard rules to reduce noise
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%EXAMpLES SOURCE ETC
+
+
 
 
 \subsection{Text Documents}
+
 
 The corpus of text obtained from a domain is usually arranged to reflect the task to be solved. For example, in a machine-learning task that attempts to determine what genre a movie is automatically using the text from movie reviews, the corpus would be formatted such that all the reviews for one movie would be used in the same document. Arranging the corpus into documents like this from raw text is necessary when attempting to determine the differences between objects in the domain, like movies in a domain of movie reviews, or people in the domain of facebook. Generally, a distinction is made between document-based tasks and other tasks. In the case of this thesis, we look at document-based domain-specific tasks.
 
@@ -138,6 +177,8 @@ There are a variety of ways to add additional structure to raw text, one-such wa
 
 
 \subsection{Pre-processing Text Data}\label{ch2:data}
+
+
 
 To obtain a good representation of a corpus, the text data must first be processed so that the representation is built with as little noise as possible. What exactly noisy data is depends on the representation and the task, but for this thesis it can be seen as parts of the text data that are not meaningful when distinguishing between types of objects in the domain. Noisy text data can have a knock-on effect on the representations that are built from it, resulting in a much worse representation. If the email of a movie reviewer was retained in the review text, that will not be useful information for a task related to the movie. Additionally, you could also see  a word starting with an uppercase or lowercase as noise, as it is not information that will benefit the representation. %that if retained in the representation would harm it more than help it. Another example of noise that you would ideally like to remove is metadata,
 
