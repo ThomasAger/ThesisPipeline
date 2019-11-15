@@ -125,7 +125,7 @@ This thesis is focused on producing interpretable representations from text data
 
 \subsection{Text Domains}
 
-In this case, a text domain refers to a subject area that is unique in its vocabulary and structure. One example is the newsgroups domain (See Section \ref{data:datasets}), which is composed of online news discussion groups from 1995. In this domain, there are subject areas, topics and posts. Each subject area has topics that users create, and each topic has posts that users respond with. Within each of these subject areas, specific jargon and a unique structure specific to that subject area and the overall domain has developed. Below an example is provided from the newsgroups domain that contains unique jargon e.g. "NOEMS", "EMM386" and a unique structure e.g. signing the post with the persons name and a personal tagline for contacting them.
+"Text domain" refers to a subject area that is unique in its vocabulary and structure. One example is the newsgroups domain (See Section \ref{data:datasets}), which is composed of online news discussion groups from 1995. In this domain, there are subject areas, topics and posts. Each subject area has topics that users create, and each topic has posts that users respond with. Within each of these subject areas, specific jargon and a unique structure specific to that subject area and the overall domain has developed. Below an example post is provided from the newsgroups domain that contains unique jargon like "NOEMS", "EMM386" and a unique structure e.g. signing the post with the persons name and a personal tagline for contacting them.
 
 
 \begin{quote}
@@ -141,21 +141,26 @@ Dave.
 
 
 -- 
+
 -------------------------------------------------------------------
+
 David Clarke   ...the well is deep...wish me well...
-ac151@Freenet.carleton.ca  David_Clarke@mtsa.ubc.ca  clarkec@sfu.ca
+
+ac151@Freenet.carleton.ca  David\_Clarke@mtsa.ubc.ca  clarkec@sfu.ca
 \end{quote}
 
-
-
-One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. 
-
-
- text data available from a domain is unique to that domain in many ways, for example on the social media site Facebook text data can be formatted into posts and comments, and is posted by users. Although a movie review by a critic could on the surface have the same structure - a post with comments below, the rules governing what is contained in the post are clearly not the same. 
+These particularities to the domain are what makes the distinction between domain-specific text data to general text data. A machine-learning model will develop a representation of how to solve the task dependent on this data. If the model is given general text data examples to learn from, then it will miss out on domain-specific quirks that can help it solve the task e.g. when learning to identify if a newsgroups post belongs to the subject of windows, if the general examples do not use jargon like "AUTO" and "EMM386" then this important information will not be used. However, if the examples given are over-specialized then the model may place excess importance on domain-specific quirks that are not actually meaningful, e.g. if in the training examples of posts about windows most users signed off their text-posts with an email that includes ".ca", meaning they are from canada, then the model may identify all posts that include ".ca" emails as about windows despite this simply being a strange quirk in the data.
 
 
 
-The main point here is not that these domains are completely different, but rather that there are meaningful differences between between text from the domain and text outside of it, and although there are different rules for each domain there are still common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data.
+%One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. 
+
+
+ %text data available from a domain is unique to that domain in many ways, for example on the social media site Facebook text data can be formatted into posts and comments, and is posted by users. Although a movie review by a critic could on the surface have the same structure - a post with comments below, the rules governing what is contained in the post are clearly not the same. 
+
+
+
+%The main point here is not that these domains are completely different, but rather that there are meaningful differences between between text from the domain and text outside of it, and although there are different rules for each domain there are still common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data.
 
 
 % Text from different domains is formatted differently, e.g. posts and comments
@@ -166,10 +171,6 @@ The main point here is not that these domains are completely different, but rath
 % There are similarities between domains that is taken advantage of e.g. using word-vectors
 
 
-% Building a vocabulary
-% What parts of text data do we want to keep?, % What is noisy data?
-% There are many ways to preprocess raw text data using expert knowledge, but we focus on an unsupervised and machine-learning approach
-% Standard rules to reduce noise
 
 
 
@@ -189,17 +190,24 @@ The main point here is not that these domains are completely different, but rath
 
 
 
-\subsection{Text Documents}
-
-
-The corpus of text obtained from a domain is usually arranged to reflect the task to be solved. For example, in a machine-learning task that attempts to determine what genre a movie is automatically using the text from movie reviews, the corpus would be formatted such that all the reviews for one movie would be used in the same document. Arranging the corpus into documents like this from raw text is necessary when attempting to determine the differences between objects in the domain, like movies in a domain of movie reviews, or people in the domain of facebook. Generally, a distinction is made between document-based tasks and other tasks. In the case of this thesis, we look at document-based domain-specific tasks.
-
-There are a variety of ways to add additional structure to raw text, one-such way is to label parts-of-speech (known as POS tagging) like nouns, adjectives, or other grammatical constructs. This can be done automatically with reasonable accuracy, however there are not many datasets with this kind-of structured information available, and it is difficult to achieve reliable results without experts annotating the data, which is costly and time-consuming. This thesis focuses on how to use raw text without adding additional structure or information. Using raw text without additional structure enables the method will have broad applicability and allows easy comparison with other work.
-
-
 \subsection{Pre-processing Text Data}\label{ch2:data}
 
 
+% Corpus are split into documents
+
+Text documents in a domain usually reflect task that needs to be solved. In a domain-specific classification task, e.g. identifying the genre of a movie in a domain of movie reviews from its review text, the subject of the task are entities in the domain, in this case movies. A natural way to arrange the data to create a document for each entity that contains all of its related data. For example, putting all the reviews for one movie in the same document. 
+
+% We just use the raw text data without modifying it.
+
+%There are a variety of ways to add additional structure to raw text, one-such way is to label parts-of-speech (known as POS tagging) like nouns, adjectives, or other grammatical constructs. This can be done automatically with reasonable accuracy, however there are not many datasets with this kind-of structured information available, and it is difficult to achieve reliable results without experts annotating the data, which is costly and time-consuming. This thesis focuses on how to use raw text without adding additional structure or information. Using raw text without additional structure enables the method will have broad applicability and allows easy comparison with other work.
+
+
+
+
+% Building a vocabulary
+% What parts of text data do we want to keep?, % What is noisy data?
+% There are many ways to preprocess raw text data using expert knowledge, but we focus on an unsupervised and machine-learning approach
+% Standard rules to reduce noise
 
 To obtain a good representation of a corpus, the text data must first be processed so that the representation is built with as little noise as possible. What exactly noisy data is depends on the representation and the task, but for this thesis it can be seen as parts of the text data that are not meaningful when distinguishing between types of objects in the domain. Noisy text data can have a knock-on effect on the representations that are built from it, resulting in a much worse representation. If the email of a movie reviewer was retained in the review text, that will not be useful information for a task related to the movie. Additionally, you could also see  a word starting with an uppercase or lowercase as noise, as it is not information that will benefit the representation. %that if retained in the representation would harm it more than help it. Another example of noise that you would ideally like to remove is metadata,
 
