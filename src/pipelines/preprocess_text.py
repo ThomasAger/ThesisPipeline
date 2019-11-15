@@ -371,7 +371,7 @@ hundy = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_100_MD
 two_hundy = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
 np.save("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.npy", fifty)
 np.save("../../data/processed/placetypes/rep/mds/num_stw_100_MDS.npy", hundy)
-np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy)
+np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy)s
 """
 #opencyc = np.load("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data_request\Lucas email 1\data\classes/num_stwOpenCYC_classes.npy")
 #mds = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.txt")
@@ -381,9 +381,14 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #import scipy.sparse as sp
 #xy = sp.load_npz("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/NB_18_NA_0.95num_stw_ppmi.npz")
 if __name__ == '__main__':
+
+
+
+
+
     max_depths = [None, None, 3, 2, 1]
     classifiers = ["LinearSVM","DecisionTreeNone","DecisionTree3","DecisionTree2","DecisionTree1"]
-    data_type = ["sentiment", "reuters", "placetypes","newsgroups"]
+    data_type = ["newsgroups","sentiment", "reuters", "placetypes"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):

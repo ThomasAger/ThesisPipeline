@@ -125,7 +125,28 @@ This thesis is focused on producing interpretable representations from text data
 
 \subsection{Text Domains}
 
-In this case, a text domain refers to a subject area that is unique in its vocabulary and structure. One example is the newsgroups domain (See Section \ref{data:datasets}), which is composed of online news discussion groups from 1995. In this domain, there are subject areas, topics and posts. Each subject area has topics that users create, and each topic has posts that users respond with. Within each of these subject areas, specific jargon developed e.g. 
+In this case, a text domain refers to a subject area that is unique in its vocabulary and structure. One example is the newsgroups domain (See Section \ref{data:datasets}), which is composed of online news discussion groups from 1995. In this domain, there are subject areas, topics and posts. Each subject area has topics that users create, and each topic has posts that users respond with. Within each of these subject areas, specific jargon and a unique structure specific to that subject area and the overall domain has developed. Below an example is provided from the newsgroups domain that contains unique jargon e.g. "NOEMS", "EMM386" and a unique structure e.g. signing the post with the persons name and a personal tagline for contacting them.
+
+
+\begin{quote}
+Has anyone else experienced problems with windows hanging
+after the installation of DOS 6?  I have narrowed the
+problem down to EMM386.
+
+If if remove (or disable) EMM386, windows is ok.  If EMM386
+is active, with NOEMS, windows hangs.  If I use AUTO with
+EMM386, the system hangs on bootup.
+
+Dave.
+
+
+-- 
+-------------------------------------------------------------------
+David Clarke   ...the well is deep...wish me well...
+ac151@Freenet.carleton.ca  David_Clarke@mtsa.ubc.ca  clarkec@sfu.ca
+\end{quote}
+
+
 
 One goal of machine-learning is to predict if a piece of text will be shared or liked by users. In this case, it is clear that in-order to determine if a movie review will be liked or shared, it is difficult to determine if that will be the case when using the same logic that you would for a facebook post. Facebook posts that trend or are well-liked are typically brief, easily consumed and focused on humour. Meanwhile, movie reviews that trend are due to cutting and intelligent analysis of a movie in a relatable way. 
 
