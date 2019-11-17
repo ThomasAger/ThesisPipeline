@@ -404,13 +404,24 @@ Decision Trees are a model that result in a tree composed of nodes. Each node is
 Decision Trees has nodes that correspond to features, so if these features are simple and easy to understand then the tree is also interpretable. Generally, simple low-depth decision trees are a good baseline for an interpretable classifier. 
 
 
-\subsection{Support Vector Machines}\label{bg:svm}
+\subsection{Linear Support Vector Machines}\label{bg:svm}
 
-Given the input features as a vector space, and treating the entities that have these features as points, a support vector machines  finds a line that maximizes the margin between entities belonging to different classes. Below, we demonstrate this principal in a two-dimensional representation. 
+Treating the entities as points in a vector space, where the dimensions of that space are the features,  a linear support vector machine  finds a hyper-plane that maximizes the margin between entities belonging to different classes. To classify new entities, they are placed in this space and labelled according to which side of the line they fall on. Below, we demonstrate this principal in a two-dimensional representation:
+
+% Hyper-plane
 
 
 
 \subsection{Neural Networks}\label{bg:nn}
+
+Neural networks are a model that can be used to solve both supervised and unsupervised problems. One-kind of network that solves supervised problems is the feedforward network. This network has sequential layers composed of nodes, where each node in one layer is connected to every node in the subsequent layer. There are three kinds of layers, the first is the input layer, which has the same amount of nodes as the input vector space has features. Then, there are hidden-layers, which vary in size, and finally an output layer that has a number of nodes $n$ equal to the amount of classes. In the case of a binary classification problem, it would have one node.
+
+Essentially, each node has an activation threshold which determines if the value will be propogated through the network, and each connection between a neuron has a weight which this value is multiplied by. The process of learning the network is tuning these parameters so that given an entity with an associated class label, the network is able to classify that entity by making the output node's as close to the class as possible. Note, that this could mean that the output is a probability of the class occurring, and a simple threshold is applied to determine the binary value. The nodes of each layer have an activation function, which is a function used on values that are propogated from the node. These functions can be linear or non-linear.
+
+The main benefit of neural networks is in its versatility. If the problem is more complex, then more nodes can be used. If the problem is simple, then less nodes can be used. As each layer can be viewed as a vector space, with the input layer being the first of these spaces, we can view the process of solving the problem with a neural network as shifting the position of entities in this space such that they are separated by class through linear or non-linear transformations. 
+
+This benefit also has a down-side, as neural networks have so many parameters (e.g. the number of nodes, the activation function, the weight initialization) it can take a long time to find the combination of parameters that work best for the associated problem. However, this lets them perform well in a variety of tasks. 
+
 
 %\subsection{Binary Classification}
 %\subsection{Multi-Label Classification}
@@ -418,14 +429,25 @@ Given the input features as a vector space, and treating the entities that have 
 
 % The problem of overfitting
 
-If 
+If a machine-learning model is given training data, then what stops that model from learning a function that simply maps each example to the given class label? In the case of a neural network,  this behaviour can be stopped by limiting the amount of neurons available in the hidden layer, forcing the network to generalize the representation into a lower-dimensional vector space. However, the problem of overfitting to the examples given rather than learning a way to solve the problem in a general way is a persistent one in machine-learning tasks. To give an example, we may expect that if we trained a machine-learning model on some data, we would be able to achieve strong results on that data given the machine-learning model. However, if new examples were introuduced then the model would fail. For example, when learning with a bag-of-words the model may realize that each document was written by a different user, and that users name is recorded in the document text. A simple function would be to say:
+
+
+ IF user\_name\_1 is > 0, THEN class = 1.
+ 
+ However, this is not actually learning any domain knowledge, it is simply overfitting to noise.
 
 % Training, test, validation sets
 
-The data for a supervised problem is usually split into three parts, the training data, the test data and the validation data. The training data are the examples that the model learns from, and the test data are the examples that the model uses to check if the function learned is correct.
+To solve the problem of overfitting, the data for a supervised problem is usually split into three parts:
+
+ \textbf{Training data} The training data are the examples that the model learns from. It is used only when creating the model, and is not used after the model has finished learning.
+ 
+ \textbf{Test data} The examples that the model uses to check if the function learned is correct.
+ 
+ \textbf{Validation data} A decision tree may perform better if it is shallow and limited in depth rather than unlimited in depth, as it will not introduce nodes that are overly specific to the training data. Validation data is used for parameter tuning, e.g. when determining how much to limit the depth of a decision tree, ho good the parameter is would be evaluated on how well the model performs on the validation set. The separation of validation data from test data is just to ensure that we are not overfitting the parameters on specific examples.
 
 
-A decision tree may perform better if it is shallow and limited in depth rather than unlimited in depth, as it will not introduce nodes that are overly specific to the training data. Validation data is used for parameter tuning, e.g. when determining how much to limit the depth of a decision tree, ho good the parameter is would be evaluated on how well the model performs on the validation set.
+
 
 
 
@@ -448,23 +470,25 @@ To evaluate a model, the difference between the real labels of documents and the
 
 Here, we assume we are classifying a single binary class, where positive labels are 1 and negative labels are 0. The most simple way to evaluate a model is by its accuracy $a$, where ${t_n}$ is the number of correct predictions, and $P_n$ is the number of all predictions.
 
-\begin{align*}
-a &= t_n / P_n  &
-\end{align*}
+
+$a = \dfrac{t_n}{ P_n}  $
+
 
 However, this can give a misleadingly high score if for example, the dataset is unbalanced with many more negative labels than positive ones, and the model predicts only negatives. An example of where this would be the case is when classifying out of all social media posts, which ones are important for emergency responders to investigate. Although there are very few positive instances of this class, identifying those is very important. In the case of a model predicting only negatives, the accuracy would be high as the number of correctly predicted negatives ${tn}$ is high, but the model has not actually learned anything, which we can tell by looking at the number of correctly predicted positives ${tp}$. For a metric that can take this into account, we must consider the number of incorrectly predicted positives (negatives classified as positive) ${fp}$ and the number of incorrectly predicted negatives ${fn}$.
 
 In this situation, the metric we would want to optimize would be recall. Recall ${rec}$ is the proportion of true positives ${tp}$ identified correctly. 
 
-${rec} = {tp} / {tp} + {fn}$
+${rec} = \dfrac{{tp}}{{tp} + {fn}}$
 
 In the case of a model predicting only negatives, the ${rec}$ would be zero. Recall is useful in these situations where we are interested in how many false negatives ${fn}$ there are. However, if the model is instead prioritizing positive predictions too much rather than negative ones, we can use precision ${pre}$
 
-${pre} = {tp} / {tp} + {fp}$
+${pre} = \dfrac{{tp}} {{tp} + {fp}}$
 
+% F1 score
 
+F1 score is the harmonic mean of recall and precision, it is used to balance and measure the recall and precision at the same time where they are equally important. 
 
-
+${F1} = 2 \cdot \dfrac{{pre} \cdot {rec}}{{pre} + {rec}}$
 
 
 \subsection{Low-Dimensional Vector Spaces}\label{ch2:vectorspaces}
@@ -474,9 +498,8 @@ ${pre} = {tp} / {tp} + {fp}$
 % Integrating similarity information has these  results
 % Just using similarity information would result in a large representation
 
-However, to model most complex relationships in e.g. a low-dimensional vector space, the features of this vector space would not be easy to understand, and are co-dependent to a degree that the tree would need to be deep to make decisions. It would need to be many nodes to achieve a strong classification result, as the features are not  meaningful independently. This means that a larger tree would be needed to achieve strong results. Additionally with a vector space, it is not easy to understand, as the features used are not clearly meaningful. Ideally we would want clearly labelled features like in a bag-of-words, but to model complex domain tasks this would require many nodes, which greatly increases complexity of the tree. 
 
-The bag-of-words (BOW) based on frequency statistics has the benefits of being easy to understand on a granular level, as each feature is a distinctly labelled word. However, it is sparse which requires specialist data structures and algorithms to store and process it efficiently, and it does not capture the context of words or the relationships between entities in the domain. 
+The bag-of-words (BOW) based on frequency statistics has the benefit of being easy to understand on a granular level, as each feature is a distinctly labelled word. However, it is sparse which requires specialist data structures and algorithms to store and process it efficiently, and it does not capture the context of words or the relationships between entities in the domain. 
 
 % we want to retain the information but reduce the dimensions
 
@@ -486,11 +509,13 @@ The bag-of-words (BOW) based on frequency statistics has the benefits of being e
 
 % PCA linear transformations dimensions ordered by importance, what is its semantic coherence? MDS non-linear transformation dissimilarity encoding, doc2vec word context
 
+Low-dimensional vector spaces are generally used to 
 
 For example, it may be the case that in a text domain of movie reviews a horror movie frequently mentions the words "scary" "blood" and "gore", and through these terms occurring together we may infer that it is a Horror movie, or that other documents with similar words like "terrifying" or "blood" are similar documents. These are the kind of relationships that we may be interested in modelling for two reasons: they capture some interesting information about how entities are related that may be useful for a classification task and we may be able to reduce the number of dimensions in the representation through a linear transformation. This is similarity information, and one way to obtain this kind-of information is by taking the frequency vectors of a Bag-Of-Words and e.g. interpreting them in terms of relative cosine similarity. However, if we only finding the similarity between each document would result in an \textit {N} by \textit {N} representation, which is prohibitively large.
 
 Generally, we can see the process of obtaining a low-dimensional vector space representation as finding  common patterns among entities in-order to encode this similarity information in a dense way. The methods to transform these high-dimensional vectors into low-dimensional vector spaces where semantic relations are encoded spatially are called dimensionality reduction methods. However, dense vector space representations usually no longer have features which are meaningful to humans. This is a trade-off when going from a sparse representation to a dense representation, the features are no longer meaningful. 
 
+However, to model most complex relationships in e.g. a low-dimensional vector space, the features of this vector space would not be easy to understand, and are co-dependent to a degree that the tree would need to be deep to make decisions. It would need to be many nodes to achieve a strong classification result, as the features are not  meaningful independently. This means that a larger tree would be needed to achieve strong results. Additionally with a vector space, it is not easy to understand, as the features used are not clearly meaningful. Ideally we would want clearly labelled features like in a bag-of-words, but to model complex domain tasks this would require many nodes, which greatly increases complexity of the tree. 
 
 
 
@@ -559,13 +584,10 @@ Generally, we can see the process of obtaining a low-dimensional vector space re
 
 
 
-\section{Neural Networks}
-
-
-
-\subsection{Feedforward Neural Networks}
 
 \subsection{Word Vectors}\label{bg:WordVectors}
+
+
 
 \subsection{Doc2Vec}
 
