@@ -540,7 +540,42 @@ The main focus of this thesis is in how to re-organize rich semantic relationshi
 
 %\subsubsection{Principal Component Analysis}
 
-%Principal Component Analysis is a linear dimensionality reduction method that is non-parametric, meaning that the method does not vary according to some parameter that can be tuned for the domain. It results in a vector space of a specific size $n$, where dimensions are  ordered by semantic importance. To give a specific example, in application to text-processing the method would reduce a bag-of-words of PPMI valuesto a dense PCA vector space of a  specified size. 
+%
+
+
+
+%To do so, we can apply singular value decomposition (SVD) of a matrix that has been normalized. This method can only model linear relationships.
+
+
+%Starting with a large data matrix, e.g. the PPMI bag-of-words, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
+
+%PPMI values capture the meaning of words in documents, but are extremely sparse, with one dimension of the vector for each word. This dimensionality makes it difficult to e.g. learn a shallow decision tree that is resistant to overfitting.
+%Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised %approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
+%They also vary in how they linearly separate entities. %How?
+%However, their commonality is that they are able to represent semantic relationships spatially. %ref
+%See Section \ref{background:WhySpace}
+
+
+
+
+
+%\subsubsection{Multi-Dimensional Scaling}
+
+%
+
+
+
+%\begin{itemize}%
+%	\item Explanation of what decision trees are
+%\item Explanation that they may not perform well on sparse information
+%\item Max features
+%\item Criterion
+%\item CART decision trees versus others
+%\end{itemize}
+
+\subsection{Principal Component Analysis}
+
+
 
 %The method is " finding new
 %variables that are linear functions of those in the original dataset, that successively maximize
@@ -560,77 +595,55 @@ The main focus of this thesis is in how to re-organize rich semantic relationshi
 % Order the eigenvectors by eigen value from highest to lowest and take the top X vectors
 
 
-
-%To do so, we can apply singular value decomposition (SVD) of a matrix that has been normalized. This method can only model linear relationships.
-
-
-%Starting with a large data matrix, e.g. the PPMI bag-of-words, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
-
-%PPMI values capture the meaning of words in documents, but are extremely sparse, with one dimension of the vector for each word. This dimensionality makes it difficult to e.g. learn a shallow decision tree that is resistant to overfitting.
-%Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised %approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
-%They also vary in how they linearly separate entities. %How?
-%However, their commonality is that they are able to represent semantic relationships spatially. %ref
-%See Section \ref{background:WhySpace}
-%This brings up an essential point: When using a semantic space, are we taking advantage of relationships that are discriminative or incorrect? The danger of relying on these spaces and the models that use them has greatly affected their adoption in critical application areas like medicine, %Citation needed
-%and has raised legal concerns about their application in e.g. determining if someone is suitable for a loan. 
+% Talk about it in terms of the literature
 
 
+Principal Component Analysis (PCA) is a linear dimensionality reduction method that is non-parametric, meaning that the method does not vary according to some given parameters. Given features e.g.  a bag-of-words, it produces a vector space of a specified size $n$, where dimensions are  ordered by semantic importance. 
+
+Essentially, PCA works by linearly combining features in-order to create new features that can differentiate entities well and are uncorrelated with previous features. This results in a new low-dimensional representation that retains information and has distinct semantic features. However, as these features are a linear combination of the previous features, they are generally not interpretable \cite{Gimenez}. 
 
 
-%\subsubsection{Multi-Dimensional Scaling}
+\subsection{Multi-Dimensional Scaling}
+
+% Talk about it in terms of the literature
+
+Multi-Dimensional Scaling  (MDS) is a non-parametric dimensionality reduction algorithm that can be metric  or non-metric. Metric MDS is linear, while non-metric MDS is non-linear. In this work, non-metric MDS is used. In the same way as PCA, the size of the output space is specified. As input, MDS takes a dissimilarity matrix of entities, where both rows and columns are entities and the values are the dissimilarity between those entities. 
+
+From a bag-of-words, the way to construct this dissimilarity matrix is by finding the dissimilarity between bag-of-words features for each entity. The disadvantage of this is that it can be very large given many entities, which means it is difficult to fit into memory. The end-result of MDS is a representation where entities that are semantically similar according to the input matrix are spatially close to each other, and semantically different entities are spatially distant from each other.
+
+
 
 %The goal of multi-dimensional scaling is to create a space that spatially represents the dissimilarity between documents. So if two text documents are very dissimilar, they will be spatially distant from each other. The same as PCA, this is a dimensionality reduction where the amount of dimensions are specified, but it requires a $D_n x D_n$ dissimilarity matrix, which can consume a lot of memory when being applied. Instead of PCA, where dimensions are ordered by importance, the resulting dimensions of MDS are not as clearly meaningful. However, this method can model non-linear relationships.
 
-
-
-%\begin{itemize}%
-%	\item Explanation of what decision trees are
-%\item Explanation that they may not perform well on sparse information
-%\item Max features
-%\item Criterion
-%\item CART decision trees versus others
-%\end{itemize}
-
-\subsection{PCA}
-
-PCA is a dimensionality reduction method that takes features e.g. bag-of-words as input and produces a vector space of a specified size as a result. It is non-parametric and linear, and the dimensions that it produces are ordered by importance. 
-
-\subsection{MDS}
-
 % Similar terms are similar together
 
-For example, it may be the case that in a text domain of movie reviews a horror movie frequently mentions the words "scary" "blood" and "gore", and through these terms occurring together we may infer that it is a Horror movie, or that other documents with similar words like "terrifying" or "blood" are similar documents.
+%For example, it may be the case that in a text domain of movie reviews a horror movie frequently mentions the words "scary" "blood" and "gore", and through these terms occurring together we may infer that it is a Horror movie, or that other documents with similar words like "terrifying" or "blood" are similar documents.
 
 % You can find similarity information with BOW
 
-This is similarity information, and one way to obtain this kind-of information is by taking the frequency vectors of a Bag-Of-Words and e.g. interpreting them in terms of relative cosine similarity.  They capture some interesting information about how entities are related
+%This is similarity information, and one way to obtain this kind-of information is by taking the frequency vectors of a Bag-Of-Words and e.g. interpreting them in terms of relative cosine similarity.  They capture some interesting information about how entities are related
 
 % BUt without reducing the dimensions of the space it would be overly large
 
-However, if the similarity between each document is the only thing that is found it would result in an \textit {N} by \textit {N} representation, which is prohibitively large.
+%However, if the similarity between each document is the only thing that is found it would result in an \textit {N} by \textit {N} representation, which is prohibitively large.
 
 
-\subsection{Word Vectors}\label{bg:WordVectors}
+\subsection{Vector Space Representations Of Words}\label{bg:WordVectors}
 
+Word-vectors are a method that obtain a vector space representation for the words in a corpus, rather than the documents. Given some pre-processed raw text the method creates a vector representation for each word. The method is unsupervised, resulting in word vectors generally being used by learning them from a large corpus of unanottated text from a variety of domains, and then applying them in domain-specific tasks.
 
+There are a multitude of ways to obtain word-vectors, like through matrix factorization \cite{Evy2007}. However, most modern methods that are used today are distributional methods like GloVe \cite{Pennington2014} and Word2Vec \cite{Mikolov2013}. These representations learn representations of  words using the context of its surrounding words.  Essentially, the meaning of each word is determined only by  context. These representations have been extremely useful, and have shown semantic coherence, for example showing in the  representation that it is possible to  model relations between words, e.g.  the  vector operation  "King" - "Man" = "Queen".             
 
 \subsection{Doc2Vec}
 
-
-
-
-
-\section{Clustering}\label{bg:clustering}
-
-\subsection{K-means}
-
-\subsection{Derrac's K-means Variation}
+Doc2Vec \cite{Le2014a} extends the Word2Vec neural network method of learning word-vectors using their context such that a document representation is learned in tandem. Essentially, as well as learning from the word's context, the words are also learned according to  what documents they are in. The document representation is built in the same way as the word representation, gradually being informed by the word context and document context.
 
 \section{Interpretable Representations}
 
-Interpretable representations are those representations where the features are meaningful, which bag-of-words is a part of. However, this work instead focuses on obtaining dense fine-grained interpretable features that retain the dimensionality reduction quality. In this case, fine-grained means that the features are rich rather than sparse, detailing exact differences between documents according to features e.g. in a ranking. For this reason, we do not include representations in this section that claim interpretability but are sparse, instead focusing on those methods that are able to achieve a similarly dense representation that also has interpretable features.
 
-\subsection{Topic Models}\label{bg:TopicModels}
+
+%Interpretable representations are those representations where the features are meaningful, which bag-of-words is a part of. However, this work instead focuses on obtaining dense fine-grained interpretable features that retain the dimensionality reduction quality. In this case, fine-grained means that the features are rich rather than sparse, detailing exact differences between documents according to features e.g. in a ranking. For this reason, we do not include representations in this section that claim interpretability but are sparse, instead focusing on those methods that are able to achieve a similarly dense representation that also has interpretable features.
+
 
 %\section{Classification}
 %Classification, particularly document classification is separating documents $d$ into labels $y$ using their features $x$, typically with a machine learning model $m$. Here, we explain some classifiers, using the bag-of-words PPMI representation introduced earlier as an example representation, and the datasets introduced in \ref{chapter3:datasets}
@@ -647,12 +660,17 @@ Interpretable representations are those representations where the features are m
 
 
 \section{Interpretable Representations}\label{ch2:Interpretability}
+
+This brings up an essential point: When using a semantic space, are we taking advantage of relationships that are discriminative or incorrect? The danger of relying on these spaces and the models that use them has greatly affected their adoption in critical application areas like medicine, %Citation needed
+and has raised legal concerns about their application in e.g. determining if someone is suitable for a loan. 
+
 a. NNSE
 b. compositional
 c. 2007 paper as wikipedia similarities
 d. Topic models\label{bg:TopicModel}
 %The interpretable representation that is obtained by this method is composed of in terms of salient features, where each of these features is described using a cluster of natural language terms. This is somewhat similar to Latent Dirichlet Allocation (LDA), which learns a representation of text documents as multinomial distributions over latent topics, where each of these topics corresponds to a multinomial distribution over words \cite{Blei03latentdirichlet}.  Topics tend to correspond to salient features, and are typically labelled with the most probable words according to the corresponding distribution. On the other hand, our work leverages clustering methods to obtain the feature labels. Many extensions of LDA have been proposed to incorporate additional information as well, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors or time stamps \cite{rosen2004author,wang2006topics}. Nonetheless, such techniques for extending LDA offer less flexibility than neural network models, e.g.\ for exploiting numerical attributes or visual features. For comparison, in our experiments the standard topic model algorithm Latent Dirchlet Allocation (LDA) is used as a baseline to  compare to the new methodology that transforms standard Vector Space Model representations. 
 e. Infogan, etc
+
 
 %There is much work on learning interpretable representations, with one popular way being to introduce sparsity or non-negativity constraints while learning, for example, sparse PCA learned using the l1-norm, \cite{H.Zou2006} \cite{Zhang2012},  or Non-Negative Sparse Embeddings (NNSE)  \cite{Murphy} which are sparse interpretable word-vectors obtained using sparse-matrix factorization and non-negativity constraints. A similar technique can also be applied to distributional word-embeddings by integrating this method with the Skip-Gram model \cite{Luo2015}. However, our approach is not intended to transform the learning processes, but rather be a post-processing step on an existing representation.
 
@@ -666,4 +684,7 @@ Instead of matrix factorization, another possible strategy is to use a neural ne
 
 The most commonly used representations for text classification are bag-of-words representations, topic models, and vector space models. Bag-of-words representations are interpretable in principle, but because the considered vocabularies typically contain tens (or hundreds) of thousands of words, the resulting learned models are nonetheless difficult to inspect and understand. Topic models and vector space models are two alternative approaches for generating low-dimensional document representations. %copy pasted
 
-\subsection{Word Vectors}
+\subsection{Topic Models}\label{bg:TopicModels}
+
+
+\subsection{Conclusion}
