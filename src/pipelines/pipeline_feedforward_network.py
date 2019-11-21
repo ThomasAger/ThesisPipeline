@@ -136,10 +136,10 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     min_samples_split = [2]
 
 
-    epoch = [100, 200, 300]
+    epoch = [100, 200, 300, 400]
     activation_function = ["relu", "tanh"]
     dropout = [0.1, 0.25, 0.5, 0.75]
-    hidden_layer_size = [0.5, 1,  2, 3]
+    hidden_layer_size = [0.5, 1,  2, 3, 4]
 
 
     # Run a pipeline that retains numbers and removes stopwords
@@ -392,8 +392,13 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                   "use_weights": use_weights}
 
             if use_bow is True:
-                space = bow
-                kfold_hpam_dict["hidden_layer_size"] = [1000, 500, 200]
+
+                space_names[i][j] = "num_stw_ppmi"
+                space = sp.load_npz("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/"+space_names[i][j]+".npz").toarray()
+                kfold_hpam_dict["hidden_layer_size"] = [500,200,100]
+                kfold_hpam_dict["epoch"] = [5]
+                kfold_hpam_dict["activation_function"] = ["relu"]
+                kfold_hpam_dict["dropout"] = [ 0.5]
             print("got here")
             tsrd = pipeline(space_names[i][j], classes, class_names, processed_folder, kfold_hpam_dict,
                             model_type=model_type, dev_percent=dev_percent, rewrite_all="2019 11 21 07 18", score_metric=score_metric,
@@ -416,7 +421,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree3"]
-    data_type = [ "newsgroups"]
+    data_type = [ "sentiment"]
     use_clusters = [True]
     use_bow = False
     print("got here")

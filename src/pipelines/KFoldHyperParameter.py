@@ -172,7 +172,7 @@ class MasterHParam(Method):
 
         elif self.model_type == "mln":
 
-            batch_size = 200
+            batch_size = 100
 
             param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
                        "_Activ_" + str( all_p["activation_function"]) + \
