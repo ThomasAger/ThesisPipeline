@@ -25,6 +25,7 @@ from model.derrac_cluster import DerracCluster
 from util.consolidate_classes import ConsolidateClasses
 import scipy.sparse as sp
 
+from score import classify
 # The overarching pipeline to obtain all prerequisite data for the derrac pipeline
 # Todo: Better standaradize the saving/loading
 last_dct = []
@@ -66,17 +67,29 @@ def pipeline(file_name, classes, class_names, processed_folder, kfold_hpam_dict,
                                                                       data_type=data_type)
     if ft_fn == "" or ft_fn is None:
         raise ValueError("ftfn is  nothing")
-    hpam_save = SaveLoad(rewrite=rewrite_all)
+    hpam_save = SaveLoad(rewrite=True)
     hyper_param = KFoldHyperParameter.HParam(class_names, kfold_hpam_dict, "mln", ft_fn,
                                              processed_folder + "mln/", hpam_save,
                                              False, rewrite_model=rewrite_all, x_train=x_train, y_train=y_train,
                                              x_test=x_test,
                                              y_test=y_test, x_dev=x_dev, y_dev=y_dev, space=space, score_metric=score_metric,
                                              auroc=False, mcm=None)
-
     hyper_param.process_and_save()
-    return hyper_param.getTopScoringRowData()
+    row_data = hyper_param.getTopScoringRowData()
+    param_data = hyper_param.getTopScoringParams()
+    """
 
+    model, model_fn = hyper_param.selectClassifier(param_data, x_train, y_train, x_test, y_test, rewrite_method=rewrite_all)
+
+    model_pred, __unused = hyper_param.trainClassifier(model)
+    score_save = SaveLoad(rewrite=True, load_all=True)
+    score = classify.selectScore(y_test, model_pred, None, file_name=model_fn,
+                                     output_folder=hyper_param.output_folder + "score/", save_class=score_save,
+                                     verbose=True, class_names=hyper_param.class_names,
+                                     fscore=hyper_param.fscore, acc=hyper_param.acc, kappa=hyper_param.kappa, auroc=hyper_param.auroc)
+    score.process_and_save()
+    """
+    return row_data
 
 """
 def mln_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, class_names,
@@ -122,10 +135,12 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     min_samples_leaf = [1]
     min_samples_split = [2]
 
-    epoch = [50, 100, 200]
+
+    epoch = [100, 200, 300]
     activation_function = ["relu", "tanh"]
     dropout = [0.1, 0.25, 0.5, 0.75]
-    hidden_layer_size = [1, 0.5, 2]
+    hidden_layer_size = [0.5, 1,  2, 3]
+
 
     # Run a pipeline that retains numbers and removes stopwords
 
@@ -402,7 +417,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     classifiers = ["DecisionTree3"]
     data_type = [ "newsgroups"]
-    use_clusters = [True, False]
+    use_clusters = [True]
     use_bow = False
     print("got here")
     for j in range(len(data_type)):

@@ -1,6 +1,101 @@
-\chapter{Investigating Neural Networks In Terms Of Directions}
+\chapter{Investigating Neural Networks In Terms Of Directions}\label{chapter5}
 
-\section{Chapter 5}\label{chapter5}
+\section{Introduction}
+
+% Neural networks are not interpretable
+
+% But there are a variety of methods for explaining and investigating them
+
+% We contribute to this knowledge in this section by introducing a process to investigate them with directions
+
+% We look at feed-forward networks and auto-encoders. The idea with auto-encoders is that we will be able to map specific terms to more complex ones by reducing the size of the vector space. With feed-forward networks, we want to see how the neural network achieves strong performance on a text classification task, aka how it transforms the representation such that it can achieve strong results on a supervised task.
+
+% The results for auto-encoders was this, feed-forward networks was that
+
+% Summary/whats coming next
+
+\section{Background}
+
+\subsection{Explanations}
+
+% Explanation is a huge field
+
+% The different kinds of explanations
+
+% Where our directions fit-into this paradigm
+
+
+\subsection{Rules and Neural Networks}
+
+% We plan to use rules in-order to create a kind of mapping of domain knowledge from specific to general using auto-encoders
+
+% There is a history of using rules to understand neural networks, pedagogical etc
+
+% Where our method fits into this
+
+
+\subsection{Investigation methods}
+
+% There are many visualization/investigation tools
+
+% Where our directions fit-into this paradigm
+
+\subsection{Feed-forward networks}
+
+% Feed-forward networks 
+
+% Basic layout, input/hidden/output, weights
+
+% Activation functions (Relu, Tanh) refer to paper
+
+% Loss (binary_crossentropy), trainer, Adagrad
+
+% Dropout
+
+% Thresholding
+
+
+\subsection{Auto-encoders}
+
+% Input/output is the same
+
+% Hidden layer constrained in some way so that the representation is more general
+
+% Denoising auto-encoders
+
+% Variations of auto-encoders in recent years. We just use the basic one.
+
+\section{Method}
+
+% Generally, we treat the hidden layers of neural networks as vector spaces.
+
+% We use the same methods as described in chapter 3, obtaining directions and rankings
+
+% Using these directions and rankings, we obtain interpretable representations
+
+\subsection{Auto-encoders}
+
+% Using the interpretable representation, we create a mapping from layer-to-layer using a rule-based classifier
+
+\subsection{Feed-forward networks}
+
+% We simply take the hidden-layer representation and look at what's going on. 
+
+\section{Parameters}
+
+\subsection{Feed-forward Networks}
+
+% We use hyper-parameter optimization to get the best performing neural network
+
+\section{Qualitative Investigation}
+
+\subsection{Feed-forward networks}
+
+\subsection{Auto-encoders}
+
+\section{Conclusion}
+
+
 
  Neural network models that encode spatial relationships in their hidden layers have achieved state-of-the-art in Text Classification by using transfer learning from a pre-trained Language Model \cite{Gong2018}. There have also been neural network models that produce an interpretable representation, for example InfoGan.
  Most state-of-the-art results rely on Vector Space Models. Ideally the method would be able to achieve strong results for simple interpretable classifiers by transforming an existing representation that performs well at the task.
@@ -40,7 +135,13 @@ We investigate the task using the newsgroups as it gives a good example of a rep
 
 To learn the feed-forward networks, we take the highest performing representation found in Table \ref{bg:repsresults} for depth-3 decision trees and use them as input representations.  For the newsgroups, this is the size 100 Doc2Vec space. Then, we set the hidden-layer to be the same size as the input representation and use a non-linear activation function.  The reasoning behind this is twofold: First, we can assume that the representation that performs well on depth-three decision trees contain good interpretable concepts that can be meaningfully adjusted by the network, and second that this allows for easy comparison between the original representation and the representation taken from the hidden layer of the network. These feedforward networks are simple, but do achieve stronger results than the linear SVM. These act as a "baseline network", by which we can see how fundamentally the most simple neural network representation may work. 
 
-The primary difference between the linear SVM results and the results achieved using this neural network is that the neural network used is multi-label, meaning that all of the classification objectives are trained at the same time. Following results showing that simple neural networks can still perform well on text classification without needing a complex architecture  \cite{Lakhotia2018} \cite{Nam2014}, we use a neural network with the following changes: Cross-entropy loss, Adagrad trainer with default parameters, Dropout, Softmax activation on the output layer, ReLu or tanH activation function. We tune the network for the following values: Dropout {0.2, 0.4, 0.6, 0.8}, Hidden activation: {ReLu, Tanh}, epochs {100, 500, 1000} and class_weight {Balanced, Unbalanced}. We then obtain directions from the best performing network.
+The primary difference between the linear SVM results and the results achieved using this neural network is that the neural network used is multi-label, meaning that all of the classification objectives are trained at the same time. Following results showing that simple neural networks can still perform well on text classification without needing a complex architecture  \cite{Lakhotia2018} \cite{Nam2014}, we use a neural network with the following changes: Cross-entropy loss, Adagrad trainer with default parameters, Dropout, Softmax activation on the output layer, ReLu or tanH activation function. We tune the network for the following values: 
+
+epoch = [100, 200, 300]
+activation_function = ["relu", "tanh"]
+dropout = [0.1, 0.25, 0.5, 0.75]
+hidden_layer_size = [1,  2, 3, 4]
+
 
 %For each domain, we test two different network set-ups. The first is one where the hidden layer is the same size as the input layer, and the second is where the hidden layer is smaller than the hidden layer. The assumption is that by constraining the hidden layer size, we can force the network to generalize and find more abstract concepts in the hidden-layer, hopefully gaining some insight into the domain by comparing the input representation and the more general hidden representation.
 

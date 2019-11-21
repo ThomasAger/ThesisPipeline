@@ -18,6 +18,7 @@ from util import split
 from pipelines import pipeline_single_dir
 from pipelines import pipeline_cluster
 from pipelines import pipeline_topic_model
+from pipelines import pipeline_feedforward_network
 from pipelines import pipeline_ft
 
 def get_grid_params(hpam_dict):
@@ -102,7 +103,7 @@ class MasterHParam(Method):
     def process(self):
         super().process()
 
-    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test,  get_tree_image=False, tree_image_fn="", entered_fn="", space=None, rewrite_method=None):
+    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test,  get_tree_image=False, tree_image_fn="", entered_fn="", space=None, rewrite_method=None, get_rep=False):
         if rewrite_method is None:
             rewrite_method = self.rewrite_model
 
@@ -170,11 +171,13 @@ class MasterHParam(Method):
                                  , feature_names=self.feature_names, class_names=self.class_names)
 
         elif self.model_type == "mln":
+
+            batch_size = 200
+
             param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
                        "_Activ_" + str( all_p["activation_function"]) + \
                        "_Dropout_" + str( all_p["dropout"]) + \
-                       "_Hsize_" + str( all_p["hidden_layer_size"]) + \
-                       "_" + self.model_type
+                       "_Hsize_" + str( all_p["hidden_layer_size"]) + "_" + self.model_type
 
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             print("Running", model_fn)
@@ -183,7 +186,8 @@ class MasterHParam(Method):
                                        epoch=all_p["epoch"], class_weight=all_p["class_weight"],
                                        activation_function=all_p["activation_function"], dropout=all_p["dropout"],
                                        hidden_layer_size=all_p["hidden_layer_size"], verbose = True,
-                                       feature_names=self.feature_names, class_names=self.class_names)
+                                       feature_names=self.feature_names, class_names=self.class_names, batch_size=batch_size,
+                                       get_rep=get_rep)
 
         return model, model_fn
 
@@ -339,15 +343,16 @@ class RecHParam(MasterHParam):
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(new_bow_fn)
                 self.entered_fn.append("")
+            """
             elif self.hpam_model_type == "mln":
-                top_params, top_row_data, space =  pipeline_ft.mln_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"], use_hidden=self.all_p[i]["dropout"], use_weights=self.all_p[i]["use_weights"])
+                top_params, top_row_data =  pipeline_feedforward_network.mln_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"], use_hidden=self.all_p[i]["dropout"], use_weights=self.all_p[i]["use_weights"])
                 self.top_scoring_params.value.append(top_params)
                 top_scoring_row_data = top_row_data
                 averaged_csv_data.append(top_scoring_row_data[1])
                 col_names = top_scoring_row_data[0]
                 indexes.append(top_scoring_row_data[2][0])
-                self.rank_fn.append(cluster_rank)
-
+                self.rank_fn.append(space)
+            """
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
@@ -724,10 +729,11 @@ class HParam(MasterHParam):
         self.top_scoring_params.value = self.all_p[index_sorted]
         print("Training best parameters on test data not dev data")
         if self.final_score_on_dev:
-            model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train, self.x_dev, self.y_dev, rewrite_method=self.rewrite_model)
+            model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train, self.x_dev, self.y_dev,
+                                                    rewrite_method=self.rewrite_model, get_rep=True)
         else:
             model, model_fn = self.selectClassifier(self.top_scoring_params.value, self.x_train, self.y_train,
-                                                    self.x_test, self.y_test, get_tree_image=False, rewrite_method=self.rewrite_model)
+                                                    self.x_test, self.y_test, get_tree_image=False, rewrite_method=self.rewrite_model, get_rep=True)
         pred, prob = self.trainClassifier(model)
         score_save = SaveLoad(rewrite=self.rewrite_model, load_all = True)
 
