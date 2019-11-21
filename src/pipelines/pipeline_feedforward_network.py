@@ -172,6 +172,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     dir_fn_array = []
     word_fn_array = []
     space_name_array = []
+
     if clusters is False:
         for j in range(len(name_of_class)):
             csv = dt.read_csv(csv_fn + name_of_class[j] + ".csv")
@@ -304,7 +305,11 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             space = None
 
             dim = int(rank_fns[i][j].split("/")[-1:][0].split("_")[4])
-            type = rank_fns[i][j].split("/")[-1:][0].split("_")[5]
+            if data_type == "movies":
+                type = "MDS"
+                dim = 200
+            else:
+                type = rank_fns[i][j].split("/")[-1:][0].split("_")[5]
             if type == "MDS":
                 if data_type != "sentiment":
                     mds_identifier = "_" + str(dim) + "_MDS"
@@ -401,8 +406,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree3"]
-    data_type = [ "newsgroups"]
-    use_clusters = [True, False]
+    data_type = [ "movies"]
+    use_clusters = [False]
     use_bow = False
     print("got here")
     for j in range(len(data_type)):

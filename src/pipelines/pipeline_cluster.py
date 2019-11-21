@@ -417,8 +417,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    classifiers = ["LinearSVM", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
-    data_type = ["placetypes"]
+    classifiers = ["DecisionTree3"]
+    data_type = ["movies"]
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
