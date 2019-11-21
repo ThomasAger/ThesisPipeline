@@ -60,6 +60,10 @@ def isStr(x):
         return True
     return False
 
+def isString(x):
+    if isinstance(x, str):
+        return True
+    return False
 # If it's a list and not a string
 def isList(x):
     try:

@@ -34,7 +34,7 @@ def get_dp(space, direction):
 
 
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
+                     model_type="", dev_percent=0.2, rewrite_all=None, remove_stop_words=True,
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="", space_name="", data_type="",
              classifier_fn="", mcm=None, top_scoring_dirs=2000, score_type="kappa", ppmi=None, dct_unchanged=None, pipeline_hpam_dict=None):
     matched_ids = []
@@ -49,7 +49,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
@@ -436,15 +436,17 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                     if len(spaces[s][0]) == 200 and "MDS" in space_names[s]:
                         classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
                         tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
+                     model_type=model_type, dev_percent=dev_percent, rewrite_all="2019 11 20 15 19", remove_stop_words=True,
                      score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
                                  mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
                 else:
+
                     classifier_fn = pipeline_fn + "_" + multiclass
                     tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                      score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
                              mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
+
                 tsrds.append(tsrd)
         # Make the combined CSV of all the dims of all the space types
         all_r = np.asarray(tsrds).transpose()
@@ -457,8 +459,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_types = [ "placetypes"]
+    classifiers = ["LinearSVM", "DecisionTree1", "DecisionTree2", "DecisionTree3"]
+    data_types = [ "placetypes"]#""newsgroups", "reuters", "sentiment"] #,
     doLR = False
     dminf = -1
     dmanf = -1
@@ -470,8 +472,8 @@ if __name__ == '__main__':
     rewrite_all = False
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [5000]
-            hp_top_dir = [1000]
+            hp_top_freq = [5000, 10000, 20000]
+            hp_top_dir = [1000, 2000]
         elif data_types[j] == "reuters":
             hp_top_freq = [5000, 10000, 20000]
             hp_top_dir = [1000, 2000]

@@ -71,7 +71,10 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
                       kfold_hpam_dict, model_type, name_of_class, score_metric, multi_class_method, classes, dev_percent, matched_ids, cluster_method,
                       svm_clusters, bow, dct, n_init=10, max_iter=300, tol=1e-4, init="k-means++", top_dir_amt = 2):
 
-
+    if "MDS" in file_name and "200" in file_name:
+        rewrite_all = "2019 11 21 06 36"
+    else:
+        rewrite_all = False
     doc_amt = split.get_doc_amt(data_type)
 
     if len(space) != doc_amt:
@@ -125,6 +128,12 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 
     cluster_dict = {}
     for i in range(len(cluster_names)):
+        if cluster_names[i] in cluster_dict:
+            if i == 1:
+                print("Clustering failed for this variation")
+                print(dir_fn)
+                exit()
+            cluster_names[i] = cluster_names[i] + "Fail" + str(i)
         cluster_dict[cluster_names[i]] = i
     # Get the rankings on the clusters
     rank_save = SaveLoad(rewrite=rewrite_all)
@@ -408,7 +417,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 
 def init():
-    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
+    classifiers = ["LinearSVM", "DecisionTree3", "DecisionTree2", "DecisionTree1"]
     data_type = ["placetypes"]
     for j in range(len(data_type)):
         doLR = False

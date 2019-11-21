@@ -7,6 +7,7 @@ from common.Method import Method
 from keras.optimizers import SGD, Adagrad, Adam, RMSprop, Adadelta, Adamax, Nadam
 from keras.callbacks import TensorBoard
 from keras.initializers import Identity, Zeros, Ones, Constant, Orthogonal
+from util import nnet
 class FineTuneNetwork(Method):
     output_ranks = None
     output_folder = None
@@ -86,7 +87,7 @@ class FineTuneNetwork(Method):
 
         orig_ranks = self.model.predict(self.space)
 
-        self.getFirstLayer()
+        self.layer_space = nnet.getFirstLayer(self.model, self.space)
         #self.ppmi_boc.transpose()
         self.model.fit(self.space, self.ppmi_boc.transpose(), nb_epoch=self.epoch, batch_size=200, verbose=1)
 
@@ -96,17 +97,7 @@ class FineTuneNetwork(Method):
         print("completed")
         super().process()
 
-    def getFirstLayer(self):
-        amt_to_subtract = 1
-        if len(self.model.layers) == 1:
-            amt_to_subtract = 0
-        for l in range(0, len(self.model.layers) - amt_to_subtract):
-            print("Writing", l, "layer")
-            truncated_model = Sequential()
-            for a in range(l + 1):
-                truncated_model.add(self.model.layers[a])
-            truncated_model.compile(loss=self.loss, optimizer=self.trainer)
-            self.layer_space.value = truncated_model.predict(self.space)
+
 
 
     def getRanks(self):

@@ -13,6 +13,7 @@ from util import check_util
 from rep import d2v
 from model.randomforest import RandomForest
 from model.decisiontree import DecisionTree
+from model.mln import MultiLabelNetwork
 from util import split
 from pipelines import pipeline_single_dir
 from pipelines import pipeline_cluster
@@ -101,10 +102,11 @@ class MasterHParam(Method):
     def process(self):
         super().process()
 
-    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test, get_tree_image=False, tree_image_fn="", entered_fn="", rewrite_method=None):
+    def selectClassifier(self, all_p, x_train, y_train, x_test, y_test,  get_tree_image=False, tree_image_fn="", entered_fn="", space=None, rewrite_method=None):
         if rewrite_method is None:
             rewrite_method = self.rewrite_model
-        svm_save = SaveLoad(rewrite_method)
+
+        classifier_save = SaveLoad(rewrite_method)
         model = None
         model_fn = None
         # In the case of the clusters, we need to do this so that it does not repeat
@@ -117,7 +119,7 @@ class MasterHParam(Method):
                        + "_C_" + str(all_p["C"]) + "_Prob_" + str(self.probability) + "_" + self.model_type
             print("Running", model_fn)
             model = LinearSVM(x_train, y_train, x_test, y_test,
-                              self.output_folder + "svm/" + model_fn, svm_save, C=all_p["C"],
+                              self.output_folder + "svm/" + model_fn, classifier_save, C=all_p["C"],
                               class_weight=all_p["class_weight"], probability=self.probability, verbose=False,
                               mcm=self.mcm)
 
@@ -130,7 +132,7 @@ class MasterHParam(Method):
             print("Running", model_fn)
 
             model = GaussianSVM(x_train, y_train, x_test, y_test,
-                                self.output_folder + "svm/" + model_fn, svm_save, gamma=all_p["gamma"],
+                                self.output_folder + "svm/" + model_fn, classifier_save, gamma=all_p["gamma"],
                                 C=all_p["C"],
                                 class_weight=all_p["class_weight"], probability=self.probability, verbose=False,
                                 mcm=self.mcm)
@@ -144,7 +146,7 @@ class MasterHParam(Method):
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             print("Running", model_fn)
             model = RandomForest(x_train, y_train, x_test, y_test,
-                                 self.output_folder + "rf/" + model_fn, svm_save,
+                                 self.output_folder + "rf/" + model_fn, classifier_save,
                                  n_estimators=all_p["n_estimators"], bootstrap=all_p["bootstrap"],
                                  max_depth=all_p["max_depth"],
                                  min_samples_leaf=all_p["min_samples_leaf"],
@@ -160,12 +162,28 @@ class MasterHParam(Method):
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             print("Running", model_fn)
             model = DecisionTree(x_train, y_train, x_test, y_test,
-                                 self.output_folder + "dt/" + model_fn, svm_save,
+                                 self.output_folder + "dt/" + model_fn, classifier_save,
                                  max_depth=all_p["max_depth"],
                                  class_weight=all_p["class_weight"], max_features=all_p["max_features"],
                                  probability=self.probability, verbose=False, mcm=self.mcm,
                                  tree_image_fn=self.output_folder + "dt/img/" + model_fn, get_tree_image=get_tree_image
                                  , feature_names=self.feature_names, class_names=self.class_names)
+
+        elif self.model_type == "mln":
+            param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
+                       "_Activ_" + str( all_p["activation_function"]) + \
+                       "_Dropout_" + str( all_p["dropout"]) + \
+                       "_Hsize_" + str( all_p["hidden_layer_size"]) + \
+                       "_" + self.model_type
+
+            model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
+            print("Running", model_fn)
+            model  = MultiLabelNetwork(x_train, y_train, x_test, y_test, self.space,
+                                           self.output_folder + "mln/" + model_fn, classifier_save,
+                                       epoch=all_p["epoch"], class_weight=all_p["class_weight"],
+                                       activation_function=all_p["activation_function"], dropout=all_p["dropout"],
+                                       hidden_layer_size=all_p["hidden_layer_size"], verbose = False,
+                                       feature_names=self.feature_names, class_names=self.class_names)
 
         return model, model_fn
 
@@ -199,7 +217,7 @@ class RecHParam(MasterHParam):
     all_row_data = None
     feature_names_from_par = None
 
-    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
+    def __init__(self, space, classes, class_names, hpam_dict, kfold_hpam_dict, hpam_model_type, model_type, file_name, classify_fn, output_folder, save_class, probability=None, rewrite_model=None, auroc=True, fscore=True, acc=True, kappa=True, dev_percent=0.2, score_metric=None, data_type=None, matched_ids=None, mcm=None, dim_names=None,
                  hpam_method=None, hpam_params=None, fn_addition=None, end_fn_added="", name_of_class="", feature_names=None):
         self.kfold_hpam_dict = kfold_hpam_dict
         self.hpam_model_type = hpam_model_type
@@ -321,6 +339,15 @@ class RecHParam(MasterHParam):
                 indexes.append(top_scoring_row_data[2][0])
                 self.rank_fn.append(new_bow_fn)
                 self.entered_fn.append("")
+            elif self.hpam_model_type == "mln":
+                top_params, top_row_data, space =  pipeline_ft.mln_pipeline(*self.hpam_params, hidden_layer_size=self.all_p[i]["hidden_layer_size"],epoch=self.all_p[i]["epoch"], activation_function=self.all_p[i]["activation_function"], use_hidden=self.all_p[i]["dropout"], use_weights=self.all_p[i]["use_weights"])
+                self.top_scoring_params.value.append(top_params)
+                top_scoring_row_data = top_row_data
+                averaged_csv_data.append(top_scoring_row_data[1])
+                col_names = top_scoring_row_data[0]
+                indexes.append(top_scoring_row_data[2][0])
+                self.rank_fn.append(cluster_rank)
+
         self.final_arrays.value = []
         self.final_arrays.value.append(col_names)
         self.final_arrays.value.append(np.asarray(averaged_csv_data).transpose())
@@ -623,7 +650,7 @@ class HParam(MasterHParam):
 
     # The CSV data that corresponds to the highest scoring row for the score_metric
 
-    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None, final_score_on_dev=False,
+    def __init__(self, class_names=None, hpam_dict=None, model_type=None, file_name=None, output_folder=None, save_class=None, probability=None, score_metric="avg_f1", rewrite_model=False, auroc=True, fscore=True, acc=True, kappa=True, x_train=None, y_train=None, x_test=None, y_test=None, x_dev=None, y_dev=None, final_score_on_dev=False, space=None,
                  mcm=None, dim_names=None, feature_names=None):
 
         # Metric that determines what will be returned to the overall hyper-parameter method
@@ -635,6 +662,8 @@ class HParam(MasterHParam):
         self.x_dev = x_dev
         self.final_score_on_dev = final_score_on_dev
         self.y_dev = y_dev
+        if space is not None:
+            self.space = space
         self.file_names = []
         self.dim_names = dim_names
 
