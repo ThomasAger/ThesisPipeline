@@ -182,7 +182,7 @@ class MasterHParam(Method):
                                            self.output_folder + "mln/" + model_fn, classifier_save,
                                        epoch=all_p["epoch"], class_weight=all_p["class_weight"],
                                        activation_function=all_p["activation_function"], dropout=all_p["dropout"],
-                                       hidden_layer_size=all_p["hidden_layer_size"], verbose = False,
+                                       hidden_layer_size=all_p["hidden_layer_size"], verbose = True,
                                        feature_names=self.feature_names, class_names=self.class_names)
 
         return model, model_fn

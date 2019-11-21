@@ -49,9 +49,12 @@ def pipeline(file_name, classes, class_names, processed_folder, kfold_hpam_dict,
 
     doc_amt = split.get_doc_amt(data_type)
 
-    if len(space) != doc_amt:
-        raise ValueError("Space len does not equal doc amt")
-
+    try:
+        if len(space) != doc_amt:
+            raise ValueError("Space len does not equal doc amt")
+    except TypeError:
+        if space.shape[1] != doc_amt:
+            raise ValueError("Space len does not equal doc amt")
     if data_type == "placetypes" or data_type == "movies":
         ft_fn = file_name + "_" + name_of_class
     else:
@@ -88,7 +91,7 @@ def mln_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, c
 """
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
-         bonus_fn="", rewrite_all=False, clusters=False):
+         bonus_fn="", rewrite_all=False, clusters=False, use_bow=False):
     pipeline_fn = "num_stw"
     name_of_class = None
     if data_type == "newsgroups":
@@ -119,10 +122,10 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     min_samples_leaf = [1]
     min_samples_split = [2]
 
-    epoch = [10000]
+    epoch = [50, 100, 200]
     activation_function = ["relu", "tanh"]
     dropout = [0.1, 0.25, 0.5, 0.75]
-    hidden_layer_size = [1]
+    hidden_layer_size = [1, 0.5, 2]
 
     # Run a pipeline that retains numbers and removes stopwords
 
@@ -361,7 +364,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                     #space_names[i].append(doc2vec_fn)
                     space = d2v_space
 
-            epoch = [500, 1000]
+            epoch = [50,100,200]
             hidden_layer_size = [1, 0.5, 2]
             activation_function = ["linear",  "tanh"]
             use_hidden = [True, False]
@@ -373,8 +376,12 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                   "use_hidden": use_hidden,
                                   "use_weights": use_weights}
 
+            if use_bow is True:
+                space = bow
+                kfold_hpam_dict["hidden_layer_size"] = [1000, 500, 200]
+            print("got here")
             tsrd = pipeline(space_names[i][j], classes, class_names, processed_folder, kfold_hpam_dict,
-                            model_type=model_type, dev_percent=dev_percent, rewrite_all="2019 11 21 06 49", score_metric=score_metric,
+                            model_type=model_type, dev_percent=dev_percent, rewrite_all="2019 11 21 07 18", score_metric=score_metric,
                             auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
                             data_type=data_type, space=space, bow=bow, dct=dct)
 
@@ -396,6 +403,8 @@ def init():
     classifiers = ["DecisionTree3"]
     data_type = [ "newsgroups"]
     use_clusters = [True, False]
+    use_bow = False
+    print("got here")
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -420,7 +429,7 @@ def init():
                      proj_folder="../../data/proj/" + data_type[j] + "/",
                      grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
                      score_metric="avg_f1", max_depth=max_depths, multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
-                     rewrite_all=rewrite_all, clusters=u_clusters)
+                     rewrite_all=rewrite_all, clusters=u_clusters, use_bow=use_bow)
 
 if __name__ == '__main__':
     print("starting")

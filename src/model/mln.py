@@ -11,8 +11,9 @@ from common.SaveLoadPOPO import SaveLoadPOPO
 from keras.optimizers import SGD, Adagrad, Adam, RMSprop, Adadelta, Adamax, Nadam
 from keras.callbacks import TensorBoard
 from keras.initializers import Identity, Zeros, Ones, Constant, Orthogonal
+from keras.utils.vis_utils import plot_model
 from util import nnet
-
+import os
 class MultiLabelNetwork(Method.ModelMethod):
     max_features = None
     class_weight = None
@@ -53,19 +54,28 @@ class MultiLabelNetwork(Method.ModelMethod):
 
     def process(self):
         self.model = Sequential()
+
+        if self.hidden_layer_size < 100:
+            hidden_size = int(len(self.x_train[0]) * self.hidden_layer_size)
+        else:
+            hidden_size = self.hidden_layer_size
         print("Hidden layer")
         self.model.add(
-            Dense(output_dim=self.hidden_layer_size, input_dim=len(self.x_train[0]), activation=self.activation_function,
+            Dense(output_dim=hidden_size, input_dim=len(self.x_train[0]), activation=self.activation_function,
                   init="glorot_uniform"))
-        
-        self.model.add(Dropout(rate=self.dropout))
+
+        #self.model.add(Dropout(rate=self.dropout))
 
         print("Output no init")
-        self.model.add(Dense(output_dim=len(self.y_train[0]), input_dim=self.hidden_layer_size, activation="sigmoid"))
+        self.model.add(Dense(output_dim=len(self.y_train[0]), input_dim=hidden_size, activation="sigmoid"))
 
 
         self.model.compile(loss="binary_crossentropy", optimizer=Adagrad(lr=0.01, epsilon=None, decay=0.0))
 
+        if self.verbose is True:
+            print("Model plot")
+            print(os.listdir())
+            plot_model(self.model, to_file='plots/model_plot.png', show_shapes=True, show_layer_names=True)
 
         # self.ppmi_boc.transpose()
         self.model.fit(self.x_train, self.y_train, nb_epoch=self.epoch, batch_size=200, verbose=1)
