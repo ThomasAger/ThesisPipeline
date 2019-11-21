@@ -397,6 +397,17 @@ Representations are  used to learn how to separate different kinds of entities i
 
 If the classifier performs well and can predict a variety of unlabelled documents, we can infer that  the representation must represent the domain's knowledge sufficiently for the task. This is why classification tasks can measure how good a representation is, if they can perform on key domain tasks like predicting the genre of a movie based on its movie reviews then they clearly represent fundamental semantic information about movies.  As an example,  the bag-of-words can be considered a good representation if the frequencies of sentiment-related words, like "good", "bad", and "thrilling" would be good enough to achieve reasonable performance, as a machine-learning classifier could determine rules based on the frequency of these relevant words, e.g. "IF good > 30, and thrilling > 20, THEN positive sentiment". The tasks that are solved in this thesis are all classification tasks. 
 
+
+\subsection{Multi-label problems}\label{bg:multi-label}
+
+% Binary is where you are just predicting a single class
+
+% Multi-class are where you are just predicting one out of many
+
+% Multi-label problems are where you are predicting things simultaneously
+
+% Our problems are generally multi-label, with sentiment as the exception 
+
 \subsection{Decision Trees}\label{bg:trees}
 
 Decision Trees are a model that result in a tree composed of nodes. Each node is associated with a feature from the representation, and  an  threshold value $T$. In the case of a bag-of-words, the nodes of this Decision Tree will correspond to unique words in the corpus vocabulary that are relevant to the task. If the bag-of-words measured raw frequency, then the threshold value would be checking how often that word occurs in  a document.  When the tree is processing a document, if the value given in the feature for that document is larger than the threshold $T$, then the tree is traversed along the left side, otherwise it traverses right side. Eventually the traversal reaches the bottom of the tree, called a leaf node, and the final  decision made on the threshold of the leaf node is the classification of the document. 

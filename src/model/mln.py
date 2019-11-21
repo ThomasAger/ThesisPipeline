@@ -13,6 +13,7 @@ from keras.callbacks import TensorBoard
 from keras.initializers import Identity, Zeros, Ones, Constant, Orthogonal
 from keras.utils.vis_utils import plot_model
 from util import nnet
+from scipy import sparse
 import os
 class MultiLabelNetwork(Method.ModelMethod):
     max_features = None
@@ -29,9 +30,11 @@ class MultiLabelNetwork(Method.ModelMethod):
     model = None
     epoch = None
     space = None
+    batch_size = None
+    get_rep = None
 
     def __init__(self, x_train, y_train, x_test, y_test, space, file_name, save_class, epoch=0,  class_weight=None, activation_function=None,
-                 dropout=None, hidden_layer_size=None, verbose=False, feature_names=None, class_names=None):
+                 dropout=None, hidden_layer_size=None, verbose=False, feature_names=None, class_names=None, batch_size=None, get_rep=False):
         self.activation_function = activation_function
         self.verbose = verbose
         self.class_weight = class_weight
@@ -41,27 +44,40 @@ class MultiLabelNetwork(Method.ModelMethod):
         self.class_names = class_names
         self.epoch = epoch
         self.space = space
+        self.batch_size = batch_size
+        self.get_rep = get_rep
         # Probability is set to true
         super().__init__(x_train, y_train, x_test, y_test, file_name, save_class, True, None)
 
     def makePopoArray(self):
         super().makePopoArray()
+        if self.get_rep:
+            self.popo_array.append(self.hidden_layer_rep)
 
     def makePopos(self):
         super().makePopos()
-        self.hidden_layer_rep = SaveLoadPOPO(self.hidden_layer_rep,self.file_name + ".npy", "npy")
+        self.hidden_layer_rep = SaveLoadPOPO(self.hidden_layer_rep,self.file_name + "rep.npy", "npy")
 
 
     def process(self):
         self.model = Sequential()
 
+        x_train_dim = len(self.x_train[0])
+        """
+        # If it's sparse
+        if(len(self.x_train[0])) > 10000:
+            x_train_dim = len(self.x_train[0])
+            x_test_dim = len(self.x_test[0])
+            self.x_train = sparse.csr_matrix(self.x_train)
+            self.x_test  = sparse.csr_matrix(self.x_test)
+        """
         if self.hidden_layer_size < 100:
-            hidden_size = int(len(self.x_train[0]) * self.hidden_layer_size)
+            hidden_size = int(x_train_dim * self.hidden_layer_size)
         else:
             hidden_size = self.hidden_layer_size
         print("Hidden layer")
         self.model.add(
-            Dense(output_dim=hidden_size, input_dim=len(self.x_train[0]), activation=self.activation_function,
+            Dense(output_dim=hidden_size, input_dim=x_train_dim, activation=self.activation_function,
                   init="glorot_uniform"))
 
         #self.model.add(Dropout(rate=self.dropout))
@@ -78,8 +94,9 @@ class MultiLabelNetwork(Method.ModelMethod):
             plot_model(self.model, to_file='plots/model_plot.png', show_shapes=True, show_layer_names=True)
 
         # self.ppmi_boc.transpose()
-        self.model.fit(self.x_train, self.y_train, nb_epoch=self.epoch, batch_size=200, verbose=1)
-        self.hidden_layer_rep = nnet.getFirstLayer(self.model, self.space)
+        self.model.fit(self.x_train, self.y_train, nb_epoch=self.epoch, batch_size=self.batch_size, verbose=1)
+        if self.get_rep:
+            self.hidden_layer_rep.value = nnet.getFirstLayer(self.model, self.space)
 
         self.test_proba.value = self.model.predict(self.x_test)
         self.test_predictions.value = nnet.probaToBinary(self.test_proba.value)
