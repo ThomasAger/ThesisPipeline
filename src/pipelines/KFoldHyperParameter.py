@@ -173,8 +173,13 @@ class MasterHParam(Method):
         elif self.model_type == "mln":
 
             batch_size = 100
-
-            param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
+            if len(all_p["hidden_layer_size"])  == 1:
+                param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
+                       "_Activ_" + str( all_p["activation_function"]) + \
+                       "_Dropout_" + str( all_p["dropout"]) + \
+                       "_Hsize_" + str( all_p["hidden_layer_size"][0]) + "_" + self.model_type
+            else:
+                param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
                        "_Activ_" + str( all_p["activation_function"]) + \
                        "_Dropout_" + str( all_p["dropout"]) + \
                        "_Hsize_" + str( all_p["hidden_layer_size"]) + "_" + self.model_type

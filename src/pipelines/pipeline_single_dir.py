@@ -133,7 +133,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     if len(rankings) < 100:
         if False in np.isclose(dt.importFirstLineOfTextFileAsFloat(rankings), get_dp(space, dirs[0])):
             raise ValueError("Rankings do not match")
-    else:
+    elif stream_rankings is False:
         print("kay")
         if False in np.isclose(rankings[0], get_dp(space, dirs[0])):
             raise ValueError("Rankings do not match")
@@ -475,7 +475,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["LinearSVM", "DecisionTree1", "DecisionTree2", "DecisionTree3"]
+    classifiers = ["DecisionTree3", "DecisionTree1", "DecisionTree2"]
     data_types = [ "newsgroups"]#""newsgroups", "reuters", "sentiment"] #,
     doLR = False
     dminf = -1
@@ -487,8 +487,12 @@ if __name__ == '__main__':
     bonus_fn = ""
     rewrite_all = False
     use_space = np.load("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups\mln\mln/"
-                        "num_stw_ppmi_Dev_6223MClass_Balanced_5_Activ_relu_Dropout_0.5_Hsize_500_mlnrep.npy")
-    use_space_name = "5_Activ_relu_Dropout_0.5_Hsize_500_mlnrep"
+                        "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep.npy")
+    use_space_name = "300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep"
+    #5_Activ_relu_Dropout_0.5_Hsize_[1000, 100]_mlnrep
+    #300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep
+    #num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep
+
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
             hp_top_freq = [10000]
@@ -500,7 +504,7 @@ if __name__ == '__main__':
             hp_top_freq = [10000]
             hp_top_dir = [2000]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [10000]
+            hp_top_freq = [100]
             hp_top_dir = [2000]
         elif data_types[j] == "movies":
             hp_top_freq = [10000]

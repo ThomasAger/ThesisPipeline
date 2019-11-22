@@ -1,12 +1,20 @@
-\chapter{Investigating Neural Networks In Terms Of Directions}\label{chapter5}
+\chapter{Directions in Neural Networks}\label{chapter5}
 
 \section{Introduction}
 
 % Neural networks are not interpretable
 
-% But there are a variety of methods for explaining and investigating them
+% However, they clearly contain a lot of useful information, as they perform well at tasks
 
-% We contribute to this knowledge in this section by introducing a process to investigate them with directions
+% There is usually a theory that these networks contain more complex relations the deeper they go, or more 'abstract' dimensions.
+
+% Three questions, first: Is it possible to obtain these more complex, accurate to domain knowledge relations and use them as features of an interpretable classifier using the methods in Chapter 3? 
+
+% Second: Can we discover what kind of relationships neural networks are finding by investigating the directions that we will use as features in the interpretable represenation obtained from the network? 
+
+% Finally: In networks which obtain successively more abstract representations, can we create a mapping of specific to abstract concepts?
+
+% The contribution of this chapter is as follows:
 
 % We look at feed-forward networks and auto-encoders. The idea with auto-encoders is that we will be able to map specific terms to more complex ones by reducing the size of the vector space. With feed-forward networks, we want to see how the neural network achieves strong performance on a text classification task, aka how it transforms the representation such that it can achieve strong results on a supervised task.
 
@@ -79,9 +87,35 @@
 
 \subsection{Feed-forward networks}
 
+These representations these networks build should differ from those obtained in the unsupervised representation in a few different ways. First, the neural network used is multi-label, meaning that all of the classification objectives are trained at the same time. Second, a non-linear activation function is used, sometimes in multiple layers. Finally, the supervised objective should shape the space more than an unsupervised objective, although only objectives that are relevant to the domain are considered in this case - as we are not interested in a network that ignores a large amount of information, rather we want the network to construct a representation that more accurately represents domain knowledge.
+
+ Following results showing that simple neural networks can still perform well on text classification without needing a complex architecture  \cite{Lakhotia2018} \cite{Nam2014}, we use a neural network with the following changes: Cross-entropy loss, Adagrad trainer with default parameters, Dropout, Softmax activation on the output layer, ReLu or tanH activation function. 
+
+We trained neural networks with non-linear activation functions so that they would  perform better than linear SVM's on  document representations. The assumption behind this is that if the network is able to achieve stronger results on the task than a baseline representation, it must be doing something more than representing the information. In other words, the representation must be better for the task than an unsupervised representation. The goal of this section is to discover why neural networks are able to perform so well, and explain it in terms of directions. 
+
+To learn a baseline feedforward network, we take the highest performing representation found in Table \ref{bg:repsresults} for clusters on depth-3 decision trees and use them as input representations.   For the newsgroups, this is the size 100 Doc2Vec space. Then, we set the hidden-layer to be the same size as the input representation and use a non-linear activation function.  The reasoning behind this is twofold: First, we can assume that the representation that performs well on depth-three decision trees contain good interpretable concepts that can be meaningfully adjusted by the network, and second that this allows for easy comparison between the original representation and the representation taken from the hidden layer of the network. These feedforward networks are simple, but do achieve stronger results than the linear SVM.  
+
+The  differences between the supervised representation and the unsupervised representation are examined here, with the main question being how exactly does a neural network achieve such strong results on the task? Some general ideas or explanations that are given are that through non-linear transformations, the internal representation of the neural network is able to find a more complex or accurate representation of domain knowledge relevant to the task.
+
+
+We additionally learn a neural network starting from the bag-of-words  with two hidden-layers, the first of size 1000 and the second of size 100. The parameters for this network are not tuned as the baseline network is, instead an initial hidden layer of size 1000 was chosen following recommendations in \cite{Nam2014a} and the secondary layer was chosen as it has a size similar to the Doc2Vec space and converged quickly. As the method described in chapter \ref{ch3} scales poorly to larger dimensional spaces, this secondary layer was necessary. In preliminary experiments, the network with two layers outperformed the single layer network consistently, and this neural network performs much more strongly than the one starting from the Doc2Vec space. 
+
 % We simply take the hidden-layer representation and look at what's going on. 
 
+
+
 \section{Parameters}
+
+When obtaining the directions, we set the frequency cut-off to the top 10,000 words and the direction cut-off when classifying to 2000 features. This is arbitrary, as both of these cut-offs need to be tuned for the specific space-type and task in-order to achieve strong results. The reason that these parameters are not tuned in this case is because we are interested in the qualitative nature of the directions, not the performance on the text classification task. 
+
+We investigate the task using the newsgroups as it gives a good example of a representation that contains many different concepts and aspects of domain knowledge, as well as a well defined classification task that if achieved well on clearly demonstrates the representation contains a good amount of information in the domain. The place-types task does not contain too many entities, making it unreliable for neural network training and the reuters task has similar problems. One alternative would be the movies domain, but as identifying the genres of movies is functionally similar to the newsgroups task, we assume that any results found for the newsgroups can easily generalize to any classification task.
+
+We tune the network for the following values: 
+
+epoch = [100, 200, 300]
+activation_function = ["relu", "tanh"]
+dropout = [0.1, 0.25, 0.5, 0.75]
+hidden_layer_size = [1,  2, 3, 4]
 
 \subsection{Feed-forward Networks}
 
@@ -90,6 +124,22 @@
 \section{Qualitative Investigation}
 
 \subsection{Feed-forward networks}
+
+
+
+Following the same process as described in Chapter \ref{ch3} to obtain a depth-3 Decision Tree for the Relu hidden layer representation of the neural network, we obtained an F1-score of 0.534, compared to the F1 score of the single directions from the original representation of 0.537. This very minimal difference is surprising, as the directions themselves are very different.
+
+% Compare the same directions but see how their rankings have changed
+
+% Compare the top directions for NDCG, top for Kappa
+
+
+
+\subsubsection{Starting from vector space}
+
+\subsubsection{Starting from bag-of-words}
+
+Obtaining directions from this space takes much longer than normal vector spaces.
 
 \subsection{Auto-encoders}
 
@@ -123,24 +173,18 @@
 \end{landscape}
 
 
-We trained neural networks with non-linear activation functions so that they would ideally perform better than linear SVM's on the document representations. The assumption behind this is that if the network is able to achieve stronger results on the task than a baseline representation, it must be doing something more than representing the information. In other words, the representation must be better for the task than an unsupervised representation. The goal of this section is to discover why neural networks are able to perform so well, and explain it in terms of directions. 
 
-The  differences between the supervised representation and the unsupervised representation are examined here, with the main question being how exactly does a neural network achieve such strong results on the task? Some general ideas or explanations that are given are that through non-linear transformations, the internal representation of the neural network is able to find a more complex or accurate representation of domain knowledge relevant to the task.  %This elevates neural networks from simply being representation learners to models that can discover and create new ideas in their representations in-order to solve the task.
+
+  %This elevates neural networks from simply being representation learners to models that can discover and create new ideas in their representations in-order to solve the task.
 
 Theoretically if we are able to identify features from each layer, then we can also map how they interact with each other. 
 
-When obtaining the directions, we set the frequency cut-off to the top 10,000 words and the direction cut-off when classifying to 2000 features. This is arbitrary, as both of these cut-offs need to be tuned for the specific space-type and task in-order to achieve strong results. The reason that these parameters are not tuned in this case is because we are interested in the qualitative nature of the directions, not the performance on the text classification task. 
 
-We investigate the task using the newsgroups as it gives a good example of a representation that contains many different concepts and aspects of domain knowledge, as well as a well defined classification task that if achieved well on clearly demonstrates the representation contains a good amount of information in the domain. The place-types task does not contain too many entities, making it unreliable for neural network training and the reuters task has similar problems. One alternative would be the movies domain, but as identifying the genres of movies is functionally similar to the newsgroups task, we assume that any results found for the newsgroups can easily generalize to any classification task.
 
-To learn the feed-forward networks, we take the highest performing representation found in Table \ref{bg:repsresults} for clusters on depth-3 decision trees and use them as input representations.   For the newsgroups, this is the size 100 Doc2Vec space. Then, we set the hidden-layer to be the same size as the input representation and use a non-linear activation function.  The reasoning behind this is twofold: First, we can assume that the representation that performs well on depth-three decision trees contain good interpretable concepts that can be meaningfully adjusted by the network, and second that this allows for easy comparison between the original representation and the representation taken from the hidden layer of the network. These feedforward networks are simple, but do achieve stronger results than the linear SVM. These act as a "baseline network", by which we can see how fundamentally the most simple neural network representation may work. 
 
-The primary difference between the linear SVM results and the results achieved using this neural network is that the neural network used is multi-label, meaning that all of the classification objectives are trained at the same time. Following results showing that simple neural networks can still perform well on text classification without needing a complex architecture  \cite{Lakhotia2018} \cite{Nam2014}, we use a neural network with the following changes: Cross-entropy loss, Adagrad trainer with default parameters, Dropout, Softmax activation on the output layer, ReLu or tanH activation function. We tune the network for the following values: 
 
-epoch = [100, 200, 300]
-activation_function = ["relu", "tanh"]
-dropout = [0.1, 0.25, 0.5, 0.75]
-hidden_layer_size = [1,  2, 3, 4]
+
+
 
 
 %For each domain, we test two different network set-ups. The first is one where the hidden layer is the same size as the input layer, and the second is where the hidden layer is smaller than the hidden layer. The assumption is that by constraining the hidden layer size, we can force the network to generalize and find more abstract concepts in the hidden-layer, hopefully gaining some insight into the domain by comparing the input representation and the more general hidden representation.

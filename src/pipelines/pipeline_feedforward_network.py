@@ -112,9 +112,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     elif data_type == "sentiment":
         name_of_class = ["Sentiment"]
     elif data_type == "movies":
-        name_of_class = ["Genres", "Keywords", "Ratings"]
+        name_of_class = ["Genres"]
     elif data_type == "placetypes":
-        name_of_class = ["Foursquare", "Geonames", "OpenCYC"]
+        name_of_class = ["Foursquare"]
     elif data_type == "reuters":
         name_of_class = ["Reuters"]
 
@@ -136,10 +136,10 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     min_samples_split = [2]
 
 
-    epoch = [100, 200, 300, 400]
-    activation_function = ["relu", "tanh"]
+    epoch = [100, 200, 300]
+    activation_function = ["tanh"]
     dropout = [0.1, 0.25, 0.5, 0.75]
-    hidden_layer_size = [0.5, 1,  2, 3, 4]
+    hidden_layer_size = [[0.5], [1], [2], [3]]
 
 
     # Run a pipeline that retains numbers and removes stopwords
@@ -322,6 +322,9 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             if data_type == "movies":
                 type = "MDS"
                 dim = 200
+            elif data_type == "sentiment":
+                type = "D2V"
+                dim = 100
             else:
                 type = rank_fns[i][j].split("/")[-1:][0].split("_")[5]
             if type == "MDS":
@@ -399,13 +402,16 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
                 space_names[i][j] = "num_stw_ppmi"
                 space = sp.load_npz("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/"+space_names[i][j]+".npz").toarray()
-                kfold_hpam_dict["hidden_layer_size"] = [500,200,100]
+                kfold_hpam_dict["hidden_layer_size"] = [[1000, 100]]
                 kfold_hpam_dict["epoch"] = [5]
-                kfold_hpam_dict["activation_function"] = ["relu"]
+                kfold_hpam_dict["activation_function"] = ["tanh"]
                 kfold_hpam_dict["dropout"] = [ 0.5]
+                rewrite_all ="2019 11 21 17 15"
+            else:
+                rewrite_all = "2019 11 21 07 18"
             print("got here")
             tsrd = pipeline(space_names[i][j], classes, class_names, processed_folder, kfold_hpam_dict,
-                            model_type=model_type, dev_percent=dev_percent, rewrite_all="2019 11 21 07 18", score_metric=score_metric,
+                            model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
                             auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
                             data_type=data_type, space=space, bow=bow, dct=dct)
 
@@ -425,8 +431,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree3"]
-    data_type = [ "sentiment"]
-    use_clusters = [True]
+    data_type = [ "placetypes"]
+    use_clusters = [False]
     use_bow = False
     print("got here")
     for j in range(len(data_type)):

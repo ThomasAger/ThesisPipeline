@@ -1,6 +1,7 @@
 
 from keras.models import Sequential
 import numpy as np
+from keras.utils.vis_utils import plot_model
 def getFirstLayer(model, x):
     amt_to_subtract = 1
     if len(model.layers) == 1:
@@ -12,6 +13,26 @@ def getFirstLayer(model, x):
             truncated_model.add(model.layers[a])
         truncated_model.compile(loss="binary_crossentropy", optimizer="sgd")
         return truncated_model.predict(x)
+
+def getSecondLayer(model, x, dropout=True):
+    amt_to_subtract = 1
+    if len(model.layers) == 1:
+        amt_to_subtract = 0
+    if dropout is True:
+        limit_to_write = 2
+    else:
+        limit_to_write = 1
+    for l in range(0, len(model.layers) - amt_to_subtract):
+        print("Writing", l, "layer")
+        truncated_model = Sequential()
+        for a in range(l + 1):
+            truncated_model.add(model.layers[a])
+        if l == limit_to_write:
+            truncated_model.compile(loss="binary_crossentropy", optimizer="sgd")
+            plot_model(truncated_model.model, to_file='plots/truncated_model.png', show_shapes=True, show_layer_names=True)
+
+            return truncated_model.predict(x)
+
 
 
 def probaToBinary(y_pred, threshold=0.5):

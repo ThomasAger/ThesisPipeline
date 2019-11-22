@@ -13,6 +13,8 @@ from keras.callbacks import TensorBoard
 from keras.initializers import Identity, Zeros, Ones, Constant, Orthogonal
 from keras.utils.vis_utils import plot_model
 from util import nnet
+
+
 from scipy import sparse
 import os
 class MultiLabelNetwork(Method.ModelMethod):
@@ -71,19 +73,32 @@ class MultiLabelNetwork(Method.ModelMethod):
             self.x_train = sparse.csr_matrix(self.x_train)
             self.x_test  = sparse.csr_matrix(self.x_test)
         """
-        if self.hidden_layer_size < 100:
-            hidden_size = int(x_train_dim * self.hidden_layer_size)
+        hidden_size = []
+        if self.hidden_layer_size[0] < 100:
+            hidden_size.append(int(x_train_dim * self.hidden_layer_size[0]))
         else:
-            hidden_size = self.hidden_layer_size
+            hidden_size.append(self.hidden_layer_size[0])
+        for i in range(1, len(self.hidden_layer_size)):
+            hidden_size.append(self.hidden_layer_size[i])
         print("Hidden layer")
-        self.model.add(
-            Dense(output_dim=hidden_size, input_dim=x_train_dim, activation=self.activation_function,
-                  init="glorot_uniform"))
 
-        #self.model.add(Dropout(rate=self.dropout))
+        using_dropout = False
+        last_hidden_size = 0
+        for i in range(len(hidden_size)):
+            if i == 0:
+                input_dim = x_train_dim
+            else:
+                input_dim = hidden_size[i-1]
+            self.model.add(Dense(output_dim=hidden_size[i], input_dim=input_dim, activation=self.activation_function,
+                      init="glorot_uniform"))
+            if self.dropout > 0.0:
+                using_dropout = True
+                self.model.add(Dropout(rate=self.dropout))
+            last_hidden_size = hidden_size[i]
 
         print("Output no init")
-        self.model.add(Dense(output_dim=len(self.y_train[0]), input_dim=hidden_size, activation="sigmoid"))
+
+        self.model.add(Dense(output_dim=len(self.y_train[0]), input_dim=last_hidden_size, activation="sigmoid"))
 
 
         self.model.compile(loss="binary_crossentropy", optimizer=Adagrad(lr=0.01, epsilon=None, decay=0.0))
@@ -96,7 +111,10 @@ class MultiLabelNetwork(Method.ModelMethod):
         # self.ppmi_boc.transpose()
         self.model.fit(self.x_train, self.y_train, nb_epoch=self.epoch, batch_size=self.batch_size, verbose=1)
         if self.get_rep:
-            self.hidden_layer_rep.value = nnet.getFirstLayer(self.model, self.space)
+            if len(hidden_size)> 1:
+                self.hidden_layer_rep.value = nnet.getSecondLayer(self.model, self.space, dropout=using_dropout)
+            else:
+                self.hidden_layer_rep.value = nnet.getFirstLayer(self.model, self.space)
 
         self.test_proba.value = self.model.predict(self.x_test)
         self.test_predictions.value = nnet.probaToBinary(self.test_proba.value)
