@@ -98,13 +98,15 @@ To learn a baseline feedforward network, we take the highest performing represen
 The  differences between the supervised representation and the unsupervised representation are examined here, with the main question being how exactly does a neural network achieve such strong results on the task? Some general ideas or explanations that are given are that through non-linear transformations, the internal representation of the neural network is able to find a more complex or accurate representation of domain knowledge relevant to the task.
 
 
-We additionally learn a neural network starting from the bag-of-words  with two hidden-layers, the first of size 1000 and the second of size 100. The parameters for this network are not tuned as the baseline network is, instead an initial hidden layer of size 1000 was chosen following recommendations in \cite{Nam2014a} and the secondary layer was chosen as it has a size similar to the Doc2Vec space and converged quickly. As the method described in chapter \ref{ch3} scales poorly to larger dimensional spaces, this secondary layer was necessary. In preliminary experiments, the network with two layers outperformed the single layer network consistently, and this neural network performs much more strongly than the one starting from the Doc2Vec space. 
+We additionally learn a neural network starting from the bag-of-words  with two hidden-layers, the first of size 1000 and the second of size 100. In preliminary experiments, the network with two layers outperformed the single layer network consistently, and this neural network performs much more strongly than the one starting from the Doc2Vec space. 
 
 % We simply take the hidden-layer representation and look at what's going on. 
 
 
 
 \section{Parameters}
+
+We use three different domains: Newsgroups, Placetypes and Movie reviews. We choose newsgroups and movie reviews as they have a relevant task that can be used to verify if the network has learned general domain concepts, e.g. in the case of newsgroups the natural categories of the documents and the movie reviews the genres of movies. Placetypes are chosen not because we expect them to perform well with neural networks, but rather because their entities are easy to understand and in-turn explain. In fact, as placetypes has such a low number of entities for its tasks we cannot expect good results with neural networks which typically perform well with a large number of entities.
 
 When obtaining the directions, we set the frequency cut-off to the top 10,000 words and the direction cut-off when classifying to 2000 features. This is arbitrary, as both of these cut-offs need to be tuned for the specific space-type and task in-order to achieve strong results. The reason that these parameters are not tuned in this case is because we are interested in the qualitative nature of the directions, not the performance on the text classification task. 
 
@@ -117,19 +119,60 @@ activation_function = ["relu", "tanh"]
 dropout = [0.1, 0.25, 0.5, 0.75]
 hidden_layer_size = [1,  2, 3, 4]
 
+When using the bag-of-words as input to the neural network for the newsgroups, we found that it worked well with default parameters.  The parameters for this network are not tuned as the baseline network is, instead an initial hidden layer of size 1000 was chosen following recommendations in \cite{Nam2014a} and the secondary layer was chosen as it has a size similar to the Doc2Vec space and converged quickly. As the method described in chapter \ref{ch3} scales poorly to larger dimensional spaces, this secondary layer was necessary. The batch size is 100 for all experiments, excluding the place-types which used a batch-size of 10 as there were so few entities.
+
 \subsection{Feed-forward Networks}
 
 % We use hyper-parameter optimization to get the best performing neural network
 
-\section{Qualitative Investigation}
+\section{Quantitative Results}
+
+Here, we show the results for the neural networks, the results for the directions obtained from the hidden layers of those networks on depth-3 decision trees, and the results of the clustering of those directions on depth-3 decision trees. The intention of these results is not to achieve state-of-the-art on the task, instead it is to create networks that can perform reasonably well on the task given a simple configuration. This is because the goal of this work is to use directions from neural networks as feature and investigatory tools, and to do that we need to know if the directions obtained from the network are still usable as features.
+
+So, this section is not intending to show that supervised models outperform unsupervised ones, as that is not necessarily the case. Rather, it intends to provide insight into what the directions in the neural networks are using the quantitative results. The main focus is not on if it outperforms other results, but rather how it performs. If it does perform well, then that gives some insight into the neural network, in particular that it must be arranging the space in a better way than an unsupervised representation can to perform well at the associated task. Similarly if it performs poorly, it must be arranging the space poorly. 
+
+These results are designed to give these kind of preliminary insights into what we expect the directions to be in the qualitative analysis in Section \ref{ch5:qual}.
 
 \subsection{Feed-forward networks}
 
+\subsubsection{Neural Network Results}
+
+Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful concepts in the space, then the directions should also perform well on a depth-3 decision tree.
+
+For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities. Similarly for the network starting from a bag of words, it scored 0.58 at best.
+
+In the movies domain, the network that used a vector space as input performed better than the original by a large margin. The original scored 0.53 and the network scored 0.57.
+
+Obtaining the directions for spaces transformed by the relu activation function were a lot slower than those of the tanh activation function.
 
 
-Following the same process as described in Chapter \ref{ch3} to obtain a depth-3 Decision Tree for the Relu hidden layer representation of the neural network, we obtained an F1-score of 0.534, compared to the F1 score of the single directions from the original representation of 0.537. This very minimal difference is surprising, as the directions themselves are very different.
+\subsubsection{Directions}
+
+
+\subsubsection{Clusters}
+
+\section{Qualitative Investigation}\label{ch5:qual}
+
+\subsection{Feed-forward networks}
+
+\subsubsection{Neural Network Results}
+
+Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful concepts in the space, then the directions should also perform well on a depth-3 decision tree.
+
+For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities.
+
+In the movies domain, the network that used a vector space as input performed better than the original by a large margin. The original scored 0.53 and the network scored 0.57.
+
+ 
+
+
+\subsubsection{Directions}
+
+Two groups of single word directions and clusters were obtained from three different domains, in each one is from the second layer of  a two-layer neural network starting from a bag-of-words and the other is from the first layer of a one-layer neural network starting from an unsupervised representation. The examples in this section for the clusters are from the clusters that performed the best in depth-3 decision-trees. When investigating single word directions, sometimes it is unclear what they mean. In this case, the most similar single word-directions are found and used to provide additional context.
 
 % Compare the same directions but see how their rankings have changed
+
+
 
 % Compare the top directions for NDCG, top for Kappa
 

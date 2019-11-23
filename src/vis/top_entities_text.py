@@ -2,7 +2,7 @@ import numpy as np
 import scipy.spatial.distance
 from sklearn.neighbors import KDTree
 
-import io.io
+from util import io
 
 
 def kdTree(entity_names, space):

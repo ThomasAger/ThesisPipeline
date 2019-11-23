@@ -449,12 +449,11 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                     exit()
                 else:
                     if data_type == "movies" or data_type == "placetypes":
-                        if len(spaces[s][0]) == 200 and "MDS" in space_names[s]:
-                            classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
-                            tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                         model_type=model_type, dev_percent=dev_percent, rewrite_all="2019 11 20 15 19", remove_stop_words=True,
-                         score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
-                                     mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
+                        classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
+                        tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
+                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
+                                 mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
                     else:
 
                         classifier_fn = pipeline_fn + "_" + multiclass
@@ -476,19 +475,26 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree3", "DecisionTree1", "DecisionTree2"]
-    data_types = [ "newsgroups"]#""newsgroups", "reuters", "sentiment"] #,
+    data_types = [ "placetypes"]#""newsgroups", "reuters", "sentiment"] #,
     doLR = False
     dminf = -1
     dmanf = -1
     """
     x = np.load("../../data\processed\placetypes/rank/fil/num_stw_num_stw_200_MDS_ndcg_1000_5000_0_rank.npy")
     """
+    #num_stw_num_stw_200_MDS_acc_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep
     mcm = "OVR"
     bonus_fn = ""
     rewrite_all = False
-    use_space = np.load("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups\mln\mln/"
-                        "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep.npy")
-    use_space_name = "300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep"
+    """
+    use_space = np.load("..\..\data\processed/"+data_types[0]+"\mln\mln/"
+                        "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep" + ".npy")
+    use_space_name = "200_Activ_tanh_Dropout_0.1_Hsize_3"
+    """
+    use_space = None
+    use_space_name = None
+    #num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep.npy
+    #"300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep"
     #5_Activ_relu_Dropout_0.5_Hsize_[1000, 100]_mlnrep
     #300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep
     #num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep
@@ -504,7 +510,7 @@ if __name__ == '__main__':
             hp_top_freq = [10000]
             hp_top_dir = [2000]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [100]
+            hp_top_freq = [10000]
             hp_top_dir = [2000]
         elif data_types[j] == "movies":
             hp_top_freq = [10000]

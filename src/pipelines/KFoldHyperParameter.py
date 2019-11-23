@@ -172,17 +172,20 @@ class MasterHParam(Method):
 
         elif self.model_type == "mln":
 
-            batch_size = 100
             if len(all_p["hidden_layer_size"])  == 1:
                 param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
                        "_Activ_" + str( all_p["activation_function"]) + \
                        "_Dropout_" + str( all_p["dropout"]) + \
-                       "_Hsize_" + str( all_p["hidden_layer_size"][0]) + "_" + self.model_type
+                       "_Hsize_" + str( all_p["hidden_layer_size"][0]) + \
+                           "_BS_" + str(all_p["batch_size"]) + \
+                           "_" + self.model_type
             else:
                 param_fn = "MClass_Balanced_" + str(all_p["epoch"]) + \
                        "_Activ_" + str( all_p["activation_function"]) + \
                        "_Dropout_" + str( all_p["dropout"]) + \
-                       "_Hsize_" + str( all_p["hidden_layer_size"]) + "_" + self.model_type
+                       "_Hsize_" + str( all_p["hidden_layer_size"]) + \
+                           "_BS_" + str(all_p["batch_size"]) + \
+                           "_" + self.model_type
 
             model_fn = file_name + "_Dev"+ "_" + str(len(x_test))  + param_fn
             print("Running", model_fn)
@@ -190,8 +193,8 @@ class MasterHParam(Method):
                                            self.output_folder + "mln/" + model_fn, classifier_save,
                                        epoch=all_p["epoch"], class_weight=all_p["class_weight"],
                                        activation_function=all_p["activation_function"], dropout=all_p["dropout"],
-                                       hidden_layer_size=all_p["hidden_layer_size"], verbose = True,
-                                       feature_names=self.feature_names, class_names=self.class_names, batch_size=batch_size,
+                                       hidden_layer_size=all_p["hidden_layer_size"], batch_size=all_p["batch_size"], verbose = True,
+                                       feature_names=self.feature_names, class_names=self.class_names,
                                        get_rep=get_rep)
 
         return model, model_fn
@@ -306,7 +309,7 @@ class RecHParam(MasterHParam):
                 self.dir_fn.append("a")
             elif self.hpam_model_type == "dir":
                 if self.all_p[i]["top_dir"] > self.all_p[i]["top_freq"]:
-                    continue
+                    self.all_p[i]["top_dir"] = self.all_p[i]["top_freq"]
                 top_params, top_row_data, top_rank, top_dir, feature_names = pipeline_single_dir.direction_pipeline(*self.hpam_params, top_scoring_freq=self.all_p[i]["top_freq"], top_scoring_dir=self.all_p[i]["top_dir"])
 
                 self.top_scoring_params.value.append(top_params)

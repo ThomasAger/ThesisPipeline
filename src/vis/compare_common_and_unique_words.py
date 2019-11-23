@@ -70,29 +70,25 @@ words3 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_PC
 words4 = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")[:1000]
 """
 
-data_type_1 = "movies"
-data_type_2 = "movies"
-first_fn = "200_MDS_ndcg_1000_10000_0_"
-second_fn = "200_MDS_f1_1000_10000_0_"
-third_fn = "200_MDS_acc_1000_10000_0_"
-fourth_fn = "200_MDS_kappa_1000_10000_0_"
-dir1 = np.load("../../data/processed/"+data_type_1+"/directions/fil/num_stw_num_stw_"+first_fn+"dir.npy").transpose()
-dir2 = np.load("../../data/processed/"+data_type_2+"/directions/fil/num_stw_num_stw_"+second_fn+"dir.npy").transpose()
-dir3 = np.load("../../data/processed/"+data_type_2+"/directions/fil/num_stw_num_stw_"+third_fn+"dir.npy").transpose()
-dir4 = np.load("../../data/processed/"+data_type_2+"/directions/fil/num_stw_num_stw_"+fourth_fn+"dir.npy").transpose()
-words1 = np.load("../../data/processed/"+data_type_1+"/rank/fil/num_stw_num_stw_"+first_fn+"words.npy")
-words2 = np.load("../../data/processed/"+data_type_2+"/rank/fil/num_stw_num_stw_"+second_fn+"words.npy")
-words3 = np.load("../../data/processed/"+data_type_2+"/rank/fil/num_stw_num_stw_"+third_fn+"words.npy")
-words4 = np.load("../../data/processed/"+data_type_2+"/rank/fil/num_stw_num_stw_"+fourth_fn+"words.npy")
+data_type_1 = "placetypes"
+use_space = np.load("..\..\data\processed/" + data_type_1 + "\mln\mln/"                                                 "num_stw_num_stw_200_MDS_acc_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_200_Activ_tanh_Dropout_0.75_Hsize_3_BS_10_mlnrep.npy")
+first_fn = "num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_"
+second_fn = "num_stw_US_200_Activ_tanh_Dropout_0.75_Hsize_3_BS_10_mlnrep_kappa_2000_10000_0_"
+third_fn = "num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_ndcg_2000_10000_0_"
+dir1 = np.load("../../data/processed/"+data_type_1+"/directions/fil/"+first_fn+"dir.npy").transpose()
+dir2 = np.load("../../data/processed/"+data_type_1+"/directions/fil/"+second_fn+"dir.npy").transpose()
+dir3 = np.load("../../data/processed/"+data_type_1+"/directions/fil/"+third_fn+"dir.npy").transpose()
+words1 = np.load("../../data/processed/"+data_type_1+"/rank/fil/"+first_fn+"words.npy")
+words2 = np.load("../../data/processed/"+data_type_1+"/rank/fil/"+second_fn+"words.npy")
+words3 = np.load("../../data/processed/"+data_type_1+"/rank/fil/"+third_fn+"words.npy")
 words_to_get_amt = 1000
 
-if words4[999] == words3[999]:
+if words2[999] == words3[999]:
     raise ValueError("imported same words")
 
-
-file_name = data_type_1 + data_type_2 + first_fn + second_fn + third_fn + fourth_fn
-words_array = np.asarray([words1[:words_to_get_amt], words2[:words_to_get_amt], words3[:words_to_get_amt], words4[:words_to_get_amt]])
-dir_array =np.asarray([dir1[:words_to_get_amt], dir2[:words_to_get_amt], dir3[:words_to_get_amt], dir4[:words_to_get_amt]])
+file_name = data_type_1 + first_fn + second_fn + third_fn
+words_array = np.asarray([words1[:words_to_get_amt], words2[:words_to_get_amt], words3[:words_to_get_amt]])
+dir_array =np.asarray([dir1[:words_to_get_amt], dir2[:words_to_get_amt], dir3[:words_to_get_amt]])
 
 import os
 getDiff = False

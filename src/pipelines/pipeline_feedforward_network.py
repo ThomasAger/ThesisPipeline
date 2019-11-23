@@ -104,7 +104,7 @@ def mln_pipeline( file_name, processed_folder,  rewrite_all, data_type, space, c
 """
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
-         bonus_fn="", rewrite_all=False, clusters=False, use_bow=False):
+         bonus_fn="", rewrite_all=False, clusters=False, use_bow=False, batch_size=None):
     pipeline_fn = "num_stw"
     name_of_class = None
     if data_type == "newsgroups":
@@ -136,10 +136,11 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
     min_samples_split = [2]
 
 
-    epoch = [100, 200, 300]
+    epoch = [300, 200, 100]
     activation_function = ["tanh"]
     dropout = [0.1, 0.25, 0.5, 0.75]
     hidden_layer_size = [[0.5], [1], [2], [3]]
+    batch_size = [batch_size]
 
 
     # Run a pipeline that retains numbers and removes stopwords
@@ -148,7 +149,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                        "class_weight": balance_params,
                        "activation_function": activation_function,
                        "dropout": dropout,
-                       "hidden_layer_size": hidden_layer_size}
+                       "hidden_layer_size": hidden_layer_size,
+                       "batch_size": batch_size}
 
     hpam_dict = {"window_size": window_size,
                  "min_count": min_count,
@@ -401,15 +403,33 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
             if use_bow is True:
 
                 space_names[i][j] = "num_stw_ppmi"
-                space = sp.load_npz("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/"+space_names[i][j]+".npz").toarray()
+                space = sp.load_npz("..\..\data\processed/"+data_type+"/bow/"+space_names[i][j]+".npz").toarray()
                 kfold_hpam_dict["hidden_layer_size"] = [[1000, 100]]
-                kfold_hpam_dict["epoch"] = [5]
-                kfold_hpam_dict["activation_function"] = ["tanh"]
+                if data_type == "placetypes":
+                    kfold_hpam_dict["epoch"] = [200]
+                else:
+                    kfold_hpam_dict["epoch"] = [5]
+                kfold_hpam_dict["activation_function"] = [ "tanh"]
                 kfold_hpam_dict["dropout"] = [ 0.5]
                 rewrite_all ="2019 11 21 17 15"
             else:
                 rewrite_all = "2019 11 21 07 18"
             print("got here")
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
+            print(space_names[i][j])
             tsrd = pipeline(space_names[i][j], classes, class_names, processed_folder, kfold_hpam_dict,
                             model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
                             auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
@@ -434,6 +454,11 @@ def init():
     data_type = [ "placetypes"]
     use_clusters = [False]
     use_bow = False
+
+    if data_type[0] == "placetypes":
+        batch_size = 10
+    else:
+        batch_size = 100
     print("got here")
     for j in range(len(data_type)):
         doLR = False
@@ -459,7 +484,7 @@ def init():
                      proj_folder="../../data/proj/" + data_type[j] + "/",
                      grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
                      score_metric="avg_f1", max_depth=max_depths, multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
-                     rewrite_all=rewrite_all, clusters=u_clusters, use_bow=use_bow)
+                     rewrite_all=rewrite_all, clusters=u_clusters, use_bow=use_bow, batch_size=batch_size)
 
 if __name__ == '__main__':
     print("starting")
