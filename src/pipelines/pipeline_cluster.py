@@ -265,6 +265,21 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         rank_fn_internal =[]
         word_fn_internal = []
         dir_fn_internal = []
+
+        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][rank_id]
+        print(rank_fn)
+        rank_fn_internal.append(rank_fn)
+
+        word_fn = "_".join(rank_fn.split("_")[:-1]) + "_words.npy"
+        print(word_fn)
+        word_fn_internal.append(word_fn)
+
+        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][dir_id]
+        dir_fn_internal.append(dir_fn)
+
+        space_name = rank_fn.split("/")[-1:][0][:-4]
+        space_name_internal.append(space_name)
+        """
         for z in range(len(csv.values)):
             rank_fn = csv.values[z][rank_id]
             print(rank_fn)
@@ -279,6 +294,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
             space_name = rank_fn.split("/")[-1:][0][:-4]
             space_name_internal.append(space_name)
+        """
 
         rank_fn_array.append(rank_fn_internal)
         word_fn_array.append(word_fn_internal)
@@ -427,7 +443,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                 col_names = all_r[0][0]
                 key = all_r[2]
                 if use_space_name is None:
-                    dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j][a] +  str(a) + "reps" + model_type + "_"
+                    dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j][a] +  "reps" + model_type + "_"
                                  + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
                         col_names, cols, key)
                 else:
@@ -441,35 +457,36 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 def init():
     classifiers = ["DecisionTree3"]
     data_type = ["placetypes"]
-    """ Placetypes bow
+    """ Placetypes bow num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_ndcg_2000_10000_0_dir.npy
     use_space_name = "200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep"
     use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"
                                      "num_stw_ppmi_Foursquare_Dev_133MClass_Balanced_"+use_space_name+".npy")
     use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_ndcg_2000_10000_0_dir.npy"
     use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_ndcg_2000_10000_0_words.npy"
     """
-    """ Placetypes vector space
-    use_space_name = "200_Activ_tanh_Dropout_0.75_Hsize_3_BS_10_mlnrep"
-    use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"                                                 "num_stw_num_stw_200_MDS_acc_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_"+use_space_name+".npy")
-    use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_kappa_2000_10000_0_dir.npy"
-    use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_kappa_2000_10000_0_words.npy"
-    """
-    """
+    #""" Placetypes vector space
+    use_space_name = "100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep"
     score_type = "ndcg"
-    use_space_name = "200_Activ_tanh_Dropout_0.1_Hsize_3"
+    use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"                                                 "num_stw_num_stw_50_AWVEmp_"+score_type+"_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_"+use_space_name+".npy")
+    use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_"+score_type+"_2000_10000_0_dir.npy"
+    use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_"+score_type+"_2000_10000_0_words.npy"
+    #"""
+    """num_stw_US__ndcg_2000_10000_0_dir
+    score_type = "ndcg"
+    use_space_name = "200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep"
     use_space = np.load("..\..\data\processed/" + data_type[
-        0] + "\mln\mln/" + "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep.npy")
+        0] + "\mln\mln/" + "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_"+use_space_name+".npy")
     use_dir_fn = "../../data/processed/" + data_type[
         0] + "/directions/fil/num_stw_US_" + use_space_name + "_"+score_type+"_2000_10000_0_dir.npy"
     use_dir_names = "../../data/processed/" + data_type[
         0] + "/rank/fil/num_stw_US_" + use_space_name + "_"+score_type+"_2000_10000_0_words.npy"
     """
-    #"""
+    """
     use_space = None
     use_space_name = None
     use_dir_fn = None
     use_dir_names = None
-    #"""
+    """
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -497,7 +514,7 @@ def init():
 
         multi_class_method = "OVR"
         bonus_fn = ""
-        rewrite_all = False
+        rewrite_all = False#"2019 11 22 14 32"
         print("iterating through classifiers")
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
@@ -514,7 +531,7 @@ def init():
                      proj_folder="../../data/proj/" + data_type[j] + "/",
                      grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
                      score_metric="avg_f1", max_depth=max_depths, multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
-                     rewrite_all="2019 11 22 14 32", cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
+                     rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
                      svm_clusters=svm_clusters[k], use_space=use_space, use_space_name=use_space_name, use_dir_fn=use_dir_fn,
                      use_dir_names=use_dir_names)
 
