@@ -453,7 +453,7 @@ def init():
     classifiers = ["DecisionTree3"]
     data_type = [ "placetypes"]
     use_clusters = [False]
-    use_bow = False
+    use_bow = True
 
     if data_type[0] == "placetypes":
         batch_size = 10
