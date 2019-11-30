@@ -8,11 +8,19 @@
 
 % There is usually a theory that these networks contain more complex relations the deeper they go, or more 'abstract' dimensions.
 
-% Three questions, first: Is it possible to obtain these more complex, accurate to domain knowledge relations and use them as features of an interpretable classifier using the methods in Chapter 3? 
+% Write things that cannot be challenged, everything can and will be used against you
 
-% Second: Can we discover what kind of relationships neural networks are finding by investigating the directions that we will use as features in the interpretable represenation obtained from the network? 
+% Aim is to do a comprehensive qualitative analysis of using these interpretable features obtained from neural networks
+
+ %First: Can we verify that the  neural networks are finding meaningful directions for the task by investigating the directions that we will use as features in the interpretable represenation obtained from the network? 
+
+% Three questions, first: Is it possible to obtain these more complex, accurate to domain knowledge relations and use them to produce interpretable representations that achieve similar results to neural networks on tasks even when using a limited number of features in a simple interpretable classifier e..g a low-depth decision tree, not replacing neural network, just using it. NOT transfer learning, cant really justify that (good space that can be used for anything)
 
 % Finally: In networks which obtain successively more abstract representations, can we create a mapping of specific to abstract concepts?
+
+%Conclusion: The rankings are sometimes weird/absurd, would be nice if it was more interpretable, thats where fine-tuning comes in
+
+
 
 % The contribution of this chapter is as follows:
 
@@ -23,6 +31,71 @@
 % Summary/whats coming next
 
 \section{Background}
+
+There are two typical methods for making neural networks interpretable, explaining the neural network after it has been learned and modifying the way the neural network is learned such that it is interpretable. However, our method does not easily fit into either of these categories, as we do not explain the neural network in terms of its predictions or making it so that it learns an additional interpretable objective.
+
+The method that we introduce is a post-processing method on the hidden layer of a neural network to re-organize it's internal semantic structure into interpretable features. This satisfies a number of important criteria in the literature. It provides interpretability of the models representation, completeness of that representation, doesn't rely on input vectors instead using information directly from the model and is not limited to a model or a classifier. 
+
+One relevant work in the image domain is TCAV which separates user-specified entities using linear regression and obtains a direction using the weights for that concept. 
+
+As the method can be used to post-process vector spaces that encode semantic directions, it can be applied to many existing models without the need for re-training or adopting a new architecture. 
+
+Interpretability and completeness
+
+Interpretability of information inside the network versus predictions
+
+
+Post-hoc versus baking it into the model
+
+Creating networks that are easier to explain:  Disentangled representations, GAN, PCA< Independent Component Analytsis, Nonnegative matrix factorization, Variational autoencoding, Beta-VAE, InfoGAN, Construction of graphs, decision trees
+
+Deep networks that are trained to make their own explanations 
+
+Linear proxy models
+
+Decision trees from neural networks  (super deep and bad)
+
+Rule extraction from neural networks
+
+Concept Activation Vectors "are a framework for interpretation of a neural nets representations by identifying and probing driections that align with human interpretable concepts"
+
+Persuasive versus transparent
+
+Saliency maps "One of the most popular approaches in interpreting NN is saliency methods (24; 22; 25; 8; 5).
+These techniques seek to identify regions of the input most relevant to the classification output by
+the network. Qualitatively, these methods often successfully label regions of the input which seem
+semantically relevant to the classification.
+" - copy pasted MIGHT BE WRONG
+
+"Even a truthful explanation may be misleading if it is only locally truthful (20). For example, since
+the importance of features only needs to be truthful in the vicinity of the data point of interest, there
+is no guarantee that the method will not generate two completely conflicting explanations. These
+inconsistencies may result in decreased user trust at a minimum. On the other hand, making a
+globally truthful explanation may be difficult as the networks decision boundaries may be complex.
+TCAV produces globally explanations, and uses model’s output to generate explanations to maintain
+consistency between explanations and the model’s reasoning.
+" - copy pasted
+
+" there is evidence that they work by gradually disentangling concepts of interest, layer by
+layer (2; 3)."
+
+"although feedforward networks learn highly nonlinear
+functions there is evidence that they work by gradually disentangling concepts of interest, layer by
+layer (2; 3). It has also been shown that representations are not necessarily contained in individual
+neurons but more generally in linear combinations of neurons (19; 27). Thus the space of neuron
+activations in layers of a neural network may have a meaningful global linear structure. Furthermore,
+if such a structure exists, we can uncover it by training a linear classifier mapping the representation
+in a single layer to a human selected set of concepts."
+
+[2] Understanding intermediate layers using linear classifier
+probes.
+
+[3] Network dissection: Quantifying interpretability of deep visual representations
+
+[19] Svcca: Singular
+vector canonical correlation analysis for deep understanding and improvement
+
+[27] Intriguing properties of neural networks.
 
 \subsection{Explanations}
 
@@ -74,6 +147,12 @@
 % Variations of auto-encoders in recent years. We just use the basic one.
 
 \section{Method}
+
+A bag-of-words representation when used as input to a decision-tree classifies using many individual words, for example the class of "comedy" would be have a node for each feature, and those features would be words like "laughed" "witty" "charming" and so on. Because of this, a larger tree is required to classify well. 
+
+Neural networks with large hidden layers can also be expected to have similar behaviour. If the hidden layer is larger, then the representation will contain directions that correspond to more granular concepts. For example, to classify comedy there may be directions like "gags, slapstick, gag", "witty, charming, wit", "comedies, comedy" "eccentric", simple concepts that directly relate to the class.
+
+As the layers get smaller, the concepts become more condensed and general. To see an example of this, see \ref{ch5:clustersusedintrees} where example clustered features from the best performing decision trees are shown.
 
 % Generally, we treat the hidden layers of neural networks as vector spaces.
 
@@ -127,23 +206,34 @@ When using the bag-of-words as input to the neural network for the newsgroups, w
 
 \section{Quantitative Results}
 
-Here, we show the results for the neural networks, the results for the directions obtained from the hidden layers of those networks on depth-3 decision trees, and the results of the clustering of those directions on depth-3 decision trees. The intention of these results is not to achieve state-of-the-art on the task, instead it is to create networks that can perform reasonably well on the task given a simple configuration. This is because the goal of this work is to use directions from neural networks as feature and investigatory tools, and to do that we need to know if the directions obtained from the network are still usable as features.
+Here, we show quantitative results for:
 
-So, this section is not intending to show that supervised models outperform unsupervised ones, as that is not necessarily the case. Rather, it intends to provide insight into what the directions in the neural networks are using the quantitative results. The main focus is not on if it outperforms other results, but rather how it performs. If it does perform well, then that gives some insight into the neural network, in particular that it must be arranging the space in a better way than an unsupervised representation can to perform well at the associated task. Similarly if it performs poorly, it must be arranging the space poorly. 
+\begin{itemize}
+	\item The predictions of the neural networks.
+	\item The results for the directions obtained from the hidden layers of the neural networks on depth-3 decision trees.
+	\item The results of the clustering of those directions on depth-3 decision trees.
+\end{itemize}
 
-These results are designed to give these kind of preliminary insights into what we expect the directions to be in the qualitative analysis in Section \ref{ch5:qual}.
+The intention of the results in this section is not to achieve state-of-the-art on the task, rather it is to show that depth-3 decision trees that use the directions  obtained from a simple neural network  can perform well on the task or sometimes better. This validates the idea that  interpretable features obtained from the neural network using the method in Chapter \ref{ch3} can be used as an alternative in a myriad of simple interpretable classifiers without much loss in prediction power. As these features are able to perform well on a simple classifier, it additionally validates the idea that these interpretable features can be used to investigate the neural network and the domain, which is looked at in more depth in the Qualitative Results Section \ref{ch5:qual}. 
 
-\subsection{Feed-forward networks}
+This section additionally provides insight into the directions contained within the neural network hidden layers.  If the neural network performs better than a linear svm with the unsupervised representation as input, it gives the insight that it must contain more relevant or refined directions than the unsupervised representation. Similarly if it performs poorly, it must be arranging the entities poorly. These results are preliminary insights that inform what we expect the directions to be like in in Section \ref{ch5:qual}.
 
 \subsubsection{Neural Network Results}
 
+For the newsgroups, the neural network with bow input performed significantly better than the one with a vector space as input. 
+
 Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful concepts in the space, then the directions should also perform well on a depth-3 decision tree.
 
-For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities. Similarly for the network starting from a bag of words, it scored 0.58 at best.
+For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities.
 
-In the movies domain, the network that used a vector space as input performed better than the original by a large margin. The original scored 0.53 and the network scored 0.57.
+\subsubsection{Direction results}
 
-Obtaining the directions for spaces transformed by the relu activation function were a lot slower than those of the tanh activation function.
+As expected, the score of a depth-3  decision tree classifier when using the directions obtained from the neural network are close to the performance of the neural network. 
+
+
+
+
+
 
 
 \subsubsection{Directions}
@@ -153,17 +243,142 @@ Obtaining the directions for spaces transformed by the relu activation function 
 
 \section{Qualitative Investigation}\label{ch5:qual}
 
+The qualitative section  focuses on showing that the interpretable feature representation is meaningful and can be used to investigate, verify and understand the neural network. There are three main goals of this qualitative investigation section:
+
+\begin{itemize}
+	\item Verify the interpretable feature representation obtained from the neural network embeddings is meaningful, and use it to  understand what the neural network embedding is representing.
+	\item Use the interpretable feature representation to investigate the difference between the embeddings.
+	\item Validate that the neural network embedding is representing concepts that are used to solve the task in a way that makes sense.
+\end{itemize}
+
+The first goal is simple to achieve: If the interpretable features obtained from the neural network make intuitive sense, then the neural network embedding can be understood by examining these features. The second goal is achieved by comparing the interpretable feature representations obtained from the embeddings. Finally, validating the neural network to ensure it is solving the task in a way that makes sense is achieved by ensuring the decision trees that use the interpretable feature representation as input make intuitive sense. 
+
+When showing results for single directions, the words that these directions are labelled with e.g. "Blood" will be accompanied by the terms for two of its most similar directions e.g. "Blood (Gore, Horror)". This is to provide context for the word such that it can be understood more easily. Unlike the clustered features, the direction is not changed. Three embeddings are used in this section for each domain: The unsupervised embedding, the neural network embedding that used the vector space as input, and the neural network embedding that used the bag-of-words as input. 
+
 \subsection{Feed-forward networks}
 
-\subsubsection{Neural Network Results}
+\subsubsection{Neural networks with vector space as input}
 
-Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful concepts in the space, then the directions should also perform well on a depth-3 decision tree.
+% Most difference
 
-For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities.
+\begin{table}[]\label{Top-scoring unique and common terms}
+	content...
+\end{table}
 
-In the movies domain, the network that used a vector space as input performed better than the original by a large margin. The original scored 0.53 and the network scored 0.57.
+ If a direction scores highly it is meaningful in the embedding. To examine the difference between the embeddings we look at the directions that are unique to each embedding and the ones that are common to them all, among the top-scoring directions. These directions are additionally used as examples to show that the features are meaningful. A direction is "unique" if the direction word and both of its associated similar direction words do not occur in either of the other two embeddings. It is common if the original direction word occurs in either of the other two embeddings. Terms are scored using NDCG \ref{ch3:NDCG} as this has good results for a variety of tasks and spaces. The frequency threshold was set to the top 10,000 terms and the score threshold was set to the top 2,000 scoring terms in NDCG. 
 
+
+
+Common terms: relevant to the class
+Unique terms: unique noise, vector space nnet performed better while bow nnet performed worse. should see something that reflects that
+Common terms btwn unsupervised and vector: common noise
+Most distance: 
+
+Generally, we see a similar trend in other domains. If noise is in the original space, using it as input to a neural network will not remove that noise. In that case, what changes between the original vector space and the neural network? To answer this question, the terms arranged by the difference between them is listed in table 
+
+
+
+\subsubsection{Neural networks with bow as input}
+
+
+
+%%% Unique dirs
+
+\begin{table}[]\label{Unique word directions identified in the bow representation}
+	Entities, terms that have gone down the most from the original space, terms that have gone up the most
+\end{table}
+
+However, this only covers those terms which were also in the original space. There are also unique word directions identified in the bow representation. %Noisy entities have gone down, prototypical entities have gone up?
+
+%The clusters obtained from the bag-of-words as input neural network directions seemed to have a general trend as well, they grouped noisy terms that were not related to the genres together, and kept the genre clusters tight without excess terms. The hypothesis that follows is that the neural network focused on optimizing the rankings for these directions, moving anything not directly related to the objective away. 
+
+To demonstrate this, we show a comparison of the neural network with bow input representation and the original representation each projected using PCA into two dimensions.
+
+%Additionally, we investigate the decision trees associated with these clusters. In these decision trees, we can see that the same features were used repeatedly with more refinement, speaking to the fact that rather than neural networks finding new concepts in the domain, they instead refine those that are relevant to the task. This makes explanation of why an entity is classified a certain way easy, as it can simply be put in terms of relative scale. For example, you could say that this movie was classified as a horror, as it was more {horror, scary, bloody} than {example movie}.
+
+The difference between the rankings of common single word directions is also investigated. Hypothetically, the rankings should make more intuitive sense, and noise should be removed, if the neural network does indeed prioritize the rankings of this important domain knowledge.
+
+
+%%% Common dirs
+
+
+
+%%%  Top dirs
+
+\begin{table}[]\label{For movies Top directions +}
+	content...
+\end{table}
  
+In the movie review domain, the original MDS space had high NDCG scores for noise, e.g. "berardinelli" a reviewer's name, or "listinfo" which is review metadata. This was also present in the neural network representation where this vector space was used as input. However, it was not present when starting from a bag-of-words. This is interesting, because the neural network performed worse with the bag-of-words as input, and very well with the vector space as input, despite their directions performing about the same on a depth-3 decision tree.
+
+%%%  Top dir differences
+
+\begin{table}[]\label{difference how top directions in original rep have changed}
+	content...
+\end{table}
+ 
+
+%%%%  Decision trees obtained from single dirs
+
+Decision trees of depth-3 in the quantiative results performed as well as neural networks, however the trees obtained from this representation are simplistic in the form of "if HORROR then HORROR" rather than representing some complex domain knowledge.
+
+%%%%  Clusters
+
+%%%%  Cluster diffs (new clusters? same terms but diff clusters?)
+
+%%%%  Decision trees obtained from clusters
+
+\begin{table}[]\label{ch5:clustersusedintrees}
+	Horror: Most important clusters used for space 1, most important for space 2
+\end{table}
+
+%%%%  Ranks obtained from single directions
+
+%%%%  Ranks obtained from cluster directions
+
+%%%%  Ranks obtained from single directions differences
+
+\begin{table}[]\label{Biggest difference in entities (entities that have gone down/gone up the most) for the same directions }
+	Entities, terms that have gone down the most from the original space, terms that have gone up the most
+\end{table}
+
+
+There are common word directions, e.g. horror. But how have the rankings changed for these directions? This is investigated by looking at the biggest differences in rankings for the same word between the original representation and the fine-tuned representation. We use the place-types results for this as they have easy to understand entities. We can see that e.g.
+
+%%%%  Ranks obtained from top directions differences
+
+%%%%  Common ranks
+
+%%%%  Unique ranks
+
+%%%%  PCA projections
+
+%%%%  Scores of different classes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The way that knowledge is represented is changed significantly in the neural network with bow input compared to the original representation. This can be verified by what clusters are used in the decision trees to classify the entities. For the neural network with bow, 
+But what if these directions are not new concepts, but instead the same rankings but with different words labelling them?
+
+
+
+
 
 
 \subsubsection{Directions}

@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="node #0\nwedding marry marries marrying bride  <= -0.274\ngini = 0.357\nsamples = 100.0%\nvalue = [0.767, 0.233]\nclass = NOT Romance", fillcolor="#e58139b2"] ;
+1 [label="node #1\nmgm sexy island male nude naked steamy handsome attractive sensual rear hot lust attraction seductive  <= -0.073\ngini = 0.24\nsamples = 74.7%\nvalue = [0.861, 0.139]\nclass = NOT Romance", fillcolor="#e58139d6"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="node #2\ngore gory violence spaghetti violent exploitation bloody brutal tarantino brutality blood torture graphic disgusting gruesome thugs nasty sadistic stomach massacre gratuitous grisly pulp squeamish visceral mayhem brutally  <= -0.077\ngini = 0.162\nsamples = 55.0%\nvalue = [0.911, 0.089]\nclass = NOT Romance", fillcolor="#e58139e6"] ;
+1 -> 2 ;
+3 [label="node #3\ngini = 0.234\nsamples = 29.3%\nvalue = [0.864, 0.136]\nclass = NOT Romance", fillcolor="#e58139d7"] ;
+2 -> 3 ;
+4 [label="node #4\ngini = 0.069\nsamples = 25.7%\nvalue = [0.964, 0.036]\nclass = NOT Romance", fillcolor="#e58139f6"] ;
+2 -> 4 ;
+5 [label="node #5\nslasher killer serial murder murders revenge killings assassination killed victims killing murdered murderer deaths kills killers kill sword assassin spree stalking murderous stalked  <= -0.727\ngini = 0.403\nsamples = 19.7%\nvalue = [0.72, 0.28]\nclass = NOT Romance", fillcolor="#e581399c"] ;
+1 -> 5 ;
+6 [label="node #6\ngini = 0.482\nsamples = 4.7%\nvalue = [0.406, 0.594]\nclass = Romance", fillcolor="#399de550"] ;
+5 -> 6 ;
+7 [label="node #7\ngini = 0.297\nsamples = 15.0%\nvalue = [0.818, 0.182]\nclass = NOT Romance", fillcolor="#e58139c6"] ;
+5 -> 7 ;
+8 [label="node #8\nmgm sexy island male nude naked steamy handsome attractive sensual rear hot lust attraction seductive  <= 0.003\ngini = 0.5\nsamples = 25.3%\nvalue = [0.491, 0.509]\nclass = Romance", fillcolor="#399de509"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="node #9\nromantic romance charming cute quirky charm sweet adorable rom delightful endearing eccentric hearted likable offbeat pleasant whimsical lovable appealing likeable harmless affection  <= 0.379\ngini = 0.457\nsamples = 13.1%\nvalue = [0.647, 0.353]\nclass = NOT Romance", fillcolor="#e5813974"] ;
+8 -> 9 ;
+10 [label="node #10\ngini = 0.377\nsamples = 7.9%\nvalue = [0.748, 0.252]\nclass = NOT Romance", fillcolor="#e58139a9"] ;
+9 -> 10 ;
+11 [label="node #11\ngini = 0.5\nsamples = 5.2%\nvalue = [0.493, 0.507]\nclass = Romance", fillcolor="#399de507"] ;
+9 -> 11 ;
+12 [label="node #12\nslasher killer serial murder murders revenge killings assassination killed victims killing murdered murderer deaths kills killers kill sword assassin spree stalking murderous stalked  <= -0.563\ngini = 0.439\nsamples = 12.2%\nvalue = [0.325, 0.675]\nclass = Romance", fillcolor="#399de584"] ;
+8 -> 12 ;
+13 [label="node #13\ngini = 0.339\nsamples = 9.1%\nvalue = [0.217, 0.783]\nclass = Romance", fillcolor="#399de5b8"] ;
+12 -> 13 ;
+14 [label="node #14\ngini = 0.459\nsamples = 3.1%\nvalue = [0.643, 0.357]\nclass = NOT Romance", fillcolor="#e5813972"] ;
+12 -> 14 ;
+}

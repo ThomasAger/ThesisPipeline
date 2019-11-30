@@ -46,6 +46,12 @@ def parameter_list_to_dict_str(parameter_list_string):#
     dict_str.append("}")
     return dict_str
 
+def convertToInt(x):
+    try:
+        return int(x)
+    except:
+        return x
+
 def isFloat(x):
     if isinstance(x, float):
         return True

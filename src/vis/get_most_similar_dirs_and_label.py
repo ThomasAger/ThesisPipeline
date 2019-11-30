@@ -1,6 +1,7 @@
 import numpy as np
 
 from util import sim
+from util import io
 def getPairs(*params):
     pairs = []
     for i in range(len(params)):
@@ -43,11 +44,11 @@ import sys
 def printPretty(word_array):
     for k in range(len(word_array)):
         if k == 0:
-            sys.stdout.write(word_array[k] + " (")
+            sys.stdout.write(str(word_array[k]) + " (")
         elif k != len(word_array) - 1:
-            sys.stdout.write(word_array[k] + ", ")
+            sys.stdout.write(str(word_array[k]) + ", ")
         else:
-            sys.stdout.write(word_array[k])
+            sys.stdout.write(str(word_array[k]))
     sys.stdout.write(")\n")
 def contextualizeWords(words, word_directions, context_words, ctx_word_directions):
     word_arrays = []
@@ -58,22 +59,71 @@ def contextualizeWords(words, word_directions, context_words, ctx_word_direction
             word_arrays[i].append(context_words[j])
         printPretty(word_arrays[i])
     return word_arrays
+
+"""
+data_type = "placetypes"
+fns = ["num_stw_num_stw_50_AWVEmp_ndcg_2000_10000_0_",
+       "num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_ndcg_2000_10000_0_",
+       "num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_ndcg_2000_10000_0_"]
+"""
+"""
+data_type = "movies"
+fns = ["num_stw_num_stw_200_MDS_ndcg_2000_10000_0_",
+       "num_stw_US_20_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_ndcg_2000_10000_0_",
+       "num_stw_US_300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep_ndcg_2000_10000_0_"]
+"""
+"""
+data_type = "newsgroups"
+fns = ["num_stw_num_stw_50_D2V_ndcg_2000_10000_0_",
+       "num_stw_US_5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_ndcg_2000_10000_0_",
+       "num_stw_US_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep_ndcg_2000_10000_0_"]
+"""
+
+
+
+
+data_type = "placetypes"
+fns = ["num_stw_num_stw_50_AWVEmp_10000_0_",
+       "num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_10000_0_",
+       "num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_10000_0_"]
+
+"""
+data_type = "movies"
+fns = ["num_stw_num_stw_200_MDS_10000_0_",
+       "num_stw_US_20_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_10000_0_",
+       "num_stw_US_300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep_10000_0_"]
+"""
+"""
+data_type = "newsgroups"
+fns = ["num_stw_num_stw_50_D2V_10000_0_",
+       "num_stw_US_5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_10000_0_",
+       "num_stw_US_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep_10000_0_"]
+"""
+
+orig_fn = "../../data_paper\experimental results/chapter 5/"+data_type+"/all_dir/"
 # Get the best-scoring terms and directions for each score-type for single directions
-sent_dir = np.load("../../data/processed/sentiment/directions/fil/num_stw_num_stw_100_D2V_ndcg_1000_10000_0_dir.npy").transpose()
-news_dir = np.load("../../data/processed/newsgroups/directions/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_dir.npy").transpose()
-placetype_dir = np.load("../../data/processed/placetypes/directions/fil/num_stw_num_stw_50_PCA_kappa_1000_10000_0_dir.npy").transpose()
-reut_dir = np.load("../../data/processed/reuters/directions/fil/num_stw_num_stw_200_MDS_ndcg_2000_5000_0_dir.npy").transpose()
+orig_space_dir = np.load(orig_fn+ fns[0] +"dir.npy")
+bow_space_dir = np.load(orig_fn+ fns[1] + "dir.npy")
+vector_space_dir = np.load(orig_fn+ fns[2]+ "dir.npy")
 
-sent_words = np.load("../../data/processed/sentiment/rank/fil/num_stw_num_stw_100_D2V_ndcg_1000_10000_0_words.npy")
-news_words = np.load("../../data/processed/newsgroups/rank/fil/num_stw_num_stw_50_D2V_ndcg_2000_10000_0_words.npy")
-placetype_words = np.load("../../data/processed/placetypes/rank/fil/num_stw_num_stw_50_PCA_kappa_1000_10000_0_words.npy")
-reut_words = np.load("../../data/processed/reuters/rank/fil/num_stw_num_stw_200_MDS_ndcg_2000_5000_0_words.npy")
+orig_space_words = np.load(orig_fn+ fns[0]+ "words.npy")
+bow_space_words = np.load(orig_fn+ fns[1] + "words.npy")
+vector_space_words = np.load(orig_fn+ fns[2] +"words.npy")
 
-all_score_words = [sent_words, news_words, placetype_words, reut_words]
-all_score_dirs = [sent_dir, news_dir, placetype_dir, reut_dir]
-words_to_get_amt = 1000
+cutoff = len(orig_space_dir)
 
-file_name = "top_scoring"
+if len(orig_space_words) != len(orig_space_dir) or len(bow_space_dir) != len(bow_space_words) or len(vector_space_dir) != len(vector_space_words):
+    print("doesn't match", len(orig_space_words),len(orig_space_dir),len(bow_space_dir),len(bow_space_words),len(vector_space_dir),len(vector_space_words))
+    exit()
+
+all_score_words = [orig_space_words[:cutoff] ]
+all_score_dirs = [orig_space_dir[:cutoff]]
+
+#ctx = np.load(orig_fn + fns[1] + "words_ctx.npy")
+"""
+for i in range(len(ctx)):
+    print(ctx[i])
+"""
 all_score_words_ctx = []
 for i in range(len(all_score_words)):
     word_arrays = contextualizeWords(all_score_words[i], all_score_dirs[i], all_score_words[i], all_score_dirs[i])
@@ -81,8 +131,12 @@ for i in range(len(all_score_words)):
     print(i, "/", len(all_score_words)-1)
 
 for i in range(len(all_score_words_ctx)):
+    np.save(orig_fn + fns[i] + "words_ctx.npy", all_score_words_ctx[i])
+
+for i in range(len(all_score_words_ctx)):
     for j in range(len(all_score_words_ctx[i])):
         printPretty(all_score_words_ctx[i][j])
+
     print("---")
     print("---")
     print("---")

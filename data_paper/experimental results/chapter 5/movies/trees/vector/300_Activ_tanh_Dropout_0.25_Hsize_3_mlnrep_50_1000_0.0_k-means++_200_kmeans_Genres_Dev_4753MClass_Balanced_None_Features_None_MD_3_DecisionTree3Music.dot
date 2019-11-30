@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="node #0\nsongs singing song sing sings singer singers lyrics vocals sung  <= 0.796\ngini = 0.148\nsamples = 100.0%\nvalue = [0.919, 0.081]\nclass = NOT Music", fillcolor="#e58139e9"] ;
+1 [label="node #1\nsongs singing song sing sings singer singers lyrics vocals sung  <= 0.238\ngini = 0.057\nsamples = 93.3%\nvalue = [0.971, 0.029]\nclass = NOT Music", fillcolor="#e58139f7"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="node #2\ndancing dance dancer ballet dancers dances  <= 2.694\ngini = 0.03\nsamples = 87.5%\nvalue = [0.985, 0.015]\nclass = NOT Music", fillcolor="#e58139fb"] ;
+1 -> 2 ;
+3 [label="node #3\ngini = 0.027\nsamples = 87.3%\nvalue = [0.986, 0.014]\nclass = NOT Music", fillcolor="#e58139fb"] ;
+2 -> 3 ;
+4 [label="node #4\ngini = 0.457\nsamples = 0.2%\nvalue = [0.353, 0.647]\nclass = Music", fillcolor="#399de574"] ;
+2 -> 4 ;
+5 [label="node #5\nelvis band concert beatles bands rock punk album albums guitar roll  <= 1.019\ngini = 0.362\nsamples = 5.8%\nvalue = [0.763, 0.237]\nclass = NOT Music", fillcolor="#e58139b0"] ;
+1 -> 5 ;
+6 [label="node #6\ngini = 0.311\nsamples = 5.3%\nvalue = [0.808, 0.192]\nclass = NOT Music", fillcolor="#e58139c2"] ;
+5 -> 6 ;
+7 [label="node #7\ngini = 0.439\nsamples = 0.5%\nvalue = [0.325, 0.675]\nclass = Music", fillcolor="#399de584"] ;
+5 -> 7 ;
+8 [label="node #8\nsongs singing song sing sings singer singers lyrics vocals sung  <= 1.483\ngini = 0.323\nsamples = 6.7%\nvalue = [0.203, 0.797]\nclass = Music", fillcolor="#399de5be"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="node #9\nepisodes episode season seasons aired television sitcom network  <= -0.653\ngini = 0.47\nsamples = 2.8%\nvalue = [0.377, 0.623]\nclass = Music", fillcolor="#399de564"] ;
+8 -> 9 ;
+10 [label="node #10\ngini = 0.384\nsamples = 1.9%\nvalue = [0.259, 0.741]\nclass = Music", fillcolor="#399de5a6"] ;
+9 -> 10 ;
+11 [label="node #11\ngini = 0.466\nsamples = 0.9%\nvalue = [0.631, 0.369]\nclass = NOT Music", fillcolor="#e581396a"] ;
+9 -> 11 ;
+12 [label="node #12\ngore gory violence spaghetti violent exploitation bloody brutal tarantino brutality blood torture graphic disgusting gruesome thugs nasty sadistic stomach massacre gratuitous grisly pulp squeamish visceral mayhem brutally  <= -0.02\ngini = 0.147\nsamples = 3.9%\nvalue = [0.08, 0.92]\nclass = Music", fillcolor="#399de5e9"] ;
+8 -> 12 ;
+13 [label="node #13\ngini = 0.119\nsamples = 3.8%\nvalue = [0.063, 0.937]\nclass = Music", fillcolor="#399de5ee"] ;
+12 -> 13 ;
+14 [label="node #14\ngini = 0.0\nsamples = 0.1%\nvalue = [1.0, 0.0]\nclass = NOT Music", fillcolor="#e58139ff"] ;
+12 -> 14 ;
+}

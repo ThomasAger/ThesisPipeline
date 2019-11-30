@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="node #0\nsongs singing song sing sings singer singers lyrics vocals sung  <= 0.835\ngini = 0.079\nsamples = 100.0%\nvalue = [0.959, 0.041]\nclass = NOT Musical", fillcolor="#e58139f4"] ;
+1 [label="node #1\nsongs singing song sing sings singer singers lyrics vocals sung  <= 0.41\ngini = 0.018\nsamples = 93.7%\nvalue = [0.991, 0.009]\nclass = NOT Musical", fillcolor="#e58139fd"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="node #2\nromantic romance charming cute quirky charm sweet adorable rom delightful endearing eccentric hearted likable offbeat pleasant whimsical lovable appealing likeable harmless affection  <= 2.154\ngini = 0.008\nsamples = 90.1%\nvalue = [0.996, 0.004]\nclass = NOT Musical", fillcolor="#e58139fe"] ;
+1 -> 2 ;
+3 [label="node #3\ngini = 0.008\nsamples = 90.1%\nvalue = [0.996, 0.004]\nclass = NOT Musical", fillcolor="#e58139fe"] ;
+2 -> 3 ;
+4 [label="node #4\ngini = 0.0\nsamples = 0.0%\nvalue = [0.0, 1.0]\nclass = Musical", fillcolor="#399de5ff"] ;
+2 -> 4 ;
+5 [label="node #5\nsherlock holmes  <= 0.116\ngini = 0.238\nsamples = 3.5%\nvalue = [0.862, 0.138]\nclass = NOT Musical", fillcolor="#e58139d6"] ;
+1 -> 5 ;
+6 [label="node #6\ngini = 0.214\nsamples = 3.5%\nvalue = [0.878, 0.122]\nclass = NOT Musical", fillcolor="#e58139dc"] ;
+5 -> 6 ;
+7 [label="node #7\ngini = 0.278\nsamples = 0.1%\nvalue = [0.167, 0.833]\nclass = Musical", fillcolor="#399de5cc"] ;
+5 -> 7 ;
+8 [label="node #8\ndancing dance dancer ballet dancers dances  <= 0.427\ngini = 0.499\nsamples = 6.3%\nvalue = [0.482, 0.518]\nclass = Musical", fillcolor="#399de512"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="node #9\nalcoholic alcoholism  <= 0.804\ngini = 0.399\nsamples = 3.3%\nvalue = [0.724, 0.276]\nclass = NOT Musical", fillcolor="#e581399e"] ;
+8 -> 9 ;
+10 [label="node #10\ngini = 0.485\nsamples = 0.9%\nvalue = [0.414, 0.586]\nclass = Musical", fillcolor="#399de54b"] ;
+9 -> 10 ;
+11 [label="node #11\ngini = 0.255\nsamples = 2.3%\nvalue = [0.85, 0.15]\nclass = NOT Musical", fillcolor="#e58139d2"] ;
+9 -> 11 ;
+12 [label="node #12\nnominated oscar won award win winning nomination nominations oscars awards academy  <= 0.264\ngini = 0.342\nsamples = 3.0%\nvalue = [0.219, 0.781]\nclass = Musical", fillcolor="#399de5b8"] ;
+8 -> 12 ;
+13 [label="node #13\ngini = 0.346\nsamples = 0.4%\nvalue = [0.778, 0.222]\nclass = NOT Musical", fillcolor="#e58139b6"] ;
+12 -> 13 ;
+14 [label="node #14\ngini = 0.244\nsamples = 2.7%\nvalue = [0.142, 0.858]\nclass = Musical", fillcolor="#399de5d5"] ;
+12 -> 14 ;
+}

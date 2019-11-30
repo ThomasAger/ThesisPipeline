@@ -27,12 +27,12 @@ def biggestEucDifference(space1, space2, entity_names):
         print(dists[i], entity_names[i])
         if i == 500:
             break
-
-space = io.io.import2dArray("../data/movies/nnet/spaces/films200.npy")
-ft_space = io.io.import2dArray("../data/movies/nnet/spaces/mds-nodupeCV1S0 SFT0 allL010010 LR kappa KMeans CA400 MC1 MS0.4 ATS1000 DS800FT BOCFi NT[200]tanh300V1.2L0.npy")
-entity_names = io.io.import1dArray("../data/movies/nnet/spaces/entitynames.txt")
+"""
+space = io.import2dArray("../data/movies/nnet/spaces/films200.npy")
+ft_space = io.import2dArray("../data/movies/nnet/spaces/mds-nodupeCV1S0 SFT0 allL010010 LR kappa KMeans CA400 MC1 MS0.4 ATS1000 DS800FT BOCFi NT[200]tanh300V1.2L0.npy")
+entity_names = io.import1dArray("../data/movies/nnet/spaces/entitynames.txt")
 biggestEucDifference(space, ft_space, entity_names)
-
+"""
 # Top_x is the amount of top entities to show. If 0, shows all
 # Cluster_ids are the clusters you want to show the top entities for. If none, then it shows all
 def getTopEntitiesOnRanking(ranking, entity_names, cluster_names, cluster_length=3, top_x=-1, cluster_ids=None, output=True):
@@ -40,7 +40,7 @@ def getTopEntitiesOnRanking(ranking, entity_names, cluster_names, cluster_length
         ranking = ranking[cluster_ids]
         cluster_names = cluster_names[cluster_ids]
     for i in range(len(cluster_names)):
-        cluster_names[i] = cluster_names[i][:cluster_length]
+        cluster_names[i] = cluster_names[i]
     top_entities = []
     top_rankings = []
     for c in range(len(ranking)):
@@ -62,20 +62,21 @@ def getTopEntitiesOnRanking(ranking, entity_names, cluster_names, cluster_length
 
 
 data_type = "movies"
-file_name = "mds-nodupeCV1S0 SFT0 allL010010 LR kappa KMeans CA400 MC1 MS0.4 ATS1000 DS800"
-cluster_names = io.io.import2dArray("../data/" + data_type + "/cluster/dict/" + file_name + ".txt", "s")
-ranking = io.io.import2dArray("../data/" + data_type + "/rank/numeric/" + file_name + ".txt")
-entity_names = io.io.import1dArray("../data/" + data_type + "/nnet/spaces/entitynames.txt")
+file_name = "num_stw_num_stw_200_MDS_ndcg_1000_10000_0_rank_50_100_0.0_k-means++_200_kmeans"
+cluster_names = io.import1dArray("../../data_paper/experimental results/chapter 5/" + data_type + "/cluster/" + file_name + ".txt", "s")
+ranking = io.import2dArray("../../data_paper/experimental results/chapter 5/" + data_type + "/cluster/" + file_name + "_best_200_rank.npy", "s")
+entity_names = io.import1dArray("../../data_paper/experimental results/chapter 5/" + data_type + "/entity_names.txt")
 top_x = 5
 cluster_length = 3
 cluster_ids = None
 
 normal_top_entities = getTopEntitiesOnRanking(ranking, entity_names, cluster_names, cluster_length, top_x, cluster_ids)
+"""
 print("---------------------")
 file_name = "mds-nodupeCV1S0 SFT0 allL010010 LR kappa KMeans CA400 MC1 MS0.4 ATS1000 DS800FT BOCFi NT[200]tanh300V1.2"
 ranking = io.io.import2dArray("../data/" + data_type + "/nnet/clusters/" + file_name + ".txt")
 finetuned_top_entities = getTopEntitiesOnRanking(ranking, entity_names, cluster_names, cluster_length, top_x, cluster_ids)
-
+"""
 
 def id_from_array(array, name):
     for n in range(len(array)):

@@ -456,7 +456,7 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
 def init():
     classifiers = ["DecisionTree3"]
-    data_type = ["placetypes"]
+    data_type = ["newsgroups"]
     """ Placetypes bow num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_ndcg_2000_10000_0_dir.npy
     use_space_name = "200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep"
     use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"
@@ -464,10 +464,11 @@ def init():
     use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_ndcg_2000_10000_0_dir.npy"
     use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_ndcg_2000_10000_0_words.npy"
     """
-    #""" Placetypes vector space
-    use_space_name = "100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep"
-    score_type = "ndcg"
-    use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"                                                 "num_stw_num_stw_50_AWVEmp_"+score_type+"_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_"+use_space_name+".npy")
+    #""" newsgroups bow
+    use_space_name = "5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep"
+    score_type = "acc"
+    use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"                                                 
+                    "num_stw_ppmi_Dev_6223MClass_Balanced_5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep.npy")
     use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_"+score_type+"_2000_10000_0_dir.npy"
     use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_"+score_type+"_2000_10000_0_words.npy"
     #"""

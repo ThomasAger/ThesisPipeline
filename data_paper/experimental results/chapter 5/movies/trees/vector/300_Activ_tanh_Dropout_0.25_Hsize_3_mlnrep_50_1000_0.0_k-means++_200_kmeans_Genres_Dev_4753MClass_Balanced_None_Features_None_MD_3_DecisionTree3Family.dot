@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="node #0\ndisneys walt  <= 0.571\ngini = 0.137\nsamples = 100.0%\nvalue = [0.926, 0.074]\nclass = NOT Family", fillcolor="#e58139eb"] ;
+1 [label="node #1\nadults children childrens parents adult  <= 1.587\ngini = 0.047\nsamples = 92.5%\nvalue = [0.976, 0.024]\nclass = NOT Family", fillcolor="#e58139f9"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="node #2\nadults children childrens parents adult  <= 1.196\ngini = 0.024\nsamples = 88.7%\nvalue = [0.988, 0.012]\nclass = NOT Family", fillcolor="#e58139fc"] ;
+1 -> 2 ;
+3 [label="node #3\ngini = 0.016\nsamples = 84.2%\nvalue = [0.992, 0.008]\nclass = NOT Family", fillcolor="#e58139fd"] ;
+2 -> 3 ;
+4 [label="node #4\ngini = 0.16\nsamples = 4.5%\nvalue = [0.912, 0.088]\nclass = NOT Family", fillcolor="#e58139e7"] ;
+2 -> 4 ;
+5 [label="node #5\nsexual nudity erotic sexually sexuality porn explicit porno  <= -0.133\ngini = 0.429\nsamples = 3.8%\nvalue = [0.688, 0.312]\nclass = NOT Family", fillcolor="#e581398b"] ;
+1 -> 5 ;
+6 [label="node #6\ngini = 0.474\nsamples = 1.6%\nvalue = [0.387, 0.613]\nclass = Family", fillcolor="#399de55e"] ;
+5 -> 6 ;
+7 [label="node #7\ngini = 0.16\nsamples = 2.2%\nvalue = [0.912, 0.088]\nclass = NOT Family", fillcolor="#e58139e7"] ;
+5 -> 7 ;
+8 [label="node #8\nadults children childrens parents adult  <= 1.453\ngini = 0.433\nsamples = 7.5%\nvalue = [0.317, 0.683]\nclass = Family", fillcolor="#399de589"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="node #9\ndisneys walt  <= 1.92\ngini = 0.408\nsamples = 2.4%\nvalue = [0.714, 0.286]\nclass = NOT Family", fillcolor="#e5813999"] ;
+8 -> 9 ;
+10 [label="node #10\ngini = 0.359\nsamples = 2.2%\nvalue = [0.765, 0.235]\nclass = NOT Family", fillcolor="#e58139b1"] ;
+9 -> 10 ;
+11 [label="node #11\ngini = 0.142\nsamples = 0.2%\nvalue = [0.077, 0.923]\nclass = Family", fillcolor="#399de5ea"] ;
+9 -> 11 ;
+12 [label="node #12\ngore gory violence spaghetti violent exploitation bloody brutal tarantino brutality blood torture graphic disgusting gruesome thugs nasty sadistic stomach massacre gratuitous grisly pulp squeamish visceral mayhem brutally  <= 0.028\ngini = 0.232\nsamples = 5.1%\nvalue = [0.134, 0.866]\nclass = Family", fillcolor="#399de5d7"] ;
+8 -> 12 ;
+13 [label="node #13\ngini = 0.181\nsamples = 4.8%\nvalue = [0.101, 0.899]\nclass = Family", fillcolor="#399de5e2"] ;
+12 -> 13 ;
+14 [label="node #14\ngini = 0.454\nsamples = 0.3%\nvalue = [0.652, 0.348]\nclass = NOT Family", fillcolor="#e5813977"] ;
+12 -> 14 ;
+}
