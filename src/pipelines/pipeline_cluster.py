@@ -125,6 +125,12 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 
     cluster_dict = {}
     for i in range(len(cluster_names)):
+        if cluster_names[i] in cluster_dict:
+            if i == 1:
+                print("Clustering failed for this variation")
+                print(dir_fn)
+                exit()
+            cluster_names[i] = cluster_names[i] + "Fail" + str(i)
         cluster_dict[cluster_names[i]] = i
     # Get the rankings on the clusters
     rank_save = SaveLoad(rewrite=rewrite_all)
@@ -161,7 +167,8 @@ def cluster_pipeline( file_name, processed_folder, cluster_amt, rewrite_all, top
 def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False,
          bonus_fn="", cluster_amt=None, cluster_methods=None,
-         rewrite_all=False, top_dir_amt=None, svm_clusters=False):
+         rewrite_all=None, top_dir_amt=None, svm_clusters=False, use_space=None, use_space_name=None, use_dir_fn=None, use_dir_names=None):
+
     orig_top_dir_amt = top_dir_amt
     pipeline_fn = "num_stw"
     name_of_class = None
@@ -258,6 +265,21 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         rank_fn_internal =[]
         word_fn_internal = []
         dir_fn_internal = []
+
+        rank_fn = csv.sort_values("avg_f1", ascending=False).values[0][rank_id]
+        print(rank_fn)
+        rank_fn_internal.append(rank_fn)
+
+        word_fn = "_".join(rank_fn.split("_")[:-1]) + "_words.npy"
+        print(word_fn)
+        word_fn_internal.append(word_fn)
+
+        dir_fn = csv.sort_values("avg_f1", ascending=False).values[0][dir_id]
+        dir_fn_internal.append(dir_fn)
+
+        space_name = rank_fn.split("/")[-1:][0][:-4]
+        space_name_internal.append(space_name)
+        """
         for z in range(len(csv.values)):
             rank_fn = csv.values[z][rank_id]
             print(rank_fn)
@@ -272,6 +294,8 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
 
             space_name = rank_fn.split("/")[-1:][0][:-4]
             space_name_internal.append(space_name)
+        """
+
         rank_fn_array.append(rank_fn_internal)
         word_fn_array.append(word_fn_internal)
         space_name_array.append(space_name_internal)
@@ -389,27 +413,81 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
                                                   "tol": tol,
                                                   "top_dir_amt": top_dir_amt}
                         print(cluster_amt[c])
-                        tsrd = pipeline(space_names[i][j][a],  dir_fns[i][j][a],  classes, class_names,processed_folder, kfold_hpam_dict,
-                                        model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
-                                        auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
-                                        cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j][a], space=space, cluster_method=cluster_methods[cm],
-                                        svm_clusters=svm_clusters, bow=bow, dct=dct)
-                        tsrds.append(tsrd)
+
+                        if use_dir_fn is  None:
+
+                            tsrd = pipeline(space_names[i][j][a],  dir_fns[i][j][a],  classes, class_names,processed_folder, kfold_hpam_dict,
+                                            model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, score_metric=score_metric,
+                                            auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method, pipeline_hpam_dict=pipeline_hpam_dict,
+                                            cluster_amt=cluster_amt[c], data_type=data_type, dir_names=word_fns[i][j][a], space=space, cluster_method=cluster_methods[cm],
+                                            svm_clusters=svm_clusters, bow=bow, dct=dct)
+                            tsrds.append(tsrd)
+                        else:
+                            tsrd = pipeline(use_space_name, use_dir_fn, classes, class_names,
+                                            processed_folder, kfold_hpam_dict,
+                                            model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
+
+                                            score_metric=score_metric,
+                                            auroc=False, name_of_class=name_of_class[j], mcm=multi_class_method,
+                                            pipeline_hpam_dict=pipeline_hpam_dict,
+                                            cluster_amt=cluster_amt[c], data_type=data_type,
+                                            dir_names=use_dir_names, space=use_space,
+                                            cluster_method=cluster_methods[cm],
+                                            svm_clusters=svm_clusters, bow=bow, dct=dct)
+                            tsrds.append(tsrd)
+
                 # Make the combined CSV of all the dims of all the space types
                 all_r = np.asarray(tsrds).transpose()
                 rows = all_r[1]
                 cols = np.asarray(rows.tolist()).transpose()
                 col_names = all_r[0][0]
                 key = all_r[2]
-                dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j][a] +  str(a) + "reps" + model_type + "_"
-                             + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
-                    col_names, cols, key)
+                if use_space_name is None:
+                    dt.write_csv(processed_folder + "clusters/score/csv_final/" + space_names[i][j][a] +  "reps" + model_type + "_"
+                                 + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
+                        col_names, cols, key)
+                else:
+                    dt.write_csv(processed_folder + "clusters/score/csv_final/" + use_space_name +  "reps" + model_type + "_"
+                                 + name_of_class[j] + "_" + str(svm_clusters)  + ".csv",
+                        col_names, cols, key)
+                    exit()
                 print("a")
 
 
 def init():
-    classifiers = ["DecisionTree1","DecisionTree2","DecisionTree3"]
-    data_type = ["placetypes"]
+    classifiers = ["DecisionTree3"]
+    data_type = ["newsgroups"]
+    """ Placetypes bow num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_ndcg_2000_10000_0_dir.npy
+    use_space_name = "200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep"
+    use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"
+                                     "num_stw_ppmi_Foursquare_Dev_133MClass_Balanced_"+use_space_name+".npy")
+    use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_ndcg_2000_10000_0_dir.npy"
+    use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_ndcg_2000_10000_0_words.npy"
+    """
+    #""" newsgroups bow
+    use_space_name = "5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep"
+    score_type = "acc"
+    use_space = np.load("..\..\data\processed/" + data_type[0] + "\mln\mln/"                                                 
+                    "num_stw_ppmi_Dev_6223MClass_Balanced_5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep.npy")
+    use_dir_fn = "../../data/processed/"+data_type[0]+"/directions/fil/num_stw_US_"+use_space_name+"_"+score_type+"_2000_10000_0_dir.npy"
+    use_dir_names = "../../data/processed/"+data_type[0]+"/rank/fil/num_stw_US_"+use_space_name+"_"+score_type+"_2000_10000_0_words.npy"
+    #"""
+    """num_stw_US__ndcg_2000_10000_0_dir
+    score_type = "ndcg"
+    use_space_name = "200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep"
+    use_space = np.load("..\..\data\processed/" + data_type[
+        0] + "\mln\mln/" + "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_"+use_space_name+".npy")
+    use_dir_fn = "../../data/processed/" + data_type[
+        0] + "/directions/fil/num_stw_US_" + use_space_name + "_"+score_type+"_2000_10000_0_dir.npy"
+    use_dir_names = "../../data/processed/" + data_type[
+        0] + "/rank/fil/num_stw_US_" + use_space_name + "_"+score_type+"_2000_10000_0_words.npy"
+    """
+    """
+    use_space = None
+    use_space_name = None
+    use_dir_fn = None
+    use_dir_names = None
+    """
     for j in range(len(data_type)):
         doLR = False
         dminf = -1
@@ -431,13 +509,13 @@ def init():
             cluster_amt = [50, 100, 200]
             top_dir_amt = [2, 1.0, 4, 6, 8]
 
-        cluster_methods = ["derrac", "kmeans"]
+        cluster_methods = ["kmeans"]
 
         svm_clusters = [False]
 
         multi_class_method = "OVR"
         bonus_fn = ""
-        rewrite_all = False
+        rewrite_all = False#"2019 11 22 14 32"
         print("iterating through classifiers")
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
@@ -455,7 +533,8 @@ def init():
                      grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
                      score_metric="avg_f1", max_depth=max_depths, multiclass=multi_class_method, LR=doLR, bonus_fn=bonus_fn,
                      rewrite_all=rewrite_all, cluster_amt=cluster_amt, cluster_methods=cluster_methods, top_dir_amt=top_dir_amt,
-                     svm_clusters=svm_clusters[k])
+                     svm_clusters=svm_clusters[k], use_space=use_space, use_space_name=use_space_name, use_dir_fn=use_dir_fn,
+                     use_dir_names=use_dir_names)
 
 if __name__ == '__main__':
     print("starting")

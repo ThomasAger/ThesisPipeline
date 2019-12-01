@@ -47,7 +47,13 @@ def get_doc_amt(data_type):
 
 
 def check_shape(features, data_type):
-    print("Shape", len(features))
+
+    try:
+        feature_len = len(features)
+    except TypeError:
+        feature_len =features.shape[1]
+    if data_type == "placetypes" or data_type == "movies":
+        print("Shape", feature_len)
     if data_type == "imdb" or data_type == "sentiment":
         max_size = imdb_total
     elif data_type == "newsgroups":
@@ -65,8 +71,8 @@ def check_shape(features, data_type):
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
-    if len(features) != max_size:
-        raise ValueError(print(len(features), "This is not the standard size, expected " + str(max_size)))
+    if feature_len != max_size:
+        raise ValueError(print(feature_len, "This is not the standard size, expected " + str(max_size)))
     return True
 
 def get_split_ids(data_type, matched_ids):
@@ -126,27 +132,39 @@ def split_data(x, y, split_ids, dev_percent_of_train=0.2, data_type=""):
     if data_type != "":
         check_shape(x, data_type)
     y = py.transIfColsLarger(y)
-    x_len = len(x)
+
+    try:
+        x_len = len(x)
+    except TypeError:
+        x_len = x.shape[1]
     y_len = len(y)
     x_train = x[split_ids["x_train"]]
     y_train = y[split_ids["y_train"]]
     x_test = x[split_ids["x_test"]]
     y_test = y[split_ids["y_test"]]
+
+    try:
+        x_train_len = len(x_train)
+        x_test_len = len(x_test)
+    except TypeError:
+        x_train_len = x_train.shape[1]
+        x_test_len = x_test.shape[1]
+
     if dev_percent_of_train > 0:
-        x_dev = x_train[int(len(x_train) * (1 - dev_percent_of_train)):]
+        x_dev = x_train[int(x_train_len * (1 - dev_percent_of_train)):]
         y_dev = y_train[int(len(y_train) * (1 - dev_percent_of_train)):]
-        x_train = x_train[:int(len(x_train) * (1 - dev_percent_of_train))]
+        x_train = x_train[:int(x_train_len * (1 - dev_percent_of_train))]
         y_train = y_train[:int(len(y_train) * (1 - dev_percent_of_train))]
         if np.amax(x_train) == np.amax(y_train) and np.amax(x_test) == np.amax(y_test):
-            if (len(x_train) + len(x_test) + len(x_dev)) != x_len:
-                raise ValueError(str(x_len) + "does not equal its components")
+            if (x_train_len + x_test_len + len(x_dev)) != x_len:
+                raise ValueError(str(x_test_len) + "does not equal its components")
             if (len(y_train) + len(y_test) + len(y_dev)) != y_len:
                 raise ValueError(str(y_len)+ "does not equal its components")
         check_util.check_splits(x_train=x_train, y_train=y_train, x_test=x_dev, y_test=y_dev)
 
     else:
         if np.amax(x_train) == np.amax(y_train) and np.amax(x_test) == np.amax(y_test):
-            if (len(x_train) + len(x_test)) != x_len:
+            if (x_train_len + x_test_len) != x_len:
                 raise ValueError(str(x_len) + "does not equal its components")
             if (len(y_train) + len(y_test)) != y_len:
                 raise ValueError(str(y_len)+ "does not equal its components")

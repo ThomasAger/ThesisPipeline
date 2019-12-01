@@ -1,6 +1,409 @@
-\chapter{Investigating Neural Networks In Terms Of Directions}
+\chapter{Directions in Neural Networks}\label{chapter5}
 
-\section{Chapter 5}\label{chapter5}
+\section{Introduction}
+
+% Neural networks are not interpretable
+
+% However, they clearly contain a lot of useful information, as they perform well at tasks
+
+% There is usually a theory that these networks contain more complex relations the deeper they go, or more 'abstract' dimensions.
+
+% Write things that cannot be challenged, everything can and will be used against you
+
+% Aim is to do a comprehensive qualitative analysis of using these interpretable features obtained from neural networks
+
+ %First: Can we verify that the  neural networks are finding meaningful directions for the task by investigating the directions that we will use as features in the interpretable represenation obtained from the network? 
+
+% Three questions, first: Is it possible to obtain these more complex, accurate to domain knowledge relations and use them to produce interpretable representations that achieve similar results to neural networks on tasks even when using a limited number of features in a simple interpretable classifier e..g a low-depth decision tree, not replacing neural network, just using it. NOT transfer learning, cant really justify that (good space that can be used for anything)
+
+% Finally: In networks which obtain successively more abstract representations, can we create a mapping of specific to abstract concepts?
+
+%Conclusion: The rankings are sometimes weird/absurd, would be nice if it was more interpretable, thats where fine-tuning comes in
+
+
+
+% The contribution of this chapter is as follows:
+
+% We look at feed-forward networks and auto-encoders. The idea with auto-encoders is that we will be able to map specific terms to more complex ones by reducing the size of the vector space. With feed-forward networks, we want to see how the neural network achieves strong performance on a text classification task, aka how it transforms the representation such that it can achieve strong results on a supervised task.
+
+% The results for auto-encoders was this, feed-forward networks was that
+
+% Summary/whats coming next
+
+\section{Background}
+
+There are two typical methods for making neural networks interpretable, explaining the neural network after it has been learned and modifying the way the neural network is learned such that it is interpretable. However, our method does not easily fit into either of these categories, as we do not explain the neural network in terms of its predictions or making it so that it learns an additional interpretable objective.
+
+The method that we introduce is a post-processing method on the hidden layer of a neural network to re-organize it's internal semantic structure into interpretable features. This satisfies a number of important criteria in the literature. It provides interpretability of the models representation, completeness of that representation, doesn't rely on input vectors instead using information directly from the model and is not limited to a model or a classifier. 
+
+One relevant work in the image domain is TCAV which separates user-specified entities using linear regression and obtains a direction using the weights for that concept. 
+
+As the method can be used to post-process vector spaces that encode semantic directions, it can be applied to many existing models without the need for re-training or adopting a new architecture. 
+
+Interpretability and completeness
+
+Interpretability of information inside the network versus predictions
+
+
+Post-hoc versus baking it into the model
+
+Creating networks that are easier to explain:  Disentangled representations, GAN, PCA< Independent Component Analytsis, Nonnegative matrix factorization, Variational autoencoding, Beta-VAE, InfoGAN, Construction of graphs, decision trees
+
+Deep networks that are trained to make their own explanations 
+
+Linear proxy models
+
+Decision trees from neural networks  (super deep and bad)
+
+Rule extraction from neural networks
+
+Concept Activation Vectors "are a framework for interpretation of a neural nets representations by identifying and probing driections that align with human interpretable concepts"
+
+Persuasive versus transparent
+
+Saliency maps "One of the most popular approaches in interpreting NN is saliency methods (24; 22; 25; 8; 5).
+These techniques seek to identify regions of the input most relevant to the classification output by
+the network. Qualitatively, these methods often successfully label regions of the input which seem
+semantically relevant to the classification.
+" - copy pasted MIGHT BE WRONG
+
+"Even a truthful explanation may be misleading if it is only locally truthful (20). For example, since
+the importance of features only needs to be truthful in the vicinity of the data point of interest, there
+is no guarantee that the method will not generate two completely conflicting explanations. These
+inconsistencies may result in decreased user trust at a minimum. On the other hand, making a
+globally truthful explanation may be difficult as the networks decision boundaries may be complex.
+TCAV produces globally explanations, and uses model’s output to generate explanations to maintain
+consistency between explanations and the model’s reasoning.
+" - copy pasted
+
+" there is evidence that they work by gradually disentangling concepts of interest, layer by
+layer (2; 3)."
+
+"although feedforward networks learn highly nonlinear
+functions there is evidence that they work by gradually disentangling concepts of interest, layer by
+layer (2; 3). It has also been shown that representations are not necessarily contained in individual
+neurons but more generally in linear combinations of neurons (19; 27). Thus the space of neuron
+activations in layers of a neural network may have a meaningful global linear structure. Furthermore,
+if such a structure exists, we can uncover it by training a linear classifier mapping the representation
+in a single layer to a human selected set of concepts."
+
+[2] Understanding intermediate layers using linear classifier
+probes.
+
+[3] Network dissection: Quantifying interpretability of deep visual representations
+
+[19] Svcca: Singular
+vector canonical correlation analysis for deep understanding and improvement
+
+[27] Intriguing properties of neural networks.
+
+\subsection{Explanations}
+
+% Explanation is a huge field
+
+% The different kinds of explanations
+
+% Where our directions fit-into this paradigm
+
+
+\subsection{Rules and Neural Networks}
+
+% We plan to use rules in-order to create a kind of mapping of domain knowledge from specific to general using auto-encoders
+
+% There is a history of using rules to understand neural networks, pedagogical etc
+
+% Where our method fits into this
+
+
+\subsection{Investigation methods}
+
+% There are many visualization/investigation tools
+
+% Where our directions fit-into this paradigm
+
+\subsection{Feed-forward networks}
+
+% Feed-forward networks 
+
+% Basic layout, input/hidden/output, weights
+
+% Activation functions (Relu, Tanh) refer to paper
+
+% Loss (binary_crossentropy), trainer, Adagrad
+
+% Dropout
+
+% Thresholding
+
+
+\subsection{Auto-encoders}
+
+% Input/output is the same
+
+% Hidden layer constrained in some way so that the representation is more general
+
+% Denoising auto-encoders
+
+% Variations of auto-encoders in recent years. We just use the basic one.
+
+\section{Method}
+
+A bag-of-words representation when used as input to a decision-tree classifies using many individual words, for example the class of "comedy" would be have a node for each feature, and those features would be words like "laughed" "witty" "charming" and so on. Because of this, a larger tree is required to classify well. 
+
+Neural networks with large hidden layers can also be expected to have similar behaviour. If the hidden layer is larger, then the representation will contain directions that correspond to more granular concepts. For example, to classify comedy there may be directions like "gags, slapstick, gag", "witty, charming, wit", "comedies, comedy" "eccentric", simple concepts that directly relate to the class.
+
+As the layers get smaller, the concepts become more condensed and general. To see an example of this, see \ref{ch5:clustersusedintrees} where example clustered features from the best performing decision trees are shown.
+
+% Generally, we treat the hidden layers of neural networks as vector spaces.
+
+% We use the same methods as described in chapter 3, obtaining directions and rankings
+
+% Using these directions and rankings, we obtain interpretable representations
+
+\subsection{Auto-encoders}
+
+% Using the interpretable representation, we create a mapping from layer-to-layer using a rule-based classifier
+
+\subsection{Feed-forward networks}
+
+These representations these networks build should differ from those obtained in the unsupervised representation in a few different ways. First, the neural network used is multi-label, meaning that all of the classification objectives are trained at the same time. Second, a non-linear activation function is used, sometimes in multiple layers. Finally, the supervised objective should shape the space more than an unsupervised objective, although only objectives that are relevant to the domain are considered in this case - as we are not interested in a network that ignores a large amount of information, rather we want the network to construct a representation that more accurately represents domain knowledge.
+
+ Following results showing that simple neural networks can still perform well on text classification without needing a complex architecture  \cite{Lakhotia2018} \cite{Nam2014}, we use a neural network with the following changes: Cross-entropy loss, Adagrad trainer with default parameters, Dropout, Softmax activation on the output layer, ReLu or tanH activation function. 
+
+We trained neural networks with non-linear activation functions so that they would  perform better than linear SVM's on  document representations. The assumption behind this is that if the network is able to achieve stronger results on the task than a baseline representation, it must be doing something more than representing the information. In other words, the representation must be better for the task than an unsupervised representation. The goal of this section is to discover why neural networks are able to perform so well, and explain it in terms of directions. 
+
+To learn a baseline feedforward network, we take the highest performing representation found in Table \ref{bg:repsresults} for clusters on depth-3 decision trees and use them as input representations.   For the newsgroups, this is the size 100 Doc2Vec space. Then, we set the hidden-layer to be the same size as the input representation and use a non-linear activation function.  The reasoning behind this is twofold: First, we can assume that the representation that performs well on depth-three decision trees contain good interpretable concepts that can be meaningfully adjusted by the network, and second that this allows for easy comparison between the original representation and the representation taken from the hidden layer of the network. These feedforward networks are simple, but do achieve stronger results than the linear SVM.  
+
+The  differences between the supervised representation and the unsupervised representation are examined here, with the main question being how exactly does a neural network achieve such strong results on the task? Some general ideas or explanations that are given are that through non-linear transformations, the internal representation of the neural network is able to find a more complex or accurate representation of domain knowledge relevant to the task.
+
+
+We additionally learn a neural network starting from the bag-of-words  with two hidden-layers, the first of size 1000 and the second of size 100. In preliminary experiments, the network with two layers outperformed the single layer network consistently, and this neural network performs much more strongly than the one starting from the Doc2Vec space. 
+
+% We simply take the hidden-layer representation and look at what's going on. 
+
+
+
+\section{Parameters}
+
+We use three different domains: Newsgroups, Placetypes and Movie reviews. We choose newsgroups and movie reviews as they have a relevant task that can be used to verify if the network has learned general domain concepts, e.g. in the case of newsgroups the natural categories of the documents and the movie reviews the genres of movies. Placetypes are chosen not because we expect them to perform well with neural networks, but rather because their entities are easy to understand and in-turn explain. In fact, as placetypes has such a low number of entities for its tasks we cannot expect good results with neural networks which typically perform well with a large number of entities.
+
+When obtaining the directions, we set the frequency cut-off to the top 10,000 words and the direction cut-off when classifying to 2000 features. This is arbitrary, as both of these cut-offs need to be tuned for the specific space-type and task in-order to achieve strong results. The reason that these parameters are not tuned in this case is because we are interested in the qualitative nature of the directions, not the performance on the text classification task. 
+
+We investigate the task using the newsgroups as it gives a good example of a representation that contains many different concepts and aspects of domain knowledge, as well as a well defined classification task that if achieved well on clearly demonstrates the representation contains a good amount of information in the domain. The place-types task does not contain too many entities, making it unreliable for neural network training and the reuters task has similar problems. One alternative would be the movies domain, but as identifying the genres of movies is functionally similar to the newsgroups task, we assume that any results found for the newsgroups can easily generalize to any classification task.
+
+We tune the network for the following values: 
+
+epoch = [100, 200, 300]
+activation_function = ["relu", "tanh"]
+dropout = [0.1, 0.25, 0.5, 0.75]
+hidden_layer_size = [1,  2, 3, 4]
+
+When using the bag-of-words as input to the neural network for the newsgroups, we found that it worked well with default parameters.  The parameters for this network are not tuned as the baseline network is, instead an initial hidden layer of size 1000 was chosen following recommendations in \cite{Nam2014a} and the secondary layer was chosen as it has a size similar to the Doc2Vec space and converged quickly. As the method described in chapter \ref{ch3} scales poorly to larger dimensional spaces, this secondary layer was necessary. The batch size is 100 for all experiments, excluding the place-types which used a batch-size of 10 as there were so few entities.
+
+\subsection{Feed-forward Networks}
+
+% We use hyper-parameter optimization to get the best performing neural network
+
+\section{Quantitative Results}
+
+Here, we show quantitative results for:
+
+\begin{itemize}
+	\item The predictions of the neural networks.
+	\item The results for the directions obtained from the hidden layers of the neural networks on depth-3 decision trees.
+	\item The results of the clustering of those directions on depth-3 decision trees.
+\end{itemize}
+
+The intention of the results in this section is not to achieve state-of-the-art on the task, rather it is to show that depth-3 decision trees that use the directions  obtained from a simple neural network  can perform well on the task or sometimes better. This validates the idea that  interpretable features obtained from the neural network using the method in Chapter \ref{ch3} can be used as an alternative in a myriad of simple interpretable classifiers without much loss in prediction power. As these features are able to perform well on a simple classifier, it additionally validates the idea that these interpretable features can be used to investigate the neural network and the domain, which is looked at in more depth in the Qualitative Results Section \ref{ch5:qual}. 
+
+This section additionally provides insight into the directions contained within the neural network hidden layers.  If the neural network performs better than a linear svm with the unsupervised representation as input, it gives the insight that it must contain more relevant or refined directions than the unsupervised representation. Similarly if it performs poorly, it must be arranging the entities poorly. These results are preliminary insights that inform what we expect the directions to be like in in Section \ref{ch5:qual}.
+
+\subsubsection{Neural Network Results}
+
+For the newsgroups, the neural network with bow input performed significantly better than the one with a vector space as input. 
+
+Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful concepts in the space, then the directions should also perform well on a depth-3 decision tree.
+
+For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities.
+
+\subsubsection{Direction results}
+
+As expected, the score of a depth-3  decision tree classifier when using the directions obtained from the neural network are close to the performance of the neural network. 
+
+
+
+
+
+
+
+\subsubsection{Directions}
+
+
+\subsubsection{Clusters}
+
+\section{Qualitative Investigation}\label{ch5:qual}
+
+The qualitative section  focuses on showing that the interpretable feature representation is meaningful and can be used to investigate, verify and understand the neural network. There are three main goals of this qualitative investigation section:
+
+\begin{itemize}
+	\item Verify the interpretable feature representation obtained from the neural network embeddings is meaningful, and use it to  understand what the neural network embedding is representing.
+	\item Use the interpretable feature representation to investigate the difference between the embeddings.
+	\item Validate that the neural network embedding is representing concepts that are used to solve the task in a way that makes sense.
+\end{itemize}
+
+The first goal is simple to achieve: If the interpretable features obtained from the neural network make intuitive sense, then the neural network embedding can be understood by examining these features. The second goal is achieved by comparing the interpretable feature representations obtained from the embeddings. Finally, validating the neural network to ensure it is solving the task in a way that makes sense is achieved by ensuring the decision trees that use the interpretable feature representation as input make intuitive sense. 
+
+When showing results for single directions, the words that these directions are labelled with e.g. "Blood" will be accompanied by the terms for two of its most similar directions e.g. "Blood (Gore, Horror)". This is to provide context for the word such that it can be understood more easily. Unlike the clustered features, the direction is not changed. Three embeddings are used in this section for each domain: The unsupervised embedding, the neural network embedding that used the vector space as input, and the neural network embedding that used the bag-of-words as input. 
+
+\subsection{Feed-forward networks}
+
+\subsubsection{Neural networks with vector space as input}
+
+% Most difference
+
+\begin{table}[]\label{Top-scoring unique and common terms}
+	content...
+\end{table}
+
+ If a direction scores highly it is meaningful in the embedding. To examine the difference between the embeddings we look at the directions that are unique to each embedding and the ones that are common to them all, among the top-scoring directions. These directions are additionally used as examples to show that the features are meaningful. A direction is "unique" if the direction word and both of its associated similar direction words do not occur in either of the other two embeddings. It is common if the original direction word occurs in either of the other two embeddings. Terms are scored using NDCG \ref{ch3:NDCG} as this has good results for a variety of tasks and spaces. The frequency threshold was set to the top 10,000 terms and the score threshold was set to the top 2,000 scoring terms in NDCG. 
+
+
+
+Common terms: relevant to the class
+Unique terms: unique noise, vector space nnet performed better while bow nnet performed worse. should see something that reflects that
+Common terms btwn unsupervised and vector: common noise
+Most distance: 
+
+Generally, we see a similar trend in other domains. If noise is in the original space, using it as input to a neural network will not remove that noise. In that case, what changes between the original vector space and the neural network? To answer this question, the terms arranged by the difference between them is listed in table 
+
+
+
+\subsubsection{Neural networks with bow as input}
+
+
+
+%%% Unique dirs
+
+\begin{table}[]\label{Unique word directions identified in the bow representation}
+	Entities, terms that have gone down the most from the original space, terms that have gone up the most
+\end{table}
+
+However, this only covers those terms which were also in the original space. There are also unique word directions identified in the bow representation. %Noisy entities have gone down, prototypical entities have gone up?
+
+%The clusters obtained from the bag-of-words as input neural network directions seemed to have a general trend as well, they grouped noisy terms that were not related to the genres together, and kept the genre clusters tight without excess terms. The hypothesis that follows is that the neural network focused on optimizing the rankings for these directions, moving anything not directly related to the objective away. 
+
+To demonstrate this, we show a comparison of the neural network with bow input representation and the original representation each projected using PCA into two dimensions.
+
+%Additionally, we investigate the decision trees associated with these clusters. In these decision trees, we can see that the same features were used repeatedly with more refinement, speaking to the fact that rather than neural networks finding new concepts in the domain, they instead refine those that are relevant to the task. This makes explanation of why an entity is classified a certain way easy, as it can simply be put in terms of relative scale. For example, you could say that this movie was classified as a horror, as it was more {horror, scary, bloody} than {example movie}.
+
+The difference between the rankings of common single word directions is also investigated. Hypothetically, the rankings should make more intuitive sense, and noise should be removed, if the neural network does indeed prioritize the rankings of this important domain knowledge.
+
+
+%%% Common dirs
+
+
+
+%%%  Top dirs
+
+\begin{table}[]\label{For movies Top directions +}
+	content...
+\end{table}
+ 
+In the movie review domain, the original MDS space had high NDCG scores for noise, e.g. "berardinelli" a reviewer's name, or "listinfo" which is review metadata. This was also present in the neural network representation where this vector space was used as input. However, it was not present when starting from a bag-of-words. This is interesting, because the neural network performed worse with the bag-of-words as input, and very well with the vector space as input, despite their directions performing about the same on a depth-3 decision tree.
+
+%%%  Top dir differences
+
+\begin{table}[]\label{difference how top directions in original rep have changed}
+	content...
+\end{table}
+ 
+
+%%%%  Decision trees obtained from single dirs
+
+Decision trees of depth-3 in the quantiative results performed as well as neural networks, however the trees obtained from this representation are simplistic in the form of "if HORROR then HORROR" rather than representing some complex domain knowledge.
+
+%%%%  Clusters
+
+%%%%  Cluster diffs (new clusters? same terms but diff clusters?)
+
+%%%%  Decision trees obtained from clusters
+
+\begin{table}[]\label{ch5:clustersusedintrees}
+	Horror: Most important clusters used for space 1, most important for space 2
+\end{table}
+
+%%%%  Ranks obtained from single directions
+
+%%%%  Ranks obtained from cluster directions
+
+%%%%  Ranks obtained from single directions differences
+
+\begin{table}[]\label{Biggest difference in entities (entities that have gone down/gone up the most) for the same directions }
+	Entities, terms that have gone down the most from the original space, terms that have gone up the most
+\end{table}
+
+
+There are common word directions, e.g. horror. But how have the rankings changed for these directions? This is investigated by looking at the biggest differences in rankings for the same word between the original representation and the fine-tuned representation. We use the place-types results for this as they have easy to understand entities. We can see that e.g.
+
+%%%%  Ranks obtained from top directions differences
+
+%%%%  Common ranks
+
+%%%%  Unique ranks
+
+%%%%  PCA projections
+
+%%%%  Scores of different classes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The way that knowledge is represented is changed significantly in the neural network with bow input compared to the original representation. This can be verified by what clusters are used in the decision trees to classify the entities. For the neural network with bow, 
+But what if these directions are not new concepts, but instead the same rankings but with different words labelling them?
+
+
+
+
+
+
+\subsubsection{Directions}
+
+Two groups of single word directions and clusters were obtained from three different domains, in each one is from the second layer of  a two-layer neural network starting from a bag-of-words and the other is from the first layer of a one-layer neural network starting from an unsupervised representation. The examples in this section for the clusters are from the clusters that performed the best in depth-3 decision-trees. When investigating single word directions, sometimes it is unclear what they mean. In this case, the most similar single word-directions are found and used to provide additional context.
+
+% Compare the same directions but see how their rankings have changed
+
+
+
+% Compare the top directions for NDCG, top for Kappa
+
+
+
+\subsubsection{Starting from vector space}
+
+\subsubsection{Starting from bag-of-words}
+
+Obtaining directions from this space takes much longer than normal vector spaces.
+
+\subsection{Auto-encoders}
+
+\section{Conclusion}
+
+
 
  Neural network models that encode spatial relationships in their hidden layers have achieved state-of-the-art in Text Classification by using transfer learning from a pre-trained Language Model \cite{Gong2018}. There have also been neural network models that produce an interpretable representation, for example InfoGan.
  Most state-of-the-art results rely on Vector Space Models. Ideally the method would be able to achieve strong results for simple interpretable classifiers by transforming an existing representation that performs well at the task.
@@ -26,3 +429,22 @@
 		\end{tabular}\caption{Space-types, clusters have the same as single directions.}
 	\end{table}
 \end{landscape}
+
+
+
+
+  %This elevates neural networks from simply being representation learners to models that can discover and create new ideas in their representations in-order to solve the task.
+
+Theoretically if we are able to identify features from each layer, then we can also map how they interact with each other. 
+
+
+
+
+
+
+
+
+
+%For each domain, we test two different network set-ups. The first is one where the hidden layer is the same size as the input layer, and the second is where the hidden layer is smaller than the hidden layer. The assumption is that by constraining the hidden layer size, we can force the network to generalize and find more abstract concepts in the hidden-layer, hopefully gaining some insight into the domain by comparing the input representation and the more general hidden representation.
+
+There are no additional techniques applied to improve the performance of the neural networks.

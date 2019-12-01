@@ -34,7 +34,7 @@ def get_dp(space, direction):
 
 
 def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type="", dev_percent=0.2, rewrite_all=False, remove_stop_words=True,
+                     model_type="", dev_percent=0.2, rewrite_all=None, remove_stop_words=True,
                      score_metric="", auroc=False, dir_min_freq=0.001, dir_max_freq=0.95, name_of_class="", space_name="", data_type="",
              classifier_fn="", mcm=None, top_scoring_dirs=2000, score_type="kappa", ppmi=None, dct_unchanged=None, pipeline_hpam_dict=None):
     matched_ids = []
@@ -49,7 +49,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=True)
+    hpam_save = SaveLoad(rewrite=rewrite_all)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
@@ -133,7 +133,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
     if len(rankings) < 100:
         if False in np.isclose(dt.importFirstLineOfTextFileAsFloat(rankings), get_dp(space, dirs[0])):
             raise ValueError("Rankings do not match")
-    else:
+    elif stream_rankings is False:
         print("kay")
         if False in np.isclose(rankings[0], get_dp(space, dirs[0])):
             raise ValueError("Rankings do not match")
@@ -249,7 +249,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
 def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVM", dir_min_freq=0.001,
          dir_max_freq=0.95, dev_percent=0.2, score_metric="avg_f1", max_depth=None, multiclass="OVR", LR=False, bonus_fn="",
-         rewrite_all = False, hp_top_freq=None, hp_top_dir=None):
+         rewrite_all = False, hp_top_freq=None, hp_top_dir=None, use_space=None, use_space_name=None):
     pipeline_fn = "num_stw"
     if data_type == "newsgroups":
         name_of_class = ["Newsgroups"]
@@ -417,6 +417,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                     print("WARNING, bonus fn active")
                 if LR:
                     final_fn = pipeline_fn + "_LR_"+ space_names[s]
+                elif use_space is not None:
+                    final_fn = pipeline_fn + "_US_"+ use_space_name
                 else:
                     final_fn = pipeline_fn + "_"+ space_names[s]
 
@@ -432,20 +434,36 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                 dct = p_corpus.getBowDct()
                 dct_unchanged = p_corpus.getBowDct()
 
-                if data_type == "movies" or data_type == "placetypes":
-                    if len(spaces[s][0]) == 200 and "MDS" in space_names[s]:
+                if use_space is not None:
+                    classifier_fn = pipeline_fn + "_" + multiclass
+                    tsrd = pipeline(final_fn, use_space, bow, dct, classes, class_names, word_list, processed_folder,
+                                    dims, kfold_hpam_dict, hpam_dict,
+                                    model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all,
+                                    remove_stop_words=True,
+                                    score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq,
+                                    dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci],
+                                    classifier_fn=classifier_fn,
+                                    mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged,
+                                    pipeline_hpam_dict=pipeline_hpam_dict, space_name=use_space_name,
+                                    data_type=data_type)
+                    tsrds.append(tsrd)
+                    break
+                else:
+                    if data_type == "movies" or data_type == "placetypes":
                         classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
                         tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                      model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
                      score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
                                  mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
-                else:
-                    classifier_fn = pipeline_fn + "_" + multiclass
-                    tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
-                     model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
-                     score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
-                             mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
-                tsrds.append(tsrd)
+                    else:
+
+                        classifier_fn = pipeline_fn + "_" + multiclass
+                        tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
+                         model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
+                         score_metric=score_metric, auroc=False, dir_min_freq=dir_min_freq, dir_max_freq=dir_max_freq, name_of_class=name_of_class[ci], classifier_fn = classifier_fn,
+                                 mcm=multi_class_method, ppmi=ppmi_unf_matrix, dct_unchanged=dct_unchanged, pipeline_hpam_dict=pipeline_hpam_dict, space_name=space_names[s], data_type=data_type)
+
+                    tsrds.append(tsrd)
         # Make the combined CSV of all the dims of all the space types
         all_r = np.asarray(tsrds).transpose()
         rows = all_r[1]
@@ -457,33 +475,48 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 
 if __name__ == '__main__':
-    classifiers = ["DecisionTree1", "DecisionTree2", "DecisionTree3"]
-    data_types = [ "placetypes"]
+    classifiers = ["DecisionTree3"]
+    data_types = [ "newsgroups"]#""newsgroups", "reuters", "sentiment"] #,
     doLR = False
     dminf = -1
     dmanf = -1
-
+    """
     x = np.load("../../data\processed\placetypes/rank/fil/num_stw_num_stw_200_MDS_ndcg_1000_5000_0_rank.npy")
-
+    """
+    #num_stw_num_stw_200_MDS_acc_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep
     mcm = "OVR"
     bonus_fn = ""
     rewrite_all = False
+
+    use_space = np.load("..\..\data\processed/"+data_types[0]+"\mln\mln/"
+                        "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep" + ".npy")
+    use_space_name = "200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep"
+    """
+    use_space = None
+    use_space_name = None
+    """
+    #num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep.npy
+    #"300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep"
+    #5_Activ_relu_Dropout_0.5_Hsize_[1000, 100]_mlnrep
+    #300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep
+    #num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep
+
     for j in range(len(data_types)):
         if data_types[j] == "placetypes":
-            hp_top_freq = [5000]
-            hp_top_dir = [1000]
+            hp_top_freq = [10000]
+            hp_top_dir = [2000]
         elif data_types[j] == "reuters":
-            hp_top_freq = [5000, 10000, 20000]
-            hp_top_dir = [1000, 2000]
+            hp_top_freq = [10000]
+            hp_top_dir = [2000]
         elif data_types[j] == "sentiment":
-            hp_top_freq = [5000, 10000, 20000]
-            hp_top_dir = [1000, 2000]
+            hp_top_freq = [10000]
+            hp_top_dir = [2000]
         elif data_types[j] == "newsgroups":
-            hp_top_freq = [ 5000, 10000, 20000]
-            hp_top_dir = [ 1000, 2000]
+            hp_top_freq = [10000]
+            hp_top_dir = [2000]
         elif data_types[j] == "movies":
-            hp_top_freq = [5000, 10000, 20000]
-            hp_top_dir = [1000, 2000]
+            hp_top_freq = [10000]
+            hp_top_dir = [2000]
         for i in range(len(classifiers)):
             if "1" in classifiers[i]:
                 max_depths = 1
@@ -496,4 +529,4 @@ if __name__ == '__main__':
             main(data_types[j], "../../data/raw/"+data_types[j]+"/",  "../../data/processed/"+data_types[j]+"/", proj_folder="../../data/proj/"+data_types[j]+"/",
                                     grams=0, model_type=classifiers[i], dir_min_freq=dminf, dir_max_freq=dmanf, dev_percent=0.2,
                                     score_metric="avg_f1", max_depth=max_depths, multiclass=mcm, LR=doLR, bonus_fn=bonus_fn, rewrite_all=rewrite_all,
-                 hp_top_dir=hp_top_dir, hp_top_freq=hp_top_freq)
+                 hp_top_dir=hp_top_dir, hp_top_freq=hp_top_freq, use_space=use_space, use_space_name=use_space_name)

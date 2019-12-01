@@ -5,13 +5,17 @@ import numpy as np
 import util.io as dt
 import scipy.sparse as sp
 import gensim.models as g
+from util import py
+from common.SaveLoadPOPO import SaveLoadPOPO
+from time import ctime
+from datetime import datetime
 class SaveLoad:
     rewrite = None
     no_save = None
     load_all = None
     verbose = None
 
-    def __init__(self, rewrite=False, no_save=False, load_all=False, verbose=True):
+    def __init__(self, rewrite=None, no_save=False, load_all=False, verbose=True):
         self.rewrite = rewrite
         self.no_save = no_save
         self.load_all = load_all
@@ -37,10 +41,23 @@ class SaveLoad:
                 save_by_type(popo_array[i].value, popo_array[i].file_type, popo_array[i].file_name)
 
     def exists(self, popo_array):
-        if self.rewrite:
+        if self.rewrite is True:
             if self.verbose:
                 print(popo_array[0].file_name, "Rewriting...")
             return False
+        elif py.isStr(self.rewrite):
+            for i in range(len(popo_array)):
+                try:
+                    time_modified = datetime.fromtimestamp(os.path.getmtime(popo_array[i].file_name))
+                except FileNotFoundError:
+                    print("File was not found so rewriting...")
+                    return False
+                rewrite_time = datetime(*[int(s) for s in self.rewrite.split()])
+                print("IF", time_modified, "LESS THAN",  rewrite_time, "THEN REWRITE")
+                if time_modified < rewrite_time: # If it is before the specified date/time
+                    if self.verbose:
+                        print(popo_array[0].file_name, "Rewriting due to time...")
+                    return False
         all_exist = 0
         for i in range(len(popo_array)):
             if os.path.exists(popo_array[i].file_name):
@@ -122,3 +139,17 @@ def save_by_type(file, type, file_name):
         dt.save_dict(file, file_name)
     else:
         raise ValueError("File type not recognized")
+
+if __name__ == '__main__':
+    test_file = "E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed\placetypes\directions/fil/test_file.txt"
+
+    #year, month, day, hour, minute
+    save = SaveLoad(rewrite="2019 11 20 15 14")
+
+    popo_array = [SaveLoadPOPO(np.asarray([0, 0, 0]), test_file, "txt")]
+    save.exists(popo_array)
+
+    if "2019 11 20 15 14" is True:
+        print("yes")
+    else:
+        print("no")

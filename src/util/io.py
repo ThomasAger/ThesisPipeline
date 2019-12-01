@@ -125,8 +125,11 @@ def write_csv(csv_fn, col_names, cols_to_add, key):
     df = pd.DataFrame(d, index=key)
     df.to_csv(csv_fn)
 
-def read_csv(csv_fn, error_bad_lines=True):
-    csv = pd.read_csv(csv_fn, index_col=0, error_bad_lines=error_bad_lines)
+def read_csv(csv_fn, error_bad_lines=True, dtype=None):
+    if dtype is not None:
+        csv = pd.read_csv(csv_fn, index_col=0, error_bad_lines=error_bad_lines)
+    else:
+        csv = pd.read_csv(csv_fn, index_col=0, error_bad_lines=error_bad_lines, dtype=dtype)
     return csv
 
 def csv_pd_to_array(csv_pd):
@@ -325,7 +328,8 @@ def getFns(folder_path):
     onlyfiles = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
     for i in onlyfiles:
         file_names.append(i)
-    return file_names
+    return file_names, folder_path
+
 
 
 def importArray(file_name, file_type="s", return_sparse=True):
