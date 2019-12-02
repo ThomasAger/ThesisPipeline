@@ -222,7 +222,7 @@ This section additionally provides insight into the directions contained within 
 
 For the newsgroups, the neural network with bow input performed significantly better than the one with a vector space as input. 
 
-Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful concepts in the space, then the directions should also perform well on a depth-3 decision tree.
+Compared to newsgroups, the neural network that used a vector space as input performed significantly better than the linear SVM on the unsupervised representation. It obtained an F1-score of 0.574, when the linear SVM's score was 0.532. The assumption follows that if it actually has found more meaningful properties in the space, then the directions should also perform well on a depth-3 decision tree.
 
 For the place-types domain, the neural network that used a vector space as input performed significantly worse than the SVM, as it scored 0.53 in F1 score compared to 0.622. However, this is not particularly meaningful as there are so few entities.
 
@@ -230,7 +230,14 @@ For the place-types domain, the neural network that used a vector space as input
 
 As expected, the score of a depth-3  decision tree classifier when using the directions obtained from the neural network are close to the performance of the neural network. 
 
+There are a few reasons that a neural network representation would perform better than an unsupervised one, which are explained here with examples from the movies domain:
+\begin{itemize}
+	\item Noise is no longer encoded spatially, making it easier to obtain meaningful features. (e.g. metadata like e-mail list names "listinfo" "robomod" are no longer highly separable, meaning that the only features found are meaningful)
+	\item New features are encoded in the representation that contribute to the task (e.g. "Blood" may be in the unsupervised representation, corresponding to if the movie was funny, but in the neural network representation a feature for "Zombie" was introduced which helps classify if the movie is a horror)
+	\item The rankings for properties that are also encoded in the unsupervised representation are better (e.g. The "Comedy" direction more correctly ranks movies based on how funny they are)
+\end{itemize}
 
+If the directions perform well and use similar features it is reasonable to assume that the rankings are better than in the unsupervised representation.
 
 
 
@@ -374,7 +381,7 @@ There are common word directions, e.g. horror. But how have the rankings changed
 
 
 The way that knowledge is represented is changed significantly in the neural network with bow input compared to the original representation. This can be verified by what clusters are used in the decision trees to classify the entities. For the neural network with bow, 
-But what if these directions are not new concepts, but instead the same rankings but with different words labelling them?
+But what if these directions are not new properties, but instead the same rankings but with different words labelling them?
 
 
 
