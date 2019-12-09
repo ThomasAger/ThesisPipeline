@@ -45,7 +45,7 @@ First, we go through the history and class names of the datasets to give context
 \textbf{Movies} Taken from work by Derrac \cite{Derrac2015}. The top 50,000 most voted-on movies were chosen for this dataset initially, and reviews were collected from four different sources (Rotten Tomatoes, IMDB, SNAP project's Amazon Reviews \footnote{https:/ /snap.stanford.edu/data/web-Amazon.html.} and the IMDB sentiment dataset. Then, the top 15,000 movies with the highest number of words were chosen as documents, where each document is composed of all of that movies reviews concatenated together. Three tasks are used to evaluate this dataset: 23 movie genres, specifically Action, Adventure, Animation, Biography, Comedy, Crime, Documentary, Drama, Family, Fantasy, Film-Noir, History, Horror, Music, Musical, Mystery, Romance, Sci-Fi, Short, Sport, Thriller, War, Western. 100 of the most common IMDB plot keywords (See Appendix \ref{app:ClassNames}) and Age Ratings from the UK and US, USA-G, UK-12-12A, UK-15, UK-18, UK-PG, USA-PG-PG13, USA-R.\label{datasets:movies} 
 
 
-\section{Technical Details}
+\section{Technical Details}\label{ch2.5:technical}
 
 In this section, we describe the vocabulary and document sizes for each domain. Each domain is preprocessed such that it is converted to lower-case,  non-alphanumeric characters are removed and whitespace is stripped such that words are separated by a single space. Words are removed from a standard list of English stop-words from the NLTK library \cite{Bird} and we filter out terms that do not occur in at least two documents, with an additional limit to the maximum number of words in a vocabulary set to 100,000. 
 

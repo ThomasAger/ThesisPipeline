@@ -81,12 +81,12 @@ fns = ["num_stw_num_stw_50_D2V_ndcg_2000_10000_0_",
 
 
 
-
+"""
 data_type = "placetypes"
 fns = ["num_stw_num_stw_50_AWVEmp_10000_0_",
        "num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_10000_0_",
        "num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_10000_0_"]
-
+"""
 """
 data_type = "movies"
 fns = ["num_stw_num_stw_200_MDS_10000_0_",
@@ -99,22 +99,26 @@ fns = ["num_stw_num_stw_50_D2V_10000_0_",
        "num_stw_US_5_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_10000_0_",
        "num_stw_US_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep_10000_0_"]
 """
+data_type = "movies"
+fns = ["num_stw_US_20_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_10000_0_"]
 
 orig_fn = "../../data_paper\experimental results/chapter 5/"+data_type+"/all_dir/"
 # Get the best-scoring terms and directions for each score-type for single directions
 orig_space_dir = np.load(orig_fn+ fns[0] +"dir.npy")
-bow_space_dir = np.load(orig_fn+ fns[1] + "dir.npy")
-vector_space_dir = np.load(orig_fn+ fns[2]+ "dir.npy")
+#bow_space_dir = np.load(orig_fn+ fns[1] + "dir.npy")
+#vector_space_dir = np.load(orig_fn+ fns[2]+ "dir.npy")
 
 orig_space_words = np.load(orig_fn+ fns[0]+ "words.npy")
-bow_space_words = np.load(orig_fn+ fns[1] + "words.npy")
-vector_space_words = np.load(orig_fn+ fns[2] +"words.npy")
+#bow_space_words = np.load(orig_fn+ fns[1] + "words.npy")
+#vector_space_words = np.load(orig_fn+ fns[2] +"words.npy")
+
+if len(orig_space_words) != len(orig_space_dir):# or len(bow_space_dir) != len(bow_space_words) or len(vector_space_dir) != len(vector_space_words):
+    print("doesn't match", len(orig_space_words))#,len(orig_space_dir),len(bow_space_dir),len(bow_space_words),len(vector_space_dir),len(vector_space_words))
+    orig_space_dir = orig_space_dir.transpose()
+    if len(orig_space_words) != len(orig_space_dir):
+        exit()
 
 cutoff = len(orig_space_dir)
-
-if len(orig_space_words) != len(orig_space_dir) or len(bow_space_dir) != len(bow_space_words) or len(vector_space_dir) != len(vector_space_words):
-    print("doesn't match", len(orig_space_words),len(orig_space_dir),len(bow_space_dir),len(bow_space_words),len(vector_space_dir),len(vector_space_words))
-    exit()
 
 all_score_words = [orig_space_words[:cutoff] ]
 all_score_dirs = [orig_space_dir[:cutoff]]

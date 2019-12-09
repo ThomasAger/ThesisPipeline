@@ -29,12 +29,12 @@ rewrite = False
 
 
 
-csv_fns = [csv_7, csv_8, csv_9]
+csv_fns = [csv_5]
 for i in range(len(csv_fns)):
     io.read_csv(csv_fns[i])
 
-fns = [fn_7, fn_8, fn_9]
-data_types = [data_type_3,data_type_3,data_type_3]
+fns = [fn_5]
+data_types = [data_type_2]
 for i in range(len(csv_fns)):
     if True:#os.path.exists(csv_fns[i][:-4] + "_context.csv") is False and rewrite is False:
         print(csv_fns[i][:-4] + "_context.csv")

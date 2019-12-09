@@ -24,6 +24,10 @@
 
 
 \makeatletter
+% Copy pasted junk
+
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
 
 %Graphics
 %\usepackage{graphicx}
@@ -31,6 +35,15 @@
 \usepackage{caption}
 \usepackage{footmisc}
 \usepackage{paralist}
+\usepackage{array}
+\usepackage{epsf}
+\usepackage{amsmath}
+\usepackage{rotating}
+\usepackage{listings}
+\usepackage{varwidth}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{listings}
 \usepackage{amsthm}
 \usepackage{subfig}
 %\usepackage{algorithm}
@@ -58,6 +71,11 @@
 \def\baselinestretch{1.5}
 \parindent0cm
 \parskip1.5ex\@plus.7ex\@minus.1ex\relax
+\lstset{
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+	keepspaces=true,
+}
 
 %Acronyms
  \usepackage{acronym}
@@ -422,8 +440,8 @@ We produce interpretable representations, and demonstrate their applicability in
 \input{chapter2}
 \input{chapter25}
 \input{chapter3}
-\input{chapter4}
 \input{chapter5}
+\input{chapter4}
 \input{appendix}
 \backmatter
 

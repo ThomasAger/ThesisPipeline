@@ -1,4 +1,4 @@
-\chapter{Re-organizing Vector Spaces into Interpretable Representations}\label{chapter3}
+\chapter{Re-organizing Vector Spaces into Interpretable Representations}\label{ch3}
 
 
 \section{Introduction}\label{chapter3:Introduction}
@@ -44,7 +44,7 @@
 
 Vector space models encode meaning spatially, but their features are typically uninterpretable. This lack of interpretability limits their off-the-shelf application in real-world domains like Medicine, the Criminal Justice System and Financial Markets (discussed in Section \ref{ch2:Interpretability}). However, they achieve strong results in a variety of domains and see widespread use as they  are flexible in how they can be learned, e.g. by integrating word-context  to achieve strong results on sentiment tasks \cite{Pennington2014}, learning visual data alongside word-data to explain the content of images \cite{Mao2014a}, and enforcing grammatical structure to perform better at question answering tasks \cite{Palangi2017}. 
 
- 
+ %%%% WHY ARE YOU DOING THIS WORK?
 
 %In the case of this work, we aim to achieve features that rank documents on words.  e.g. In the domain of IMDB movie reviews, a feature would be "Horror", where the associated value would be a ranking of movies on that word. Top movies would be those that are spatially the most representative of this word. 
 
@@ -65,6 +65,30 @@ This chapter follows work by Derrac\cite{Derrac2015}, who first introduced the m
 By measuring how far up a document is on the orthogonal direction vector for a word, we can obtain a ranking of that document on that word, e.g. how 'Scary' it is relative to the other documents. After repeating this process for all documents on a word direction, we can obtain a ranking of all documents on a word that can be used as a feature for the representation. This forms the basis of our approach towards restructuring a vector space such that the features encoded spatially are used directly as features of the representation. We first obtain hyper-planes for all words based on binary frequency. Then, we identify words which are semantically important (by e.g. F1 Score or accuracy of the hyper-plane). Finally, we obtain orthogonal directions for these word hyperplanes and rank documents on how far up they are on these directions. This ranking is then used as a feature of the new representation.
 
  However, it can be sometimes unclear what a document being high up on a direction can mean when it's just a single word. For example, in a domain of IMDB movie reviews "numbers" could be referring to musical "numbers" in a broadway musical movie, or the amount of mathematics done by the actors. To resolve this, similar words can be clustered together e.g.  we can give context to the word "numbers" by clustering together similar word directions  "singing songs musical song numbers dance dancing sings sing broadway". This can be done with an off-the-shelf clustering algorithm like K-means (see \ref{bg:clustering}). We show examples of these word cluster labels for the features of our interpretable representation in \ref{ch3:ExampleRep}.
+ 
+ 
+ \begin{table}[] 
+ 	\scriptsize
+ 	\begin{tabular}{lll}                                                                   
+ 		\textbf{IMDB Movie Reviews}                                 & \textbf{Flickr-Placetypes}           & \textbf{20-Newsgroups}                           \\
+ 		\toprule
+ 		courtroom legal trial court                                 & broadway news money hollywood        & switzerland austria sweden swiss     \\
+ 		disturbing disgusting gross                                 & fir bark activism avian              & ham amp reactor watts                \\
+ 		tear cried tissues tears                                    & palace statues ornate decoration     & karabag armenian karabakh azerbaijan \\
+ 		war soldiers vietnam combat                                 & drummer produce musicians performers & 4800 parity 9600 bps                 \\
+ 		message social society issues                               & ubahn railways electrical bahn       & xfree86 linux                        \\
+ 		events accuracy accurate facts                              & winery pots manor winecountry        & umpires umpire 3b viola              \\
+ 		santa christmas season holiday                              & steeple religion monastery cathedral & atm hq ink paradox                   \\
+ 		martial arts kung                                           & blanket whiskers fur adorable        & lpt1 irq chipset mfm                 \\
+ 		bizarre weird awkward                                       & desolate eerie mental loneliness     & manhattan beauchaine bronx queens    \\
+ 		drug drugs dealers dealer                                   & carro shelby 1965 automobiles        & photoshop adobe                      \\
+ 		inspirational inspiring fiction narrative                   & relax dunes tranquil relaxing        & reboost fusion astronomers galactic 
+ 	\end{tabular}  
+ 	\caption{Example features from three different domains, where each cluster of words corresponds to a direction which movies are ranked on}\label{ch3:ExampleRep}    
+ \end{table}   
+ 
+ In summary, this Chapter builds on the original method to find directions in a vector space and rank documents on them introduced by Derrac \cite {Derrac2015}. This chapter  introduces and explains variants to the method in Section \ref{ch3:method}, and investigates directions qualitatively in Section \ref{ch3:qualitative}, examining how the new variants perform relative to each other. The main contribution of the chapter is an extensive quantitative examination in section \ref{ch3:quantitative} of many unsupervised representation variants across five domains (as described in \ref{chapter3:Introduction}) to determine their usefulness in simple interpretable classifiers.  Finally, conclusions are made on the contribution of the chapter in section \ref{ch3:conclusion}. Chapter \ref{ch4} builds on this method by applying and investigating its usage with vector spaces obtained from supervised neural networks, and the Chapter \ref{ch5} identifies problems with this method and introduces a novel unsupervised solution to improve performance.
+ 
 
 %The original method introduced by Derrac \cite{Derrac2015} used this insight to obtain word-directions, i.e. vectors that go from objects that least have a word to ones that have it most. 
 
@@ -84,34 +108,15 @@ By measuring how far up a document is on the orthogonal direction vector for a w
 
 %These property-directions give a natural way to obtain an interpretable representation of a vector space. First, property-directions are identified in the space, then a ranking is derived from these property-directions where documents that are lower on the property-direction are given lower ranks, and documents that are higher on the property-direction are given a higher rank. Finally, these rankings are taken as features of a new interpretable representation. 
 
+\section{Background}
+
 Directions in vector spaces that go from documents that least represent a word, to those that most represent it, can be useful in a wide variety of applications. The most immediate example is perhaps that they allow for a natural way to implement critique-based recommendation systems, where users can specify how their desired result should relate to a given set of suggestions \cite{Viappiani2006}. For instance, \cite{Vig2014} propose a movie recommendation system in which the user can specify that they want to see suggestions for movies that are ``similar to this one, but scarier''. If the direction of being scary is adequately modelled in a vector space of movies, such critiques can be addressed in a straightforward way. Similarly, in \cite{Kovashka} a system was developed that can find ``shoes like these but shinier'', based on a vector space representation that was derived from visual features. Semantic search systems can use such directions to interpret queries involving gradual and possibly ill-defined features, such as ``\emph{popular} holiday destinations in Europe'' \cite{Jameel}. While features such as popularity are typically not encoded in traditional knowledge bases, they can often be represented as semantic space directions.  As another application, directions can also be used in interpretable classifiers. For example, \cite{Derrac2015} learned rule based classifiers from ranks induced by the feature directions.
 
 Other work which has taken advantage of directions in vector spaces has relied on word-embeddings \ref{bg:WordVectors}. For instance,  \cite{gupta2015distributional} found that features of countries, such as their GDP, fertility rate or even level of CO$_2$ emissions, can be predicted from word embeddings using a linear regression model.   In \cite{kim2013deriving} directional vectors in word embeddings were found that correspond to adjectival scales (e.g.\ bad $<$ okay $<$ good $<$ excellent) while \cite{Rothe2016} found directions indicating lexical features such as the frequency of occurrence and polarity of words.
 
 
 
-\begin{table}[] 
-	\scriptsize
-	\begin{tabular}{lll}                                                                   
-		\textbf{IMDB Movie Reviews}                                 & \textbf{Flickr-Placetypes}           & \textbf{20-Newsgroups}                           \\
-		\toprule
-		courtroom legal trial court                                 & broadway news money hollywood        & switzerland austria sweden swiss     \\
-		disturbing disgusting gross                                 & fir bark activism avian              & ham amp reactor watts                \\
-		tear cried tissues tears                                    & palace statues ornate decoration     & karabag armenian karabakh azerbaijan \\
-		war soldiers vietnam combat                                 & drummer produce musicians performers & 4800 parity 9600 bps                 \\
-		message social society issues                               & ubahn railways electrical bahn       & xfree86 linux                        \\
-		events accuracy accurate facts                              & winery pots manor winecountry        & umpires umpire 3b viola              \\
-		santa christmas season holiday                              & steeple religion monastery cathedral & atm hq ink paradox                   \\
-		martial arts kung                                           & blanket whiskers fur adorable        & lpt1 irq chipset mfm                 \\
-		bizarre weird awkward                                       & desolate eerie mental loneliness     & manhattan beauchaine bronx queens    \\
-		drug drugs dealers dealer                                   & carro shelby 1965 automobiles        & photoshop adobe                      \\
-		inspirational inspiring fiction narrative                   & relax dunes tranquil relaxing        & reboost fusion astronomers galactic 
-	\end{tabular}  
-	\caption{Example features from three different domains, where each cluster of words corresponds to a direction which movies are ranked on}\label{ch3:ExampleRep}    
-\end{table}   
 
-
-This work builds on the original method to find directions in a vector space and rank documents on them introduced by Derrac \cite {Derrac2015}. This chapter differs from that work by first introducing and explaining variants to the method in Section \ref{ch3:method}, then investigating directions qualitatively in Section \ref{ch3:qualitative}, examining how the new variants perform relative to each other, and finally an extensive quantitative examination in section \ref{ch3:quantitative} of all variants across all domains (as described in \ref{chapter3:Introduction}) to determine their usefulness in interpretable classifiers is explored.  Finally, conclusions are made on the contribution of the chapter in section \ref{ch3:conclusion}. Chapter \ref{ch4} builds on this method by applying and investigating its usage with vector spaces obtained from supervised neural networks, and the Chapter \ref{ch5} identifies problems with this method and introduces a novel unsupervised solution to improve performance.
 
 
 
@@ -800,7 +805,11 @@ Given these assumptions, low-depth Decision Trees can give an estimation of how 
 
 
 
-Primarily F1-score  is used to determine if a classifier is good or not. This is because many of the classes are unbalanced so accuracy is not a good metric, as high accuracy could be achieved by predicting only zeros.  All of the results shown in this section are the end-product of a two-part hyper-parameter optimization. Each Decision Tree has its own set of hyper-parameters that are optimized as does each representation-type. These are the models trained on the training data and scored on the test data, with the highest performing in terms of F1-score parameters from hyper-parameter optimization on the development data. For ease of comparison, some results are provided with SVM's and unbounded Decision Trees, as well as a baseline Topic Model, which is used as a reference for a standard interpretable representation. Below, the parameters are listed that are optimized for each of these model types:
+Primarily F1-score  is used to determine if a classifier is good or not. This is because many of the classes are unbalanced so accuracy is not a good metric, as high accuracy could be achieved by predicting only zeros.  
+
+\subsubsection{Model Hyper-parameters}\label{ch3:hyperparam}
+
+All of the results shown in this section are the end-product of a two-part hyper-parameter optimization. Each Decision Tree has its own set of hyper-parameters that are optimized as does each representation-type. These are the models trained on the training data and scored on the test data, with the highest performing in terms of F1-score parameters from hyper-parameter optimization on the development data. For ease of comparison, some results are provided with SVM's and unbounded Decision Trees, as well as a baseline Topic Model, which is used as a reference for a standard interpretable representation. Below, the parameters are listed that are optimized for each of these model types:
 
 \textbf{Linear Support Vector Machines (SVM's)}\ref{bg:SVM}: C parameters and gamma parameters.
 C {1.0, 0.01, 0.001, 0.0001}, Gamma {1.0, 0.01, 0.001, 0.0001}.
@@ -809,6 +818,9 @@ C {1.0, 0.01, 0.001, 0.0001}, Gamma {1.0, 0.01, 0.001, 0.0001}.
 
 \textbf{CART Decision Trees }\ref{bg:trees}: The number of features to consider when looking for the best split. $None, auto, log2$ and the criterion for a node split $criterion: gini, entropy$.
 	
+	
+\subsubsection{Representations used}
+
 For the baselines, four different Vector Space Models are used, a Bag-Of-Words of PPMI (BOW-PPMI) scores and a standard Latent Dirchlet Allocation (LDA) Topic Model. As well as the original filtering done to the representations, for the BOW-PPMI additionally all terms are filtered out that do not occur in at least $(d_N / 1000)$ documents. Otherwise, there would be too many irrelevant terms to be a fair comparison. The dimension amounts that are compared are of size $(50, 100, 200)$.
 The MDS space is not available for sentiment, as the memory cost was too prohibitive with 50,000 documents, and there are no doc2vec spaces for placetypes/movies, as it was only possible access to the Bag-Of-Words representation.
 

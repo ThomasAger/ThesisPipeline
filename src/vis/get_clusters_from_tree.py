@@ -105,6 +105,8 @@ for z in range(len(folders)):
     np.save(save_fns[z] +  add_folder[z] +"/" + "all_tree_labels_trimmed_" + str(splits[z]) + ".npy", class_trimmed_labels)
     np.save(save_fns[z] +  add_folder[z] +"/" + "double_tree_labels_trimmed_" + str(splits[z]) + ".npy", double_class_trimmed_labels)
 
+
+
     c_l_p = vis.getPrettyStrings(class_labels)
     d_c_l = vis.getPrettyStrings(double_class_labels)
     c_t_l = vis.getPrettyStrings(class_trimmed_labels)

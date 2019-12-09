@@ -131,6 +131,9 @@ def getPrettyStrings(array):
         pretty_clusters = []
         for j in range(len(array[i])):
             split = array[i][j].split()
+            if len(split) > 7:
+                split = split[:6]
+                split[3] = "..."
             pretty_clusters.append(clusterPretty(split))
         cluster_string = ""
         for i in range(len(pretty_clusters)):

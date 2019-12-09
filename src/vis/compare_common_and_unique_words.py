@@ -22,7 +22,7 @@ third_fn = "num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_ndcg_200
 csv_1 = io.read_csv("../../data_paper\experimental results\chapter 5/"+data_type_1+"/csv/num_stw_num_stw_50_AWVEmp_10000_0Streamed_ndcg.csv")
 csv_2 = io.read_csv("../../data_paper\experimental results\chapter 5/"+data_type_1+"/csv/num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_10000_0Streamed_ndcg.csv")
 csv_3 = io.read_csv("../../data_paper\experimental results\chapter 5/"+data_type_1+"/csv/num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_10000_0Streamed_ndcg.csv")
-words_to_get_amt = 2000
+words_to_get_amt = 500
 
 """
 data_type_1 = "movies"
