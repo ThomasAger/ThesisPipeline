@@ -22,19 +22,19 @@ fn_7 = "num_stw_num_stw_50_AWVEmp_10000_0_"
 fn_8 = "num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_10000_0_"
 fn_9 = "num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_10000_0_"
 
-csv_7 = "../../data_paper\experimental results\chapter 5/"+data_type_3+"/csv/num_stw_num_stw_50_AWVEmp_10000_0Streamed_ndcg.csv"
+csv_7 = "../../data_paper\experimental results\chapter 5/"+data_type_3+"/csv/num_stw_num_stw_50_AWVEmp_10000_0_F1_ACC_Kappa_.csv"
 csv_8 = "../../data_paper\experimental results\chapter 5/"+data_type_3+"/csv/num_stw_US_200_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_BS_10_mlnrep_10000_0Streamed_ndcg.csv"
 csv_9 = "../../data_paper\experimental results\chapter 5/"+data_type_3+"/csv/num_stw_US_100_Activ_tanh_Dropout_0.25_Hsize_2_BS_10_mlnrep_10000_0Streamed_ndcg.csv"
 rewrite = False
 
 
 
-csv_fns = [csv_5]
+csv_fns = [csv_7]
 for i in range(len(csv_fns)):
     io.read_csv(csv_fns[i])
 
-fns = [fn_5]
-data_types = [data_type_2]
+fns = [fn_7]
+data_types = [data_type_3]
 for i in range(len(csv_fns)):
     if True:#os.path.exists(csv_fns[i][:-4] + "_context.csv") is False and rewrite is False:
         print(csv_fns[i][:-4] + "_context.csv")

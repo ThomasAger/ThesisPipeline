@@ -54,7 +54,7 @@ def pipeline(file_name, space, bow, dct, classes, class_names, words_to_get, pro
     except FileNotFoundError:
         matched_ids = None
 
-    hpam_save = SaveLoad(rewrite=rewrite_all)
+    hpam_save = SaveLoad(rewrite=True)
 
     # Folds and space are determined inside of the method for this hyper-parameter selection, as it is stacked
     hyper_param = KFoldHyperParameter.RecHParam(None, classes, class_names, pipeline_hpam_dict, kfold_hpam_dict, "dir", model_type,
@@ -148,7 +148,7 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
         raise ValueError("Dct has changed shape")
 
     # Get NDCG scores
-    ndcg_save = SaveLoad(rewrite=rewrite_all)
+    ndcg_save = SaveLoad(rewrite=True)
 
     if stream_rankings: #and no_below > 5000) or no_below > 10000:
         ndcg = GetNDCGStreamed(rankings, ppmi, new_word2id_dict, dct_unchanged.token2id,  ndcg_save,  file_name, processed_folder + "rank/ndcg/", no_below, no_above)
@@ -455,8 +455,8 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
                     break
                 else:
 
-                    if data_type == "movies" or data_type == "placetypes":
-                        if "AWV" in space_names[s] and "50" in space_names[s]:
+                    if data_type == "reuters":
+                        if "MDS" in space_names[s] and "200" in space_names[s]:
                             classifier_fn = final_fn + "_" + name_of_class[i] + "_" + multiclass
                             tsrd = pipeline(final_fn, spaces[s], bow, dct, classes, class_names, word_list, processed_folder, dims, kfold_hpam_dict, hpam_dict,
                          model_type=model_type, dev_percent=dev_percent, rewrite_all=rewrite_all, remove_stop_words=True,
@@ -485,7 +485,7 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
 
 if __name__ == '__main__':
     classifiers = ["DecisionTree3"]
-    data_types = [ "placetypes"]#""newsgroups", "reuters", "sentiment"] #,
+    data_types = [ "reuters"]#""newsgroups", "reuters", "sentiment"] #,
     doLR = False
     dminf = -1
     dmanf = -1
@@ -495,7 +495,7 @@ if __name__ == '__main__':
     #num_stw_num_stw_200_MDS_acc_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep
     mcm = "OVR"
     bonus_fn = ""
-    rewrite_all = "2019 12 02 11 25"
+    rewrite_all = None
     """
     use_space = np.load("..\..\data\processed/"+data_types[0]+"\mln\mln/"
                         "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep" + ".npy")
@@ -516,7 +516,7 @@ if __name__ == '__main__':
             hp_top_freq = [10000]
             hp_top_dir = [2000]
         elif data_types[j] == "reuters":
-            hp_top_freq = [10000]
+            hp_top_freq = [5000]
             hp_top_dir = [2000]
         elif data_types[j] == "sentiment":
             hp_top_freq = [10000]

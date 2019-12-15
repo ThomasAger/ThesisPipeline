@@ -413,10 +413,16 @@ The tree can be viewed as a hierarchy of importance for the class, with the most
 
 Decision Trees has nodes that correspond to features, so if these features are simple and easy to understand then the tree is also interpretable. Generally, simple low-depth decision trees are a good baseline for an interpretable classifier. 
 
+%% TALK ABOUT PARAMETERS, MAX FEATURES, WEIGHTS, ESPECIALLY !!!!!!!!!!!!!!
 
+% !!!!!!!!!!!!!!!!!!!!!!!
+
+% REFER TO WHAT GINI/ENTROPY ARE
+
+% !!!!!!!!!!!!!!!!!!!!!!!!!
 \subsection{Linear Support Vector Machines}\label{bg:svm}
 
-Treating the entities as points in a vector space, where the dimensions of that space are the features,  a linear support vector machine  finds a hyper-plane that maximizes the margin between entities belonging to different classes. To classify new entities, they are placed in this space and labelled according to which side of the line they fall on. Below, we demonstrate this principal in a two-dimensional representation:
+Treating the entities as points in a vector space, where the dimensions of that space are the features,  a linear support vector machine  finds a hyper-plane that maximizes the margin between entities belonging to different classes. To classify new entities, they are placed in this space and labelled according to which side of the line they fall on. %Below, we demonstrate this principal in a two-dimensional representation:
 
 % Hyper-plane
 
@@ -437,7 +443,7 @@ This benefit also has a down-side, as neural networks have so many parameters (e
 %\subsection{Multi-Label Classification}
 \subsection{Overfitting}
 
-% The problem of overfitting
+% The problem of overfitting\dfrac{_{_{num}}}{den}
 
 If a machine-learning model is given training data, then what stops that model from learning a function that simply maps each example to the given class label? In the case of a neural network,  this behaviour can be stopped by limiting the amount of neurons available in the hidden layer, forcing the network to generalize the representation into a lower-dimensional vector space. However, the problem of overfitting to the examples given rather than learning a way to solve the problem in a general way is a persistent one in machine-learning tasks. To give an example, we may expect that if we trained a machine-learning model on some data, we would be able to achieve strong results on that data given the machine-learning model. However, if new examples were introuduced then the model would fail. For example, when learning with a bag-of-words the model may realize that each document was written by a different user, and that users name is recorded in the document text. A simple function would be to say:
 
@@ -581,7 +587,7 @@ The main focus of this thesis is in how to re-organize rich semantic relationshi
 %\item CART decision trees versus others
 %\end{itemize}
 
-\subsection{Principal Component Analysis}
+\subsection{Principal Component Analysis}\label{ch2:PCA}
 
 
 
@@ -611,7 +617,7 @@ Principal Component Analysis (PCA) is a linear dimensionality reduction method t
 Essentially, PCA works by linearly combining features in-order to create new features that can differentiate entities well and are uncorrelated with previous features. This results in a new low-dimensional representation that retains information and has distinct semantic features. However, as these features are a linear combination of the previous features, they are generally not interpretable \cite{Gimenez}. 
 
 
-\subsection{Multi-Dimensional Scaling}
+\subsection{Multi-Dimensional Scaling}\label{ch2:MDS}
 
 % Talk about it in terms of the literature
 
@@ -638,11 +644,11 @@ From a bag-of-words, the way to construct this dissimilarity matrix is by findin
 
 \subsection{Vector Space Representations Of Words}\label{bg:WordVectors}
 
-Word-vectors are a method that obtain a vector space representation for the words in a corpus, rather than the documents. Given some pre-processed raw text the method creates a vector representation for each word. The method is unsupervised, resulting in word vectors generally being used by learning them from a large corpus of unanottated text from a variety of domains, and then applying them in domain-specific tasks.
+Word-vectors are a method that obtain a vector space representation for the words in a corpus, rather than the documents. Given some pre-processed raw text the method creates a vector representation for each word. The method is unsupervised, resulting in word vectors generally being used by learning them from a large corpus of unannotated text from a variety of domains, and then applying them in domain-specific tasks.
 
 There are a multitude of ways to obtain word-vectors, like through matrix factorization \cite{Evy2007}. However, most modern methods that are used today are distributional methods like GloVe \cite{Pennington2014} and Word2Vec \cite{Mikolov2013}. These representations learn representations of  words using the context of its surrounding words.  Essentially, the meaning of each word is determined only by  context. These representations have been extremely useful, and have shown semantic coherence, for example showing in the  representation that it is possible to  model relations between words, e.g.  the  vector operation  "King" - "Man" = "Queen".             
 
-\subsection{Doc2Vec}
+\subsection{Doc2Vec}\label{ch2:doc2vec}
 
 Doc2Vec \cite{Le2014a} extends the Word2Vec neural network method of learning word-vectors using their context such that a document representation is learned in tandem. Essentially, as well as learning from the word's context, the words are also learned according to  what documents they are in. The document representation is built in the same way as the word representation, gradually being informed by the word context and document context.
 

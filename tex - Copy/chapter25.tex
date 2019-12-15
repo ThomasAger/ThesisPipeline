@@ -69,13 +69,27 @@ For the bag-of-words representation used as a baseline, terms are additionally f
 
 For the work in the following chapters, we wanted a variety of different Vector Space Models. Below the choices for the Vector Space Models that are formally described in Section \ref{bg:SemanticSpaces} are explained:
 
-\textbf{Multi-Dimensional Scaling (MDS)}: Following \cite{derracAIJ}, we use Multi-Dimensional Scaling (MDS) to learn semantic spaces from the angular differences between the PPMI weighted BoW vectors. This was chosen as it performed well in previous work by \cite{Derrac2015}, and is a non-linear transformation based on PPMI vectors. %A non-linear transformation that is used to evaluate the quality of representations when built from a standard BOW-PPMI. Chosen as it performed well in the work introducing this method.
+\textbf{Multi-Dimensional Scaling (MDS) (See Section \ref{ch2:MDS})}:  Multi-Dimensional Scaling (MDS) is used for comparison, as it was the only space used in the work that introduced this method \cite{derracAIJ}. In this case, the input is a matrix of dissimilarity values between the PPMI vectors of documents of size  $n X n$, where $n$ is the number of documents.  %A non-linear transformation that is used to evaluate the quality of representations when built from a standard BOW-PPMI. Chosen as it performed well in the work introducing this method.
 
-\textbf{Principal Component Analysis (PCA)}: We use PCA as a linear transformation of the PPMI weighted BoW vectors, as it is a standard dimensionality reduction technique used historically and prevalently today to serve as a baseline reference.
+\textbf{Principal Component Analysis (PCA) (See Section \ref{ch2:PCA})}: We use PCA as a linear transformation of the PPMI weighted BoW vectors, as it is a standard dimensionality reduction technique used historically and prevalently today to serve as a baseline reference.
 
-\textbf{Doc2Vec (D2V)}: Inspired by the Skipgram model \cite{DBLP:conf/icml/LeM14}.  A distributional document representation used as a representative of a higher performing method of learning in terms of document classification. For the Doc2Vec space, the hyper-parameters are additionally tuned for the $window size (5, 10, 15)$ referring to the context window, the $min count (1, 5, 10)$ referring to the minimum frequency of words and the $epochs (50, 100, 200)$ of the network for each size space. We chose the best parameters for each class in each domain by evaluating the space as input to linear SVM's, which were tuned with two parameters: the best C values  $1.0, 0.01, 0.001, 0.000]$ and if the weights should be balanced such that positive instances are weighted in proportion to how rare they are.
+\textbf{Doc2Vec (D2V) (See Section \ref{ch2:doc2vec})}: Doc2Vec is inspired by the Skipgram model \cite{DBLP:conf/icml/LeM14}.  It is distributional in the sense that the context of words and documents is used during its learning process. It is used here as a it is of a recent class of neural embedding models, which has been reported in the literature to perform well in document classification tasks. For the Doc2Vec space, the following hyper-parameters are tuned: 
 
-\textbf{Average Word Vectors (AWV)}: Finally, we also use semantic spaces that are composed of averaged word vectors, using a pre-trained GloVe word embeddings trained on the Wikipedia 2014 + Gigaword 5 corpus\footnote{\url{https://nlp.stanford.edu/projects/glove/}}. While simply averaging word vectors may seem naive, this was found to be a competitive approach for unsupervised representations in several applications \cite{DBLP:conf/naacl/HillCK16}. For each document, we simply average the vector representations of the words that appear at least twice in the BoW representation.
+\begin{itemize}
+	\item The ${window size} (5, 10, 15)$ referring to the  window of the words that are used as context during training 
+	\item The ${min count} (1, 5, 10)$ referring to the minimum frequency of words  
+	\item The ${epochs} (50, 100, 200)$ of the network for each size space. 
+\end{itemize}
+
+
+
+\textbf{Average Word Vectors (AWV)}: Finally, we also learn a document embedding by averaging word vectors, using a pre-trained GloVe word embeddings (See Section \ref{bg:WordVectors}) that was trained on the Wikipedia 2014 + Gigaword 5 corpus\footnote{\url{https://nlp.stanford.edu/projects/glove/}}. While simply averaging word vectors may seem naive, this was found to be a competitive approach for unsupervised representations in several applications \cite{DBLP:conf/naacl/HillCK16}. We simply average the vector representations of the words that appear at least twice in the BoW representation. Strangely, we found that this performed better than weighing the words on frequency or PPMI.
+
+To determine the best doc2vec model for each task in each domain, and to investigate the quality of these representations, a linear SVM is used that takes the document representations as input. This SVM is also hyper-parameter tuned to find the best C values    $ C (1.0, 0.01, 0.001, 0.000)$, and if the  weights should be balanced such that positive instances are weighted in proportion to how rare they are ${balanced} (0, 1)$ (See Section \ref{hyperparameters)
+
+Unfortunately, doc2vec representations could not be obtained for the movies or place-types domains as the original text was not available, only the bag-of-words.
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 
