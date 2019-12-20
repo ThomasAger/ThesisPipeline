@@ -332,14 +332,14 @@
 
 \begin{center}
 \vspace*{3ex}
-\textbf{\Huge Title line 1}\\[2ex]
-\textbf{\Huge Title line 2}\\[12ex]
+\textbf{\Huge Disentangling existing vector spaces}\\[2ex]
+%\textbf{\Huge Title line 2}\\[12ex]
 \textbf{\large A thesis submitted in partial fulfilment}\\[1ex]
 \textbf{\large of the requirement for the degree of Doctor of
   Philosophy}\\[16ex]
-\textbf{\LARGE Name M. Lastname}\\
+\textbf{\LARGE Thomas J. Ager}\\
 \vfill
-\textbf{\LARGE July 2011}\\
+\textbf{\LARGE January 2020}\\
 \vfill
 \textbf{\LARGE Cardiff University}\\[1ex]
 \textbf{\LARGE School of Computer Science \& Informatics}\\[4ex]
@@ -406,8 +406,8 @@ machine-readable formats and related software is available at
 \ \vspace*{1.11cm}
 \markboth{Dedication}{}
 \begin{flushright}
-\textbf{\large To People you care}\\
-\textbf{\large for their patience and support.}
+\textbf{\large To Steven and my parents.}\\
+\textbf{\large for your invaluable and unwavering support.}
 \end{flushright}
 \newpage
 \markboth{}{}
@@ -416,7 +416,72 @@ machine-readable formats and related software is available at
 
 \chapter*{Abstract}
 
-We produce interpretable representations, and demonstrate their applicability in interpretable classifiers. Our approach is model-agnostic, given a similarity-based representation, we are able to produce a representation in terms of domain knowledge. We evaluate the interpretability of our representation and provide examples of interpretable classifiers with our representation.
+%%%%%%%%%%%%%%%%% OLD WORK
+
+%NESY 
+%Vector space embeddings can be used as a tool for learning semantic relationships from unstructured text documents. Among others, earlier work has shown how in a vector space of entities (e.g. different movies) fine-grained semantic relationships can be identified with directions (e.g. more violent than).
+
+%IJCAI 
+%In many applications, it is important for classification models to be interpretable. Unfortunately, however, prominent While dimensionality reduction methods could be used in principle, the resulting dimensions would typically not be interpretable. To address this shortcoming, we propose a method to learn interpretable features from a given low-dimensional vector space representation.
+
+%CONLL
+%In this paper we consider semantic spaces consisting of objects from some particular domain (e.g.\ IMDB movie reviews). and 
+
+%%%%%%%%%%%%%%%%% OLD WORK
+
+
+% General problem introduction, why it matters, what past work did, what the results will achieve
+
+% Most vector spaces are entangled
+
+In this thesis vector space document embeddings consisting of entities from some particular domain (e.g.\ IMDB movie reviews) are used. Representations of text documents induced from text data are typically either sparse and separated into clear semantic features (e.g. in the case of a bag-of-words, where each feature is the number of times a word occurs), or they are dense vector space document embeddings where the individual features are not clearly meaningful.  However, despite the individual features of these document embeddings not being meaningful, similarity data  encoded spatially in these document embeddings is meaningful. In work by Derrac \cite{Derrac2015}, it was  observed that such document embeddings often model important features of the domain (e.g.\ how "scary" a movie is, where that movie representation is obtained from text data of its reviews) as directions. By calculating the dot product of  these feature directions,  a value is obtained that corresponds to how  far up entities are on a feature direction. This allows  entities to be ranked according to how much they 'have' the corresponding feature, e.g.\ movies can be ranked on how "scary" they are.
+
+The objective of this thesis is to obtain feature representations from existing document embeddings where each feature is clear and semantic. For example, in a domain of movie reviews, each feature would rank entities correctly on some salient domain concept, e.g.\ "Scary", "Funny", "Romantic". This acts as an unsupervised post-processing step on any existing document embedding. This thesis concerns itself with application of this methodology to a variety of document embeddings, of particular interest is the application to embeddings derived from neural networks. Obtaining these semantic features from neural networks offers a useful contribution to work in improving these models and making them more transparent. These semantic features are beneficial for a variety of purposes, in particular that they provide an inductive bias to classifiers, generalize well to unseen entities, and enable transfer learning. Further, for neural network practitioners, they may provide insight into what the neural network is doing correctly or incorrectly in its learning process. In terms of application, a representation like this can be used in entity oriented search engines, recommendation systems, among others, or perhaps even be used as input to a simple classifier as an alternative to the hard to decipher original neural network. Vector space embeddings have only become more widespread in use, especially as neural network architectures have advanced to  state-of-the-art performance in many tasks. However, semantic features like these are usually obtained by using a specialized learning procedure, e.g.\ by enforcing sparsity constraints or orthogonality between features, and learned from the original text data.
+
+The work by Derrac \cite{Derrac2015} obtained semantic features from Multi-Dimensional Scaling (MDS) document embeddings and validated their work by classifying entities using a rule-based classifier (FOIL), resulting in rules of the form "\textbf{IF} \textit{x} is more scary than most horror films \textbf{THEN} \textit{x} is a horror film.". The work in this thesis is a deeper investigation and improvement of this method. It  experimentally validates that these features are clear and semantic across a variety of unsupervised document embedding models and domains, including from neural network embeddings. Further,  variants of the method are introduced that improve performance. These results are verified on  a document classification task that  classified decision trees with a limited depth. This limitation verifies that the feature representation has captured features that correspond to domain knowledge, as if the classifier can perform well with a low amount of features those features must be semantic. 
+
+As mentioned previously, the method is used on supervised and unsupervised neural network hidden layers. In particular, a qualitative analysis of feed-forward networks and auto-encoders is conducted, finding that feed-forward networks have better feature representations of features relevant to the task, and auto-encoders when stacked (such that the hidden-layer  of one auto-encoder is the input to another) represent increasingly abstract features. After identifying directions that model salient properties of entities in each of these vector spaces, symbolic rules are induced that relate specific properties to more general ones. In addition to introducing variants of the method in \cite{Derrac2015}, this thesis also introduces an additional post-processing step for improving the derived feature representations. Methods for learning document embeddings,  are mostly aimed at modelling similarity. In Chapter \ref{ch5}, it is argued that there is an inherent trade-off between capturing similarity and faithfully modelling features as directions. Following this observation, a simple method to fine-tune existing document embeddings is proposed, with the aim of improving the quality of the feature directions obtained from them. Crucially, this  method is also fully unsupervised, requiring only a bag-of-words representation of the objects as input.  In particular,  first  clusters of terms are identified that refer to salient properties of the considered domain, and a simple neural network model is used to learn a new representation in which each of these properties is faithfully modelled as a direction. As in Chapter \ref {ch3}, the usefulness of this approach is validated using low-depth decision trees, where it is found that in most cases performance improves.
+
+Overall, this thesis offers methods to post-process existing document embeddings in-order to obtain clear semantic features, quantitatively finds that these methods are effective, and qualitatively investigates these features. New variants of an existing method are introduced, and a qualitative investigation of  neural networks using these properties observes characteristics like auto-encoders finding more abstract features the more stacked the representation is. Finally, a new methodology to fine-tune the vector space such that a better feature representation is obtained is introduced and quantitatively validated. 
+
+%Can this method be applied to a variety of representations?
+%Can this method be applied to more domains?
+%Does this method result in a representation of clear semantic features?
+%Can these semantic features be used to form a useful alternative representation?
+%Are the features meaningful qualitatively in a variety of domains and for a variety of representations?
+
+%The work in Chapter \ref{ch3} addresses these questions, and introduces variants to their method that result in  better performance on tasks.
+
+%There are a variety of approaches to obtaining vector space representations where features are clear and semantic. 
+
+%simple models such as (small) decision trees cannot readily be applied to text documents due to the size of the underlying feature space. 
+ 
+
+  
+
+
+
+
+
+% Disentanglement and why it matters
+
+% Existing disentanglement methods and why they dont fit the gap
+
+% What we actually did to solve this problem 1st chapter
+
+% What the results were 1st chapter
+
+% What we did 2nd
+
+% Results 2nd
+
+% What we did 3rd
+
+% Results 3rd
+
+% Overall conclusions
+
+%Vector space representations of documents can be re-organized  such that their dimensions correspond to clear semantic features. Furthermore, these disentangled representations can be used to provide a useful inductive bias to classifiers, and as the features are disentangled, they can be used to qualitatively investigate the hidden layers of neural networks to gain valuable insights into how they represent documents. 
 %\def\baselinestretch{1}\normalfont
 
 \def\baselinestretch{1.5}\normalfont
@@ -444,6 +509,7 @@ We produce interpretable representations, and demonstrate their applicability in
 \input{chapter3}
 \input{chapter5}
 \input{chapter4}
+\input{chapter6}
 \input{appendix}
 \backmatter
 
