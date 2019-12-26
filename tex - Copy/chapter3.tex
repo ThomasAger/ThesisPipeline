@@ -365,6 +365,8 @@ Other work which has taken advantage of directions in vector spaces has relied o
 
 \subsection{K-means}
 
+% USING DEFAULT PARAMETERS NOW
+
 \subsection{Derrac's K-means Variation}
 
 
@@ -425,14 +427,17 @@ This section details the methodology to disentangle a document embedding model s
 
 \subsection{Obtaining Directions and Rankings From Words}\label{ch3:LearningInterpretableDirections}
 
- The method starts with a given document embedding model $V_D$ induced from text documents $d \in D$ and their associated bag-of-words $B_D$. For the bag-of-words $B_D$ each document is composed of word frequencies $d = ({wf}_1, {wf}_2, ..., {wf}_n)$ where ${wf}(d)$ is equal to the frequency of a word in a document and $n$ is equal to the number of unique words  in the vocabulary $w \in W$.
-  Following the general explanation in the introduction, this section more precisely explains how to obtain a word-direction vector $\mathcal{D}_w$ for all words in the vocabulary $w \in W$, by using a vector found by a linear model $M_w$ that separates documents that have a word and do not have a word. Then, from that direction it explains  how to obtain a ranking of all documents $R_w = ({rw}_{d1}, {rw}_{d2}, ..., {rw}_{dn})$ where ${rw}_{d}$ is equal to the ranking of a document on a word direction and $n$ is the number of documents. The section following this one shows how to remove word directions that are not semantically important by evaluating the quality of the classifier that obtained the direction $M_w$, or the quality of the direction $\mathcal{D}_w$.
- 
+ The method starts with a given document embedding  induced from text documents $D$ and their associated bag-of-words $B$. The bag-of-words representation of a document $d$ is given by its vector of word frequencies $b = (\textit{wf}_1, {wf}_2, ..., {wf}_n)$ where ${wf}(d)$ is equal to the frequency of a word in a document and $n$ is equal to the number of unique words  in the vocabulary $W$.
+  Following the general explanation in the introduction, this section more precisely explains how to obtain a word-direction vector $\mathcal{D}_w$ for all words in the vocabulary $w \in W$, by using a vector found by a linear model $M_w$ that separates documents that have a word and do not have a word. Then, from that direction it explains  how to obtain a ranking of all documents $R_w = ({rw}_{d1}, {rw}_{d2}, ..., {rw}_{di})$ where ${rw}_{d}$ is equal to the ranking of a document on a word direction and $i$ is the number of documents. The section following this one shows how to remove word directions that are not semantically important by evaluating the quality of the classifier that obtained the direction $M_w$, or the quality of the direction $\mathcal{D}_w$.
 
 
 %%%%%%%%%%%%Features that are important will be spatially organized in a way that reflects the similarity between the Bag-Of-Words representations they were composed of. In particular, we expect that documents will be arranged in a direction, where generally the higher the PPMI score for a group of words that correspond to a feature (e.g. $Horror, Scary, Gore$) the further away they will be from those that have low PPMI scores for those words. We give examples of this in Figure \ref{ch3:DirectionsGraphic}, by projecting documents into a 2D space of salient features we are able to show that these documents are structured according to directions for these features. Salient features will typically be a more abstract representation which will be natural in the domain, e.g. in a domain of IMDB movie reviews, genres
 
-\noindent \textbf{Obtaining directions for each word} Each document is represented by a vector $v_d $ in the document embedding model $V_D$. For this section, document vectors $v_d$ are treated as points $p_d$ in the document embedding model. For each word $w$, a hyper-plane $h_w$ is obtained by training a linear model$\footnote{Tested using a logistic regression classifier and a linear SVM, both achieved similar results}$ $M_w$ on the document embedding model $V_D$   so that each document $p_d $ in the document embedding model where the word $w $ occurs more than once ${wf}(d) \geq 1$ are separated from those where the word did not occur ${wf}(d) = 0$. We obtain such hyperplanes for all words in the vocabulary above a frequency threshold ${wf}(D) > T$ where ${wf}(D)$ is the frequency of the word in all documents. In practice, the parameter $T$ is determined with hyper-parameter optimization. This task is unbalanced, i.e. there are typically fewer documents that contain the word compared to those that do not contain it, so the weights of the classifier are balanced such that positive instances are weighted in proportion to how rare they are.\footnote{ \href{https://scikit-learn.org/stable/modules/generated/sklearn.utils.class_weight.compute_class_weight.html}{Using scikit-learn, class\_weight:'balanced'}}
+\noindent \textbf{Obtaining directions for each word} Each document is represented by a vector $v_d $ in the document embedding model $V_D$. %For this section, document vectors $v_d$ are treated as points $p_d$ in the document embedding model. 
+For each word $w$, a hyper-plane $h_w$ is obtained by training a linear classifier$\footnote{Tested using a logistic regression classifier and a linear SVM, both achieved similar results}$ $M_w$ on the document vectors  so that all documents where the word $w $ occurs more than once are separated from those where the word did not occur. We obtain such hyperplanes for  words in the vocabulary above a frequency threshold ${wf}(D) > T$ where ${wf}(D)$ is the frequency of the word $wf$ in all documents $D$. %In practice, the parameter $T$ is determined with hyper-parameter optimization. 
+This task is unbalanced, i.e. there are typically fewer documents that contain the word compared to those that do not contain it. For this reason, the weights of the training examples are weighted, where the weights of the classifier are balanced such that positive instances are weighted in proportion to how rare they are.\footnote{ \href{https://scikit-learn.org/stable/modules/generated/sklearn.utils.class_weight.compute_class_weight.html}{Using scikit-learn, class\_weight:'balanced'}}
+
+
 
 Although the hyperplane $h_w$ is classifying a binary class (either classifying documents $d_p$ as negative or positive), the distance between the document vectors $d_p$ and the hyperplane $h_w$ will vary. For example, when separating documents based on the occurrence of a word, it can be expected that the documents which contain the word more frequently would be further away from the hyper-plane on the positive side. We give an example of two directions in Figure \ref{ch3:ToyHyperPlane}. To  apply this idea to a real domain, we can give an example from movie reviews, where the word is 'Scary' and the most 'Scary' movies are at the tip of the direction and those that are least 'Scary' are at the base of the direction. With this understanding, the direction $\mathcal{D}_w$ can be obtained by simply taking the vector perpendicular to the hyperplane $h_w $. This direction goes from documents $d_p$ from those lowest on the direction (at the distance furthest from the hyperplane on the side where documents $d_p $ are classified) to those highest on the direction at the distance furthest from the hyperplane at the positive side. 
 
@@ -506,7 +511,7 @@ Another approach is to cluster similar directions together, obtaining new cluste
 This has the same  benefits of the previous method in that the number of features are reduced and words can be given context when clustered together as a label for the feature. However, they also change the representation, e.g. two directions that describe a similar feature of movies when clustered together  e.g. the feature-directions for the words "Bloody" and "Gorey" will result in a better performing feature overall. Both are words in movie reviews to describe how much blood a movie contains, so if these feature directions are averaged then the cluster direction can be used to produce a more balanced ranking for how much blood there is in films.  Essentially, the cluster feature-direction could more accurately represent the semantics of a bloody  film, compared to what is possible when considering either feature-direction individually. Finally, clustering also can obtain new properties by clustering directions, e.g. "Bloody" refers to how bloody a film is, but when clustered with "Bloody", "Scary" and "Horror", the new clustered direction now models the property of a horror movie more accurately.
 
 
-On the other hand, its possible that when clustering many words together the cluster direction no longer represents a semantically important feature. For example given the associated label for a cluster direction $\{Romance, Love\}$ and a cluster direction $\{Bloody, Gorey\}$ the feature-direction for $\{Cute\}$ is more relevant to the former rather than the latter, and  has been used in reviews for romance movies. But it has also been used in reviews for movies containing cute animals. This would make the new clustered direction $\{Romance, Love, Cute\}$ perform worse at classifying the movie genre "Romance", but a bit better at classifying if a movie contains animals. It might thus be preferable to keep \textit{Cute} in a separate cluster that represents  animal movies rather than a cluster that represents romantic movies with cute animals. In the quantitative results, sometimes clustering performed worse than single directions, and not being able to find the clusters that correspond to the specific classes in question can be attributed as to why, as they may have been  disrupted by clustering together words that disrupt a more important meaning. This is the reason for the hyper-parameter optimization of the clustering methods, and introducing standard K-means as a variant.
+On the other hand, its possible that when clustering many words together the cluster direction no longer represents a semantically important feature. For example given the associated label for a cluster direction $\{Romance, Love\}$ and a cluster direction $\{Bloody, Gorey\}$ the feature-direction for $\{Cute\}$ is more relevant to the former rather than the latter, and  has been used in reviews for romance movies. But it has also been used in reviews for movies containing cute animals. This would make the new clustered direction $\{Romance, Love, Cute\}$ perform worse at classifying the movie genre "Romance", but a bit better at classifying if a movie contains animals. It might thus be preferable to keep \textit{Cute} in a separate cluster that represents  animal movies rather than a cluster that represents romantic movies with cute animals. In the quantitative results, sometimes clustering performed worse than single directions, and not being able to find the clusters that correspond to the specific classes in question can be attributed as to why, as they may have been  disrupted by clustering together words that disrupt a more important meaning. 
 
 %  ${Cr}_{cl}$ where ${cl} = ({cl}_{cr1}, {cl}_{cr2}, ..., {cl}_{crn})$ and ${cl}_{cr}$ is the cluster of labels for a feature.
 
@@ -524,23 +529,7 @@ On the other hand, its possible that when clustering many words together the clu
 
 %The final benefit to clustering the words is that linear classifiers are generally suited better to 'disentangled' representations \cite{Bengio2012}. In this case, we refer to disentanglement in the sense of obtaining a feature vector where each dimension is distinct, rather than the Vector Space Model being naturally clustered. Additionally, if our representation is dense and disentangled into the natural features of the domain, it is unlikely to overfit and will be able to generalize more easily. 
 
-We will experiment with two different clustering methods: k-means and a variant of k-means that was proposed in the work by Derrac \cite{Derrac2015}:
-
-\noindent \textbf{K-Means} K-means is a standard baseline clustering algorithm. In the experimental results, it was found that Derrac's variation relies too much on the initial choice of cluster centers, meaning if that key directions may be missed. Avoiding this is difficult without extensive and sometimes arbitrary hyper-parameter optimization. As K-Means has easy to tune hyper-parameters, it can find clusters that correspond to the task. 
-
-Given the input $X$, traditional k-means  begins with $K$ centers chosen uniformly at randomly from $X$. In this work we use the K-means++ variation \cite{Arthur}, where the first center is chosen uniformly at random from $X$ and the remaining centers are chosen with the following probability, where $D(x)$ is the shortest distance from a data point $x \in X$ to the closest center that has already been chosen:
-
-\begin{align}
-\dfrac{D(x)^2}{\sum_{x \in X} D(x)^2} 
-\end{align}
-  
-After this initialization, the standard k-means process is followed. The distance between each input $x$ and center $c$ is calculated. In-order for the Euclidean distance used in k-means to be meaningful, the vector directions are normalized. In particular the relationship between them is:
-
-\begin{align}
-cos(angle) = 1 - dist/2 
-\end{align}
-
- Each input $x$ is then assigned to its closest center $c$. Then, the centers are recomputed to be the mean of their assigned inputs. This process starting with the distance calculation is repeated until the centers do not change or a maximum number of iterations is reached (in this case, the default parameter of 300 iterations is used). 
+In-order to help find good cluster directions that correspond to the task, we introduce the use of k-means alongside the clustering algorithm introduced in the work by Derrac \cite{Derrac2015}. For both clustering methods, the only parameter tuned is the amount of clusters:
 
 
 
@@ -555,7 +544,7 @@ cos(angle) = 1 - dist/2
 
 %%%%%%%%%%%%%%%
 
-\noindent \textbf{Derrac's K-Means Variation} This is the clustering method used in the work this method was introduced in \cite{derrac2015}.  As input to the clustering algorithm, it considers the $N$ best-scoring candidate feature directions $v_w$. Hyper-parameter selection is performed by varying the scoring method or amount of candidate feature directions $N$. The main idea underlying their approach is to select the cluster centers such that (i) they are among the top-scoring candidate feature directions, and (ii) are as close to being orthogonal to each other as possible. 
+\noindent \textbf{Derrac's K-Means Variation} This is the clustering method used in the work this method was introduced in \cite{Derrac2015}.  As input to the clustering algorithm, it considers the $N$ best-scoring candidate feature directions $v_w$. Hyper-parameter selection is performed by varying the scoring method or amount of candidate feature directions $N$. The main idea underlying their approach is to select the cluster centers such that (i) they are among the top-scoring candidate feature directions, and (ii) are as close to being orthogonal to each other as possible. 
  
  
 The output of this clustering algorithm is a set of cluster directions ${CD} = C_1,...,C_K$, where each cluster direction $C$ has an associated label of words it is composed of  $L(w_1, w_2, ..., w_n)$. Note that these a feature representation is obtained for these cluster directions as described in the previous section. In the following, we will write   ${C}_j$  to denote the centers of the directions corresponding to the words in the cluster $L_j$, and $w_d$ for the direction corresponding to the word in that cluster.
@@ -574,6 +563,23 @@ C = \min(\max_{C_j \in {CD}}({cos_{w_i \in W_n}(w_i, v_{C_j})}))
 
 
 Where $W_n$ are the candidate word-directions, and $CD$ is the current set of cluster centers. Once $k$ clusters have been selected,  each candidate direction $w_i$  is added to its most similar cluster $max_{C_j \in {CD}}(cos(w_i, C_j)$ and after adding that direction the cluster direction is updated to be the average of the current center and the newly added word ${AVG}(C_j, w_i)$. This continues until all candidate directions $W_n$ are added to clusters. The cluster centers $CD$ are taken as the final cluster centers.
+
+
+\noindent \textbf{K-Means} K-means is a standard baseline clustering algorithm. In the experimental results, it was found that Derrac's variation relies too much on the initial choice of cluster centers, meaning  that key directions may be missed if terms related to them are not initially chosen. Avoiding this is difficult without extensive and sometimes arbitrary hyper-parameter optimization. K-means is used as an alternative baseline that does not have this problem. Default parameters and the The k-means algorithm is implemented in scikit-learn with default parameters \cite{\href{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html}{Default parameters for k-means in scikit-learn}}.
+
+Given the input $X$, traditional k-means  begins with $K$ centers chosen uniformly at randomly from $X$. In this work we use the K-means++ variation \cite{Arthur}, where the first center is chosen uniformly at random from $X$ and the remaining centers are chosen with the following probability, where $D(x)$ is the shortest distance from a data point $x \in X$ to the closest center that has already been chosen:
+
+\begin{align}
+\dfrac{D(x)^2}{\sum_{x \in X} D(x)^2} 
+\end{align}
+
+After this initialization, the standard k-means process is followed. The distance between each input $x$ and center $c$ is calculated. In-order for the Euclidean distance used in k-means to be meaningful, the vector directions are normalized. In particular the relationship between them is:
+
+\begin{align}
+cos(angle) = 1 - dist/2 
+\end{align}
+
+Each input $x$ is then assigned to its closest center $c$. Then, the centers are recomputed to be the mean of their assigned inputs. This process starting with the distance calculation is repeated until the centers do not change or a maximum number of iterations is reached (in this case, the default parameter of 300 iterations is used). 
 
 
 
@@ -828,7 +834,6 @@ The aim of this quantitative evaluation is to verify the disentanglement of the 
 
 First some baseline results are obtained using the unsupervised representations as input to a variety of classifiers. Then,  the disentangled feature representations are used as input to low-depth  CART Decision Trees  are used (See Background Section \ref{bg:trees}) limited to a depth of one, two or three. The idea behind this is that if the properties that were spatially encoded in the  document embeddings  are disentangled, then the decision trees with a limited depth should be able to perform close to or equal performance to the original results for the unsupervised representation.  If only the the performance of the disentangled feature representation was being evaluated, Linear SVM's could be used. However, the aim of this section is not to prove that these disentangled feature representations perform well, but rather that they are disentangled. 
 
-
 Essentially, if depth-one decision trees (that uses only a single feature to make a classification decision) can model a class well using the disentangled representation as input, then the information in  the original document embedding that enabled it to perform well on the task has been disentangled into a single feature. Similarly, if the disentangled representation performs well on a depth-three limited decision tree, then it is safe to assume the method has disentangled a few different relevant properties from the original representation.   Figure \ref{ch3:DecisionTree} shows one of the trees that was obtained from our feature based representation.  If the document embedding is indeed disentangled into a feature representation composed of important properties for the domain, then these low-depth decision trees should generalize well to test data. To show the difference in entanglement between the original unsupervised document embeddings and the disentangled feature representations, low-depth decision tree results are also obtained for the unsupervised document embeddings. 
  %This evaluation has assumes that a good disentangled representation will disentangle properties that can classify key domain tasks i.e. if the document embedding model is representing domain knowledge well it can be expected that the document embedding model is linearly separable for key semantics of the domain. In spatial terms, a representation will be capable of being linearly transformed by our method into these distinct relevant properties if semantically distinct entities are spatially separated, and semantically similar entities are close together.
 
@@ -890,7 +895,7 @@ The best doc2vec embedding for each task is the one that performs best when used
 
 \subsubsection{Experiment Two: The best single-term property features}
 
-The objective of this experiment is to verify that the single-term property features are disentangled. It may be the case that clustering directions does more harm to the feature representation than good, so these experiments are used to investigate the use of a feature representation composed only of rankings of entities on single terms. This is done-so by using feature representations composed of single term property rankings as input to low-depth Decision Trees. This experiment also finds  the best-performing parameters on the task for the single-directions. The end-result is that for each task, there will be a best performing document embedding model and size of that model (e.g. Doc2Vec of size 50), and the following hyper-parameters are optimized for that model:
+The objective of this experiment is to verify that the single-term property features are disentangled. It may be the case that clustering directions does more harm to the feature representation than good, so these experiments are used to investigate the use of a feature representation composed only of rankings  entities on single terms. This is done  by using feature representations composed of single term property rankings as input to low-depth Decision Trees. This experiment also finds  the best-performing parameters on the task for the single-directions. The end-result is that for each task, there will be a best performing document embedding model and size of that model (e.g. Doc2Vec of size 50), and the following hyper-parameters are optimized for that model:
 
 \begin{itemize}
 	\item The frequency cut-off of the terms $f (20000, 10000, 5000) $, where directions are only obtained for terms in the top $f$.
@@ -907,15 +912,8 @@ The reason these hyper-parameters are optimized are because even the top-scoring
 
 \subsubsection{Experiment Three: The best cluster features}
 
-The objective of this experiment is to verify that the cluster features are disentangled. Clustering is an alternative method to using single-term directions that combines the directions into clusters. This results in a lower amount of linearly combined features labelled with clusters of words. As in the last experiment, this is done by using a feature-representation composed of cluster-rankings as input to low-depth Decision Trees.  The two different clustering methods,  K-means\footnote{K-means implemented in \href{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}{scikit-learn}} and Derrac's k-means variation (as described in Section \ref{ch3:LabellingWords}), are used. The best single-term property parameters are used as the basis of this experiment, where for each classifier and task the clusters are obtained from the top $s$ directions and score-type $t$,  chosen by hyper-parameter optimization for that classifier and task.
+The objective of this experiment is to verify that the cluster features are disentangled. Clustering is an alternative method to using single-term directions that combines the directions into clusters. This results in a lower amount of linearly combined features labelled with clusters of words. As in the last experiment, this is done by using a feature-representation composed of cluster-rankings as input to low-depth Decision Trees.  The two different clustering methods,  K-means\footnote{K-means implemented in \href{https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html}{scikit-learn}} and Derrac's k-means variation (as described in Section \ref{ch3:LabellingWords}), are used. The best single-term property parameters are used as the basis of this experiment, where for each classifier and task the clusters are obtained from the top $s$ directions and score-type $t$,  chosen by hyper-parameter optimization for that classifier and task. The only hyper-parameter optimized in this experiment is the amount of clusters.
 
-The Derrac clustering method does not have hyper-parameters, but the following hyper-parameters are tuned for K-means:
-
-\begin{itemize}
-	\item The number of times the algorithm will be run with different centroid seeds $(5, 10, 50)$ where the final output is the run with the best inertia. 
-	\item The maximum number of iterations for a single run $(100, 300, 1000)$
-	\item The tolerance $(0.001, 0.0001, 0.00001, 0.0)$
-\end{itemize}
 
 
 
@@ -1168,7 +1166,7 @@ This idea is supported when looking at the depth-three tree for this class, whic
 
 %%%%%%%%%%%
 
-Meanwhile, this same lack of separation caused the clusters to lose performance in the "sequel" class. With the K-means method, the cluster was found for ("franchise sequels sequel installments") with the Derrac variant, the corresponding cluster was ("franchise sequels sequel instalments entry returns"). This cluster was also chosen for the Derrac variant as the first node of its Decision Tree, but this caused it to perform worse than k-means. This is likely because although the words "entry" and "returns" were most similar to this cluster, they disrupted the direction too much. Indeed, when looking at the k-means clusters, the "returns" direction is clustered with "events situation conclusion spoiler ... protagonists exscapes break scenario ...", seemingly referring to a character or thing "returning" in a conclusive part of the movie, and the word "entry" is clustered with the words "effective genuine ... hits build surprisingly ... succeeds essentially finale entry ..." seemingly relating to a more sentiment related cluster about how a movie performed. So in this case k-means being able to find more disentangled clusters than Derrac gave it a performance advantage. 
+Meanwhile, this same lack of separation caused the clusters to lose performance in the "sequel" class. With the K-means method, the cluster was found for ("franchise sequels sequel installments") with the Derrac variant, the corresponding cluster was ("franchise sequels sequel instalments entry returns"). This cluster was also chosen for the Derrac variant as the first node of its Decision Tree, but this caused it to perform worse than k-means. This is likely because although the words "entry" and "returns" were most similar to this cluster, they disrupted the direction too much. Indeed, when looking at the k-means clusters, the "returns" direction is clustered with "events situation conclusion spoiler ... protagonists exscapes break scenario ...", seemingly referring to a character or thing "returning" in a conclusive part of the movie, and the word "entry" is clustered with the words "effective genuine ... hits build surprisingly ... succeeds essentially finale entry ..." seemingly relating to a more sentiment related cluster about how a movie performed. So in this case k-means found more disentangled clusters than Derrac gave it a performance advantage. 
 
 
 %%%%%%%%%%%%

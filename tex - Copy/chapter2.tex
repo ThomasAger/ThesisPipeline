@@ -430,18 +430,45 @@ Treating the entities as points in a vector space, where the dimensions of that 
 
 \subsection{Neural Networks}\label{bg:nn}
 
-Neural networks are a model that can be used to solve both supervised and unsupervised problems. One-kind of network that solves supervised problems is the feedforward network. This network has sequential layers composed of nodes, where each node in one layer is connected to every node in the subsequent layer. There are three kinds of layers, the first is the input layer, which has the same amount of nodes as the input vector space has features. Then, there are hidden-layers, which vary in size, and finally an output layer that has a number of nodes $n$ equal to the amount of classes. In the case of a binary classification problem, it would have one node.
+%Cross-entropy loss, Adagrad trainer with default parameters, Dropout, Sigmoid activation on the output layer. Instead of Relu which we found did not obtain good directions, we used the tanh activation function. Dropout is a regularizer that drops out units during training and makes the representation more general and robust. Adagrad is a trainer that adjusts the learning rate during training. 
 
-Essentially, each node has an activation threshold which determines if the value will be propogated through the network, and each connection between a neuron has a weight which this value is multiplied by. The process of learning the network is tuning these parameters so that given an entity with an associated class label, the network is able to classify that entity by making the output node as close to the class as possible. Note, that this could mean that the output is a probability of the class occurring, and a simple threshold is applied to determine the binary value. The nodes of each layer have an activation function, which is a function used on values that are propogated from the node. These functions can be linear or non-linear.
 
-The main benefit of neural networks is in its versatility. If the problem is more complex, then more nodes can be used. If the problem is simple, then less nodes can be used. Hidden layers can be viewed as vector spaces, and the result of learning is that the position of entities in that hidden layer are transformed non-linearly such that they are better organized for the objective, for example splitting apart entities that belong to different classes. This is the relative power of neural networks over other approaches, an objective can be specified e.g. text classification, and then a  network can be trained that obtains  vector spaces organized according to that task with ease.  
+Neural networks contain:
+
+* Layers
+	- Input layers
+	- Hidden layers
+	- Output layers
+* Nodes
+	- Activation thresholds
+	- Activation functions % Use formulas to clarify how it works
+		~ Relu
+		~ Tanh
+		~ Sigmoid
+* Connections between nodes
+	- Weights
+* Loss functions
+	- Making the output node as close to the class as possible
+* Training methods (sgd (gradient descent), adagrad)
+	- backproagation
+	
+	%Dropout is a regularizer that drops out units during training and makes the representation more general and robust. Adagrad is a trainer that adjusts the learning rate during training. 
+	
+
+One kind of neural network is the feed-forward network, where nodes never connect to nodes in layers prior to them. In this way, the feed-forward network always feeds information forwards. In standard applications of a feed-forward network, layers are "fully connected", meaning that each node is connected to every node in the subsequent layer. 
+
+Neural networks are a model that can be used to solve both supervised and unsupervised problems. One kind of network that solves supervised problems is the feedforward network. This network has sequential layers composed of nodes, where each node in one layer is connected to every node in the subsequent layer. There are three kinds of layers, the first is the input layer, which has the same amount of nodes as the input vector space has features. Then, there are hidden layers, which may vary in size, and finally an output layer that has a number of nodes $n$ equal to the amount of classes. In the case of a binary classification problem, it would have one node.
+
+Essentially, each node has an activation threshold which determines if the value will be propogated through the network, and each connection between a neuron has a weight which this value is multiplied by. The process of learning the network is tuning these parameters so that given an entity with an associated class label, the network is able to classify that entity by making the output node as close to the class as possible. Note, that this could mean that the output is a probability of the entity belong to the corresponding class, and a simple threshold is applied to determine the binary value. The nodes of each layer have an activation function, which is a function used on values that are propogated from the node. These functions can be linear or non-linear.
+
+ If the problem is more complex, then more nodes can be used. If the problem is simple, then fewer nodes can be used. Hidden layers can be viewed as vector spaces, and the result of learning is that the position of entities in that hidden layer are transformed non-linearly such that they are better organized for the objective, for example categorizing entities that belong to different classes. This is an important advantage of neural network models in the context of text classification: these models jointly solve the task of representation learning (i.e. transforming some initial representation into one which is better suited for the given task) and the task of learning the actual classification model.
 
 This benefit also has a down-side, as neural networks have so many parameters (e.g. the number of nodes, the activation function, the weight initialization) it can take a long time to find the combination of parameters that enable the network to organize entities efficiently for the associated problem. However, this lets them perform well in a variety of tasks. 
 
 
 %\subsection{Binary Classification}
 %\subsection{Multi-Label Classification}
-\subsection{Overfitting}
+\subsection{Overfitting} % Discuss bias/variance trade off
 
 % The problem of overfitting\dfrac{_{_{num}}}{den}
 
