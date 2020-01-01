@@ -301,14 +301,14 @@ In the next Chapter of the thesis, as well as in section \ref{ch2:interpretabili
 
 %Need to write about the concept of salient features of a domain here.
 \subsection{Bag-Of-Words}\label{bg:BOW}
+The bag-of-words is a  simple representation that can scale to an extreme amount of data, that comes with the following assumption: the context of words is unnecessary information to perform well on the task. How correct this assumption is depends on the task, but despite this view being overly-simplistic the application and use of the bag-of-words (BOW) is broad. There are multiple ways to represent words in the BOW format, but the most common is by the frequency of the words in a document.
 
-The bag-of-words is a simple representation that can scale to an extreme amount of data. Although when looking to achieve state-of-the-art results representations that are more complex or tailored to the domain are used, with enough examples even a basic representation can have enough information to clearly distinguish between types of entities in a domain for a task. 
+% Although when looking to achieve state-of-the-art results representations that are more complex or tailored to the domain are used, with enough examples even a basic representation can have enough information to clearly distinguish between types of entities in a domain for a task. 
 
-The bag-of-words (BOW)  ignores word context, instead taking the words that occur in each document and assigning a value to them in a matrix, e.g. where each word in a document is assigned a value for  its frequency in that document. For example, a short document of text like "there was a dog, and a man, and the man, and the dog" would be translated into word frequencies "there: 1, was: 1, a: 2, and: 3, the: 2, man: 2, dog: 2". This representation is simple, and ignores word context, grammar and punctuation but is highly effective when using machines to solve problems using a large amount of unstructured text documents. The bag-of-words is an important part of the work of this thesis, serving as the foundation of more complex and interpretable representations. 
+The bag-of-words (BOW)  assigns a value to each word based on its number of occurrences in the document. For example, a short document like "there was a dog, and a man, and the man, and the dog" would be translated into word frequencies "there: 1, was: 1, a: 2, and: 3, the: 2, man: 2, dog: 2". This representation is simple,  ignores word context, grammar and punctuation but is highly effective when using a large amount of unstructured text documents.  %CITE HERE 
+%The bag-of-words is an important part of the work of this thesis, serving as the foundation of more complex and interpretable representations. 
 
-As mentioned in the previous section, unnessecary parts of the data that are not  meaningful for the task should be removed. The bag-of-words is a representation that comes with the following assumption: the context of words is an unnessecary part of the data to perform well on the task. How correct this assumption is depends on the task, but despite this view being overly-simplistic the application and use of the bag-of-words (BOW) is broad. There are multiple ways to represent words in the BOW format, but the most common is by the frequency of the words in a document.
-
-The natural structure for this kind of representation is that of a matrix, where rows are documents and columns are words in the domain as defined by their vocabulary. Specifically,  text documents in a domain $d \in D$ have an associated vocabulary of unique words across all documents $w \in W$. The bag-of-words $B_D$ is a matrix where each document is a row, and each column is a word, where the value of each word for a document is the word's frequency in that document $d = ({wf}_1, {wf}_2, ..., {wf}_n)$ where ${wf}(d)$ is equal to the frequency of a word in a document and $n$ is equal to the number of unique words  in the vocabulary for all documents $w \in W$. In terms of the general structure given above, our representation $r$  is the bag-of-words, and the features $r = (x_1, x_2, ..., x_n)$ are the word frequencies.
+The  structure of the bag-of-words is  a matrix, where rows are documents and columns are words in the corpus vocabulary. Specifically,  text documents in a domain $d \in D$ have an associated vocabulary of unique words across all documents $w \in W$. The bag-of-words $B_D$ is a matrix where each document is a row, and each column is a word, where the value of each word for a document is the word's frequency in that document $d = (\textit{wf}_1, \textit{wf}_2, ..., \textit{wf}_n)$ where ${wf}(d)$ is equal to the frequency of a word in a document and $n$ is equal to the number of unique words  in the vocabulary for all documents $w \in W$. In terms of the general structure given above, our representation $r$  is the bag-of-words, and the features $r = (x_1, x_2, ..., x_n)$ are the word frequencies.
 
 %Given these vectors we can determine the similarity between two documents or two words by the similarity between their frequency vectors or document vectors. %!!!!!!!!!EXamles???
 
@@ -339,7 +339,7 @@ Where ${df}(w)$ is the amount of documents the word $w$ has occurred in and $d_n
 \end{align*}
 
 
-\subsubsection{Positive Pointwise Mutual Information (PPMI)}
+\subsubsection{Positive Pointwise Mutual Information (PPMI)}\label{bg:ppmi}
 
 
 
@@ -507,7 +507,7 @@ To solve the problem of overfitting, the data for a supervised problem is usuall
 
 % Given features $x$ and labels $y$, a model $m$ learns a way to predict the label of a document given its features, and this learned method can be applied to unlabelled documents. For example, given a bag-of-words representation, one way to automatically label a news article category would be with thresholds on the frequency of words in the text e.g. if the word "amazing" and the word "great" both occur more frequently than a threshold $T$ determined by a model, then the label is $0$,  a "very good" movie. 
 
-\subsection{Evaluation Metrics}
+\subsection{Evaluation Metrics}\label{bg:metrics}
 
 To evaluate a model, the difference between the real labels of documents and the predicted features of documents is compared. However, the value of the model is in its ability to predict the labels of documents that are unlabelled. Typically, this problem is solved by splitting the documents into a training set and a test set. The training set is used when learning the model, and the test set is used to verify the model is working correctly. 
 

@@ -49,6 +49,8 @@ First, we go through the history and class names of the datasets to give context
 
 In this section, we describe the vocabulary and document sizes for each domain. Each domain is preprocessed such that it is converted to lower-case,  non-alphanumeric characters are removed and whitespace is stripped such that words are separated by a single space. Words are removed from a standard list of English stop-words from the NLTK library \cite{Bird} and we filter out terms that do not occur in at least two documents, with an additional limit to the maximum number of words in a vocabulary set to 100,000. 
 
+For each task in each domain,  each of the datasets are split into a 2/3 training data, 1/3 test data split.  We additionally remove 20\% of the training data and use that as development data for our hyper-parameters. 
+
 
 \textbf{IMDB Sentiment}\footnote{Obtained by: https://keras.io/datasets/, Originally from https://ai.stanford.edu/~amaas/data/sentiment/ \cite{Maas2011a}} When the original corpus was produced, the 50 most frequent terms were removed. It contains 50,000 documents with a vocabulary size of 78,588. After removing terms that did not occur in at least two documents, the vocabulary size was reduced to 55384.  the number of positive instances in the classes is 25,000.
 

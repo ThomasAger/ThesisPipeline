@@ -83,7 +83,8 @@ def direction_pipeline(dct_unchanged, dct, bow, dir_min_freq, dir_max_freq, file
 
     doc_amt = split.get_doc_amt(data_type)
 
-    wl_save = SaveLoad(rewrite=rewrite_all)
+    wl_save = SaveLoad(rewrite=True)
+    # If using dir min freq and dir max freq
     if dir_min_freq != -1 and dir_max_freq != -1:
         no_below = int(doc_amt * dir_min_freq)
         no_above = int(doc_amt * dir_max_freq)
