@@ -260,21 +260,21 @@ url = {http://portal.acm.org/citation.cfm?id=183423{\&}dl=},
 volume = {12},
 year = {1994}
 }
-@article{Arjovsky2017,
-abstract = {The goal of this paper is not to introduce a single algorithm or method, but to make theoretical steps towards fully understanding the training dynamics of generative adversarial networks. In order to substantiate our theoretical analysis, we perform targeted experiments to verify our assumptions, illustrate our claims, and quantify the phenomena. This paper is divided into three sections. The first section introduces the problem at hand. The second section is dedicated to studying and proving rigorously the problems including instability and saturation that arize when training generative adversarial networks. The third section examines a practical and theoretically grounded direction towards solving these problems, while introducing new tools to study them.},
-archivePrefix = {arXiv},
-arxivId = {1701.04862},
-author = {Arjovsky, Martin and Bottou, L{\'{e}}on},
-doi = {10.2507/daaam.scibook.2010.27},
-eprint = {1701.04862},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Arjovsky, Bottou - 2017 - Towards Principled Methods for Training Generative Adversarial Networks.pdf:pdf},
-isbn = {1584880309},
-issn = {17269687},
-mendeley-groups = {Annotated/Generative Adversarial Nets},
-title = {{Towards Principled Methods for Training Generative Adversarial Networks}},
-url = {http://arxiv.org/abs/1701.04862},
-year = {2017}
+
+@inproceedings{Arjovsky2017,
+  author    = {Mart{\'{\i}}n Arjovsky and
+               L{\'{e}}on Bottou},
+  title     = {Towards Principled Methods for Training Generative Adversarial Networks},
+  booktitle = {5th International Conference on Learning Representations, {ICLR} 2017,
+               Toulon, France, April 24-26, 2017, Conference Track Proceedings},
+  year      = {2017},
+  crossref  = {DBLP:conf/iclr/2017},
+  url       = {https://openreview.net/forum?id=Hk4\_qw5xe},
+  timestamp = {Thu, 04 Apr 2019 13:20:07 +0200},
+  biburl    = {https://dblp.org/rec/bib/conf/iclr/ArjovskyB17},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
+
 @article{Arora2012,
 abstract = {Topic Modeling is an approach used for automatic comprehension and classification of data in a variety of settings, and perhaps the canonical application is in uncovering thematic structure in a corpus of documents. A number of foundational works both in machine learning and in theory have suggested a probabilistic model for documents, whereby documents arise as a convex combination of (i.e. distribution on) a small number of topic vectors, each topic vector being a distribution on words (i.e. a vector of word-frequencies). Similar models have since been used in a variety of application areas; the Latent Dirichlet Allocation or LDA model of Blei et al. is especially popular. Theoretical studies of topic modeling focus on learning the model's parameters assuming the data is actually generated from it. Existing approaches for the most part rely on Singular Value Decomposition(SVD), and consequently have one of two limitations: these works need to either assume that each document contains only one topic, or else can only recover the span of the topic vectors instead of the topic vectors themselves. This paper formally justifies Nonnegative Matrix Factorization(NMF) as a main tool in this context, which is an analog of SVD where all vectors are nonnegative. Using this tool we give the first polynomial-time algorithm for learning topic models without the above two limitations. The algorithm uses a fairly mild assumption about the underlying topic matrix called separability, which is usually found to hold in real-life data. A compelling feature of our algorithm is that it generalizes to models that incorporate topic-topic correlations, such as the Correlated Topic Model and the Pachinko Allocation Model. We hope that this paper will motivate further theoretical results that use NMF as a replacement for SVD - just as NMF has come to replace SVD in many applications.},
 archivePrefix = {arXiv},
@@ -564,26 +564,33 @@ title = {{Montague Meets Markov : Deep Semantics with Probabilistic Logical Form
 volume = {1},
 year = {2013}
 }
+
 @article{Bengio2009,
-abstract = {Theoretical results suggest that in order to learn the kind of complicated functions that can represent high-level abstractions (e.g., in vision, language, and other AI-level tasks), one may need deep architectures. Deep architectures are composed of multiple levels of non-linear operations, such as in neural nets with many hidden layers or in complicated propositional formulae re-using many sub-formulae. Searching the parameter space of deep architectures is a difficult task, but learning algorithms such as those for Deep Belief Networks have recently been proposed to tackle this problem with notable success, beating the state-of-the-art in certain areas. This monograph discusses the motivations and principles regarding learning algorithms for deep architectures, in particular those exploiting as building blocks unsupervised learning of single-layer models such as Restricted Boltzmann Machines, used to construct deeper models such as Deep Belief Networks.},
-archivePrefix = {arXiv},
-arxivId = {submit/0500581},
-author = {Bengio, Yoshua},
-doi = {10.1561/2200000006},
-eprint = {0500581},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Bengio - 2009 - Learning Deep Architectures for AI.pdf:pdf},
-isbn = {2200000006},
-issn = {1935-8237},
-journal = {Foundations and Trends{\textregistered} in Machine Learning},
-mendeley-groups = {Papers/Paper 1,Report/Features,Progress Report,Report},
-number = {1},
-pages = {1--127},
-pmid = {17348934},
-primaryClass = {submit},
-title = {{Learning Deep Architectures for AI}},
-volume = {2},
-year = {2009}
+  abstract = {Theoretical results suggest that in order to learn the kind of complicated functions that can represent high-level abstractions (e.g., in vision, language, and other AI-level tasks), one may need deep architectures. Deep architectures are composed of multiple levels of non-linear operations, such as in neural nets with many hidden layers or in complicated propositional formulae re-using many sub-formulae. Searching the parameter space of deep architectures is a difficult task, but learning algorithms such as those for Deep Belief Networks have recently been proposed to tackle this problem with notable success, beating the state-of-the-art in certain areas. This monograph discusses the motivations and principles regarding learning algorithms for deep architectures, in particular those exploiting as building blocks unsupervised learning of single-layer models such as Restricted Boltzmann Machines, used to construct deeper models such as Deep Belief Networks.},
+  added-at = {2018-02-10T18:29:43.000+0100},
+  author = {Bengio, Yoshua},
+  biburl = {https://www.bibsonomy.org/bibtex/24ac7fbfc4e40b606733ec3d33b6c9e26/flint63},
+  description = {Book ISBN 978-1-60198-294-0},
+  doi = {10.1561/2200000006},
+  file = {Journal Issue:2009/Bengio09.pdf:PDF},
+  groups = {public},
+  interhash = {30174ec5e2667a039cdc30c5d359dc47},
+  intrahash = {4ac7fbfc4e40b606733ec3d33b6c9e26},
+  issn = {1935-8237},
+  journal = {Foundations and Trends in Machine Learning},
+  keywords = {01801 paper numerical ai data pattern recognition analysis learn algorithm},
+  number = 1,
+  pages = {1--127},
+  timestamp = {2018-04-16T12:36:58.000+0200},
+  title = {Learning Deep Architectures for {AI}},
+  username = {flint63},
+  volume = 2,
+  year = 2009
 }
+
+
+
+
 @article{Bengio2013,
 abstract = {The success of machine learning algorithms generally depends on data representation, and we hypothesize that this is because different representations can entangle and hide more or less the different explanatory factors of variation behind the data. Although specific domain knowledge can be used to help design representations, learning with generic priors can also be used, and the quest for AI is motivating the design of more powerful representation-learning algorithms implementing such priors. This paper reviews recent work in the area of unsupervised feature learning and deep learning, covering advances in probabilistic models, auto-encoders, manifold learning, and deep networks. This motivates longer-term unanswered questions about the appropriate objectives for learning good representations, for computing representations (i.e., inference), and the geometrical connections between representation learning, density estimation and manifold learning.},
 archivePrefix = {arXiv},
@@ -4118,15 +4125,7 @@ title = {{An unexpected unity among methods for interpreting model predictions}}
 url = {http://arxiv.org/abs/1611.07478},
 year = {2016}
 }
-@article{Luo2015,
-author = {Luo, Hongyin and Liu, Zhiyuan and Luan, Huanbo and Sun, Maosong},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Luo et al. - 2015 - Online Learning of Interpretable Word Embeddings.pdf:pdf},
-mendeley-groups = {Annotated/Word Vectors},
-number = {September},
-pages = {1687--1692},
-title = {{Online Learning of Interpretable Word Embeddings}},
-year = {2015}
-}
+
 @article{Craven1993,
 author = {{M.W. Craven}, J.W. Shavlik},
 file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/M.W. Craven - 1993 - Learning Symbolic Rules Using Artificial Neural Networks.pdf:pdf},
@@ -4138,16 +4137,16 @@ volume = {41},
 year = {1993}
 }
 @article{Maas2011,
-abstract = {Unsupervised vector-based approaches to semantics can model rich lexical meanings, but they largely fail to capture sentiment information that is central to many word meanings and important for a wide range of NLP tasks. We present a model that uses a mix of unsupervised and supervised techniques to learn word vectors capturing semantic term–document information as well as rich sentiment content. The proposed model can leverage both continuous and multi-dimensional sentiment in- formation as well as non-sentiment annota- tions. We instantiate the model to utilize the document-level sentiment polarity annotations present in many online documents (e.g. star ratings). We evaluate the model using small, widely used sentiment and subjectivity corpora and find it out-performs several previously introduced methods for sentiment classification. We also introduce a large dataset of movie reviews to serve as a more robust benchmark for work in this area.},
-author = {Maas, Andrew L and Daly, Raymond E. and Pham, Peter T. and Huang, Dan and Ng, Andrew Y. and Potts, Christopher},
-doi = {978-1-932432-87-9},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Maas et al. - 2011 - Learning Word Vectors for Sentiment Analysis.pdf:pdf},
-isbn = {9781932432879},
-journal = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
-mendeley-groups = {Annotated/Datasets,!Paper 3/task,!Paper 3/task/Large Movie Review},
-pages = {142--150},
-title = {{Learning Word Vectors for Sentiment Analysis}},
-year = {2011}
+	abstract = {Unsupervised vector-based approaches to semantics can model rich lexical meanings, but they largely fail to capture sentiment information that is central to many word meanings and important for a wide range of NLP tasks. We present a model that uses a mix of unsupervised and supervised techniques to learn word vectors capturing semantic term–document information as well as rich sentiment content. The proposed model can leverage both continuous and multi-dimensional sentiment in- formation as well as non-sentiment annota- tions. We instantiate the model to utilize the document-level sentiment polarity annotations present in many online documents (e.g. star ratings). We evaluate the model using small, widely used sentiment and subjectivity corpora and find it out-performs several previously introduced methods for sentiment classification. We also introduce a large dataset of movie reviews to serve as a more robust benchmark for work in this area.},
+	author = {Maas, Andrew L and Daly, Raymond E. and Pham, Peter T. and Huang, Dan and Ng, Andrew Y. and Potts, Christopher},
+	doi = {978-1-932432-87-9},
+	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Maas et al. - 2011 - Learning Word Vectors for Sentiment Analysis.pdf:pdf},
+	isbn = {9781932432879},
+	journal = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
+	mendeley-groups = {Annotated/Datasets,!Paper 3/task,!Paper 3/task/Large Movie Review},
+	pages = {142--150},
+	title = {{Learning Word Vectors for Sentiment Analysis}},
+	year = {2011}
 }
 @article{Macqueen,
 author = {Macqueen, J},
@@ -4582,12 +4581,18 @@ url = {http://arxiv.org/abs/1702.02540},
 year = {2017}
 }
 @article{Murphy,
-author = {Murphy, Brian and Pratim, Partha and Tom, Talukdar},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Murphy, Pratim, Tom - Unknown - Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding.pdf:pdf},
-keywords = {distributional semantics,inter-,neuro-semantics,pretability,sparse coding,vector-space models,word embeddings},
-mendeley-groups = {Annotated/Word Vectors,Annotated/NMF},
-title = {{Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding}}
+abstract = {In this paper, we introduce an application of matrix factorization to produce corpus-derived, distributional models of semantics that demonstrate cognitive plausibility. We find that word representations learned by Non-Negative Sparse Embedding (NNSE), a variant of matrix factorization, are sparse, effective, and highly interpretable. To the best of our knowledge, this is the first approach which yields semantic representation of words satisfying these three desirable properties. Though extensive experimental evaluations on multiple real-world tasks and datasets, we demonstrate the superiority of semantic models learned by NNSE over other state-of-the-art baselines. {\textcopyright} 2012 The COLING.},
+author = {Murphy, Brian and Talukdar, Partha Pratim and Mitchell, Tom},
+file = {::},
+journal = {24th International Conference on Computational Linguistics - Proceedings of COLING 2012: Technical Papers},
+keywords = {Distributional semantics,Interpretability,Neuro-semantics,Sparse coding,Vector-space models,Word embeddings},
+mendeley-groups = {Thesis/Sparse reps},
+number = {December 2012},
+pages = {1933--1950},
+title = {{Learning effective and interpretable semantic models using non-negative sparse embedding}},
+year = {2012}
 }
+
 @article{Nam2014a,
 abstract = {Neural networks have recently been proposed for multi-label classification because they are able to capture and model label dependencies in the output layer. In this work, we investigate limitations of BP-MLL, a neural network (NN) architecture that aims at minimizing pairwise ranking error. Instead, we propose to use a comparably simple NN approach with recently proposed learning techniques for large-scale multi-label text classification tasks. In particular, we show that BP-MLL's ranking loss minimization can be efficiently and effectively replaced with the commonly used cross entropy error function, and demonstrate that several advances in neural network training that have been developed in the realm of deep learning can be effectively employed in this setting. Our experimental results show that simple NN models equipped with advanced techniques such as rectified linear units, dropout, and AdaGrad perform as well as or even outperform state-of-the-art approaches on six large-scale textual datasets with diverse characteristics.},
 archivePrefix = {arXiv},
@@ -4732,17 +4737,22 @@ volume = {40},
 year = {2007}
 }
 @article{Palangi2017,
-abstract = {We introduce an architecture, the Tensor Product Recurrent Network (TPRN). In our application of TPRN, internal representations learned by end-to-end optimization in a deep neural network performing a textual question-answering (QA) task can be interpreted using basic concepts from linguistic theory. No performance penalty need be paid for this increased interpretability: the proposed model performs comparably to a state-of-the-art system on the SQuAD QA task. The internal representation which is interpreted is a Tensor Product Representation: for each input word, the model selects a symbol to encode the word, and a role in which to place the symbol, and binds the two together. The selection is via soft attention. The overall interpretation is built from interpretations of the symbols, as recruited by the trained model, and interpretations of the roles as used by the model. We find support for our initial hypothesis that symbols can be interpreted as lexical-semantic word meanings, while roles can be interpreted as approximations of grammatical roles (or categories) such as subject, wh-word, determiner, etc. Fine-grained analysis reveals specific correspondences between the learned roles and parts of speech as assigned by a standard tagger (Toutanova et al. 2003), and finds several discrepancies in the model's favor. In this sense, the model learns significant aspects of grammar, after having been exposed solely to linguistically unannotated text, questions, and answers: no prior linguistic knowledge is given to the model. What is given is the means to build representations using symbols and roles, with an inductive bias favoring use of these in an approximately discrete manner.},
+abstract = {We introduce an architecture, the Tensor Product Recurrent Network (TPRN). In our application of TPRN, internal representations-learned by end-to-end optimization in a deep neural network performing a textual question-answering (QA) task-can be interpreted using basic concepts from linguistic theory. No performance penalty need be paid for this increased interpretability: the proposed model performs comparably to a state-of-the-art system on the SQuAD QA task. The internal representation which is interpreted is a Tensor Product Representation: for each input word, the model selects a symbol to encode the word, and a role in which to place the symbol, and binds the two together. The selection is via soft attention. The overall interpretation is built from interpretations of the symbols, as recruited by the trained model, and interpretations of the roles as used by the model. We find support for our initial hypothesis that symbols can be interpreted as lexical-semantic word meanings, while roles can be interpreted as approximations of grammatical roles (or categories) such as subject, wh-word, determiner, etc. Fine-grained analysis reveals specific correspondences between the learned roles and parts of speech as assigned by a standard tagger (Toutanova et al. 2003), and finds several discrepancies in the model's favor. In this sense, the model learns significant aspects of grammar, after having been exposed solely to linguistically unannotated text, questions, and answers: no prior linguistic knowledge is given to the model. What is given is the means to build representations using symbols and roles, with an inductive bias favoring use of these in an approximately discrete manner.},
 archivePrefix = {arXiv},
 arxivId = {1705.08432},
 author = {Palangi, Hamid and Smolensky, Paul and He, Xiaodong and Deng, Li},
 eprint = {1705.08432},
 file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Palangi et al. - 2017 - Question-Answering with Grammatically-Interpretable Representations.pdf:pdf},
-mendeley-groups = {!Paper 3/Interpretable LSTMs},
-title = {{Question-Answering with Grammatically-Interpretable Representations}},
+isbn = {9781577358008},
+journal = {32nd AAAI Conference on Artificial Intelligence, AAAI 2018},
+mendeley-groups = {!Paper 3/task/Interpretable LSTMs},
+pages = {5350--5357},
+title = {{Question-answering with grammatically-interpretable representations}},
 url = {http://arxiv.org/abs/1705.08432},
-year = {2017}
+year = {2018}
 }
+
+
 @article{Panchenko2016,
 abstract = {Word sense embeddings represent a word sense as a low-dimensional numeric vector. While this representation is potentially useful for NLP applications, its interpretability is inherently limited. We propose a simple technique that improves interpretability of sense vectors by mapping them to synsets of a lexical resource. Our experiments with AdaGram sense embeddings and BabelNet synsets showthat it is possible to retrieve synsets that correspond to automatically learned sense vectors with Precision of 0.87, Recall of 0.42 andAUC of 0.78.},
 author = {Panchenko, Alexander},
@@ -5030,21 +5040,7 @@ title = {{Stochastic Backpropagation and Approximate Inference in Deep Generativ
 url = {http://arxiv.org/abs/1401.4082},
 year = {2014}
 }
-@article{Ribeiro2016,
-abstract = {Despite widespread adoption, machine learning models remain mostly black boxes. Understanding the reasons behind predictions is, however, quite important in assessing trust, which is fundamental if one plans to take action based on a prediction, or when choosing whether to deploy a new model. Such understanding also provides insights into the model, which can be used to transform an untrustworthy model or prediction into a trustworthy one. In this work, we propose LIME, a novel explanation technique that explains the predictions of any classifier in an interpretable and faithful manner, by learning an interpretable model locally around the prediction. We also propose a method to explain models by presenting representative individual predictions and their explanations in a non-redundant way, framing the task as a submodular optimization problem. We demonstrate the flexibility of these methods by explaining different models for text (e.g. random forests) and image classification (e.g. neural networks). We show the utility of explanations via novel experiments, both simulated and with human subjects, on various scenarios that require trust: deciding if one should trust a prediction, choosing between models, improving an untrustworthy classifier, and identifying why a classifier should not be trusted.},
-archivePrefix = {arXiv},
-arxivId = {1602.04938},
-author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
-doi = {10.1145/1235},
-eprint = {1602.04938},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Ribeiro, Singh, Guestrin - 2016 - Why Should I Trust You Explaining the Predictions of Any Classifier.pdf:pdf},
-isbn = {9781450321389},
-issn = {9781450321389},
-mendeley-groups = {Report/Explaining predictions,Annotated/Explanations,!Paper 3/task/newsgroups},
-title = {{"Why Should I Trust You?": Explaining the Predictions of Any Classifier}},
-url = {http://arxiv.org/abs/1602.04938},
-year = {2016}
-}
+
 @article{Ribeiro,
 abstract = {We introduce a novel model-agnostic system that explains the behavior of complex models with high-precision rules called anchors, representing local, " sufficient " conditions for predic-tions. We propose an algorithm to efficiently compute these explanations for any black-box model with high-probability guarantees. We demonstrate the flexibility of anchors by ex-plaining a myriad of different models for different domains and tasks. In a user study, we show that anchors enable users to predict how a model would behave on unseen instances with less effort and higher precision, as compared to existing linear explanations or no explanations.},
 author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
@@ -6856,22 +6852,22 @@ pages = {1--22},
 title = {{Neural Networks for Multi-Label Learning}}
 }
 @article{Zhang2015,
-abstract = {Sina Weibo, China's most popular microblogging platform, is currently used by over {\$}500M{\$} users and is considered to be a proxy of Chinese social life. In this study, we contrast the discussions occurring on Sina Weibo and on Chinese language Twitter in order to observe two different strands of Chinese culture: people within China who use Sina Weibo with its government imposed restrictions and those outside that are free to speak completely anonymously. We first propose a simple ad-hoc algorithm to identify topics of Tweets and Weibo. Different from previous works on micro-message topic detection, our algorithm considers topics of the same contents but with different $\backslash${\#}tags. Our algorithm can also detect topics for Tweets and Weibos without any $\backslash${\#}tags. Using a large corpus of Weibo and Chinese language tweets, covering the period from January {\$}1{\$} to December {\$}31{\$}, {\$}2012{\$}, we obtain a list of topics using clustered $\backslash${\#}tags that we can then use to compare the two platforms. Surprisingly, we find that there are no common entries among the Top {\$}100{\$} most popular topics. Furthermore, only {\$}9.2\backslash{\%}{\$} of tweets correspond to the Top {\$}1000{\$} topics on Sina Weibo platform, and conversely only {\$}4.4\backslash{\%}{\$} of weibos were found to discuss the most popular Twitter topics. Our results reveal significant differences in social attention on the two platforms, with most popular topics on Sina Weibo relating to entertainment while most tweets corresponded to cultural or political contents that is practically non existent in Sina Weibo.},
-archivePrefix = {arXiv},
-arxivId = {arXiv:1508.06655v1},
-author = {Zhang, Qian and Goncalves, Bruno},
-doi = {10.1145/1235},
-eprint = {arXiv:1508.06655v1},
-file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Zhang, Goncalves - 2015 - “Why Should I Trust You” Explaining the Predictions of Any Classifier BROKEN DETAILS.pdf:pdf},
-isbn = {9781450321389},
-issn = {9781450321389},
-journal = {Acm},
-keywords = {4d trajectory management,importance sampling,motion planning,separation assurance,tactical planning},
-mendeley-groups = {!Paper 3/task/newsgroups},
-pages = {4503},
-title = {{“Why Should I Trust You?” Explaining the Predictions of Any Classifier [ BROKEN DETAILS ]}},
-year = {2015}
+author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+title = {"Why Should I Trust You?": Explaining the Predictions of Any Classifier},
+year = {2016},
+isbn = {9781450342322},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2939672.2939778},
+doi = {10.1145/2939672.2939778},
+booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+pages = {1135–1144},
+numpages = {10},
+keywords = {explaining machine learning, interpretability, black box classifier, interpretable machine learning},
+location = {San Francisco, California, USA},
+series = {KDD ’16}
 }
+
 @article{Zhang2017,
 archivePrefix = {arXiv},
 arxivId = {arXiv:1802.00614v2},
@@ -7108,21 +7104,16 @@ year = {2015}
 	volume = {2017-Janua},
 	year = {2017}
 }
-@article{Zhang2012,
-	abstract = {Sparse PCA provides a linear combination of small number of features that maximizes variance across data. Although Sparse PCA has apparent advantages compared to PCA, such as better interpretability, it is generally thought to be computationally much more expensive. In this paper, we demonstrate the surprising fact that sparse PCA can be easier than PCA in practice, and that it can be reliably applied to very large data sets. This comes from a rigorous feature elimination pre-processing result, coupled with the favorable fact that features in real-life data typically have exponentially decreasing variances, which allows for many features to be eliminated. We introduce a fast block coordinate ascent algorithm with much better computational complexity than the existing first-order ones. We provide experimental results obtained on text corpora involving millions of documents and hundreds of thousands of features. These results illustrate how Sparse PCA can help organize a large corpus of text data in a user-interpretable way, providing an attractive alternative approach to topic models.},
-	archivePrefix = {arXiv},
-	arxivId = {1210.7054},
-	author = {Zhang, Youwei and Ghaoui, Laurent El},
-	doi = {10.1021/acs.inorgchem.5b02349},
-	eprint = {1210.7054},
-	file = {:D$\backslash$:/PhD/Code/ThesisPipeline/ThesisPipeline/tex/papers/4337-large-scale-sparse-principal-component-analysis-with-application-to-text-data.pdf:pdf},
-	isbn = {9781618395993},
-	issn = {0020-1669},
-	mendeley-groups = {11Thesis/Interpretability/Representations,11Thesis},
-	pages = {1--8},
-	title = {{Large-Scale Sparse Principal Component Analysis with Application to Text Data}},
-	url = {http://arxiv.org/abs/1210.7054},
-	year = {2012}
+
+@incollection{Zhang2012,
+title = {Large-Scale Sparse Principal Component Analysis with Application to Text Data},
+author = {Youwei Zhang and Laurent E. Ghaoui},
+booktitle = {Advances in Neural Information Processing Systems 24},
+editor = {J. Shawe-Taylor and R. S. Zemel and P. L. Bartlett and F. Pereira and K. Q. Weinberger},
+pages = {532--539},
+year = {2011},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.nips.cc/paper/4337-large-scale-sparse-principal-component-analysis-with-application-to-text-data.pdf}
 }
 @article{TomasMikolovWen-tauYih2013,
 	
@@ -7716,13 +7707,12 @@ year = {2015}
 	volume = {15},
 	year = {2013}
 }
-@article{Arthur,
-	author = {Arthur, David and Vassilvitskii, Sergei},
-	file = {:E$\backslash$:/Downloads/Work/2006-13.pdf:pdf},
-	mendeley-groups = {11Thesis},
-	pages = {1--11},
-	title = {{k-means ++ : The Advantages of Careful Seeding}},
-	volume = {8}
+
+@INPROCEEDINGS{Arthur,
+    author = {David Arthur and Sergei Vassilvitskii},
+    title = {K-means++: the advantages of careful seeding},
+    booktitle = {In Proceedings of the 18th Annual ACM-SIAM Symposium on Discrete Algorithms},
+    year = {2007}
 }
 @article{Ananny2016,
 	
@@ -7964,11 +7954,23 @@ year = {2015}
 }
 
 @inproceedings{kovashka2012whittlesearch,
-	Author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
-	Booktitle = {IEEE Conference on Computer Vision and Pattern Recognition},
-	Pages = {2973--2980},
-	Title = {Whittlesearch: Image search with relative attribute feedback},
-	Year = {2012}}
+abstract = {We propose a novel mode of feedback for image search, where a user describes which properties of exemplar images should be adjusted in order to more closely match his/her mental model of the image sought. For example, perusing image results for a query “black shoes”, the user might state, “Show me shoe images like these, but sportier.” Offline, our approach first learns a set of ranking functions, each of which predicts the relative strength of a nameable attribute in an image (e.g., sportiness). At query time, the system presents the user with a set of exemplar images, and the user relates them to his/her target image with comparative statements. Using a series of such constraints in the multi-dimensional attribute space, our method iteratively updates its relevance function and re-ranks the database of images. To determine which exemplar images receive feedback from the user, we present two variants of the approach: one where the feedback is user-initiated and another where the feedback is actively system-initiated. In either case, our approach allows a user to efficiently “whittle away” irrelevant portions of the visual feature space, using semantic language to precisely communicate her preferences to the system. We demonstrate our technique for refining image search for people, products, and scenes, and we show that it outperforms traditional binary relevance feedback in terms of search speed and accuracy. In addition, the ordinal nature of relative attributes helps make our active approach efficient—both computationally for the machine when selecting the reference images, and for the user by requiring less user interaction than conventional passive and active methods.},
+archivePrefix = {arXiv},
+arxivId = {1505.04141},
+author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
+doi = {10.1007/s11263-015-0814-0},
+eprint = {1505.04141},
+file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
+issn = {15731405},
+journal = {International Journal of Computer Vision},
+keywords = {Active selection,Content-based image search,Interactive image search,Relative attributes},
+mendeley-groups = {11Thesis/Applications},
+number = {2},
+pages = {185--210},
+title = {{WhittleSearch: Interactive Image Search with Relative Attribute Feedback}},
+volume = {115},
+year = {2015}
+}
 
 @article{Vig:2012:TGE:2362394.2362395,
 	Author = {Vig, Jesse and Sen, Shilad and Riedl, John},
@@ -7983,13 +7985,20 @@ year = {2015}
 	Bdsk-Url-1 = {http://doi.acm.org/10.1145/2362394.2362395},
 	Bdsk-Url-2 = {http://dx.doi.org/10.1145/2362394.2362395}}
 
+
 @article{viappiani2006preference,
-	Author = {Viappiani, Paolo and Faltings, Boi and Pu, Pearl},
-	Journal = {Journal of Artificial Intelligence Research},
-	Pages = {465--503},
-	Title = {Preference-based Search using Example-Critiquing with Suggestions},
-	Volume = {27},
-	Year = {2006}}
+abstract = {We consider interactive tools that help users search for their most preferred item in a large collection of options. In particular, we examine example-critiquing, a technique for enabling users to incrementally construct preference models by critiquing example options that are presented to them. We present novel techniques for improving the example-critiquing technology by adding suggestions to its displayed options. Such suggestions are calculated based on an analysis of users' current preference model and their potential hidden preferences. We evaluate the performance of our model-based suggestion techniques with both synthetic and real users. Results show that such suggestions are highly attractive to users and can stimulate them to express more preferences to improve the chance of identifying their most preferred item by up to 78{\%}.},
+author = {Viappiani, P. and Faltings, B. and Pu, P.},
+doi = {10.1613/jair.2075},
+file = {:E$\backslash$:/Downloads/Work/10477-Article Text-19459-1-10-20180216.pdf:pdf},
+issn = {1076-9757},
+journal = {Journal of Artificial Intelligence Research},
+mendeley-groups = {11Thesis/Applications},
+pages = {465--503},
+title = {{Preference-based Search using Example-Critiquing with Suggestions}},
+volume = {27},
+year = {2006}
+}
 
 @article{derracAIJ,
 	Author = {Derrac, J. and Schockaert, S.},
@@ -8017,16 +8026,20 @@ year = {2015}
 	year      = {2017}
 }
 
+
 @inproceedings{DBLP:conf/sigir/JameelBS17,
-	author    = {Shoaib Jameel and
-	Zied Bouraoui and
-	Steven Schockaert},
-	title     = {MEmbER: Max-Margin Based Embeddings for Entity Retrieval},
-	booktitle = {Proceedings of the 40th International {ACM} {SIGIR} Conference on
-	Research and Development in Information Retrieval},
-	pages     = {783--792},
-	year      = {2017}
+           month = {August},
+          author = {Shoaib Jameel and Zied Bouraoui and Steven Schockaert},
+       booktitle = {Proceedings of the 40th International ACM SIGIR Conference on Research and Development in Information Retrieval - SIGIR '17},
+           title = {MEmbER: Max-Margin Based Embeddings for Entity Retrieval},
+       publisher = {ACM},
+         journal = {SIGIR '17 Proceedings of the 40th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+           pages = {783--792},
+            year = {2017},
+             url = {https://kar.kent.ac.uk/69598/},
+        abstract = {We propose a new class of methods for learning vector space embeddings of entities. While most existing methods focus on modelling similarity, our primary aim is to learn embeddings that are interpretable, in the sense that query terms have a direct geometric representation in the vector space. Intuitively, we want all entities that have some property (i.e. for which a given term is relevant) to be located in some well-defined region of the space. This is achieved by imposing max-margin constraints that are derived from a bag-of-words representation of the entities. The resulting vector spaces provide us with a natural vehicle for identifying entities that have a given property (or ranking them according to how much they have the property), and conversely, to describe what a given set of entities have in common. As we show in our experiments, our models lead to a substantially better performance in a range of entity-oriented search tasks, such as list completion and entity ranking.}
 }
+
 
 @inproceedings{van2016learning,
 	title={Learning latent vector spaces for product search},
@@ -8441,9 +8454,10 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	abstract = {Unsupervised vector-based approaches to semantics can model rich lexical meanings, but they largely fail to capture sentiment information that is central to many word meanings and important for a wide range of NLP tasks. We present a model that uses a mix of unsupervised and supervised techniques to learn word vectors capturing semantic term–document information as well as rich sentiment content. The proposed model can leverage both continuous and multi-dimensional sentiment in- formation as well as non-sentiment annota- tions. We instantiate the model to utilize the document-level sentiment polarity annotations present in many online documents (e.g. star ratings). We evaluate the model using small, widely used sentiment and subjectivity corpora and find it out-performs several previously introduced methods for sentiment classification. We also introduce a large dataset of movie reviews to serve as a more robust benchmark for work in this area.},
 	author = {Maas, Andrew L and Daly, Raymond E. and Pham, Peter T. and Huang, Dan and Ng, Andrew Y. and Potts, Christopher},
 	doi = {978-1-932432-87-9},
+	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Maas et al. - 2011 - Learning Word Vectors for Sentiment Analysis.pdf:pdf},
 	isbn = {9781932432879},
-	journal = {Proc.\ ACL},
-	mendeley-groups = {Annotated/Datasets},
+	journal = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
+	mendeley-groups = {Annotated/Datasets,!Paper 3/task,!Paper 3/task/Large Movie Review},
 	pages = {142--150},
 	title = {{Learning Word Vectors for Sentiment Analysis}},
 	year = {2011}
@@ -9676,22 +9690,21 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	mendeley-groups = {Annotated/Interpretable representations,Annotated/Word Vectors},
 	title = {{A Compositional and Interpretable Semantic Space}}
 }
-@article{Murphy,
-	author = {Murphy, Brian and Pratim, Partha and Tom, Talukdar},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Murphy, Pratim, Tom - Unknown - Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding.pdf:pdf},
-	keywords = {distributional semantics,inter-,neuro-semantics,pretability,sparse coding,vector-space models,word embeddings},
-	mendeley-groups = {Annotated/Word Vectors,Annotated/NMF},
-	title = {{Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding}}
-}
+
 @article{Luo2015,
-	author = {Luo, Hongyin and Liu, Zhiyuan and Luan, Huanbo and Sun, Maosong},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Luo et al. - 2015 - Online Learning of Interpretable Word Embeddings.pdf:pdf},
-	mendeley-groups = {Annotated/Word Vectors},
-	number = {September},
-	pages = {1687--1692},
-	title = {{Online Learning of Interpretable Word Embeddings}},
-	year = {2015}
+abstract = {Word embeddings encode semantic meanings of words into low-dimension word vectors. In most word embeddings, one cannot interpret the meanings of specific dimensions of those word vectors. Nonnegative matrix factorization (NMF) has been proposed to learn interpretable word embeddings via non-negative constraints. However, NMF methods suffer from scale and memory issue because they have to maintain a global matrix for learning. To alleviate this challenge, we propose online learning of interpretable word embeddings from streaming text data. Experiments show that our model consistently outperforms the state-of-the-art word embedding methods in both representation ability and interpretability. The source code of this paper can be obtained from http://github.com/skTim/OIWE.},
+author = {Luo, Hongyin and Luan, Zhiyuan and Huanbo, Liuv and Sun, Maosong},
+doi = {10.18653/v1/d15-1196},
+file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Luo et al. - 2015 - Online Learning of Interpretable Word Embeddings.pdf:pdf},
+isbn = {9781941643327},
+journal = {Conference Proceedings - EMNLP 2015: Conference on Empirical Methods in Natural Language Processing},
+mendeley-groups = {Annotated/Word Vectors,11Thesis/Interpretability/Word Vectors/Constraints},
+number = {September},
+pages = {1687--1692},
+title = {{Online learning of interpretable word embeddings}},
+year = {2015}
 }
+
 @article{Bechberger,
 	archivePrefix = {arXiv},
 	arxivId = {arXiv:1706.04825v1},
@@ -9848,23 +9861,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	volume = {7},
 	year = {2010}
 }
-@article{Ribeiro2016,
-	abstract = {Despite widespread adoption, machine learning models remain mostly black boxes. Understanding the reasons behind predictions is, however, quite important in assessing trust, which is fundamental if one plans to take action based on a prediction, or when choosing whether to deploy a new model. Such understanding also provides insights into the model, which can be used to transform an untrustworthy model or prediction into a trustworthy one. In this work, we propose LIME, a novel explanation technique that explains the predictions of any classifier in an interpretable and faithful manner, by learning an interpretable model locally around the prediction. We also propose a method to explain models by presenting representative individual predictions and their explanations in a non-redundant way, framing the task as a submodular optimization problem. We demonstrate the flexibility of these methods by explaining different models for text (e.g. random forests) and image classification (e.g. neural networks). We show the utility of explanations via novel experiments, both simulated and with human subjects, on various scenarios that require trust: deciding if one should trust a prediction, choosing between models, improving an untrustworthy classifier, and identifying why a classifier should not be trusted.},
-	archivePrefix = {arXiv},
-	arxivId = {1602.04938},
-	author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
-	doi = {10.1145/1235},
-	eprint = {1602.04938},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Ribeiro, Singh, Guestrin - 2016 - Why Should I Trust You Explaining the Predictions of Any Classifier.pdf:pdf},
-	isbn = {9781450321389},
-	issn = {9781450321389},
-	mendeley-groups = {Report/Explaining predictions,Annotated/Explanations},
-	journal={Proc.\ KDD},
-	pages={1135-1144},
-	title = {{"Why Should I Trust You?": Explaining the Predictions of Any Classifier}},
-	url = {http://arxiv.org/abs/1602.04938},
-	year = {2016}
-}
+
 @article{Freitas2013,
 	abstract = {The vast majority of the literature evaluates the performance of classification models using only the criterion of predictive accuracy. This paper reviews the case for considering also the comprehensibility (interpretability) of classification models, and discusses the interpretability of five types of classification models, namely decision trees, classification rules, decision tables, nearest neighbors and Bayesian network classifiers. We discuss both interpretability issues which are specific to each of those model types and more generic interpretability issues, namely the drawbacks of using model size as the only criterion to evaluate the comprehensibility of a model, and the use of monotonicity constraints to improve the comprehensibility and acceptance of classification models by users.},
 	author = {Freitas, Alex A.},
@@ -10159,9 +10156,14 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2012}
 }
 
-@article{Maas2011a,
-	author = {Maas, Andrew L and Daly, Raymond E and Pham, Peter T and Huang, Dan and Ng, Andrew Y and Potts, Christopher},
-	file = {:E$\backslash$:/PhD/Code/ThesisPipeline/ThesisPipeline/tex/p142-maas.pdf:pdf},
+@article{Maas2011,
+	abstract = {Unsupervised vector-based approaches to semantics can model rich lexical meanings, but they largely fail to capture sentiment information that is central to many word meanings and important for a wide range of NLP tasks. We present a model that uses a mix of unsupervised and supervised techniques to learn word vectors capturing semantic term–document information as well as rich sentiment content. The proposed model can leverage both continuous and multi-dimensional sentiment in- formation as well as non-sentiment annota- tions. We instantiate the model to utilize the document-level sentiment polarity annotations present in many online documents (e.g. star ratings). We evaluate the model using small, widely used sentiment and subjectivity corpora and find it out-performs several previously introduced methods for sentiment classification. We also introduce a large dataset of movie reviews to serve as a more robust benchmark for work in this area.},
+	author = {Maas, Andrew L and Daly, Raymond E. and Pham, Peter T. and Huang, Dan and Ng, Andrew Y. and Potts, Christopher},
+	doi = {978-1-932432-87-9},
+	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Maas et al. - 2011 - Learning Word Vectors for Sentiment Analysis.pdf:pdf},
+	isbn = {9781932432879},
+	journal = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
+	mendeley-groups = {Annotated/Datasets,!Paper 3/task,!Paper 3/task/Large Movie Review},
 	pages = {142--150},
 	title = {{Learning Word Vectors for Sentiment Analysis}},
 	year = {2011}
@@ -10206,30 +10208,40 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2017}
 }
 @article{Kovashka,
-	author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
-	file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	title = {{WhittleSearch : Image Search with Relative Attribute Feedback}}
+abstract = {We propose a novel mode of feedback for image search, where a user describes which properties of exemplar images should be adjusted in order to more closely match his/her mental model of the image sought. For example, perusing image results for a query “black shoes”, the user might state, “Show me shoe images like these, but sportier.” Offline, our approach first learns a set of ranking functions, each of which predicts the relative strength of a nameable attribute in an image (e.g., sportiness). At query time, the system presents the user with a set of exemplar images, and the user relates them to his/her target image with comparative statements. Using a series of such constraints in the multi-dimensional attribute space, our method iteratively updates its relevance function and re-ranks the database of images. To determine which exemplar images receive feedback from the user, we present two variants of the approach: one where the feedback is user-initiated and another where the feedback is actively system-initiated. In either case, our approach allows a user to efficiently “whittle away” irrelevant portions of the visual feature space, using semantic language to precisely communicate her preferences to the system. We demonstrate our technique for refining image search for people, products, and scenes, and we show that it outperforms traditional binary relevance feedback in terms of search speed and accuracy. In addition, the ordinal nature of relative attributes helps make our active approach efficient—both computationally for the machine when selecting the reference images, and for the user by requiring less user interaction than conventional passive and active methods.},
+archivePrefix = {arXiv},
+arxivId = {1505.04141},
+author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
+doi = {10.1007/s11263-015-0814-0},
+eprint = {1505.04141},
+file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
+issn = {15731405},
+journal = {International Journal of Computer Vision},
+keywords = {Active selection,Content-based image search,Interactive image search,Relative attributes},
+mendeley-groups = {11Thesis/Applications},
+number = {2},
+pages = {185--210},
+title = {{WhittleSearch: Interactive Image Search with Relative Attribute Feedback}},
+volume = {115},
+year = {2015}
 }
+
 @article{Vig2014,
-	author = {Vig, Jesse and Sen, Shilad and Riedl, John},
-	doi = {10.1145/2362394.2362395},
-	file = {:E$\backslash$:/tag{\_}genome.pdf:pdf},
-	keywords = {Tagging, conversational recommenders, data mining, information retrieval, machine learning, recommender systems},
-	mendeley-groups = {11Thesis/Applications},
-	number = {November},
-	title = {{The Tag Genome : Encoding Community Knowledge to Support Novel Interaction The Tag Genome : Encoding Community Knowledge to Support}},
-	year = {2014}
+abstract = {This article introduces the tag genome, a data structure that extends the traditional tagging model to provide enhanced forms of user interaction. Just as a biological genome encodes an organism based on a sequence of genes, the tag genome encodes an item in an information space based on its relationship to a common set of tags. We present a machine learning approach for computing the tag genome, and we evaluate several learning models on a ground truth dataset provided by users. We describe an application of the tag genome called Movie Tuner which enables users to navigate from one item to nearby items along dimensions represented by tags. We present the results of a 7-week field trial of 2,531 users of Movie Tuner and a survey evaluating users subjective experience. Finally, we outline the broader space of applications of the tag genome. {\textcopyright} 2012 ACM.},
+author = {Vig, Jesse and Sen, Shilad and Riedl, John},
+doi = {10.1145/2362394.2362395},
+file = {:E$\backslash$:/Downloads/Work/tag{\_}genome.pdf:pdf},
+issn = {21606463},
+journal = {ACM Transactions on Interactive Intelligent Systems},
+keywords = {Tagging,conversational recommenders,data mining,information retrieval,machine learning,recommender systems},
+number = {3},
+title = {{The tag genome: Encoding community knowledge to support novel interaction}},
+volume = {2},
+year = {2012}
 }
-@article{Viappiani2006,
-	author = {Viappiani, Paolo},
-	file = {:E$\backslash$:/Downloads/Work/10477-Article Text-19459-1-10-20180216.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	pages = {465--503},
-	title = {{Preference-based Search using Example-Critiquing with Suggestions}},
-	volume = {27},
-	year = {2006}
-}
+
+
+
 
 @article{Amodei2016,
 	abstract = {Rapid progress in machine learning and artificial intelligence (AI) has brought increasing attention to the potential impacts of AI technologies on society. In this paper we discuss one such potential impact: the problem of accidents in machine learning systems, defined as unintended and harmful behavior that may emerge from poor design of real-world AI systems. We present a list of five practical research problems related to accident risk, categorized according to whether the problem originates from having the wrong objective function ("avoiding side effects" and "avoiding reward hacking"), an objective function that is too expensive to evaluate frequently ("scalable supervision"), or undesirable behavior during the learning process ("safe exploration" and "distributional shift"). We review previous work in these areas as well as suggesting research directions with a focus on relevance to cutting-edge AI systems. Finally, we consider the high-level question of how to think most productively about the safety of forward-looking applications of AI.},
@@ -10411,16 +10423,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	volume = {115},
 	year = {2017}
 }
-@article{Vig2014,
-	author = {Vig, Jesse and Sen, Shilad and Riedl, John},
-	doi = {10.1145/2362394.2362395},
-	file = {:E$\backslash$:/tag{\_}genome.pdf:pdf},
-	keywords = {Tagging, conversational recommenders, data mining, information retrieval, machine learning, recommender systems},
-	mendeley-groups = {11Thesis/Applications},
-	number = {November},
-	title = {{The Tag Genome : Encoding Community Knowledge to Support Novel Interaction The Tag Genome : Encoding Community Knowledge to Support}},
-	year = {2014}
-}
+
 @article{Binns2017,
 	abstract = {The internet has become a central medium through which `networked publics' express their opinions and engage in debate. Offensive comments and personal attacks can inhibit participation in these spaces. Automated content moderation aims to overcome this problem using machine learning classifiers trained on large corpora of texts manually annotated for offence. While such systems could help encourage more civil debate, they must navigate inherently normatively contestable boundaries, and are subject to the idiosyncratic norms of the human raters who provide the training data. An important objective for platforms implementing such measures might be to ensure that they are not unduly biased towards or against particular norms of offence. This paper provides some exploratory methods by which the normative biases of algorithmic content moderation systems can be measured, by way of a case study using an existing dataset of comments labelled for offence. We train classifiers on comments labelled by different demographic subsets (men and women) to understand how differences in conceptions of offence between these groups might affect the performance of the resulting models on various test sets. We conclude by discussing some of the ethical choices facing the implementers of algorithmic moderation systems, given various desired levels of diversity of viewpoints amongst discussion participants.},
 	archivePrefix = {arXiv},
@@ -10525,10 +10528,22 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2016}
 }
 @article{Kovashka,
-	author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
-	file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	title = {{WhittleSearch : Image Search with Relative Attribute Feedback}}
+abstract = {We propose a novel mode of feedback for image search, where a user describes which properties of exemplar images should be adjusted in order to more closely match his/her mental model of the image sought. For example, perusing image results for a query “black shoes”, the user might state, “Show me shoe images like these, but sportier.” Offline, our approach first learns a set of ranking functions, each of which predicts the relative strength of a nameable attribute in an image (e.g., sportiness). At query time, the system presents the user with a set of exemplar images, and the user relates them to his/her target image with comparative statements. Using a series of such constraints in the multi-dimensional attribute space, our method iteratively updates its relevance function and re-ranks the database of images. To determine which exemplar images receive feedback from the user, we present two variants of the approach: one where the feedback is user-initiated and another where the feedback is actively system-initiated. In either case, our approach allows a user to efficiently “whittle away” irrelevant portions of the visual feature space, using semantic language to precisely communicate her preferences to the system. We demonstrate our technique for refining image search for people, products, and scenes, and we show that it outperforms traditional binary relevance feedback in terms of search speed and accuracy. In addition, the ordinal nature of relative attributes helps make our active approach efficient—both computationally for the machine when selecting the reference images, and for the user by requiring less user interaction than conventional passive and active methods.},
+archivePrefix = {arXiv},
+arxivId = {1505.04141},
+author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
+doi = {10.1007/s11263-015-0814-0},
+eprint = {1505.04141},
+file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
+issn = {15731405},
+journal = {International Journal of Computer Vision},
+keywords = {Active selection,Content-based image search,Interactive image search,Relative attributes},
+mendeley-groups = {11Thesis/Applications},
+number = {2},
+pages = {185--210},
+title = {{WhittleSearch: Interactive Image Search with Relative Attribute Feedback}},
+volume = {115},
+year = {2015}
 }
 @article{Jameel,
 	author = {Jameel, Shoaib and Bouraoui, Zied and Schockaert, Steven},
@@ -10569,14 +10584,12 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2018}
 }
 @article{Trifonov,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1809.08621v2},
-	author = {Trifonov, Valentin and Ganea, Octavian-eugen and Potapenko, Anna and Hofmann, Thomas and Eth, Z},
-	eprint = {arXiv:1809.08621v2},
-	file = {:E$\backslash$:/PhD/Papedrs/1809.08621 (1).pdf:pdf},
-	mendeley-groups = {11Thesis/Interpretability/Sentence Vectors,11Thesis/Interpretability/GAN's and VAE},
-	title = {{Learning and Evaluating Sparse Interpretable Sentence Embeddings}}
+  title={Learning and Evaluating Sparse Interpretable Sentence Embeddings},
+  author={Valentin Trifonov and Octavian-Eugen Ganea and Anna Potapenko and Thomas Hofmann},
+  booktitle={BlackboxNLP EMNLP},
+  year={2018}
 }
+
 @article{Chen2016,
 	author = {Chen, Xi and Duan, Yan and Houthooft, Rein and Schulman, John and Sutskever, Ilya and Abbeel, Pieter},
 	file = {:E$\backslash$:/PhD/Papedrs/6399-infogan-interpretable-representation-learning-by-information-maximizing-generative-adversarial-nets.pdf:pdf},
@@ -11002,30 +11015,20 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	mendeley-groups = {11Thesis/Interpretability/Safety},
 	title = {{in Intelligent Data Analysis}}
 }
-@article{Arthur,
-	author = {Arthur, David and Vassilvitskii, Sergei},
-	file = {:E$\backslash$:/Downloads/Work/2006-13.pdf:pdf},
-	mendeley-groups = {11Thesis},
-	pages = {1--11},
-	title = {{k-means ++ : The Advantages of Careful Seeding}},
-	volume = {8}
+
+
+
+@incollection{Zhang2012,
+title = {Large-Scale Sparse Principal Component Analysis with Application to Text Data},
+author = {Youwei Zhang and Laurent E. Ghaoui},
+booktitle = {Advances in Neural Information Processing Systems 24},
+editor = {J. Shawe-Taylor and R. S. Zemel and P. L. Bartlett and F. Pereira and K. Q. Weinberger},
+pages = {532--539},
+year = {2011},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.nips.cc/paper/4337-large-scale-sparse-principal-component-analysis-with-application-to-text-data.pdf}
 }
-@article{Zhang2012,
-	abstract = {Sparse PCA provides a linear combination of small number of features that maximizes variance across data. Although Sparse PCA has apparent advantages compared to PCA, such as better interpretability, it is generally thought to be computationally much more expensive. In this paper, we demonstrate the surprising fact that sparse PCA can be easier than PCA in practice, and that it can be reliably applied to very large data sets. This comes from a rigorous feature elimination pre-processing result, coupled with the favorable fact that features in real-life data typically have exponentially decreasing variances, which allows for many features to be eliminated. We introduce a fast block coordinate ascent algorithm with much better computational complexity than the existing first-order ones. We provide experimental results obtained on text corpora involving millions of documents and hundreds of thousands of features. These results illustrate how Sparse PCA can help organize a large corpus of text data in a user-interpretable way, providing an attractive alternative approach to topic models.},
-	archivePrefix = {arXiv},
-	arxivId = {1210.7054},
-	author = {Zhang, Youwei and Ghaoui, Laurent El},
-	doi = {10.1021/acs.inorgchem.5b02349},
-	eprint = {1210.7054},
-	file = {:D$\backslash$:/PhD/Code/ThesisPipeline/ThesisPipeline/tex/papers/4337-large-scale-sparse-principal-component-analysis-with-application-to-text-data.pdf:pdf},
-	isbn = {9781618395993},
-	issn = {0020-1669},
-	mendeley-groups = {11Thesis/Interpretability/Representations,11Thesis},
-	pages = {1--8},
-	title = {{Large-Scale Sparse Principal Component Analysis with Application to Text Data}},
-	url = {http://arxiv.org/abs/1210.7054},
-	year = {2012}
-}
+
 @article{Miller2017a,
 	archivePrefix = {arXiv},
 	arxivId = {arXiv:1706.07269v1},
@@ -11119,14 +11122,20 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2013}
 }
 @article{Viappiani2006,
-	author = {Viappiani, Paolo},
-	file = {:E$\backslash$:/Downloads/Work/10477-Article Text-19459-1-10-20180216.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	pages = {465--503},
-	title = {{Preference-based Search using Example-Critiquing with Suggestions}},
-	volume = {27},
-	year = {2006}
+abstract = {We consider interactive tools that help users search for their most preferred item in a large collection of options. In particular, we examine example-critiquing, a technique for enabling users to incrementally construct preference models by critiquing example options that are presented to them. We present novel techniques for improving the example-critiquing technology by adding suggestions to its displayed options. Such suggestions are calculated based on an analysis of users' current preference model and their potential hidden preferences. We evaluate the performance of our model-based suggestion techniques with both synthetic and real users. Results show that such suggestions are highly attractive to users and can stimulate them to express more preferences to improve the chance of identifying their most preferred item by up to 78{\%}.},
+author = {Viappiani, P. and Faltings, B. and Pu, P.},
+doi = {10.1613/jair.2075},
+file = {:E$\backslash$:/Downloads/Work/10477-Article Text-19459-1-10-20180216.pdf:pdf},
+issn = {1076-9757},
+journal = {Journal of Artificial Intelligence Research},
+mendeley-groups = {11Thesis/Applications},
+pages = {465--503},
+title = {{Preference-based Search using Example-Critiquing with Suggestions}},
+volume = {27},
+year = {2006}
 }
+
+\cite{Viappiani2006}
 @article{Curry,
 	author = {Curry, Edward and Buitelaar, Paul},
 	file = {:C$\backslash$:/Users/Workk/Documents/preprint{\_}nldb{\_}{\_}commonsense{\_}2014.pdf:pdf},
@@ -11305,14 +11314,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	mendeley-groups = {11Thesis/Interpretability,11Thesis/Interpretability/Explanation},
 	title = {{Explaining Explanations : An Approach to Evaluating Interpretability of Machine Learning}}
 }
-@article{Park2017,
-	author = {Park, Sungjoon and Bak, Jinyeong and Oh, Alice},
-	file = {:E$\backslash$:/PhD/Papedrs/e86c35f9f72edcec37ac747a6da19cd7f489.pdf:pdf},
-	mendeley-groups = {11Thesis/Interpretability/Word Vectors/Post-processing,11Thesis/Interpretability/GAN's and VAE},
-	pages = {401--411},
-	title = {{Rotated Word Vector Representations and their Interpretability}},
-	year = {2017}
-}
+
 @article{Xu2017,
 	archivePrefix = {arXiv},
 	arxivId = {arXiv:1802.01345v3},
@@ -11442,16 +11444,25 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Content-Based Recommendation Systems}},
 	year = {2007}
 }
+
 @article{Fisch2016,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1704.00051v2},
-	author = {Fisch, Adam and Weston, Jason and Bordes, Antoine and Chen, Danqi},
-	eprint = {arXiv:1704.00051v2},
-	file = {:E$\backslash$:/1704.00051.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	title = {{Reading Wikipedia to Answer Open-Domain Questions}},
-	year = {2016}
+abstract = {This paper proposes to tackle open-domain question answering using Wikipedia as the unique knowledge source: the answer to any factoid question is a text span in a Wikipedia article. This task of machine reading at scale combines the challenges of document retrieval (finding the relevant articles) with that of machine comprehension of text (identifying the answer spans from those articles). Our approach combines a search component based on bigram hashing and TF-IDF matching with a multi-layer recurrent neural network model trained to detect answers in Wikipedia paragraphs. Our experiments on multiple existing QA datasets indicate that (1) both modules are highly competitive with respect to existing counterparts and (2) multitask learning using distant supervision on their combination is an effective complete system on this challenging task.},
+archivePrefix = {arXiv},
+arxivId = {1704.00051},
+author = {Chen, Danqi and Fisch, Adam and Weston, Jason and Bordes, Antoine},
+doi = {10.18653/v1/P17-1171},
+eprint = {1704.00051},
+file = {:E$\backslash$:/1704.00051.pdf:pdf},
+isbn = {9781945626753},
+journal = {ACL 2017 - 55th Annual Meeting of the Association for Computational Linguistics, Proceedings of the Conference (Long Papers)},
+mendeley-groups = {11Thesis/Applications},
+pages = {1870--1879},
+title = {{Reading Wikipedia to answer open-domain questions}},
+volume = {1},
+year = {2017}
 }
+
+\cite{Fisch2016}
 @article{Rifai2011,
 	abstract = {Although the structure and composition of plant communities is known to influence the functioning of ecosystems, there is as yet no agreement as to how these should be described from a functional perspective. We tested the biomass ratio hypothesis, which postulates that ecosystem properties should depend on species traits and on species contribution to the total biomass of the community, in a successional sere following vineyard abandonment in the Mediterranean region of France. Ecosystem-specific net primary productivity, litter decomposition rate, and total soil carbon and nitrogen varied significantly with field age, and correlated with community-aggregated (i.e., weighed according to the relative abundance of species) functional leaf traits. The three easily measurable traits tested, specific leaf area, leaf dry matter content, and nitrogen concentration, provide a simple means to scale up from organ to ecosystem functioning in complex plant communities. We propose that they be called {\&}8220;functional markers,{\&}8221; and be used to assess the impacts of community changes on ecosystem properties induced, in particular, by global change drivers.},
 	author = {Rifai, Salah and Muller, Xavier},
@@ -12372,12 +12383,20 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2014}
 }
 @article{Zilke2016,
-	author = {Zilke, Jan Ruben and Menc{\'{i}}a, Eneldo Loza and Janssen, Frederik},
-	file = {:E$\backslash$:/PhD/DS16DeepRED.pdf:pdf},
-	isbn = {9783319463070},
-	title = {{DeepRED – Rule Extraction from Deep Neural Networks}},
-	year = {2016}
+abstract = {Neural network classifiers are known to be able to learn very accurate models. In the recent past, researchers have even been able to train neural networks with multiple hidden layers (deep neural networks) more effectively and efficiently. However, the major downside of neural networks is that it is not trivial to understand the way how they derive their classification decisions. To solve this problem, there has been research on extracting better understandable rules from neural networks. However, most authors focus on nets with only one single hidden layer. The present paper introduces a new decompositional algorithm – DeepRED – that is able to extract rules from deep neural networks. The evaluation of the proposed algorithm shows its ability to outperform a pedagogical baseline on several tasks, including the successful extraction of rules from a neural network realizing the XOR function.},
+author = {Zilke, Jan Ruben and Menc{\'{i}}a, Eneldo Loza and Janssen, Frederik},
+doi = {10.1007/978-3-319-46307-0_29},
+file = {:E$\backslash$:/PhD/DS16DeepRED.pdf:pdf},
+isbn = {9783319463063},
+issn = {16113349},
+journal = {Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics)},
+pages = {457--473},
+title = {{DeepRED – Rule extraction from deep neural networks}},
+volume = {9956 LNAI},
+year = {2016}
 }
+
+
 @article{Cheng2016,
 	abstract = {In this paper we address the question of how to render sequence-level networks better at handling structured input. We propose a machine reading simulator which processes text incrementally from left to right and performs shallow reasoning with memory and attention. The reader extends the Long Short-Term Memory architecture with a memory network in place of a single memory cell. This enables adaptive memory usage during recurrence with neural attention, offering a way to weakly induce relations among tokens. The system is initially designed to process a single sequence but we also demonstrate how to integrate it with an encoder-decoder architecture. Experiments on language modeling, sentiment analysis, and natural language inference show that our model matches or outperforms the state of the art.},
 	archivePrefix = {arXiv},
@@ -13606,19 +13625,38 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	pages = {2672--2680},
 	pmid = {1000183096},
 	title = {{Generative Adversarial Nets}},
-	url = {http://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf},
+	url = {http://@article{Amodei2016,
+abstract = {Rapid progress in machine learning and artificial intelligence (AI) has brought increasing attention to the potential impacts of AI technologies on society. In this paper we discuss one such potential impact: the problem of accidents in machine learning systems, defined as unintended and harmful behavior that may emerge from poor design of real-world AI systems. We present a list of five practical research problems related to accident risk, categorized according to whether the problem originates from having the wrong objective function ("avoiding side effects" and "avoiding reward hacking"), an objective function that is too expensive to evaluate frequently ("scalable supervision"), or undesirable behavior during the learning process ("safe exploration" and "distributional shift"). We review previous work in these areas as well as suggesting research directions with a focus on relevance to cutting-edge AI systems. Finally, we consider the high-level question of how to think most productively about the safety of forward-looking applications of AI.},
+archivePrefix = {arXiv},
+arxivId = {1606.06565},
+author = {Amodei, Dario and Olah, Chris and Steinhardt, Jacob and Christiano, Paul and Schulman, John and Man{\'{e}}, Dan},
+doi = {1606.06565},
+eprint = {1606.06565},
+file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Amodei et al. - 2016 - Concrete Problems in AI Safety.pdf:pdf},
+isbn = {0387310738},
+mendeley-groups = {!Paper 3,11Thesis/Interpretability/Safety},
+pages = {1--29},
+title = {{Concrete Problems in AI Safety}},
+url = {http://arxiv.org/abs/1606.06565},
+year = {2016}
+}
+papers.nips.cc/paper/5423-generative-adversarial-nets.pdf},
 	year = {2014}
 }
+
 @article{Aldarwish2017,
-	author = {Aldarwish, Maryam Mohammed},
-	doi = {10.1109/ISADS.2017.41},
-	file = {:E$\backslash$:/07940253.pdf:pdf},
-	isbn = {9781509040421},
-	keywords = {2015 is almost 2,5,a statistic made by,billion and it is,emarketer,has shown the number,network sites,of,sns,social,social media users in,support vector machine,svm,ugc,user generated content},
-	pages = {282--285},
-	title = {{Posts}},
-	year = {2017}
+abstract = {The use of Social Network Sites (SNS) is increasing nowadays especially by the younger generations. The availability of SNS allows users to express their interests, feelings and share daily routine. Many researchers prove that using user-generated content (UGC) in a correct way may help determine people's mental health levels. Mining the UGC could help to predict the mental health levels and depression. Depression is a serious medical illness, which interferes most with the ability to work, study, eat, sleep and having fun. However, from the user profile in SNS, we can collect all the information that relates to person's mood, and negativism. In this research, our aim is to investigate how SNS user's posts can help classify users according to mental health levels. We propose a system that uses SNS as a source of data and screening tool to classify the user using artificial intelligence according to the UGC on SNS. We created a model that classify the UGC using two different classifiers: Support Vector Machine (SVM), and Na{\"{i}}ve Bayes.},
+author = {Aldarwish, Maryam Mohammed and Ahmad, Hafiz Farooq},
+doi = {10.1109/ISADS.2017.41},
+file = {:E$\backslash$:/07940253.pdf:pdf},
+isbn = {9781509040414},
+journal = {Proceedings - 2017 IEEE 13th International Symposium on Autonomous Decentralized Systems, ISADS 2017},
+keywords = {Social Network Sites (SNS),Support Vector Machine (SVM),User Generated Content (UGC)},
+pages = {277--280},
+title = {{Predicting Depression Levels Using Social Media Posts}},
+year = {2017}
 }
+
 @article{Zhang,
 	abstract = {Multilabel learning is an extension of standard binary classi cation where the goal is to predict a set of labels (we call an individual label a tag) for each input example. The recent probabilistic classi er chain (PCC) method learns a series of probabilistic models that capture tag correlations. In this paper, we show how the PCC model may be viewed as a neural network with connections between output nodes. We then show that using a hidden layer in the neural network, instead of connections between output nodes, brings advantages that include tractable test-time inference and removing the need to select a xed tag ordering. Moreover, the hidden units capture nonlinear latent structure, which improves classi cation accuracy, and allows correlations between tags to be visualized explicitly. Compared to previous neural network methods for multilabel learning, we explain several design decisions that lead to a notable decrease in training time and a notable increase in accuracy. Empirical results show that the new method outperforms existing MLL methods on benchmark datasets. A nal contribution of the paper is to introduce a new multilabel dataset of movies where the tags are genres. Experimentally, the new method performs best on this dataset also.},
 	author = {Zhang, Min-ling and Zhou, Zhi-hua},
@@ -15211,17 +15249,21 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2012}
 }
 @article{Palangi2017,
-	abstract = {We introduce an architecture, the Tensor Product Recurrent Network (TPRN). In our application of TPRN, internal representations learned by end-to-end optimization in a deep neural network performing a textual question-answering (QA) task can be interpreted using basic concepts from linguistic theory. No performance penalty need be paid for this increased interpretability: the proposed model performs comparably to a state-of-the-art system on the SQuAD QA task. The internal representation which is interpreted is a Tensor Product Representation: for each input word, the model selects a symbol to encode the word, and a role in which to place the symbol, and binds the two together. The selection is via soft attention. The overall interpretation is built from interpretations of the symbols, as recruited by the trained model, and interpretations of the roles as used by the model. We find support for our initial hypothesis that symbols can be interpreted as lexical-semantic word meanings, while roles can be interpreted as approximations of grammatical roles (or categories) such as subject, wh-word, determiner, etc. Fine-grained analysis reveals specific correspondences between the learned roles and parts of speech as assigned by a standard tagger (Toutanova et al. 2003), and finds several discrepancies in the model's favor. In this sense, the model learns significant aspects of grammar, after having been exposed solely to linguistically unannotated text, questions, and answers: no prior linguistic knowledge is given to the model. What is given is the means to build representations using symbols and roles, with an inductive bias favoring use of these in an approximately discrete manner.},
-	archivePrefix = {arXiv},
-	arxivId = {1705.08432},
-	author = {Palangi, Hamid and Smolensky, Paul and He, Xiaodong and Deng, Li},
-	eprint = {1705.08432},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Palangi et al. - 2017 - Question-Answering with Grammatically-Interpretable Representations.pdf:pdf},
-	mendeley-groups = {!Paper 3/Interpretable LSTMs},
-	title = {{Question-Answering with Grammatically-Interpretable Representations}},
-	url = {http://arxiv.org/abs/1705.08432},
-	year = {2017}
+abstract = {We introduce an architecture, the Tensor Product Recurrent Network (TPRN). In our application of TPRN, internal representations-learned by end-to-end optimization in a deep neural network performing a textual question-answering (QA) task-can be interpreted using basic concepts from linguistic theory. No performance penalty need be paid for this increased interpretability: the proposed model performs comparably to a state-of-the-art system on the SQuAD QA task. The internal representation which is interpreted is a Tensor Product Representation: for each input word, the model selects a symbol to encode the word, and a role in which to place the symbol, and binds the two together. The selection is via soft attention. The overall interpretation is built from interpretations of the symbols, as recruited by the trained model, and interpretations of the roles as used by the model. We find support for our initial hypothesis that symbols can be interpreted as lexical-semantic word meanings, while roles can be interpreted as approximations of grammatical roles (or categories) such as subject, wh-word, determiner, etc. Fine-grained analysis reveals specific correspondences between the learned roles and parts of speech as assigned by a standard tagger (Toutanova et al. 2003), and finds several discrepancies in the model's favor. In this sense, the model learns significant aspects of grammar, after having been exposed solely to linguistically unannotated text, questions, and answers: no prior linguistic knowledge is given to the model. What is given is the means to build representations using symbols and roles, with an inductive bias favoring use of these in an approximately discrete manner.},
+archivePrefix = {arXiv},
+arxivId = {1705.08432},
+author = {Palangi, Hamid and Smolensky, Paul and He, Xiaodong and Deng, Li},
+eprint = {1705.08432},
+file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Palangi et al. - 2017 - Question-Answering with Grammatically-Interpretable Representations.pdf:pdf},
+isbn = {9781577358008},
+journal = {32nd AAAI Conference on Artificial Intelligence, AAAI 2018},
+mendeley-groups = {!Paper 3/task/Interpretable LSTMs},
+pages = {5350--5357},
+title = {{Question-answering with grammatically-interpretable representations}},
+url = {http://arxiv.org/abs/1705.08432},
+year = {2018}
 }
+
 @article{Garcez2014,
 	abstract = {The goal of neural-symbolic computation is to integrate ro- bust connectionist learning and sound symbolic reasoning. With the recent advances in connectionist learning, in par- ticular deep neural networks, forms of representation learn- ing have emerged. However, such representations have not become useful for reasoning. Results from neural-symbolic computation have shown to offer powerful alternatives for knowledge representation, learning and reasoning in neural computation. This paper recalls the main contributions and discusses key challenges for neural-symbolic integration which have been identified at a recent Dagstuhl seminar.},
 	author = {Garcez, Avila and Besold, Tarek R and Raedt, Luc De and F{\"{o}}ldiak, Peter and Hitzler, Pascal and Icard, Thomas and K{\"{u}}hnberger, Kai-uwe and Lamb, Luis C and Miikkulainen, Risto and Silver, Daniel L},
@@ -15760,13 +15802,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	url = {http://arxiv.org/abs/1709.04219},
 	year = {2017}
 }
-@article{Murphy,
-	author = {Murphy, Brian and Pratim, Partha and Tom, Talukdar},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Murphy, Pratim, Tom - Unknown - Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding.pdf:pdf},
-	keywords = {distributional semantics,inter-,neuro-semantics,pretability,sparse coding,vector-space models,word embeddings},
-	mendeley-groups = {Annotated/Word Vectors,Annotated/NMF},
-	title = {{Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding}}
-}
+
 @article{,
 	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Unknown - Unknown - CM1102 Web Applications Exercise 3 CSS for multi-column layout and drop down menus Objectives of the exercise.pdf:pdf},
 	pages = {1--2},
@@ -15815,21 +15851,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	volume = {13},
 	year = {1993}
 }
-@article{Ribeiro2016,
-	abstract = {Despite widespread adoption, machine learning models remain mostly black boxes. Understanding the reasons behind predictions is, however, quite important in assessing trust, which is fundamental if one plans to take action based on a prediction, or when choosing whether to deploy a new model. Such understanding also provides insights into the model, which can be used to transform an untrustworthy model or prediction into a trustworthy one. In this work, we propose LIME, a novel explanation technique that explains the predictions of any classifier in an interpretable and faithful manner, by learning an interpretable model locally around the prediction. We also propose a method to explain models by presenting representative individual predictions and their explanations in a non-redundant way, framing the task as a submodular optimization problem. We demonstrate the flexibility of these methods by explaining different models for text (e.g. random forests) and image classification (e.g. neural networks). We show the utility of explanations via novel experiments, both simulated and with human subjects, on various scenarios that require trust: deciding if one should trust a prediction, choosing between models, improving an untrustworthy classifier, and identifying why a classifier should not be trusted.},
-	archivePrefix = {arXiv},
-	arxivId = {1602.04938},
-	author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
-	doi = {10.1145/1235},
-	eprint = {1602.04938},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Ribeiro, Singh, Guestrin - 2016 - Why Should I Trust You Explaining the Predictions of Any Classifier.pdf:pdf},
-	isbn = {9781450321389},
-	issn = {9781450321389},
-	mendeley-groups = {Report/Explaining predictions,Annotated/Explanations,!Paper 3/task/newsgroups},
-	title = {{"Why Should I Trust You?": Explaining the Predictions of Any Classifier}},
-	url = {http://arxiv.org/abs/1602.04938},
-	year = {2016}
-}
+
 @article{Leike2017,
 	abstract = {We present a suite of reinforcement learning environments illustrating various safety properties of intelligent agents. These problems include safe interruptibility, avoiding side effects, absent supervisor, reward gaming, safe exploration, as well as robustness to self-modification, distributional shift, and adversaries. To measure compliance with the intended safe behavior, we equip each environment with a performance function that is hidden from the agent. This allows us to categorize AI safety problems into robustness and specification problems, depending on whether the performance function corresponds to the observed reward function. We evaluate A2C and Rainbow, two recent deep reinforcement learning agents, on our environments and show that they are not able to solve them satisfactorily.},
 	archivePrefix = {arXiv},
@@ -16911,23 +16933,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Making machine learning models interpretable}},
 	year = {2012}
 }
-@article{Zhang2015,
-	abstract = {Sina Weibo, China's most popular microblogging platform, is currently used by over {\$}500M{\$} users and is considered to be a proxy of Chinese social life. In this study, we contrast the discussions occurring on Sina Weibo and on Chinese language Twitter in order to observe two different strands of Chinese culture: people within China who use Sina Weibo with its government imposed restrictions and those outside that are free to speak completely anonymously. We first propose a simple ad-hoc algorithm to identify topics of Tweets and Weibo. Different from previous works on micro-message topic detection, our algorithm considers topics of the same contents but with different $\backslash${\#}tags. Our algorithm can also detect topics for Tweets and Weibos without any $\backslash${\#}tags. Using a large corpus of Weibo and Chinese language tweets, covering the period from January {\$}1{\$} to December {\$}31{\$}, {\$}2012{\$}, we obtain a list of topics using clustered $\backslash${\#}tags that we can then use to compare the two platforms. Surprisingly, we find that there are no common entries among the Top {\$}100{\$} most popular topics. Furthermore, only {\$}9.2\backslash{\%}{\$} of tweets correspond to the Top {\$}1000{\$} topics on Sina Weibo platform, and conversely only {\$}4.4\backslash{\%}{\$} of weibos were found to discuss the most popular Twitter topics. Our results reveal significant differences in social attention on the two platforms, with most popular topics on Sina Weibo relating to entertainment while most tweets corresponded to cultural or political contents that is practically non existent in Sina Weibo.},
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1508.06655v1},
-	author = {Zhang, Qian and Goncalves, Bruno},
-	doi = {10.1145/1235},
-	eprint = {arXiv:1508.06655v1},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Zhang, Goncalves - 2015 - “Why Should I Trust You” Explaining the Predictions of Any Classifier BROKEN DETAILS.pdf:pdf},
-	isbn = {9781450321389},
-	issn = {9781450321389},
-	journal = {Acm},
-	keywords = {4d trajectory management,importance sampling,motion planning,separation assurance,tactical planning},
-	mendeley-groups = {!Paper 3/task/newsgroups},
-	pages = {4503},
-	title = {{“Why Should I Trust You?” Explaining the Predictions of Any Classifier [ BROKEN DETAILS ]}},
-	year = {2015}
-}
+
 @article{Dong2017a,
 	abstract = {Interpretability of deep neural networks (DNNs) is essential since it enables users to understand the overall strengths and weaknesses of the models, conveys an understanding of how the models will behave in the future, and how to diagnose and correct potential problems. However, it is challenging to reason about what a DNN actually does due to its opaque or black-box nature. To address this issue, we propose a novel technique to improve the interpretability of DNNs by leveraging the rich semantic information embedded in human descriptions. By concentrating on the video captioning task, we first extract a set of semantically meaningful topics from the human descriptions that cover a wide range of visual concepts, and integrate them into the model with an interpretive loss. We then propose a prediction difference maximization algorithm to interpret the learned features of each neuron. Experimental results demonstrate its effectiveness in video captioning using the interpretable features, which can also be transferred to video action recognition. By clearly understanding the learned features, users can easily revise false predictions via a human-in-the-loop procedure.},
 	archivePrefix = {arXiv},
@@ -18278,15 +18284,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Exploiting Flickr Meta-Data for Predicting Environmental Features School of Computer Science {\&} Informatics}},
 	year = {2019}
 }
-@article{Vig2014,
-	author = {Vig, Jesse and Sen, Shilad and Riedl, John},
-	doi = {10.1145/2362394.2362395},
-	file = {:E$\backslash$:/Downloads/Work/tag{\_}genome.pdf:pdf},
-	keywords = {Tagging, conversational recommenders, data mining, information retrieval, machine learning, recommender systems},
-	number = {June 2012},
-	title = {{The Tag Genome : Encoding Community Knowledge to Support Novel Interaction The Tag Genome : Encoding Community Knowledge to Support}},
-	year = {2014}
-}
+
 @article{Lastname2011b,
 	author = {Lastname, Name M},
 	file = {:E$\backslash$:/Downloads/Work/thesis (1).pdf:pdf},
@@ -18436,15 +18434,24 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Machine learning for targeted display advertising : transfer learning in action}},
 	year = {2014}
 }
+
 @article{Gilpina,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1806.00069v3},
-	author = {Gilpin, Leilani H and Bau, David and Yuan, Ben Z and Bajwa, Ayesha and Specter, Michael and Kagal, Lalana},
-	eprint = {arXiv:1806.00069v3},
-	file = {:E$\backslash$:/PhD/Papedrs/1806.00069.pdf:pdf},
-	mendeley-groups = {11Thesis/Unsorted,11Thesis/Interpretability/GAN's and VAE},
-	title = {{Explaining Explanations : An Overview of Interpretability of Machine Learning}}
+abstract = {There has recently been a surge of work in explanatory artificial intelligence (XAI). This research area tackles the important problem that complex machines and algorithms often cannot provide insights into their behavior and thought processes. XAI allows users and parts of the internal system to be more transparent, providing explanations of their decisions in some level of detail. These explanations are important to ensure algorithmic fairness, identify potential bias/problems in the training data, and to ensure that the algorithms perform as expected. However, explanations produced by these systems is neither standardized nor systematically assessed. In an effort to create best practices and identify open challenges, we describe foundational concepts of explainability and show how they can be used to classify existing literature. We discuss why current approaches to explanatory methods especially for deep neural networks are insufficient. Finally, based on our survey, we conclude with suggested future research directions for explanatory artificial intelligence.},
+archivePrefix = {arXiv},
+arxivId = {1806.00069},
+author = {Gilpin, Leilani H. and Bau, David and Yuan, Ben Z. and Bajwa, Ayesha and Specter, Michael and Kagal, Lalana},
+doi = {10.1109/DSAA.2018.00018},
+eprint = {1806.00069},
+file = {:E$\backslash$:/PhD/Papedrs/1806.00069.pdf:pdf},
+isbn = {9781538650905},
+journal = {Proceedings - 2018 IEEE 5th International Conference on Data Science and Advanced Analytics, DSAA 2018},
+keywords = {Deep learning and deep analytics,Fairness and transparency in data science,Machine learning theories,Models and systems},
+mendeley-groups = {11Thesis/Unsorted,11Thesis/Interpretability/GAN's and VAE},
+pages = {80--89},
+title = {{Explaining explanations: An overview of interpretability of machine learning}},
+year = {2019}
 }
+
 @article{Nam2014a,
 	abstract = {Neural networks have recently been proposed for multi-label classification because they are able to capture and model label dependencies in the output layer. In this work, we investigate limitations of BP-MLL, a neural network (NN) architecture that aims at minimizing pairwise ranking error. Instead, we propose to use a comparably simple NN approach with recently proposed learning techniques for large-scale multi-label text classification tasks. In particular, we show that BP-MLL's ranking loss minimization can be efficiently and effectively replaced with the commonly used cross entropy error function, and demonstrate that several advances in neural network training that have been developed in the realm of deep learning can be effectively employed in this setting. Our experimental results show that simple NN models equipped with advanced techniques such as rectified linear units, dropout, and AdaGrad perform as well as or even outperform state-of-the-art approaches on six large-scale textual datasets with diverse characteristics.},
 	archivePrefix = {arXiv},
@@ -18648,13 +18655,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	volume = {9},
 	year = {2014}
 }
-@article{Maas2011a,
-	author = {Maas, Andrew L and Daly, Raymond E and Pham, Peter T and Huang, Dan and Ng, Andrew Y and Potts, Christopher},
-	file = {:E$\backslash$:/PhD/Code/ThesisPipeline/ThesisPipeline/tex/p142-maas.pdf:pdf},
-	pages = {142--150},
-	title = {{Learning Word Vectors for Sentiment Analysis}},
-	year = {2011}
-}
+
 @article{Fyshe2015,
 	abstract = {Vector Space Models (VSMs) of Semantics are useful tools for exploring the semantics of single words, and the composition of words to make phrasal meaning. While many meth- ods can estimate the meaning (i.e. vector) of a phrase, few do so in an interpretable way. We introduce a new method (CNNSE) that al- lows word and phrase vectors to adapt to the notion of composition. Our method learns a VSM that is both tailored to support a chosen semantic composition operation, and whose resulting features have an intuitive interpreta- tion. Interpretability allows for the exploration of phrasal semantics, which we leverage to an- alyze performance on a behavioral task. 1},
 	author = {Fyshe, Alona and Wehbe, Leila and Talukdar, Partha and Murphy, Brian and Mitchell, Tom},
@@ -19575,21 +19576,16 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Unknown - Unknown - arffs.groovy:groovy},
 	title = {arffs}
 }
-@article{Zhang2012,
-	abstract = {Sparse PCA provides a linear combination of small number of features that maximizes variance across data. Although Sparse PCA has apparent advantages compared to PCA, such as better interpretability, it is generally thought to be computationally much more expensive. In this paper, we demonstrate the surprising fact that sparse PCA can be easier than PCA in practice, and that it can be reliably applied to very large data sets. This comes from a rigorous feature elimination pre-processing result, coupled with the favorable fact that features in real-life data typically have exponentially decreasing variances, which allows for many features to be eliminated. We introduce a fast block coordinate ascent algorithm with much better computational complexity than the existing first-order ones. We provide experimental results obtained on text corpora involving millions of documents and hundreds of thousands of features. These results illustrate how Sparse PCA can help organize a large corpus of text data in a user-interpretable way, providing an attractive alternative approach to topic models.},
-	archivePrefix = {arXiv},
-	arxivId = {1210.7054},
-	author = {Zhang, Youwei and Ghaoui, Laurent El},
-	doi = {10.1021/acs.inorgchem.5b02349},
-	eprint = {1210.7054},
-	file = {:D$\backslash$:/PhD/Code/ThesisPipeline/ThesisPipeline/tex/papers/4337-large-scale-sparse-principal-component-analysis-with-application-to-text-data.pdf:pdf},
-	isbn = {9781618395993},
-	issn = {0020-1669},
-	mendeley-groups = {11Thesis/Interpretability/Representations,11Thesis},
-	pages = {1--8},
-	title = {{Large-Scale Sparse Principal Component Analysis with Application to Text Data}},
-	url = {http://arxiv.org/abs/1210.7054},
-	year = {2012}
+
+@incollection{Zhang2012,
+title = {Large-Scale Sparse Principal Component Analysis with Application to Text Data},
+author = {Youwei Zhang and Laurent E. Ghaoui},
+booktitle = {Advances in Neural Information Processing Systems 24},
+editor = {J. Shawe-Taylor and R. S. Zemel and P. L. Bartlett and F. Pereira and K. Q. Weinberger},
+pages = {532--539},
+year = {2011},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.nips.cc/paper/4337-large-scale-sparse-principal-component-analysis-with-application-to-text-data.pdf}
 }
 @article{Ager2012h,
 	author = {Ager, Thomas and Schockaert, Steven},
@@ -19928,13 +19924,20 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2012}
 }
 @article{Lee2012,
-	author = {Lee, Ching-pei and Lin, Chih-jen},
-	file = {:E$\backslash$:/ranksvml2.pdf:pdf},
-	keywords = {large-scale,learning,learning to rank,linear model,ranking support vector machines},
-	pages = {1--33},
-	title = {{Large-scale Linear RankSVM}},
-	year = {2012}
+abstract = {Linear rankSVM is one of the widely used methods for learning to rank. Although its performance may be inferior to nonlinear methods such as kernel rankSVM and gradient boosting decision trees, linear rankSVM is useful to quickly produce a baseline model. Furthermore, following its recent development for classification, linear rankSVM may give competitive performance for large and sparse data. A great deal of works have studied linear rankSVM. The focus is on the computational efficiency when the number of preference pairs is large. In this letter, we systematically study existing works, discuss their advantages and disadvantages, and propose an efficient algorithm. We discuss different implementation issues and extensions with detailed experiments. Finally, we develop a robust linear rankSVM tool for public use. {\textcopyright} 2014 Massachusetts Institute of Technology.},
+author = {Lee, Ching Pei and Lin, Chih Jen},
+doi = {10.1162/NECO_a_00571},
+file = {:E$\backslash$:/ranksvml2.pdf:pdf},
+issn = {08997667},
+journal = {Neural Computation},
+keywords = {large-scale,learning,learning to rank,linear model,ranking support vector machines},
+number = {4},
+pages = {781--817},
+title = {{Large-scale linear rankSVM}},
+volume = {26},
+year = {2014}
 }
+
 @misc{,
 	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Unknown - Unknown - vpetite.txt:txt},
 	title = {vpetite}
@@ -20169,16 +20172,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Improving the Adversarial Robustness and Interpretability of Deep Neural Networks by Regularizing Their Input Gradients}},
 	year = {2017}
 }
-@article{Fisch2016,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1704.00051v2},
-	author = {Fisch, Adam and Weston, Jason and Bordes, Antoine and Chen, Danqi},
-	eprint = {arXiv:1704.00051v2},
-	file = {:E$\backslash$:/1704.00051.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	title = {{Reading Wikipedia to Answer Open-Domain Questions}},
-	year = {2016}
-}
+
 @article{Towell1990,
 	author = {Towell, Geoffrey G and Shavlik, Jude W and Noordeweir, Michiel O},
 	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Towell, Shavlik, Noordeweir - 1990 - Refinement of Approximate Domain Theories by Knowledge-Based Neural Networks.pdf:pdf},
@@ -20413,17 +20407,21 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2015}
 }
 @article{Palangi2017,
-	abstract = {We introduce an architecture, the Tensor Product Recurrent Network (TPRN). In our application of TPRN, internal representations learned by end-to-end optimization in a deep neural network performing a textual question-answering (QA) task can be interpreted using basic concepts from linguistic theory. No performance penalty need be paid for this increased interpretability: the proposed model performs comparably to a state-of-the-art system on the SQuAD QA task. The internal representation which is interpreted is a Tensor Product Representation: for each input word, the model selects a symbol to encode the word, and a role in which to place the symbol, and binds the two together. The selection is via soft attention. The overall interpretation is built from interpretations of the symbols, as recruited by the trained model, and interpretations of the roles as used by the model. We find support for our initial hypothesis that symbols can be interpreted as lexical-semantic word meanings, while roles can be interpreted as approximations of grammatical roles (or categories) such as subject, wh-word, determiner, etc. Fine-grained analysis reveals specific correspondences between the learned roles and parts of speech as assigned by a standard tagger (Toutanova et al. 2003), and finds several discrepancies in the model's favor. In this sense, the model learns significant aspects of grammar, after having been exposed solely to linguistically unannotated text, questions, and answers: no prior linguistic knowledge is given to the model. What is given is the means to build representations using symbols and roles, with an inductive bias favoring use of these in an approximately discrete manner.},
-	archivePrefix = {arXiv},
-	arxivId = {1705.08432},
-	author = {Palangi, Hamid and Smolensky, Paul and He, Xiaodong and Deng, Li},
-	eprint = {1705.08432},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Palangi et al. - 2017 - Question-Answering with Grammatically-Interpretable Representations.pdf:pdf},
-	mendeley-groups = {!Paper 3/task/Interpretable LSTMs},
-	title = {{Question-Answering with Grammatically-Interpretable Representations}},
-	url = {http://arxiv.org/abs/1705.08432},
-	year = {2017}
+abstract = {We introduce an architecture, the Tensor Product Recurrent Network (TPRN). In our application of TPRN, internal representations-learned by end-to-end optimization in a deep neural network performing a textual question-answering (QA) task-can be interpreted using basic concepts from linguistic theory. No performance penalty need be paid for this increased interpretability: the proposed model performs comparably to a state-of-the-art system on the SQuAD QA task. The internal representation which is interpreted is a Tensor Product Representation: for each input word, the model selects a symbol to encode the word, and a role in which to place the symbol, and binds the two together. The selection is via soft attention. The overall interpretation is built from interpretations of the symbols, as recruited by the trained model, and interpretations of the roles as used by the model. We find support for our initial hypothesis that symbols can be interpreted as lexical-semantic word meanings, while roles can be interpreted as approximations of grammatical roles (or categories) such as subject, wh-word, determiner, etc. Fine-grained analysis reveals specific correspondences between the learned roles and parts of speech as assigned by a standard tagger (Toutanova et al. 2003), and finds several discrepancies in the model's favor. In this sense, the model learns significant aspects of grammar, after having been exposed solely to linguistically unannotated text, questions, and answers: no prior linguistic knowledge is given to the model. What is given is the means to build representations using symbols and roles, with an inductive bias favoring use of these in an approximately discrete manner.},
+archivePrefix = {arXiv},
+arxivId = {1705.08432},
+author = {Palangi, Hamid and Smolensky, Paul and He, Xiaodong and Deng, Li},
+eprint = {1705.08432},
+file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Palangi et al. - 2017 - Question-Answering with Grammatically-Interpretable Representations.pdf:pdf},
+isbn = {9781577358008},
+journal = {32nd AAAI Conference on Artificial Intelligence, AAAI 2018},
+mendeley-groups = {!Paper 3/task/Interpretable LSTMs},
+pages = {5350--5357},
+title = {{Question-answering with grammatically-interpretable representations}},
+url = {http://arxiv.org/abs/1705.08432},
+year = {2018}
 }
+
 @article{Laine2016,
 	abstract = {In this paper, we present a simple and efficient method for training deep neural networks in a semi-supervised setting where only a small portion of training data is labeled. We introduce temporal ensembling, where we form a consensus prediction of the unknown labels under multiple instances of the network-in-training on different epochs, and most importantly, under different regularization and input augmentation conditions. This ensemble prediction can be expected to be a better predictor for the unknown labels than the output of the network at the most recent training epoch, and can thus be used as a target for training. Using our method, we set new records for two standard semi-supervised learning benchmarks, reducing the classification error rate from 18.63{\%} to 12.89{\%} in CIFAR-10 with 4000 labels and from 18.44{\%} to 6.83{\%} in SVHN with 500 labels.},
 	archivePrefix = {arXiv},
@@ -20529,12 +20527,23 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2017}
 }
 @article{Lewis1993,
-	author = {Lewis, David D},
-	file = {:E$\backslash$:/10.1.1.14.1921.pdf:pdf},
-	pages = {1--22},
-	title = {{Natural language processing for information retrieval 1 Abstract 2 Introduction 3 Document retrieval}},
-	year = {1993}
+author = {Lewis, David D. and Jones, Karen Sp\"{a}rck},
+title = {Natural Language Processing for Information Retrieval},
+year = {1996},
+issue_date = {January 1996},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {39},
+number = {1},
+issn = {0001-0782},
+url = {https://doi.org/10.1145/234173.234210},
+doi = {10.1145/234173.234210},
+journal = {Commun. ACM},
+month = jan,
+pages = {92–101},
+numpages = {10}
 }
+
 @article{Science2018,
 	author = {Science, Computer and Monitoring, Progress and Report, Interim Review},
 	file = {:E$\backslash$:/Downloads/Work/InterimReviewForm (2).pdf:pdf},
@@ -21064,13 +21073,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Unknown - Unknown - Interim Report Student Details Section A Student Self-Assessment A . 1 Thesis Title and Hypothesis A . 2 Overall Pr.pdf:pdf},
 	title = {{Interim Report Student Details Section A : Student Self-Assessment A . 1 Thesis Title and Hypothesis A . 2 Overall Progress}}
 }
-@article{Murphy,
-	author = {Murphy, Brian and Pratim, Partha and Tom, Talukdar},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Murphy, Pratim, Tom - Unknown - Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding.pdf:pdf},
-	keywords = {distributional semantics,inter-,neuro-semantics,pretability,sparse coding,vector-space models,word embeddings},
-	mendeley-groups = {Annotated/Word Vectors,Annotated/NMF},
-	title = {{Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding}}
-}
+
 @article{Kulkarni2015,
 	abstract = {This paper presents the Deep Convolution Inverse Graphics Network (DC-IGN) that aims to learn an interpretable representation of images that is disentangled with respect to various transformations such as object out-of-plane rotations, lighting variations, and texture. The DC-IGN model is composed of multiple layers of convolution and de-convolution operators and is trained using the Stochastic Gradient Variational Bayes (SGVB) algorithm. We propose training procedures to encourage neurons in the graphics code layer to have semantic meaning and force each group to distinctly represent a specific transformation (pose,light,texture,shape etc.). Given a static face image, our model can re-generate the input image with different pose, lighting or even texture and shape variations from the base face. We present qualitative and quantitative results of the model's efficacy to learn a 3D rendering engine. Moreover, we also utilize the learnt representation for two important visual recognition tasks: (1) an invariant face recognition task and (2) using the representation as a summary statistic for generative modeling.},
 	archivePrefix = {arXiv},
@@ -21298,8 +21301,13 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2003}
 }
 @article{Maas2011a,
-	author = {Maas, Andrew L and Daly, Raymond E and Pham, Peter T and Huang, Dan and Ng, Andrew Y and Potts, Christopher},
-	file = {:E$\backslash$:/PhD/Code/ThesisPipeline/ThesisPipeline/tex/p142-maas.pdf:pdf},
+	abstract = {Unsupervised vector-based approaches to semantics can model rich lexical meanings, but they largely fail to capture sentiment information that is central to many word meanings and important for a wide range of NLP tasks. We present a model that uses a mix of unsupervised and supervised techniques to learn word vectors capturing semantic term–document information as well as rich sentiment content. The proposed model can leverage both continuous and multi-dimensional sentiment in- formation as well as non-sentiment annota- tions. We instantiate the model to utilize the document-level sentiment polarity annotations present in many online documents (e.g. star ratings). We evaluate the model using small, widely used sentiment and subjectivity corpora and find it out-performs several previously introduced methods for sentiment classification. We also introduce a large dataset of movie reviews to serve as a more robust benchmark for work in this area.},
+	author = {Maas, Andrew L and Daly, Raymond E. and Pham, Peter T. and Huang, Dan and Ng, Andrew Y. and Potts, Christopher},
+	doi = {978-1-932432-87-9},
+	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Maas et al. - 2011 - Learning Word Vectors for Sentiment Analysis.pdf:pdf},
+	isbn = {9781932432879},
+	journal = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
+	mendeley-groups = {Annotated/Datasets,!Paper 3/task,!Paper 3/task/Large Movie Review},
 	pages = {142--150},
 	title = {{Learning Word Vectors for Sentiment Analysis}},
 	year = {2011}
@@ -21390,15 +21398,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	url = {http://arxiv.org/abs/1612.07843},
 	year = {2016}
 }
-@article{Viappiani2006,
-	author = {Viappiani, Paolo},
-	file = {:E$\backslash$:/Downloads/Work/10477-Article Text-19459-1-10-20180216.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	pages = {465--503},
-	title = {{Preference-based Search using Example-Critiquing with Suggestions}},
-	volume = {27},
-	year = {2006}
-}
+
 @article{Yang2014,
 	abstract = {Abstract Genetic algorithms are among the most popular evolutionary algorithms in terms of the diversity of their applications. A vast majority of well-known optimization problems have been solved using genetic algorithms. In addition, genetic algorithms are population-based, and many modern evolutionary algorithms are directly based on genetic algorithms or have some strong similarities to them.},
 	author = {Yang, Xin-She},
@@ -22399,14 +22399,12 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {4ae075de7bf9ea2cac01fe02e2920ee5c789.pdf}
 }
 @article{Trifonov,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1809.08621v2},
-	author = {Trifonov, Valentin and Ganea, Octavian-eugen and Potapenko, Anna and Hofmann, Thomas and Eth, Z},
-	eprint = {arXiv:1809.08621v2},
-	file = {:E$\backslash$:/PhD/Papedrs/1809.08621 (1).pdf:pdf},
-	mendeley-groups = {11Thesis/Interpretability/Sentence Vectors,11Thesis/Interpretability/GAN's and VAE},
-	title = {{Learning and Evaluating Sparse Interpretable Sentence Embeddings}}
+  title={Learning and Evaluating Sparse Interpretable Sentence Embeddings},
+  author={Valentin Trifonov and Octavian-Eugen Ganea and Anna Potapenko and Thomas Hofmann},
+  booktitle={BlackboxNLP EMNLP},
+  year={2018}
 }
+
 @article{TomasMikolovWen-tauYih2013,
 	abstract = {Continuous space language models have re- cently demonstrated outstanding results across a variety of tasks. In this paper, we ex- amine the vector-space word representations that are implicitly learned by the input-layer weights. We find that these representations are surprisingly good at capturing syntactic and semantic regularities in language, and that each relationship is characterized by a relation-specific vector offset. This allows vector-oriented reasoning based on the offsets between words. For example, the male/female relationship is automatically learned, and with the induced vector representations, “King - Man + Woman” results in a vector very close to “Queen.” We demonstrate that the word vectors capture syntactic regularities by means of syntactic analogy questions (provided with this paper), and are able to correctly answer almost 40{\%} of the questions. We demonstrate that the word vectors capture semantic regu- larities by using the vector offset method to answer SemEval-2012 Task 2 questions. Re- markably, this method outperforms the best previous systems. 1},
 	archivePrefix = {arXiv},
@@ -22971,10 +22969,22 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {1993}
 }
 @article{Kovashka,
-	author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
-	file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
-	mendeley-groups = {11Thesis/Applications},
-	title = {{WhittleSearch : Image Search with Relative Attribute Feedback}}
+abstract = {We propose a novel mode of feedback for image search, where a user describes which properties of exemplar images should be adjusted in order to more closely match his/her mental model of the image sought. For example, perusing image results for a query “black shoes”, the user might state, “Show me shoe images like these, but sportier.” Offline, our approach first learns a set of ranking functions, each of which predicts the relative strength of a nameable attribute in an image (e.g., sportiness). At query time, the system presents the user with a set of exemplar images, and the user relates them to his/her target image with comparative statements. Using a series of such constraints in the multi-dimensional attribute space, our method iteratively updates its relevance function and re-ranks the database of images. To determine which exemplar images receive feedback from the user, we present two variants of the approach: one where the feedback is user-initiated and another where the feedback is actively system-initiated. In either case, our approach allows a user to efficiently “whittle away” irrelevant portions of the visual feature space, using semantic language to precisely communicate her preferences to the system. We demonstrate our technique for refining image search for people, products, and scenes, and we show that it outperforms traditional binary relevance feedback in terms of search speed and accuracy. In addition, the ordinal nature of relative attributes helps make our active approach efficient—both computationally for the machine when selecting the reference images, and for the user by requiring less user interaction than conventional passive and active methods.},
+archivePrefix = {arXiv},
+arxivId = {1505.04141},
+author = {Kovashka, Adriana and Parikh, Devi and Grauman, Kristen},
+doi = {10.1007/s11263-015-0814-0},
+eprint = {1505.04141},
+file = {:E$\backslash$:/WhittleSearch{\_}Image{\_}search{\_}with{\_}relative.pdf:pdf},
+issn = {15731405},
+journal = {International Journal of Computer Vision},
+keywords = {Active selection,Content-based image search,Interactive image search,Relative attributes},
+mendeley-groups = {11Thesis/Applications},
+number = {2},
+pages = {185--210},
+title = {{WhittleSearch: Interactive Image Search with Relative Attribute Feedback}},
+volume = {115},
+year = {2015}
 }
 @article{Rankings,
 	author = {Rankings, Phrase Direction and Score, Ndcg and Rankings, Cluster and Tree, Decision and Validation, Using Cross},
@@ -23570,14 +23580,20 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2010}
 }
 @article{Kenton1953,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1810.04805v2},
-	author = {Kenton, Ming-wei Chang and Kristina, Lee and Devlin, Jacob},
-	eprint = {arXiv:1810.04805v2},
-	file = {:E$\backslash$:/1810.04805.pdf:pdf},
-	number = {Mlm},
-	title = {{BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding}},
-	year = {1953}
+    title = "{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+    author = "Devlin, Jacob  and
+      Chang, Ming-Wei  and
+      Lee, Kenton  and
+      Toutanova, Kristina",
+    booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/N19-1423",
+    doi = "10.18653/v1/N19-1423",
+    pages = "4171--4186",
+    abstract = "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models (Peters et al., 2018a; Radford et al., 2018), BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5 (7.7 point absolute improvement), MultiNLI accuracy to 86.7{\%} (4.6{\%} absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
 }
 @article{Miller2017,
 	abstract = {In his seminal book The Inmates are Running the Asylum: Why High-Tech Products Drive Us Crazy And How To Restore The Sanity [2004, Sams Indianapolis, IN, USA], Alan Cooper ar-gues that a major reason why software is of-ten poorly designed (from a user perspective) is that programmers are in charge of design de-cisions, rather than interaction designers. As a result, programmers design software for them-selves, rather than for their target audience; a phenomenon he refers to as the 'inmates run-ning the asylum'. This paper argues that ex-plainable AI risks a similar fate. While the re-emergence of explainable AI is positive, this paper argues most of us as AI researchers are building explanatory agents for ourselves, rather than for the intended users. But ex-plainable AI is more likely to succeed if re-searchers and practitioners understand, adopt, implement, and improve models from the vast and valuable bodies of research in philosophy, psychology, and cognitive science; and if evalu-ation of these models is focused more on people than on technology. From a light scan of litera-ture, we demonstrate that there is considerable scope to infuse more results from the social and behavioural sciences into explainable AI, and present some key results from these fields that are relevant to explainable AI.},
@@ -23695,16 +23711,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	url = {http://arxiv.org/abs/1405.4047},
 	year = {2014}
 }
-@article{Vig2014,
-	author = {Vig, Jesse and Sen, Shilad and Riedl, John},
-	doi = {10.1145/2362394.2362395},
-	file = {:E$\backslash$:/tag{\_}genome.pdf:pdf},
-	keywords = {Tagging, conversational recommenders, data mining,},
-	mendeley-groups = {11Thesis/Applications},
-	number = {November},
-	title = {{The Tag Genome : Encoding Community Knowledge to Support Novel Interaction The Tag Genome : Encoding Community Knowledge to Support}},
-	year = {2014}
-}
+
 @article{Conll,
 	author = {Conll, Anonymous},
 	pages = {1--10},
@@ -24247,23 +24254,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	url = {http://arxiv.org/abs/1711.00399},
 	year = {2017}
 }
-@article{Zhang2015,
-	abstract = {Sina Weibo, China's most popular microblogging platform, is currently used by over {\$}500M{\$} users and is considered to be a proxy of Chinese social life. In this study, we contrast the discussions occurring on Sina Weibo and on Chinese language Twitter in order to observe two different strands of Chinese culture: people within China who use Sina Weibo with its government imposed restrictions and those outside that are free to speak completely anonymously. We first propose a simple ad-hoc algorithm to identify topics of Tweets and Weibo. Different from previous works on micro-message topic detection, our algorithm considers topics of the same contents but with different $\backslash${\#}tags. Our algorithm can also detect topics for Tweets and Weibos without any $\backslash${\#}tags. Using a large corpus of Weibo and Chinese language tweets, covering the period from January {\$}1{\$} to December {\$}31{\$}, {\$}2012{\$}, we obtain a list of topics using clustered $\backslash${\#}tags that we can then use to compare the two platforms. Surprisingly, we find that there are no common entries among the Top {\$}100{\$} most popular topics. Furthermore, only {\$}9.2\backslash{\%}{\$} of tweets correspond to the Top {\$}1000{\$} topics on Sina Weibo platform, and conversely only {\$}4.4\backslash{\%}{\$} of weibos were found to discuss the most popular Twitter topics. Our results reveal significant differences in social attention on the two platforms, with most popular topics on Sina Weibo relating to entertainment while most tweets corresponded to cultural or political contents that is practically non existent in Sina Weibo.},
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1508.06655v1},
-	author = {Zhang, Qian and Goncalves, Bruno},
-	doi = {10.1145/1235},
-	eprint = {arXiv:1508.06655v1},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Zhang, Goncalves - 2015 - “Why Should I Trust You” Explaining the Predictions of Any Classifier BROKEN DETAILS.pdf:pdf},
-	isbn = {9781450321389},
-	issn = {9781450321389},
-	journal = {Acm},
-	keywords = {4d trajectory management,importance sampling,motion planning,separation assurance,tactical planning},
-	mendeley-groups = {!Paper 3/task/newsgroups},
-	pages = {4503},
-	title = {{“Why Should I Trust You?” Explaining the Predictions of Any Classifier [ BROKEN DETAILS ]}},
-	year = {2015}
-}
+
 @article{Baehrens2010,
 	abstract = {After building a classifier with modern tools of machine learning we typically have a black box at hand that is able to predict well for unseen data. Thus, we get an answer to the question what is the most likely label of a given unseen data point. However, most methods will provide no answer why the model predicted a particular label for a single instance and what features were most influential for that particular instance. The only method that is currently able to provide such explanations are decision trees. This paper proposes a procedure which (based on a set of assumptions) allows to explain the decisions of any classification method.},
 	archivePrefix = {arXiv},
@@ -24558,15 +24549,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	isbn = {9780134437736},
 	title = {{Mathematics with Calculus}}
 }
-@article{Vig2014,
-	author = {Vig, Jesse and Sen, Shilad and Riedl, John},
-	doi = {10.1145/2362394.2362395},
-	file = {:E$\backslash$:/Downloads/Work/tag{\_}genome.pdf:pdf},
-	keywords = {Tagging, conversational recommenders, data mining,},
-	number = {June 2012},
-	title = {{The Tag Genome : Encoding Community Knowledge to Support Novel Interaction The Tag Genome : Encoding Community Knowledge to Support}},
-	year = {2014}
-}
+
 @article{Windows2014,
 	abstract = {The objective of this case study was to obtain some first-hand information about the functional consequences of a cosmetic tongue split operation for speech and tongue motility. One male patient who had performed the operation on himself was interviewed and underwent a tongue motility assessment, as well as an ultrasound examination. Tongue motility was mildly reduced as a result of tissue scarring. Speech was rated to be fully intelligible and highly acceptable by 4 raters, although 2 raters noticed slight distortions of the sibilants /s/ and /z/. The 3-dimensional ultrasound demonstrated that the synergy of the 2 sides of the tongue was preserved. A notably deep posterior genioglossus furrow indicated compensation for the reduced length of the tongue blade. It is concluded that the tongue split procedure did not significantly affect the participant's speech intelligibility and tongue motility.},
 	archivePrefix = {arXiv},
@@ -25099,12 +25082,19 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2014}
 }
 @article{Zilke2016,
-	author = {Zilke, Jan Ruben and Menc{\'{i}}a, Eneldo Loza and Janssen, Frederik},
-	file = {:E$\backslash$:/PhD/DS16DeepRED.pdf:pdf},
-	isbn = {9783319463070},
-	title = {{DeepRED – Rule Extraction from Deep Neural Networks}},
-	year = {2016}
+abstract = {Neural network classifiers are known to be able to learn very accurate models. In the recent past, researchers have even been able to train neural networks with multiple hidden layers (deep neural networks) more effectively and efficiently. However, the major downside of neural networks is that it is not trivial to understand the way how they derive their classification decisions. To solve this problem, there has been research on extracting better understandable rules from neural networks. However, most authors focus on nets with only one single hidden layer. The present paper introduces a new decompositional algorithm – DeepRED – that is able to extract rules from deep neural networks. The evaluation of the proposed algorithm shows its ability to outperform a pedagogical baseline on several tasks, including the successful extraction of rules from a neural network realizing the XOR function.},
+author = {Zilke, Jan Ruben and Menc{\'{i}}a, Eneldo Loza and Janssen, Frederik},
+doi = {10.1007/978-3-319-46307-0_29},
+file = {:E$\backslash$:/PhD/DS16DeepRED.pdf:pdf},
+isbn = {9783319463063},
+issn = {16113349},
+journal = {Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics)},
+pages = {457--473},
+title = {{DeepRED – Rule extraction from deep neural networks}},
+volume = {9956 LNAI},
+year = {2016}
 }
+
 @article{Chorowski2015a,
 	abstract = {People can understand complex structures if they relate to more isolated yet understandable concepts. Despite this fact, popular pattern recognition tools, such as decision tree or production rule learners, produce only flat models which do not build intermediate data representations. On the other hand, neural networks typically learn hierarchical but opaque models. We show how constraining neurons' weights to be nonnegative improves the interpretability of a network's operation. We analyze the proposed method on large data sets: the MNIST digit recognition data and the Reuters text categorization data. The patterns learned by traditional and constrained network are contrasted to those learned with principal component analysis and nonnegative matrix factorization.},
 	author = {Chorowski, Jan and Zurada, Jacek M.},
@@ -26198,14 +26188,19 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2005}
 }
 @article{Luo2015,
-	author = {Luo, Hongyin and Liu, Zhiyuan and Luan, Huanbo and Sun, Maosong},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Luo et al. - 2015 - Online Learning of Interpretable Word Embeddings.pdf:pdf},
-	mendeley-groups = {Annotated/Word Vectors,11Thesis/Interpretability/Word Vectors/Constraints},
-	number = {September},
-	pages = {1687--1692},
-	title = {{Online Learning of Interpretable Word Embeddings}},
-	year = {2015}
+abstract = {Word embeddings encode semantic meanings of words into low-dimension word vectors. In most word embeddings, one cannot interpret the meanings of specific dimensions of those word vectors. Nonnegative matrix factorization (NMF) has been proposed to learn interpretable word embeddings via non-negative constraints. However, NMF methods suffer from scale and memory issue because they have to maintain a global matrix for learning. To alleviate this challenge, we propose online learning of interpretable word embeddings from streaming text data. Experiments show that our model consistently outperforms the state-of-the-art word embedding methods in both representation ability and interpretability. The source code of this paper can be obtained from http://github.com/skTim/OIWE.},
+author = {Luo, Hongyin and Luan, Zhiyuan and Huanbo, Liuv and Sun, Maosong},
+doi = {10.18653/v1/d15-1196},
+file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Luo et al. - 2015 - Online Learning of Interpretable Word Embeddings.pdf:pdf},
+isbn = {9781941643327},
+journal = {Conference Proceedings - EMNLP 2015: Conference on Empirical Methods in Natural Language Processing},
+mendeley-groups = {Annotated/Word Vectors,11Thesis/Interpretability/Word Vectors/Constraints},
+number = {September},
+pages = {1687--1692},
+title = {{Online learning of interpretable word embeddings}},
+year = {2015}
 }
+
 @article{Manly2017,
 	author = {Manly, Bryan F J and Alberto, Jorge A Navarro},
 	doi = {10.18637/jss.v078.b03},
@@ -26294,13 +26289,18 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	year = {2010}
 }
 @article{Park2017,
-	author = {Park, Sungjoon and Bak, Jinyeong and Oh, Alice},
-	file = {:E$\backslash$:/PhD/Papedrs/e86c35f9f72edcec37ac747a6da19cd7f489.pdf:pdf},
-	mendeley-groups = {11Thesis/Interpretability/Word Vectors/Post-processing,11Thesis/Interpretability/GAN's and VAE},
-	pages = {401--411},
-	title = {{Rotated Word Vector Representations and their Interpretability}},
-	year = {2017}
+abstract = {Vector representation of words improves performance in various NLP tasks, but the high-dimensional word vectors are very difficult to interpret. We apply several rotation algorithms to the vector representation of words to improve the interpretability. Unlike previous approaches that induce sparsity, the rotated vectors are interpretable while preserving the expressive performance of the original vectors. Furthermore, any pre-built word vector representation can be rotated for improved interpretability. We apply rotation to skip-grams and glove and compare the expressive power and interpretability with the original vectors and the sparse overcomplete vectors. The results show that the rotated vectors outperform the original and the sparse overcomplete vectors for interpretability and expressiveness tasks.},
+author = {Park, Sungjoon and Bak, Jin Yeong and Oh, Alice},
+doi = {10.18653/v1/d17-1041},
+file = {:E$\backslash$:/PhD/Papedrs/e86c35f9f72edcec37ac747a6da19cd7f489.pdf:pdf},
+isbn = {9781945626838},
+journal = {EMNLP 2017 - Conference on Empirical Methods in Natural Language Processing, Proceedings},
+mendeley-groups = {11Thesis/Interpretability/Word Vectors/Post-processing,11Thesis/Interpretability/GAN's and VAE},
+pages = {401--411},
+title = {{Rotated word vector representations and their interpretability}},
+year = {2017}
 }
+
 @article{Panchenko2016,
 	abstract = {Word sense embeddings represent a word sense as a low-dimensional numeric vector. While this representation is potentially useful for NLP applications, its interpretability is inherently limited. We propose a simple technique that improves interpretability of sense vectors by mapping them to synsets of a lexical resource. Our experiments with AdaGram sense embeddings and BabelNet synsets showthat it is possible to retrieve synsets that correspond to automatically learned sense vectors with Precision of 0.87, Recall of 0.42 andAUC of 0.78.},
 	author = {Panchenko, Alexander},
@@ -26589,21 +26589,24 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	volume = {27},
 	year = {2014}
 }
-@article{Ribeiro2016,
-	abstract = {Despite widespread adoption, machine learning models remain mostly black boxes. Understanding the reasons behind predictions is, however, quite important in assessing trust, which is fundamental if one plans to take action based on a prediction, or when choosing whether to deploy a new model. Such understanding also provides insights into the model, which can be used to transform an untrustworthy model or prediction into a trustworthy one. In this work, we propose LIME, a novel explanation technique that explains the predictions of any classifier in an interpretable and faithful manner, by learning an interpretable model locally around the prediction. We also propose a method to explain models by presenting representative individual predictions and their explanations in a non-redundant way, framing the task as a submodular optimization problem. We demonstrate the flexibility of these methods by explaining different models for text (e.g. random forests) and image classification (e.g. neural networks). We show the utility of explanations via novel experiments, both simulated and with human subjects, on various scenarios that require trust: deciding if one should trust a prediction, choosing between models, improving an untrustworthy classifier, and identifying why a classifier should not be trusted.},
-	archivePrefix = {arXiv},
-	arxivId = {1602.04938},
-	author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
-	doi = {10.1145/1235},
-	eprint = {1602.04938},
-	file = {:C$\backslash$:/Users/Workk/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Ribeiro, Singh, Guestrin - 2016 - Why Should I Trust You Explaining the Predictions of Any Classifier.pdf:pdf},
-	isbn = {9781450321389},
-	issn = {9781450321389},
-	mendeley-groups = {Report/Explaining predictions,Annotated/Explanations,!Paper 3/task/newsgroups},
-	title = {{"Why Should I Trust You?": Explaining the Predictions of Any Classifier}},
-	url = {http://arxiv.org/abs/1602.04938},
-	year = {2016}
+
+@inproceedings{Ribeiro2016,
+author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+title = {“Why Should I Trust You?”: Explaining the Predictions of Any Classifier},
+year = {2016},
+isbn = {9781450342322},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2939672.2939778},
+doi = {10.1145/2939672.2939778},
+booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+pages = {1135–1144},
+numpages = {10},
+keywords = {explaining machine learning, interpretability, black box classifier, interpretable machine learning},
+location = {San Francisco, California, USA},
+series = {KDD ’16}
 }
+
 @article{Rocktaschel2015,
 	abstract = {While most approaches to automatically recognizing entailment relations have used classifiers employing hand engineered features derived from complex natural language processing pipelines, in practice their performance has been only slightly better than bag-of-word pair classifiers using only lexical similarity. The only attempt so far to build an end-to-end differentiable neural network for entailment failed to outperform such a simple similarity classifier. In this paper, we propose a neural model that reads two sentences to determine entailment using long short-term memory units. We extend this model with a word-by-word neural attention mechanism that encourages reasoning over entailments of pairs of words and phrases. Furthermore, we present a qualitative analysis of attention weights produced by this model, demonstrating such reasoning capabilities. On a large entailment dataset this model outperforms the previous best neural model and a classifier with engineered features by a substantial margin. It is the first generic end-to-end differentiable system that achieves state-of-the-art accuracy on a textual entailment dataset.},
 	archivePrefix = {arXiv},
@@ -26907,16 +26910,23 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Man is to Computer Programmer as Woman is to Homemaker ? Debiasing Word Embeddings}},
 	year = {2016}
 }
+
 @article{Evy2007,
-	author = {Evy, J Oseph P L},
-	file = {::},
-	mendeley-groups = {Thesis/Word Vectors},
-	number = {3},
-	pages = {510--526},
-	title = {{Extracting semantic representations from word co-occurrence statistics : A computational study}},
-	volume = {39},
-	year = {2007}
+abstract = {In a previous article, we presented a systematic computational study of the extraction of semantic representations from the word-word co-occurrence statistics of large text corpora. The conclusion was that semantic vectors of pointwise mutual information values from very small co-occurrence windows, together with a cosine distance measure, consistently resulted in the best representations across a range of psychologically relevant semantic tasks. This article extends that study by investigating the use of three further factors-namely, the application of stop-lists, word stemming, and dimensionality reduction using singular value decomposition (SVD)-that have been used to provide improved performance elsewhere. It also introduces an additional semantic task and explores the advantages of using a much larger corpus. This leads to the discovery and analysis of improved SVD-based methods for generating semantic representations (that provide new state-of-the-art performance on a standard TOEFL task) and the identification and discussion of problems and misleading results that can arise without a full systematic study. {\textcopyright} 2012 Psychonomic Society, Inc.},
+author = {Bullinaria, John A. and Levy, Joseph P.},
+doi = {10.3758/s13428-011-0183-8},
+file = {::},
+issn = {1554351X},
+journal = {Behavior Research Methods},
+keywords = {Corpus statistics,SVD,Semantic representation},
+mendeley-groups = {Thesis/Word Vectors},
+number = {3},
+pages = {890--907},
+title = {{Extracting semantic representations from word co-occurrence statistics: Stop-lists, stemming, and SVD}},
+volume = {44},
+year = {2012}
 }
+
 @book{Hillier,
 	author = {Hillier, Frederick S},
 	file = {::},
@@ -26994,16 +27004,26 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	volume = {5},
 	year = {2009}
 }
+
 @article{Gimenez,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1308.6626},
-	author = {Gimenez, Yanina and Giussani, Guido},
-	eprint = {arXiv:1308.6626},
-	file = {::},
-	mendeley-groups = {Thesis/Representations},
-	number = {1996},
-	title = {{Searching for the core variables in principal components analysis}}
+abstract = {In this article, we introduce a procedure for selecting variables in principal components analysis. It is developed to identify a small subset of the original variables that best explain the principal components through nonparametric relationships. There are usually some noisy uninformative variables in a dataset, and some variables that are strongly related to one another because of their general dependence. The procedure is designed to be used following the satisfactory initial principal components analysis with all variables, and its aim is to help to interpret the underlying structures. We analyze the asymptotic behavior of the method and provide some examples.},
+archivePrefix = {arXiv},
+arxivId = {1308.6626},
+author = {Gimenez, Yanina and Giussani, Guido},
+doi = {10.1214/17-BJPS361},
+eprint = {1308.6626},
+file = {::},
+issn = {01030752},
+journal = {Brazilian Journal of Probability and Statistics},
+keywords = {Informative variables,Multivariate analysis,Principal components,Selection of variables},
+mendeley-groups = {Thesis/Representations},
+number = {4},
+pages = {730--754},
+title = {{Searching for the core variables in principal components analysis}},
+volume = {32},
+year = {2018}
 }
+
 @article{Sebastiani,
 	archivePrefix = {arXiv},
 	arxivId = {arXiv:cs/0110053v1},
@@ -27015,14 +27035,23 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Machine Learning in Automated Text Categorization}}
 }
 @article{Kim,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1703.05192v2},
-	author = {Kim, Taeksoo and Cha, Moonsu and Kim, Hyunsoo and Kwon, Jung and Jiwon, Lee},
-	eprint = {arXiv:1703.05192v2},
-	file = {::},
-	mendeley-groups = {Thesis/Latent variables},
-	title = {{Learning to Discover Cross-Domain Relations with Generative Adversarial Networks}}
+  title = 	 {Learning to Discover Cross-Domain Relations with Generative Adversarial Networks},
+  author = 	 {Taeksoo Kim and Moonsu Cha and Hyunsoo Kim and Jung Kwon Lee and Jiwon Kim},
+  booktitle = 	 {Proceedings of the 34th International Conference on Machine Learning},
+  pages = 	 {1857--1865},
+  year = 	 {2017},
+  editor = 	 {Doina Precup and Yee Whye Teh},
+  volume = 	 {70},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {International Convention Centre, Sydney, Australia},
+  month = 	 {06--11 Aug},
+  publisher = 	 {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v70/kim17a/kim17a.pdf},
+  url = 	 {http://proceedings.mlr.press/v70/kim17a.html},
+  abstract = 	 {While humans easily recognize relations between data from different domains without any supervision, learning to automatically discover them is in general very challenging and needs many ground-truth pairs that illustrate the relations. To avoid costly pairing, we address the task of discovering cross-domain relations given unpaired data. We propose a method based on a generative adversarial network that learns to discover relations between different domains (DiscoGAN). Using the discovered relations, our proposed network successfully transfers style from one domain to another while preserving key attributes such as orientation and face identity.}
 }
+
+
 @article{Zhao2007,
 	archivePrefix = {arXiv},
 	arxivId = {arXiv:1804.08069v1},
@@ -27056,14 +27085,23 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	mendeley-groups = {Thesis/New Folder},
 	title = {{Disentangling Factors of Variation by Mixing Them}}
 }
+
 @article{Le2014a,
-	author = {Le, Quoc and Mikolov, Tomas and Com, Tmikolov Google},
-	file = {::},
-	mendeley-groups = {Thesis/Representations},
-	title = {{Distributed Representations of Sentences and Documents}},
-	volume = {32},
-	year = {2014}
+abstract = {Many machine learning algorithms require the input to be represented as a fixed-length feature vector. When it comes to texts, one of the most common fixed-length features is bag-of-words. Despite their popularity, bag-of-words features have two major weaknesses: They lose the ordering of the words and they also ignore semantics of the words. For example, "powerful," "strong" and "Paris" are equally distant. In this paper, we propose Paragraph Vector, an unsupervised algorithm that learns fixed-length feature representations from variable-length pieces of texts, such as sentences, paragraphs, and documents. Our algorithm represents each document by a dense vector which is trained to predict words in the document. Its construction gives our algorithm the potential to overcome the weaknesses of bag-of- words models. Empirical results show that Paragraph Vectors outperforms bag-of-words models as well as other techniques for text representations. Finally, we achieve new state-of-the-art results on several text classification and sentiment analysis tasks.},
+archivePrefix = {arXiv},
+arxivId = {1405.4053},
+author = {Le, Quoc and Mikolov, Tomas},
+eprint = {1405.4053},
+file = {::},
+isbn = {9781634393973},
+journal = {31st International Conference on Machine Learning, ICML 2014},
+mendeley-groups = {Thesis/Representations},
+pages = {2931--2939},
+title = {{Distributed representations of sentences and documents}},
+volume = {4},
+year = {2014}
 }
+
 @article{Derrac2015,
 	abstract = {Commonsense reasoning patterns such as interpolation and a fortiori inference have proven useful for dealing with gaps in structured knowledge bases. An important difficulty in applying these reasoning patterns in practice is that they rely on fine-grained knowledge of how different concepts and entities are semantically related. In this paper, we show how the required semantic relations can be learned from a large collection of text documents. To this end, we first induce a conceptual space from the text documents, using multi-dimensional scaling. We then rely on the key insight that the required semantic relations correspond to qualitative spatial relations in this conceptual space. Among others, in an entirely unsupervised way, we identify salient directions in the conceptual space which correspond to interpretable relative properties such as 'more fruity than' (in a space of wines), resulting in a symbolic and interpretable representation of the conceptual space. To evaluate the quality of our semantic relations, we show how they can be exploited by a number of commonsense reasoning based classifiers. We experimentally show that these classifiers can outperform standard approaches, while being able to provide intuitive explanations of classification decisions. A number of crowdsourcing experiments provide further insights into the nature of the extracted semantic relations.},
 	author = {Derrac, Joaqu??n and Schockaert, Steven},
@@ -27142,15 +27180,26 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Disentangled Representations for Manipulation of Sentiment in Text}},
 	year = {2017}
 }
-@article{Banner,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1804.07212v2},
-	author = {Banner, Edward and Marshall, Iain J and Wallace, Byron C},
-	eprint = {arXiv:1804.07212v2},
-	file = {:E$\backslash$:/1804.07212.pdf:pdf},
-	mendeley-groups = {11Thesis/Disentanglement/Text},
-	title = {{Learning Disentangled Representations of Texts}}
+
+
+@inproceedings{Banner,
+    title = "Learning Disentangled Representations of Texts with Application to Biomedical Abstracts",
+    author = "Jain, Sarthak  and
+      Banner, Edward  and
+      van de Meent, Jan-Willem  and
+      Marshall, Iain J.  and
+      Wallace, Byron C.",
+    booktitle = "Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing",
+    month = oct # "-" # nov,
+    year = "2018",
+    address = "Brussels, Belgium",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D18-1497",
+    doi = "10.18653/v1/D18-1497",
+    pages = "4683--4693",
+    abstract = "We propose a method for learning disentangled representations of texts that code for distinct and complementary aspects, with the aim of affording efficient model transfer and interpretability. To induce disentangled embeddings, we propose an adversarial objective based on the (dis)similarity between triplets of documents with respect to specific aspects. Our motivating application is embedding biomedical abstracts describing clinical trials in a manner that disentangles the populations, interventions, and outcomes in a given trial. We show that our method learns representations that encode these clinically salient aspects, and that these can be effectively used to perform aspect-specific retrieval. We demonstrate that the approach generalizes beyond our motivating application in experiments on two multi-aspect review corpora.",
 }
+
 @article{Hu2017,
 	abstract = {Generic generation and manipulation of text is challenging and has limited success compared to recent deep generative modeling in visual domain. This paper aims at generating plausible natural language sentences, whose attributes are dynamically controlled by learning disentangled latent representations with designated semantics. We propose a new neural generative model which combines variational auto-encoders and holistic attribute discriminators for effective imposition of semantic structures. With differentiable approximation to discrete text samples, explicit constraints on independent attribute controls, and efficient collaborative learning of generator and discriminators, our model learns highly interpretable representations from even only word annotations, and produces realistic sentences with desired attributes. Quantitative evaluation validates the accuracy of sentence and attribute generation.},
 	archivePrefix = {arXiv},
@@ -27231,15 +27280,7 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Machine learning for targeted display advertising : transfer learning in action}},
 	year = {2014}
 }
-@article{Gilpina,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1806.00069v3},
-	author = {Gilpin, Leilani H and Bau, David and Yuan, Ben Z and Bajwa, Ayesha and Specter, Michael and Kagal, Lalana},
-	eprint = {arXiv:1806.00069v3},
-	file = {:E$\backslash$:/PhD/Papedrs/1806.00069.pdf:pdf},
-	mendeley-groups = {11Thesis/Unsorted,11Thesis/Interpretability/GAN's and VAE},
-	title = {{Explaining Explanations : An Overview of Interpretability of Machine Learning}}
-}
+
 @article{Grgic-Hlaca2017,
 	abstract = {Consider a binary decision making process where a single machine learning classifier replaces a multitude of humans. We raise questions about the resulting loss of diversity in the decision making process. We study the potential benefits of using random classifier ensembles instead of a single classifier in the context of fairness-aware learning and demonstrate various attractive properties: (i) an ensemble of fair classifiers is guaranteed to be fair, for several different measures of fairness, (ii) an ensemble of unfair classifiers can still achieve fair outcomes, and (iii) an ensemble of classifiers can achieve better accuracy-fairness trade-offs than a single classifier. Finally, we introduce notions of distributional fairness to characterize further potential benefits of random classifier ensembles.},
 	archivePrefix = {arXiv},
@@ -27353,33 +27394,29 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {{Retrofitting Word Vectors to Semantic Lexicons}},
 	year = {2015}
 }
-@article{Trifonov2018,
-	author = {Trifonov, Valentin and Ganea, Octavian-eugen and Eth, Z and Potapenko, Anna and Hofmann, Thomas and Eth, Z},
-	file = {::},
-	mendeley-groups = {Thesis/Sparse reps},
-	pages = {200--210},
-	title = {{Learning and Evaluating Sparse Interpretable Sentence Embeddings}},
-	year = {2018}
+@article{Trifonov,
+  title={Learning and Evaluating Sparse Interpretable Sentence Embeddings},
+  author={Valentin Trifonov and Octavian-Eugen Ganea and Anna Potapenko and Thomas Hofmann},
+  booktitle={BlackboxNLP EMNLP},
+  year={2018}
 }
-@article{Murphya,
-	author = {Murphy, Brian and Pratim, Partha and Tom, Talukdar},
-	file = {::},
-	keywords = {1950,coling 2012,december 2012,distributional semantics,inter-,mumbai,neuro-semantics,pages 1933,pretability,proceedings of coling 2012,sparse coding,technical papers,vector-space models,word embeddings},
-	mendeley-groups = {Thesis/Sparse reps},
-	number = {December 2012},
-	pages = {1933--1950},
-	title = {{Learning Effective and Interpretable Semantic Models using Non-Negative Sparse Embedding}}
-}
+
 @article{Mescheder2018,
-	archivePrefix = {arXiv},
-	arxivId = {arXiv:1801.04406v4},
-	author = {Mescheder, Lars and Geiger, Andreas and Nowozin, Sebastian},
-	eprint = {arXiv:1801.04406v4},
-	file = {::},
-	mendeley-groups = {Thesis/Latent variables},
-	title = {{Which Training Methods for GANs do actually Converge ?}},
-	year = {2018}
+abstract = {GAN training for absolutely continuous data and generator distributions. In this paper, we show that the requirement of absolute continuity is necessary: we describe a simple yet prototypical counterexample showing that in the more realistic case of distributions that are not absolutely continuous, unregularized GAN training is not always convergent. Furthermore, we discuss reg- ularization strategies that were recently proposed to stabilize GAN training. Our analysis shows that GAN training with instance noise or zero- centered gradient penalties converges. On the other hand, we show that Wasserstein-GANs and WGAN-GP with a finite number of discriminator updates per generator update do not always converge to the equilibrium point. We discuss these results, leading us to a new explanation for the stability problems of GAN training. Based on our analysis, we extend our convergence results to more general GANs and prove local convergence for simplified gradient penalties even if the generator and data distributions lie on lower dimensional manifolds. We find these penalties to work well in practice and use them to learn high- resolution generative image models for a variety of datasets with little hyperparameter tuning.},
+archivePrefix = {arXiv},
+arxivId = {1801.04406},
+author = {Mescheder, Lars and Geiger, Andreas and Nowozin, Sebastian},
+eprint = {1801.04406},
+file = {::},
+isbn = {9781510867963},
+journal = {35th International Conference on Machine Learning, ICML 2018},
+mendeley-groups = {Thesis/Latent variables},
+pages = {5589--5626},
+title = {{Which training methods for GANs do actually converge?}},
+volume = {8},
+year = {2018}
 }
+
 @article{Cohen1995,
 	author = {Cohen, William},
 	year = {1995},
@@ -27387,4 +27424,28 @@ COPY+PASTING ALL REFERENCES AS A QUICK FIX TO MISSING ENTRIES:
 	title = {Fast Effective Rule Induction},
 	journal = {Twelfth International Conference on Machine Learning: 1995},
 	doi = {10.1016/B978-1-55860-377-6.50023-2}
+}
+@article{Mehrabi2019,
+abstract = {With the widespread use of AI systems and applications in our everyday lives, it is important to take fairness issues into consideration while designing and engineering these types of systems. Such systems can be used in many sensitive environments to make important and life-changing decisions; thus, it is crucial to ensure that the decisions do not reflect discriminatory behavior toward certain groups or populations. We have recently seen work in machine learning, natural language processing, and deep learning that addresses such challenges in different subdomains. With the commercialization of these systems, researchers are becoming aware of the biases that these applications can contain and have attempted to address them. In this survey we investigated different real-world applications that have shown biases in various ways, and we listed different sources of biases that can affect AI applications. We then created a taxonomy for fairness definitions that machine learning researchers have defined in order to avoid the existing bias in AI systems. In addition to that, we examined different domains and subdomains in AI showing what researchers have observed with regard to unfair outcomes in the state-of-the-art methods and how they have tried to address them. There are still many future directions and solutions that can be taken to mitigate the problem of bias in AI systems. We are hoping that this survey will motivate researchers to tackle these issues in the near future by observing existing work in their respective fields.},
+archivePrefix = {arXiv},
+arxivId = {1908.09635},
+author = {Mehrabi, Ninareh and Morstatter, Fred and Saxena, Nripsuta and Lerman, Kristina and Galstyan, Aram},
+eprint = {1908.09635},
+file = {:E$\backslash$:/1908.09635.pdf:pdf},
+title = {{A Survey on Bias and Fairness in Machine Learning}},
+url = {http://arxiv.org/abs/1908.09635},
+year = {2019}
+}
+
+
+@article{Ribeiro2016a,
+abstract = {Understanding why machine learning models behave the way they do empowers both system designers and end-users in many ways: in model selection, feature engineering, in order to trust and act upon the predictions, and in more intuitive user interfaces. Thus, interpretability has become a vital concern in machine learning, and work in the area of interpretable models has found renewed interest. In some applications, such models are as accurate as non-interpretable ones, and thus are preferred for their transparency. Even when they are not accurate, they may still be preferred when interpretability is of paramount importance. However, restricting machine learning to interpretable models is often a severe limitation. In this paper we argue for explaining machine learning predictions using model-agnostic approaches. By treating the machine learning models as black-box functions, these approaches provide crucial flexibility in the choice of models, explanations, and representations, improving debugging, comparison, and interfaces for a variety of users and models. We also outline the main challenges for such methods, and review a recently-introduced model-agnostic explanation approach (LIME) that addresses these challenges.},
+archivePrefix = {arXiv},
+arxivId = {1606.05386},
+author = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+eprint = {1606.05386},
+file = {:E$\backslash$:/1606.05386.pdf:pdf},
+title = {{Model-Agnostic Interpretability of Machine Learning}},
+url = {http://arxiv.org/abs/1606.05386},
+year = {2016}
 }
