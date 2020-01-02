@@ -52,13 +52,12 @@ To give some real examples, in Table \ref{tabTopRanked}, names of documents are 
 \begin{table*}[t]
 	
 	\centering
-	\setlength{\tabcolsep}{8pt}
-	\renewcommand{\arraystretch}{1.2}
-	\footnotesize
+	\setlength{\tabcolsep}{14pt}
+	\renewcommand{\arraystretch}{1}
+	\scriptsize
 	\begin{tabularx}{\textwidth}{l l l}
-		\toprule
 		\textbf{Feature direction} & Highest ranking objects & Highest fine-tuned ranking objects\\
-		\midrule              
+		\toprule             
 		\{steep, climb, slope\}                   & mountain, landscape, national park & ski slope, steep slope, slope                                     \\
 		\{illuminated, illumination, skyscraper\} & building, city, skyscraper         & tall building, office building, large building                    \\
 		\{play, kid, kids\}                       & school, field, fence               & college classroom, classroom, school                              \\
@@ -69,10 +68,10 @@ To give some real examples, in Table \ref{tabTopRanked}, names of documents are 
 		\{spire, belltower, towers\}              & building, arch, house              & bell tower, arch, religious site                                  \\
 		\{stones, moss, worldheritage\}           & landscape, fence, steps            & ancient site, ancient wall, tomb                                  \\
 		\{mosaic, tile, bronze\}                  & building, city, steps              & cathedral, church, religious site     \\
-		\bottomrule
+	
 	\end{tabularx}
 	
-	\caption{Comparing the highest ranking place-type objects in the original and fine-tuned space. \label{tabTopRanked}}
+	\caption{Comparing the highest ranking place-type objects in the original and fine-tuned space}\label{tabTopRanked}
 \end{table*}
 
 
@@ -108,7 +107,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 
 
-%We find that our fine-tuned representation consistently improves depth one and depth three decision trees, sometimes substantially. Additionally, we find that the single depth trees perform well for many classes, often performing on par with, or even better than larger decision trees. \todo{In diagram 1, we give an example of a three depth decision tree from a domain of movie reviews, used to classify the 'Horror' genre}. 
+%We find that our fine-tuned representation consistently improves depth one and depth three decision trees, sometimes substantially. Additionally, we find that the single depth trees perform well for many classes, often performing on par with, or even better than larger decision trees. 
 
 %The remainder of the paper is structured as follows. After presenting related work in the next section, Section \ref{LearningInterpretableDirections} explains how interpretable directions are identified from the initial vector space, while Section \ref{secFinetuning} introduces our proposed fine-tuning method. Finally, in Section \ref{secExperiments} we present our experimental results, showing that decision trees learned from the fine-tuned rankings perform we
 %In our work, we aim to obtain a fine-grained, conceptually sound interpretable representation in an entirely unsupervised way. We follow previous work, where authors \cite{Derrac2015} used an unsupervised method to obtain fine-grained interpretable rankings of entities from a vector space wherein entities correspond to points, and concepts to regions e.g. in a vector space learned from wine tasting notes, a ranking of wines based on how many $'tannins'$ they have. They did this by finding highly separable terms e.g. in a space learned from movie reviews, $'scary'$, $'funny'$,  $'romantic'$, and a corresponding direction for each of these terms. These directions were then clustered together  $'scary'$, $'gory'$, $'terrifying'$ using a simple K-means algorithm. Finally, a ranking was induced for each entity on each cluster (e.g. a ranking of how $'scary'$ each movie is), and used as input to an interpretable classifier, e.g. a Decision Tree classifying the genre of a movie. See Fig 1.
@@ -169,7 +168,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 %Similarly, our feature directions are also labelled with the most closely associated words. 
 %However, while LDA only uses bag-of-words (BoW) representations, our focus is specifically on identifying and improving features that are modelled as directions in semantic spaces. 
 
-%\todo{Say something about the problem of assigning (single) labels to topics; lots of people have looked at doing something more sophisticated then simply describing topics using the top few terms, and these approaches are also relevant to this paper as we might in principle use similar methods to label our directions.}
+
 %where documents are represented by a distribution of topics, and each topic is a distribution over words \cite{Blei2003}.  By simply taking the words with the top probability for a topic, we can easily obtain coherent topics. 
 %removed a bunch of stuff about document classification
 %LDA has been extended by many approaches, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors \cite{rosen2004author} or time stamps \cite{wang2006topics}.
@@ -180,7 +179,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 %\textbf{Vector space models} typically use a form of matrix factorization to obtain low-dimensional document representations. By far the most common approach is to use Singular Value Decomposition \cite{ASI:ASI1}, although other approaches have been advocated as well. 
 %One approach which is of particular interest is non-negative matrix factorization (NMF), in which dimensions correspond to a non-negative combination of words. This is assumed to help interpretability as it means that dimensions can essentially be viewed as topics (i.e.\ they also correspond to scikit-learned sets of words). 
-%\todo{Have you found any references where NMF is used for document representation (we are not so much concerned with word vectors in this paper ...)?} 
+
 %Instead of matrix factorization, another possible strategy is to use a neural network or least squares optimization approach. This is commonly used for generating word embeddings \cite{DBLP:conf/nips/MikolovSCCD13,glove2014}, but can similarly be used to learn representations of text documents \cite{DBLP:journals/corr/DaiOL15,van2016learning,DBLP:conf/sigir/JameelBS17}. Such approaches have the advantage that various forms of domain-specific structured knowledge can easily be taken into account. Some authors have also proposed hybrid models, which combine topic models and vector space models. For example, the Gaussian LDA model represents topics as multivariate Gaussian distributions over a word embedding \cite{DBLP:conf/acl/DasZD15}. Beyond document representation, topic models have also been used to improve word embedding models, by learning a different vector for each topic-word combination \cite{DBLP:conf/aaai/LiuLCS15}.
 
 %\smallskip
@@ -303,7 +302,6 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 %While the Kappa metric was found to perform well, one drawback is that it does not actually evaluate the ranking of the documents induced by $v_w$. To address this, in this paper we will also consider the normalized discounted cumulative gain (NDCG) metric \cite{jarvelin2002cumulated} and, following good results, the accuracy metric. 
 % ???? SHOULD WE TALK ABOUT NDCG? NOT SURE IF RESULTS ARE GOOD ????
 
-% [REMOVED, DIDNT TEST WITH PRIMAL DIRS] We also carried out some initial experiments with other ranking evaluation metrics, such as Spearman's $\rho$, but found NDCG to give the most promising results. %\todo{....} Table \ref{tabKappaNDCG} shows the words with the highest Kappa score and the words with the highest NDCG score in a space of movies. As can be observed, the Kappa score gives a higher prominence to binary properties \todo{add examples}, whereas the NDCG score leads us to select more gradual properties \todo{add examples}.
 
 
 
@@ -358,7 +356,6 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 %Standard dimensionality reduction methods such as singular value decomposition or Multi-Dimensional Scaling (MDS) aim to learn a vector space that preserves, as much as possible, the similarity structure between the considered text documents. However, for our purposes, the quality of the rankings induced by the interpretable directions is more important than the overall similarity structure. 
 
-%For the property \todo{},  we find movies such as \todo{}, which are not actually related to this property. The underlying reason is that these movies are outliers in the considered collection. As a result, their vector representation will also be significantly different from the average, and thus they will tend to receive extreme positions in the rankings induced by the interpretable directions. \todo{Try to find examples (not necessarily from the movies space) of other types of issues with initial vector space that get resolved by the fine-tuning step. Maybe something with two documents that are very similar overall (and thus get a very similar vector representation), but differ in one of the properties, where because of their similarity, they initially get a similar rank, even for the property in which they differ.}
 
 To improve the directions and address these problems, we propose a method for fine-tuning the semantic space representations and corresponding feature directions. First, it is explained how to obtain target rankings from PPMI scores. Then, the neural network that uses these target rankings to improve the vector space and its associated feature-directions is described. The main  idea is to use the BoW representations of the objects as a kind of weak supervision signal: if an object should be ranked highly for a given feature, we would expect the words describing that feature to appear frequently in its description.
 %In particular, from the BoW representations, we first construct target rankings for each of the feature directions. 
@@ -394,19 +391,6 @@ Let us consider a cluster $C_j$ for which we want to determine the target featur
 %-----------------------------------
 \subsection{Fine-Tuning}
 
-%\begin{figure}
-%    \centering
-%    \fbox{
-%    \parbox{0.8\columnwidth}{
-%        \begin{center}
-%            \vspace{50pt}
-%            \todo{add figure}
-%            \vspace{50pt}
-%        \end{center}
-%    }
-%    }
-%    \caption{Neural network for fine-tuning the interpretable directions of a given vector space embedding \label{figNNarchitecture}.}
-%\end{figure}
 
 We now use the target values $\tau(C_j,o_i)$ to fine-tune the initial representations. To this end, we use a simple neural network architecture with one hidden layer. As inputs to the network, we use the initial vectors $o_1,...,o_n \in \mathbb{R}^k$. These are fed into a layer of dimension $l$:
 $$
@@ -427,10 +411,6 @@ The effect of this fine-tuning step is illustrated in the right-most column of T
 
 %Below, we compare a decision tree with fine-tuning to one without, and can see that the one with fine-tuning relies more on a few select important clusters (e.g. 'horror') rather than many separate ones. We can assume that this is because the ranking for 'horror' has become more refined, meaning that specifying the exact boundaries of the ranking required results in a more accurate score. 
 
-
-
-%\todo{Stress importance of this step for making sure that space remains as similar as possible to the initial one.}
-%\todo{Discuss Table \ref{tabTopRanked}.}
 
 
 
@@ -458,9 +438,8 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 %In a similar vein, depth-3 trees can only refer to a few features to make a decision, hence they crucially rely on the availability of high-quality features. If our fine-tuning method improves the quality of the interpretable directions, we should thus expect to see a corresponding improvement in classification performance.
 \begin{table}[t]
 	\centering
-	\setlength{\tabcolsep}{8pt}
-	\begin{tabularx}{\columnwidth}{llll}
-		\toprule
+	\begin{tabular}{llll}
+
 		\textbf{20 Newsgroups}  & F1 D1 & F1 D3 & F1 DN \\
 		\midrule
 		%AWV FT      & 0.45  & 0.43  & 0.38  \\
@@ -478,8 +457,8 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 		FT AWVw  & 0.41  & 0.41  & 0.43  \\
 		AWVw    & 0.38  & 0.40  & 0.43 \\
 		LDA           & 0.40 & 0.37 & 0.35 \\  
-		\bottomrule
-	\end{tabularx}
+
+	\end{tabular}
 	
 	\caption{Results for 20 Newsgroups. \label{tabNGspaces}}
 \end{table}
@@ -503,7 +482,7 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 %\begin{description}
 %\item[Genres] This task consist in predicting which genres have been assigned to a given movie on IMDB, focusing on the 23 most frequent genres. Since each movie can have more than one genre, we consider 23 binary classification problems.
 %\item[Keywords] This task consists in predicting whether a given plot keyword has been assigned to a movie on IMDB, focusing on the 100 most common keywords. Again, we consider binary classification problems.
-%\item[Ratings] Here the task consists in predicting the correct age rating certificate for a movie. This is again treated as a binary classification problem, which consists in predicting e.g.\ whether a movie has ``at least rating 15'', where we use the ranking U/PG $<$ 12/12A $<$ 15 $<$ 18/R18 for UK age certificates and G/PG $<$ PG13 $<$ R/NC-17 for US certificates. \todo{check}
+
 %\end{description}
 
 %\begin{itemize}
@@ -525,12 +504,11 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 \begin{table*}[t]
 	\centering
 	\small
-	\setlength{\tabcolsep}{7pt}
+	\setlength{\tabcolsep}{4.4pt}
 	\renewcommand{\arraystretch}{1.1}
 	\begin{tabularx}{\textwidth}{llllllllllll}
-		\toprule{}
 		\textbf{Movie Reviews} &      &      &      &            &      &      &      &                &      &      &      \\
-		\midrule{}
+		\toprule{}
 		\textbf{Genres}        & D1   & D3   & DN   & \textbf{Keywords}   & D1   & D3   & DN   & \textbf{Ratings}        & D1   & D3   & DN   \\
 		\midrule{}FT MDS        & \textbf{0.57} & \textbf{0.56} & 0.51 & FT MDS     & \textbf{0.33} & \textbf{0.33} & 0.24 & FT MDS         & \textbf{0.49} & \textbf{0.51} & \textbf{0.46} \\
 		MDS           & 0.40 & 0.49 & \textbf{0.52} & MDS        & 0.31 & 0.32 & \textbf{0.25} & MDS            & 0.46 & 0.49 & \textbf{0.46} \\
@@ -538,34 +516,34 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 		AWV           & 0.35 & 0.44 & 0.43 & AWV        & 0.26 & 0.21 & 0.19 & AWV            & 0.44 & 0.48 & 0.41 \\
 		LDA           & 0.52 & 0.51 & 0.45 & LDA        & 0.22 & 0.19 & 0.18 & LDA            & 0.48 & 0.48 & 0.41 \\
 		&      &      &      &            &      &      &      &                &      &      &      \\
-		\toprule
+	
 		\textbf{Place-types}   &      &      &      &            &      &      &      &                &      &      &      \\
-		\midrule{}
+		\toprule{}
 		\textbf{Geonames}      & D1   & D3   & DN   & \textbf{Foursquare} & D1   & D3   & DN   & \textbf{OpenCYC}        & D1   & D3   & DN   \\
 		\midrule{}FT MDS        & 0.32 & 0.31 & 0.24 & FT MDS     & 0.41 & 0.44 & 0.41 & FT MDS         & 0.35 & 0.36 & 0.30 \\
 		MDS           & 0.32 & 0.31 & 0.21 & MDS        & 0.38 & 0.42 & 0.42 & MDS            & 0.35 & 0.36 & 0.29 \\
 		FT AWV        & 0.31 & 0.29 & 0.23 & FT AWV     & 0.39 & 0.42 & 0.41 & FT AWV         & 0.37 & \textbf{0.37} & 0.28 \\
 		AWV           & 0.28 & 0.28 & 0.22 & AWV        & 0.32 & 0.37 & 0.31 & AWV            & 0.33 & 0.35 & 0.26 \\
 		LDA           & \textbf{0.34} & \textbf{0.32} & \textbf{0.27} & LDA        & \textbf{0.55} & \textbf{0.48} & \textbf{0.47} & LDA            & \textbf{0.40} & 0.36 & \textbf{0.31} \\
-		\bottomrule{}
+		
 	\end{tabularx}
 	
-	\caption{The results for Movie Reviews and Place-Types on depth-1, depth-3 and unbounded trees. \label{tabResultsMoviePlaces}}
+	\caption{The results for Movie Reviews and Place-Types on depth-1, depth-3 and unbounded trees\label{tabResultsMoviePlaces}}
 \end{table*}
 \begin{table}[t]
 	\centering
 	\setlength{\tabcolsep}{10pt}
-	\begin{tabularx}{\columnwidth}{llll}
-		\toprule
+	\begin{tabular}{llll}
+		
 		\textbf{IMDB Sentiment} & D1   & D3   & DN   \\
-		\midrule
+		\toprule{}
 		FT PCA         & 0.78 & 0.80 & 0.79 \\
 		PCA            & 0.76 & \textbf{0.82} & \textbf{0.80} \\
 		FT AWV         & 0.72 & 0.76 & 0.71 \\
 		AWV            & 0.74 & 0.76 & 0.71 \\
 		LDA            & \textbf{0.79} & 0.80 & 0.79 \\
-		\bottomrule
-	\end{tabularx}
+		
+	\end{tabular}
 	\caption{Results for IMDB Sentiment. \label{tabSentiment}}
 	
 \end{table}

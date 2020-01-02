@@ -273,7 +273,8 @@ As a general overview of the results,  the disentangled feature embeddings deriv
 
 \begin{table}[]
 \begin{tabular}{llll}
-	& Movies      & Placetypes  & Newsgroups  \\
+	& \textbf{Movies}      & \textbf{Placetypes}  & \textbf{Newsgroups}  \\
+	\toprule
 	U-Embedding (Linear SVM)   & 0.532082959 & 0.630040432 & 0.628171051 \\
 	NNET-U                      & 0.559090895 & 0.563313632 & 0.627577055 \\
 	NNET-B                      & 0.435345945 & 0.597008771 & 0.673618458 \\
@@ -353,8 +354,9 @@ In Table \ref{ch5:topscores} the top NDCG scoring terms are listed for each doma
 \begin{table}[]
 	\scriptsize
 	\begin{tabular}{lll}
-		Movies                                   &                                                   &                                                          \\
+		\textbf{Movies}                                   &                                                   &                                                          \\
 		Unsupervised Embedding                                  & NNET BOW Input                                       & NNET Embedding Input                                             \\
+		\toprule
 		listinfo (mailman, rec)                  & horror (pacing, dialog)                           & listinfo (mailman, rec)                                  \\
 		robomod (mailman, rec)                   & westerns (russian, digitally)                     & robomod (mailman, rec)                                   \\
 		mailing (mailman, listinfo)              & documentary (joke, ultimate)                      & mailing (mailman, listinfo)                              \\
@@ -378,7 +380,8 @@ In Table \ref{ch5:topscores} the top NDCG scoring terms are listed for each doma
 		crime (illegal, violence)                & lapland (alberi, topv333)                         & gibraltar (iow, upon)                                    \\
 		leafs (iris, cyan)                       & sunbathing (underwater, relaxed)                  & song (singing, juni)                                     \\
 
-		Newsgroups                               &                                                   &                                                          \\
+		\textbf{Newsgroups}                               &                                                   &                                                          \\
+		\toprule
 		solid (design, single)                   & vol (vast, foot)                                  & temperature (discoveries, surveys)                       \\
 		struggle (grew, landed)                  & volt (amplifier, soldered)                        & testify (ali, concentrated)                              \\
 		spreading (pursued, tolerant)            & voltage (cautious, scanned)                       & solid (company, sides)                                   \\
@@ -397,7 +400,7 @@ In Table \ref{ch5:topscores} the top NDCG scoring terms are listed for each doma
 		tea (nagornokarabakh, mothers)           & single (entire, prove)                            & volumes (raster, josephus)                               \\
 		quick (careful, usual)                   & oxygen (speeding, extraordinary)                  & voluntary (transmitted, satan)                           \\
 		utterly (violates, sinners)              & widgets (shells, experimentation)                 & volvo (outlet, 302)                                     
-	\end{tabular}\caption{NDCG Top-Scoring directions}\label{ch5:topscores}
+	\end{tabular}\caption{Top-scoring directions measured using NDCG score}\label{ch5:topscores}
 \end{table}
 
 \subsubsection{Common and Unique Terms to Each Embedding}\label{ch5:commonunique}
@@ -413,8 +416,9 @@ Interestingly, there were only 14 unique terms for the unsupervised embedding, a
 \begin{table}[]
 	\scriptsize
 	\begin{tabular}{L{3.8cm}L{3.8cm}L{3.8cm}L{3.8cm}}
-Movies                               &                                             &                                        &                                            \\
+\textbf{Movies}                               &                                             &                                        &                                            \\
 Unique Unsupervised                  & Unique NNET-B                           & Unique NNET-U                & Common                                     \\
+\toprule
 immigrants (immigrant, america)      & unlike (terrific, efforts)                  & carry (recent, hoping)                 & noir (fatale, femme)                       \\
 flashback (flashbacks, present)      & efforts (detail, directors)                 & federal (fbi, agents)                  & martial (kung, fight)                      \\
 bloated (spectacle, overlong)        & impression (throw, truth)                   & possessed (demonic, forces)            & horror (scary, scares)                     \\
@@ -451,8 +455,10 @@ Meanwhile NNET-B seems to have elevated terms that are not relevant to the task.
 \begin{table}[]
 	\scriptsize
 	\centering
+	\setlength\extrarowheight{-0.5pt}
 	\begin{tabular}{llll}
 		Unsupervised - NNET-U          & Unsupervised - NNET-B              & NNET-U - Unsupervised                 & NNET-B - Unsupervised                \\
+		\toprule
 		zoom (cuts, editing)           & zoom (cuts, editing)               & allens (woody, allen)                 & atmosphere (mood, atmospheric)       \\
 		wimpy (villian, instance)      & zombies (zombie, undead)           & animation (animated, cartoon)         & biased (agree, showed)               \\
 		wright (forrest, buyer)        & williams (jim, includes)           & adults (children, adult)              & abomination (insult, horrible)       \\
@@ -520,7 +526,8 @@ The best-performing cluster parameters for  NNET-U resulted in directions that a
 		\scriptsize
 		\centering
 \begin{tabular}{llll}
-	Newsgroups               & Unsupervised Embedding                                     & NNET-B                                                               & NNET-U  \\
+	\textbf{Newsgroups}               & Unsupervised Embedding                                     & NNET-B                                                               & NNET-U  \\
+	\toprule
 	alt.atheism              & (celestial, creationist, psalm, ..., fallacy, baptism)     & (messenger, faiths)                                                    & (homosexuality) \\
 	comp.graphics            & (povray, raytracing)                                       & (pbmplus, sgis, sunview, phigs, pex, colormap, pixmap)                 & (tiff)          \\
 	comp.os.ms-windows.misc  & (winini, systemini, cica)                                  & (cirrus, workgroups, hicolor, ..., keystrokes, sdk)                    & (xlib)          \\
@@ -559,8 +566,11 @@ The reason for the similar performance is likely that at the cost of re-organizi
 	\begin{table}[]
 		\scriptsize
 		\centering
+		\setlength\extrarowheight{-0.5pt}
+		
 		\begin{tabular}{lp{7cm}p{7cm}p{7cm}}
-			Movies      & Unsupervised Embedding                                                       & NNET-B                                                           & NNET-U                                                           \\
+			\textbf{Movies}      & Unsupervised Embedding                                                       & NNET-B                                                           & NNET-U                                                           \\
+			\toprule
 			Action      & (fight, fighting, epic, ..., battle, weapons)                                & (martial)                                                          & (martial, fight, fighting, fights, choreography, choreographed, fighter) \\
 			Adventure   & (animation, animated, anime, voiced, cartoon)                                & (adventure, adventures)                                            & (adventure, spectacle, exciting, ..., seat, boyfriend)                   \\
 			Animation   & (animation, animated, anime, voiced, cartoon)                                & (voiced)                                                           & (voice, voiced, recording, voices, vocal, listening)                     \\
@@ -617,8 +627,8 @@ In conclusion for this section, entities seem to make sense in the case of place
 	\scriptsize
 	\centering
 	\begin{tabular}{lll}
-		Class       & Decision Tree Cluster-Feature                                             & Top 5 Entities                     \\
-                          & Unsupervised                                                                              &                                                                                                     \\
+		\textbf{Class}       & \textbf{Decision Tree Cluster-Feature}                                             & \textbf{Top 5 Entities}                     \\
+		\toprule
 ArtsAndEntertainment       & (snack, vegetable, lemon, pepper, vegetables)                                             & (restaurant, market, asian restaurant, seafood restaurant, japanese restaurant)                     \\
 CollegeAndUniversity       & (annarbor, graduation, eugene, institute, highschool, cal)                                & (college, campus, college campus, university, school)                                               \\
 Food                       & (cuisine)                                                                                 & (restaurant, asian restaurant, japanese restaurant, seafood restaurant, chinese restaurant)         \\
@@ -663,8 +673,10 @@ The results show that in most cases, entities are semantically similar, meaning 
 
 \begin{table}[]
 	\scriptsize
+	\setlength\extrarowheight{-1pt}
 	\begin{tabular}{ll}
-		Cluster Features                           & Top 5 Ranked Entities                                                                  \\
+		\textbf{Cluster Features}                           & \textbf{Top 5 Ranked Entities}                                                                  \\
+		\toprule
 		Unsupervised Embedding                     &                                                                                        \\
 		bass (drums, tom)                          & (indie theater, jazz club, music studio, music venue, rock club)                       \\
 		arrival (ticket, departure)                & (taxiway, airport tram, airport, aircraft cabin, airport gate)                         \\
@@ -865,7 +877,7 @@ We base our experiments on the movie reviews domain. To collect the terms that a
 
 \subsection{Software, Architecture and Settings}
 
-To implement the denoising auto-encoders, the Keras\footnote{\href{https://keras.io/}{Keras}}  library is used. As in Chapter \ref{ch3}, scikit-learn~\cite{Pedregosa2012} is used for the SVM implementation. All of the code and data for this Chapter is available on GitHub\footnote{\url{https://github.com/eygrr/RulesFromAuto-encoders}}. A 200 dimensional MDS space is used as the input to our stack of auto-encoders, as this performed the best in Chapter \ref{ch3}. The network is trained using stochastic gradient descent and the mean squared error loss function. For the encoders and decoders, the tanh activation function is used. For the first auto-encoder,  the same size layer as the input is maintained. Afterwards, the hidden representation size is halved each time it is used  as input to another auto-encoder, and this process is repeated three times, resulting in four new hidden representations $\{Input: 200, Hidden: 200, 100, 50, 25\}$. The input space is corrupted using  Gaussian noise with a standard deviation of 0.6 each time. This was chosen as higher noise values seemed to result in meaningless directions in initial results, but lesser noise values did not result in much change. As the lower layers are closer to the bag-of-words representation and are higher dimensional, the Kappa scores are higher in earlier spaces, as it is easier to separate entities. We address this in the clusters by setting the  score threshold $T$ using Kappa score  such that the number of terms we choose from is twice the number of dimensions in the space. Similarly, we set the threshold for the frequency of the words such that 12,000 directions are available to assign to the cluster centres in every space. 
+To implement the denoising auto-encoders, the Keras\footnote{\href{https://keras.io/}{Keras}}  library is used. As in Chapter \ref{ch3}, scikit-learn is used for the SVM implementation. All of the code and data for this Chapter is available on GitHub\footnote{\url{https://github.com/eygrr/RulesFromAuto-encoders}}. A 200 dimensional MDS space is used as the input to our stack of auto-encoders, as this performed the best in Chapter \ref{ch3}. The network is trained using stochastic gradient descent and the mean squared error loss function. For the encoders and decoders, the tanh activation function is used. For the first auto-encoder,  the same size layer as the input is maintained. Afterwards, the hidden representation size is halved each time it is used  as input to another auto-encoder, and this process is repeated three times, resulting in four new hidden representations $\{Input: 200, Hidden: 200, 100, 50, 25\}$. The input space is corrupted using  Gaussian noise with a standard deviation of 0.6 each time. This was chosen as higher noise values seemed to result in meaningless directions in initial results, but lesser noise values did not result in much change. As the lower layers are closer to the bag-of-words representation and are higher dimensional, the Kappa scores are higher in earlier spaces, as it is easier to separate entities. We address this in the clusters by setting the  score threshold $T$ using Kappa score  such that the number of terms we choose from is twice the number of dimensions in the space. Similarly, we set the threshold for the frequency of the words such that 12,000 directions are available to assign to the cluster centres in every space. 
 
 \subsection{Qualitative Evaluation of Induced Clusters}
 
@@ -874,15 +886,15 @@ In Table \ref{ch5:labelcomparison}, we illustrate the differences between cluste
 Both auto-encoders model increasingly general properties, but the properties obtained when using denoising auto-encoder properties are more general. For example, the normal auto-encoder captures properties like ``Horror" and ``Thriller", but does not capture more general properties like ``Society" and ``Relationship". Further, ``Gore"  is the  most similar to the directions ``Zombie" and ``Zombies" in Layer 1, the most similar directions of ``Budget" and ``Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the more general idea of a "Horror" movie, rather than a "Zombie" movie, by being grouped with directions that are more relevant to all horror movies rather than only some horror movies. 
 
 \begin{sidewaystable}
-	\label{ch5:labelcomparison}
-	\caption{A comparison between the first layers and the fourth layers of two different kinds of auto-encoders.}
 	\vspace{5 mm}
-	\begin{adjustbox}{center}
-		\begin{tabular}{|ll|ll|}
-			\hline
+	
+	\setlength\extrarowheight{-3pt}
+
+		\begin{tabular}{llll}
+
 			\bf Standard Auto-encoder &   & \textbf{Denoising Auto-encoder} &   \\
-			\bf Layer 1  \bf   & \bf Layer 4 \bf &  \textbf{Layer 1}  \bf   & \bf Layer 4 \bf \\
-			\hline
+			 Layer 1     &  Layer 4  &  Layer 1   &  Layer 4 \\
+\toprule
 			horror: terror, horrific & horror: victims, nudity  & gore: zombie, zombies & society: view, understand \\
 			thriller: thrillers, noir & documentary: perspective, insight  & jokes: chuckle, fart & emotional: insight, portrays \\
 			comedies: comedy, timing & blood: killing, effects   & horror: terror, horrific & stupid: flick, silly  \\
@@ -903,10 +915,11 @@ Both auto-encoders model increasingly general properties, but the properties obt
 			digital: dolby, definition & interviews: included, showed & laughing: outrageous, mouthed & study: details, detail \\
 			gory: graphic, gruesome & comedic: comedies, humorous & relationships: ensemble, interactions & land: water, super \\
 			romantic: handsome, attractive & emotionally: central, relationships & creepy: mysterious, eerie & chemistry, comedies, comedic \\
-			
-			\hline 
+		
 		\end{tabular}
-	\end{adjustbox}
+	\caption{A comparison between the first layers and the fourth layers of two different kinds of auto-encoders.}
+	\label{ch5:labelcomparison}
+
 \end{sidewaystable}
 
 \subsection{Qualitative Evaluation of Induced Symbolic Rules}

@@ -350,13 +350,16 @@
 
 \thispagestyle{plain}
 
-\vspace*{6ex}
-
 \textbf{\large Declaration}
 
-This work has not previously been accepted in substance for any degree and is not concurrently submitted in candidature for any degree.\\[2ex]
+This thesis is the result of my own independent work, except where otherwise stated,
+and the views expressed are my own. Other sources are acknowledged by explicit references.
+The thesis has not been edited by a third party beyond what is permitted by
+Cardiff University's Use of Third Party Editors by Research Degree Students Procedure.\\[2ex]
 Signed \dotfill \ (candidate) \hspace*{10em}\\[1ex]
 Date\ \ \ \ \ \dotfill \hspace*{18em}
+
+\vfill
 
 \vfill
 
@@ -385,21 +388,13 @@ Date\ \ \ \ \ \dotfill \hspace*{18em}
 
 \vfill
 
-\cleardoublepage
+\vspace*{3ex}
 
-\thispagestyle{plain}
-\ \vfill{\small
-Copyright \copyright\ 2011 Name Lastname.\\
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.2 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A
-copy of the license is included in the section entitled ``GNU Free
-Documentation License''.}\\[3.5ex]
-A copy of this document in various transparent and opaque
-machine-readable formats and related software is available at
-\url{http://yourwebsite}.
-\cleardoublepage
+\textbf{\large Word Count}  \ \ \ \ \dotfill \hspace*{18em}
+
+(Excluding Abstract, acknowledgements, declarations, contents pages, appendices, tables,
+diagrams and figures, references, bibliography, footnotes and endnotes)
+
 
 
 \ \vspace*{1.11cm}
@@ -524,6 +519,12 @@ Overall, this thesis quantitatively and qualitatively validates  that disentangl
 
 \chapter*{Acknowledgements}
 
+It has been a long journey from the start of this PhD to the end of it, and I owe almost all of my success to my supervisor Steven Schockaert, and my unofficial co-supervisor Ondrej Kuzelka. I would like to thank them especially for all their guidance and their many ideas about the work undertaken in the thesis.
+
+I would also like to thank my colleagues at Cardiff University, who provided a community to engage with when I needed an audience for my presentations, or to discuss my thoughts about the work. It is certainly in large part thanks to them that I was able to be where I am today.
+
+My deepest thanks go to my parents, who were able to support me through the final years of my PhD. Finally I thank God, who guided me when I needed it most.
+
 \tableofcontents
 
 \input{listofpublications.tex}
@@ -532,9 +533,9 @@ Overall, this thesis quantitatively and qualitatively validates  that disentangl
 
 \listoftables
 
-\listofalgorithms
+%\listofalgorithms
 
-\input{acronyms.tex}
+%\input{acronyms.tex}
 
 \mainmatter
 %begin each chapter chapter1.tex by \Chapter{chapter1}, for example, then the sections and so on...
@@ -545,12 +546,7 @@ Overall, this thesis quantitatively and qualitatively validates  that disentangl
 \input{chapter5}
 \input{chapter4}
 \input{chapter6}
-\input{appendix}
-\backmatter
-
-\def\baselinestretch{1}\normalfont
-\input{fdl.tex}
-\def\baselinestretch{1.24}\normalfont
+\backmatter 
 
 \bibliographystyle{plain}
 \bibliography{bibliography}
