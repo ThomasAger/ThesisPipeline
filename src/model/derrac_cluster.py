@@ -55,14 +55,14 @@ class DerracCluster(Method):
         if self.top_dir_amt == self.cluster_amt:
             centroid_ids = range(self.cluster_amt)
         else:
-            for c in range(1, self.cluster_amt):
+            for c in range(1, self.cluster_amt): # For each cluster
                 max_values = []
-                for i in range(self.top_dir_amt):
+                for i in range(self.top_dir_amt): # For each word direction
                     cos_vals = []
-                    for j in range(len(centroid_ids)):
+                    for j in range(len(centroid_ids)): # Get the similarity between the word direction and each of the cluster directions
                          cos_vals.append(cosSim(self.features[i], self.features[centroid_ids[j]]))
-                    max_values.append(np.max(cos_vals))
-                min_val_id = py.aminId(max_values)
+                    max_values.append(np.max(cos_vals)) # Add the maximum similarity among the clusters  to max_values
+                min_val_id = py.aminId(max_values) # Get the minimum
                 centroid_ids.append(min_val_id)
                 print(c+1, "/", self.cluster_amt, self.feature_names[min_val_id], max_values[min_val_id])
 

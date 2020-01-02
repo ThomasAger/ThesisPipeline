@@ -11,7 +11,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
 from util import py
-
+from sklearn.utils.class_weight import compute_class_weight
 import pydotplus as pydot
 from sklearn import tree
 
@@ -81,5 +81,8 @@ class DecisionTree(Method.ModelMethod):
                 orig_graph = pydot.graph_from_dot_file(self.tree_image_fn + self.class_names[i] + ".dot")
                 orig_graph.write_png(self.tree_image_fn + self.class_names[i] + ".png")
         super().process()
+import numpy as np
 
-
+if __name__ == '__main__':
+    y = [0, 0, 0, 0, 1]
+    print(compute_class_weight('balanced', np.unique(y), y))

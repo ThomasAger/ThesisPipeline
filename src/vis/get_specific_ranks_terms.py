@@ -42,10 +42,9 @@ for z in range(len(data_types)):
         common.append(common_sorted[i].split()[0].strip())
     print("worked")
     for g in range(len(rank_fns[z])):
+
         print(g)
-        top_words = io.import1dArray(rank_fns[z][g] + "words.txt")
-        all_words = io.read_csv(word_fns[z][g], dtype=str).index.values
-        all_words = vis.sortByScoreWordArrays(top_words, all_words)
+        all_words = np.load(rank_fns[z][g] + "words.npy")
         ranks = np.load(rank_fns[z][g] +"rank.npy")
         if len(ranks) != len(all_words):
             ranks = ranks.transpose()

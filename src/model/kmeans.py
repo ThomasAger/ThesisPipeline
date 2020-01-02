@@ -41,7 +41,6 @@ class KMeansCluster(Method):
         self.cluster_names.value = cluster_names
         self.centroids.value = cluster_centers
 
-
         self.cluster_dirs.value = []
         for i in range(len(self.feature_names)):
             self.cluster_dirs.value.append([])

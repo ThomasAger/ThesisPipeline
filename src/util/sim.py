@@ -14,6 +14,9 @@ def getXMostSimilarIndex(term, terms_to_match, terms_to_ignore, amt):
             if dt.checkIfInArray(terms_to_ignore, t) is False:
                 s = getSimilarity(term, terms_to_match[t])
                 if s > highest_term and dt.checkIfInArray(most_similar_term_indexes, t) is False and s <= 0.99:
+                    if s > 0.95:
+                        print("It's big enough, continuing")
+                        break
                     highest_term = s
                     term_index = t
         most_similar_term_indexes.append(term_index)
