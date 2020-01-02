@@ -11,6 +11,7 @@ cluster_fn3 = "../../data_paper\experimental results\chapter 5/"+data_types[2]+"
 cluster_fn4 = "../../data_paper\experimental results\chapter 5/"+data_types[3]+"/cluster/" + "num_stw_num_stw_200_MDS_ndcg_1000_10000_0_rank_50_100_0.0_k-means++_200_kmeans.txt"
 cluster_fn5 = "../../data_paper\experimental results\chapter 5/"+data_types[4]+"/cluster/" + "20_Activ_tanh_Dropout_0.5_Hsize_[1000, 100]_mlnrep_10_1000_0.0_k-means++_200_kmeans.txt"
 cluster_fn6 = "../../data_paper\experimental results\chapter 5/"+data_types[5]+"/cluster/" + "300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep_50_1000_0.0_k-means++_200_kmeans.txt"
+
 rank_fn1 = "_best_100_rank.npy"
 rank_fn2 = "_best_200_rank.npy"
 rank_fn3 = "_best_50_rank.npy"
@@ -28,12 +29,13 @@ for z in range(len(data_types)):
     clusters = io.import1dArray(cluster_fns[z])
     ranks = np.load(cluster_fns[z][:-4] + rank_fns[z])
     final_labels = []
-
+    final_labels_pretty = []
     for i in range(len(labels)):
         if len(labels[i]) == 0:
             print("Empty label")
             exit()
         final_labels.append(labels[i][-1].strip())
+        final_labels_pretty.append(vis.clusterPretty(labels[i][-1].strip().split()))
     ids = []
     for j in range(len(final_labels)):
         for i in range(len(clusters)):
@@ -41,9 +43,13 @@ for z in range(len(data_types)):
                 ids.append(i)
                 break
     ranks_to_get = ranks[ids]
-
+    top_5_entities = []
     all_top_entities = []
     for i in range(len(ranks_to_get)):
         all_top_entities.append(np.asarray(list(reversed(entities[z][np.argsort(ranks_to_get[i])]))))
         print(final_labels[i], all_top_entities[i][:5])
+        top_5_entities.append(vis.clusterPretty(all_top_entities[i][:5]))
     np.save(cluster_fns[z][:-4] + "top_entities.npy",all_top_entities)
+    io.write_csv(cluster_fns[z][:-4] + "top_5_entities.csv",
+                 ["ranks"],
+                 [top_5_entities], key=final_labels_pretty)

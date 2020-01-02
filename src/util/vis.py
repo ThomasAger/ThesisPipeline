@@ -6,10 +6,13 @@ def sortByScoreWordArrays(array_to_sort, word_array):
     sorted_array = []
     for i in range(len(word_array)):
         for j in range(len(array_to_sort)):
-            if array_to_sort[j] == word_array[i]:
+            if array_to_sort[j].strip().lower() == word_array[i].strip().lower():
                 sorted_array.append(word_array[i])
 
                 break
+    if len(sorted_array) == 0:
+        print("Cannot sort, does not match")
+        exit()
     return sorted_array
 
 def getPairs(*params):
@@ -83,10 +86,13 @@ def clusterPretty(word_array):
     word_output = "("
     for k in range(len(word_array)):
         word_array[k] = str(word_array[k])
-        if k != len(word_array) - 1 or k == 0:
-            word_output += word_array[k] + ", "
+        if len(word_array) == 1:
+            word_output += word_array[k] + ")"
         else:
-            word_output = word_output + word_array[k] + ")"
+            if k != len(word_array) - 1 or k == 0:
+                word_output += word_array[k] + ", "
+            else:
+                word_output = word_output + word_array[k] + ")"
 
     return word_output
 

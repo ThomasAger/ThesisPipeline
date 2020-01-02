@@ -24,6 +24,10 @@
 
 
 \makeatletter
+% Copy pasted junk
+
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
 
 %Graphics
 %\usepackage{graphicx}
@@ -31,7 +35,18 @@
 \usepackage{caption}
 \usepackage{footmisc}
 \usepackage{paralist}
+\usepackage{array}
+\usepackage{epsf}
+\usepackage{amsmath}
+\usepackage{rotating}
+\usepackage{listings}
+\usepackage{varwidth}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{listings}
 \usepackage{amsthm}
+\usepackage{longtable}
+\usepackage{afterpage}
 \usepackage{subfig}
 %\usepackage{algorithm}
 %\usepackage{rotating}
@@ -58,6 +73,11 @@
 \def\baselinestretch{1.5}
 \parindent0cm
 \parskip1.5ex\@plus.7ex\@minus.1ex\relax
+\lstset{
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+	keepspaces=true,
+}
 
 %Acronyms
  \usepackage{acronym}
@@ -197,7 +217,6 @@
 
 % Graphics
 \usepackage[dvips]{graphicx}
-\usepackage[usenames,dvipsnames]{color}
 \usepackage{rotating}
 \usepackage{psfrag}
 \usepackage{epic}
@@ -312,14 +331,14 @@
 
 \begin{center}
 \vspace*{3ex}
-\textbf{\Huge Title line 1}\\[2ex]
-\textbf{\Huge Title line 2}\\[12ex]
+\textbf{\Huge Disentangling low-dimensional vector space representations of text documents}\\[2ex]
+%\textbf{\Huge Title line 2}\\[12ex]
 \textbf{\large A thesis submitted in partial fulfilment}\\[1ex]
 \textbf{\large of the requirement for the degree of Doctor of
   Philosophy}\\[16ex]
-\textbf{\LARGE Name M. Lastname}\\
+\textbf{\LARGE Thomas J. Ager}\\
 \vfill
-\textbf{\LARGE July 2011}\\
+\textbf{\LARGE January 2020}\\
 \vfill
 \textbf{\LARGE Cardiff University}\\[1ex]
 \textbf{\LARGE School of Computer Science \& Informatics}\\[4ex]
@@ -331,13 +350,16 @@
 
 \thispagestyle{plain}
 
-\vspace*{6ex}
-
 \textbf{\large Declaration}
 
-This work has not previously been accepted in substance for any degree and is not concurrently submitted in candidature for any degree.\\[2ex]
+This thesis is the result of my own independent work, except where otherwise stated,
+and the views expressed are my own. Other sources are acknowledged by explicit references.
+The thesis has not been edited by a third party beyond what is permitted by
+Cardiff University's Use of Third Party Editors by Research Degree Students Procedure.\\[2ex]
 Signed \dotfill \ (candidate) \hspace*{10em}\\[1ex]
 Date\ \ \ \ \ \dotfill \hspace*{18em}
+
+\vfill
 
 \vfill
 
@@ -366,28 +388,20 @@ Date\ \ \ \ \ \dotfill \hspace*{18em}
 
 \vfill
 
-\cleardoublepage
+\vspace*{3ex}
 
-\thispagestyle{plain}
-\ \vfill{\small
-Copyright \copyright\ 2011 Name Lastname.\\
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.2 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A
-copy of the license is included in the section entitled ``GNU Free
-Documentation License''.}\\[3.5ex]
-A copy of this document in various transparent and opaque
-machine-readable formats and related software is available at
-\url{http://yourwebsite}.
-\cleardoublepage
+\textbf{\large Word Count}  \ \ \ \ \dotfill \hspace*{18em}
+
+(Excluding Abstract, acknowledgements, declarations, contents pages, appendices, tables,
+diagrams and figures, references, bibliography, footnotes and endnotes)
+
 
 
 \ \vspace*{1.11cm}
 \markboth{Dedication}{}
 \begin{flushright}
-\textbf{\large To People you care}\\
-\textbf{\large for their patience and support.}
+\textbf{\large To my parents.}\\
+\textbf{\large for their invaluable and unwavering support.}
 \end{flushright}
 \newpage
 \markboth{}{}
@@ -396,13 +410,120 @@ machine-readable formats and related software is available at
 
 \chapter*{Abstract}
 
-We produce interpretable representations, and demonstrate their applicability in interpretable classifiers. Our approach is model-agnostic, given a similarity-based representation, we are able to produce a representation in terms of domain knowledge. We evaluate the interpretability of our representation and provide examples of interpretable classifiers with our representation.
+%%%%%%%%%%%%%%%%% OLD WORK
+
+%NESY 
+%Vector space embeddings can be used as a tool for learning semantic relationships from unstructured text documents. Among others, earlier work has shown how in a vector space of entities (e.g. different movies) fine-grained semantic relationships can be identified with directions (e.g. more violent than).
+
+%IJCAI 
+%In many applications, it is important for classification models to be interpretable. Unfortunately, however, prominent While dimensionality reduction methods could be used in principle, the resulting dimensions would typically not be interpretable. To address this shortcoming, we propose a method to learn interpretable features from a given low-dimensional vector space representation.
+
+%CONLL
+%In this paper we consider semantic spaces consisting of objects from some particular domain (e.g.\ IMDB movie reviews). and 
+
+%%%%%%%%%%%%%%%%% OLD WORK
+
+
+% General problem introduction, why it matters, what past work did, what the results will achieve
+
+% Most vector spaces are entangled
+
+
+% By the way, if you use the word disentangled in the title of your thesis, you should explain this term in the abstract.
+
+% Broader context
+
+%This thesis is concerned with vector space representations of  documents in a given domain (e.g. movies in a domain of movie reviews). Such representations are often learned from text documents that describe these entities. 
+In contrast to traditional document representations such as bags-of-words, vector space representations that are currently most popular tend to be lower-dimensional. This has important advantages, e.g. making the representation of a given document less dependent on the exact words that are used in its description. However, this comes at an important cost, namely that the representation is  "entangled", meaning that the features of the representation are not individually meaningful or interpretable. The main aim of this thesis is to address this problem  by disentangling   vector spaces into representations that are composed of individual, important and meaningful features in the given domain. In a domain of IMDB movie reviews, where each document is a review, the disentangled feature representation would be separated into features that describe how "Scary", "Romantic", ..., "Comedic",  the  movie is. This thesis builds on an initial approach introduced by  Derrac \cite{Derrac2015}, where it was  observed that low-dimensional vector space representations of documents  often model important features of the domain as directions. The method begins by obtaining direction vectors for all terms  using a linear classifier to find a hyper-plane that separates entities that have a term and do not have a term. Then, from each hyper-plane the orthogonal vector is taken as a direction that goes from documents that least have the word (as they are furthest from the hyper-plane on the negative side) to documents that most have it (as they are furthest from the hyper-plane on the positive side). The importance of these terms is determined by how well the linear classifier performs on a standard classification metric, e.g. accuracy, which approximates how linearly separable the entities are that contain the term in the vector space. The most important terms are taken, and documents are ranked on these directions by calculating the dot product between the orthogonal vector to the hyper-plane and each document vectors. This results in  a value is obtained that corresponds to how  far up documents are on the direction, enabling    documents to be ranked on how much they 'have' a particular meaningful feature,  e.g.\ movies can be ranked on how "Scary" they are. %In terms of application, a representation like this can be used in entity oriented search engines, recommendation systems, among others, or perhaps even be used as input to a simple classifier as an alternative to a hard to decipher  neural networks. 
+
+% Contribution 1
+
+The work by Derrac \cite{Derrac2015} obtained semantic features from Multi-Dimensional Scaling (MDS) document embeddings and validated their work by classifying entities using a rule-based classifier (FOIL), resulting in rules of the form "\textbf{IF} \textit{x} is more scary than most horror films \textbf{THEN} \textit{x} is a horror film.". The first main contribution of this thesis is a deeper investigation and improvement of this method, in particular by  experimentally validating that the  features derived from the initial embeddings are clear and semantic across a variety of unsupervised document embedding models and domains. Variants of the method are introduced that are shown to improve  performance, and the results are  quantitatively tested using low-depth decision trees.
+
+% Contribution 2
+
+Neural network architectures have advanced to the state-of-the-art  in many tasks, following the idea that their hidden layers can be viewed as document embeddings, the second main contribution of the work is in deriving semantic features from the hidden layers of neural networks. In particular, a qualitative analysis of two kinds of neural networks is conducted, feed-forward networks and stacked auto-encoders. Auto-encoders are  stacked by using their hidden-layer as the input  to another auto-encoder. Characteristics of  learned feed-forward networks are identified, in particular that they can learn higher-quality representations of  features that are relevant to the considered classification problem. In the case of auto-encoders, it is found  that as  auto-encoders are  stacked, increasingly abstract features can be derived from them. For example, in the initial auto-encoder layers, features like "Horror" and "Comedy" can be separated well by the linear classifier, meanwhile in the latter layers features like "society" and "relationships" are easy to separate. After identifying directions that model important features of documents in each stacked auto-encoder, symbolic rules are induced that relate specific features to more general ones. These rules are interesting, as they can be used to produce a domain theory of the domain where abstract terms are explained in terms of specific ones, for example:
+
+\begin{align}\label{rule1}\texttt{IF Emotions  AND  Journey THEN Adventure}\end{align} 
+
+% Contribution 3
+
+ In addition to introducing variants of the method in \cite{Derrac2015}, this thesis also introduces an additional post-processing step for improving disentangled feature representations by fine-tuning the original embedding to prioritize faithfully modelled directions. Methods for learning document embeddings  are mostly aimed at modelling similarity. It is found  that there is an inherent trade-off between capturing similarity and faithfully modelling features as directions. Following this observation, a simple method to fine-tune  document embeddings is proposed, with the aim of improving the quality of the feature directions obtained from them. Crucially, this  method is also fully unsupervised, requiring only a bag-of-words representation of the objects as input.  In particular,  clusters of terms are identified that refer to salient properties of the considered domain, and a simple neural network model is used to learn a new representation in which each of these properties is more faithfully modelled as a direction. It is found that in most cases this method improves the ranking of entities, and results in increased performance when disentangled feature representations are used as input to classifiers. %As in Chapter \ref {ch3}, the usefulness of this approach is validated using low-depth decision trees, where it is found that in most cases performance improves.
+
+
+%The objective of this thesis is to improve how such semantically meaningful feature directions can be learned from a given  document embedding.  This thesis concerns itself with application of this methodology to a variety of document embeddings. These semantic features are beneficial for a variety of purposes,  One important examples is the fact that they provide a useful inductive bias.  they may provide insight into what the neural network is doing correctly or incorrectly in its learning process. 
+
+ %The how semantic these features are is evaluated using a document classification task that classifies decision trees with a limited depth. This limitation verifies that the feature representation has captured features that correspond to domain knowledge, as if the classifier can perform well with a low amount of features those features must be semantic. 
+
+
+
+% Paragraph focusing on how methods can be useful for your applications
+
+Overall, this thesis quantitatively and qualitatively validates  that disentangled feature representations of meaningful features can be derived from low-dimensional vector spaces of documents, across a variety of domains and document embedding models.  New variants of the method introduced by Derrac \cite{Derrac2015} are evaluated and found to be effective. Neural networks are investigated, and in the case of  stacked auto-encoders,  features become more abstract as auto-encoders are stacked, and a method to obtain a domain theory that links specific properties to more general ones is introduced. In the case of feed-forward networks, a variety of interesting characteristics are observed, in particular that feed-forward networks make features that are more relevant to the task more separable. Finally, a new method is introduced to fine-tune existing document embeddings such that their features are more meaningful. 
+
+
+
+%This won't be clear, as you haven't actually explained that the semantic features allow you to derive a more interpretable, feature-based representation of the entities.
+
+
+
+
+%This sentence is not clear. I think you are talking about existing approaches to learn disentangled neural network representations (like InfoGAN), but that won't be clear to the reader + probably this is too much detail for the abstract anyway. 
+
+% features like these are usually obtained by using a specialized learning procedure, e.g.\ by enforcing sparsity constraints or orthogonality between features, and learned from the original text data.
+
+ 
+
+%Can this method be applied to a variety of representations?
+%Can this method be applied to more domains?
+%Does this method result in a representation of clear semantic features?
+%Can these semantic features be used to form a useful alternative representation?
+%Are the features meaningful qualitatively in a variety of domains and for a variety of representations?
+
+%The work in Chapter \ref{ch3} addresses these questions, and introduces variants to their method that result in  better performance on tasks.
+
+%There are a variety of approaches to obtaining vector space representations where features are clear and semantic. 
+
+%simple models such as (small) decision trees cannot readily be applied to text documents due to the size of the underlying feature space. 
+ 
+
+  
+
+
+
+
+
+% Disentanglement and why it matters
+
+% Existing disentanglement methods and why they dont fit the gap
+
+% What we actually did to solve this problem 1st chapter
+
+% What the results were 1st chapter
+
+% What we did 2nd
+
+% Results 2nd
+
+% What we did 3rd
+
+% Results 3rd
+
+% Overall conclusions
+
+%Vector space representations of documents can be re-organized  such that their dimensions correspond to clear semantic features. Furthermore, these disentangled representations can be used to provide a useful inductive bias to classifiers, and as the features are disentangled, they can be used to qualitatively investigate the hidden layers of neural networks to gain valuable insights into how they represent documents. 
 %\def\baselinestretch{1}\normalfont
 
 \def\baselinestretch{1.5}\normalfont
 
 
 \chapter*{Acknowledgements}
+
+It has been a long journey from the start of this PhD to the end of it, and I owe almost all of my success to my supervisor Steven Schockaert, and my unofficial co-supervisor Ondrej Kuzelka. I would like to thank them especially for all their guidance and their many ideas about the work undertaken in the thesis.
+
+I would also like to thank my colleagues at Cardiff University, who provided a community to engage with when I needed an audience for my presentations, or to discuss my thoughts about the work. It is certainly in large part thanks to them that I was able to be where I am today.
+
+My deepest thanks go to my parents, who were able to support me through the final years of my PhD. Finally I thank God, who guided me when I needed it most.
 
 \tableofcontents
 
@@ -412,9 +533,9 @@ We produce interpretable representations, and demonstrate their applicability in
 
 \listoftables
 
-\listofalgorithms
+%\listofalgorithms
 
-\input{acronyms.tex}
+%\input{acronyms.tex}
 
 \mainmatter
 %begin each chapter chapter1.tex by \Chapter{chapter1}, for example, then the sections and so on...
@@ -422,14 +543,10 @@ We produce interpretable representations, and demonstrate their applicability in
 \input{chapter2}
 \input{chapter25}
 \input{chapter3}
-\input{chapter4}
 \input{chapter5}
-\input{appendix}
-\backmatter
-
-\def\baselinestretch{1}\normalfont
-\input{fdl.tex}
-\def\baselinestretch{1.24}\normalfont
+\input{chapter4}
+\input{chapter6}
+\backmatter 
 
 \bibliographystyle{plain}
 \bibliography{bibliography}

@@ -1,4 +1,4 @@
-\chapter{Fine-tuning Vector Spaces to Improve Their Directions}\label{ch3}
+\chapter{Modelling Semantic Features in Fine-Tuned Vector Spaces}\label{ch5}
 
 
 \section{Introduction}
@@ -24,7 +24,7 @@
 
 % General overview of the problem and motivations
 
-Chapter \ref{chapter3} introduced a method to obtain  feature-directions from off-the-shelf vector-spaces, as well as methods to test the quality of these feature-directions and their associated feature-rankings. Then, this method was applied in Chapter \ref{chapter5} to obtain feature-directions from the layers of neural networks. However, feature-directions obtained from either of these vector spaces can sometimes be sub-optimal. For example in the case of neural network auto-encoders, it was found that the quality of feature-directions in a auto-encoder representation degrade from a maximal Kappa score of 0.52 in the initial layer of to   a maximal Kappa score of 0.18 on the 5th layer (See Section \ref{ch5:denoisingscore}).  
+Chapter \ref{ch3} introduced a method to obtain  feature-directions from vector-spaces, as well as methods to test the quality of these feature-directions and their  associated entity rankings. Then, this method was applied in Chapter \ref{ch5} to obtain feature-directions from the layers of neural networks. However, feature-directions obtained from either of these vector spaces can sometimes be sub-optimal. For example in the case of neural network auto-encoders, it was found that the quality of feature-directions in a auto-encoder representations degrade the more that the auto-encoder layers are stacked.  
 
 %In Chapter \ref{chapter3} and Chapter \ref{chapter5} it was shown that feature-directions can be obtained from a variety of vector-spaces regardless of how they have been learned, e.g. Multi-Dimensional Scaling representations are learned with a similarity-centered objective, and denoising auto-encoder's are learned with an objective to retain information, but feature-directions can be obtained from both of them. However, the feature-directions learned are sub-optimal, as they a consequence of a learning objective rather than being learned with optimal feature-directions being considered. 
 
@@ -33,7 +33,7 @@ Chapter \ref{chapter3} introduced a method to obtain  feature-directions from of
 
 % More specific outline of the problem for similarity-centered objectives
 
- In figure \ref{fig:toyExample}, a problem that can occur with feature-directions from representations learned with a similarity-centred objective, e.g. Multi-Dimensional Scaling (see Section \ref{ch2:MDS}) is illustrated. This is an example problem in the toy domain of shapes, where  basic geometric shapes are embedded in a two-dimensional space. In this example, directions have been identified which encode how light an object is and how closely its shape resembles a square. While most of the shapes embedded in this space are grey-scale circles and squares, one of the shapes embedded in this space is a red triangle, a clear outlier. When considering that the objective the space is learned with is similarity, the spatial representation for this triangle  is correct,  as it is far from all the other shapes. However, when ranking the shapes on the feature-directions for square and light, the  outlier  takes up an extreme position on the rankings. This means that the triangle is ranked incorrectly, as it is considered to be the shape that most exhibits the features ``light'' and ``square''.
+ In figure \ref{fig:toyExample}, a problem that can occur with feature-directions from representations learned with a similarity-centred objective, e.g. Multi-Dimensional Scaling (see Section \ref{ch2:MDS}), is illustrated. This is an example problem in the toy domain of shapes, where  basic geometric shapes are embedded in a two-dimensional space. In this example, directions have been identified which encode how light an object is and how closely its shape resembles a square. While most of the shapes embedded in this space are grey-scale circles and squares, one of the shapes embedded in this space is a red triangle, a clear outlier. When considering that the objective the space is learned with is similarity, the spatial representation for this triangle  is correct,  as it is far from all the other shapes. However, when ranking the shapes on the feature-directions for square and light, the  outlier  takes up an extreme position on the rankings. This means that the triangle is ranked incorrectly, as it is considered to be the shape that most exhibits the features ``light'' and ``square''.
 
 \begin{figure}
 	\centering
@@ -42,23 +42,22 @@ Chapter \ref{chapter3} introduced a method to obtain  feature-directions from of
 	\label{fig:toyExample}
 \end{figure}
 
-Ideally, representations would be learned with knowledge of feature-directions. For example, the method to learn a representation of the toy domain would know that it should model the features "square" and "light" rather than a similarity objective, so that this triangle would end up closer to the bottom-left corner. However, as we cannot a-priori determine the features the space must be learned from, it is difficult to learn a representation in this way. This Chapter instead introduces an unsupervised method that given a representation and its associated feature-directions, we can obtain a  vector space and associated feature-directions where the quality of the feature-directions is prioritized over the existing structure. The intention of this method is to resolve issues like those described in the previous two paragraphs.
+Ideally, representations would be learned with knowledge of feature-directions. For example, the method to learn a representation of the toy domain would know that it should model the features "square" and "light" rather than a similarity objective, so that this triangle would end up closer to the bottom-left corner. However, as we cannot a-priori determine the features the space must be learned from, it is difficult to learn a representation in this way. This chapter instead introduces an unsupervised method, that given a representation and its associated feature-directions,  can obtain a  vector space and associated feature-directions where the quality of the feature-directions is prioritized  over the similarity structure. The intention of this method is to resolve issues like those described in the previous two paragraphs.
 
-To introduce the idea behind the method, we start with the assumption that each feature-direction has one feature-word, which describes the feature: if the feature-ranking of a document on a feature-direction is faithful to the bag-of-words score for the feature-word in the document, then the feature-ranking is good. To give an example of why this assumption is useful, in the IMDB movies domain \ref{datasets:movies} Multi-Dimensional Scaling (MDS) spaces there is the case of an Indian Bollywood movie that is very unlike other movies, as its reviews only use language specific to Bollywood films and the amount of reviews it has is low overall. This movie occupies a top-ranking position in a variety of feature-directions,  as a consequence of it being very dissimilar to other movies. The fine-tuning process solves this problem by attempting to match its  ranking in the vector space that is very high, to its bag-of-words value, which is zero. This results in this obscure outlier movie being moved down drastically in the rankings. 
+To introduce the idea behind the method, we start with the assumption that each feature-direction is characterised by one feature-word, which describes the feature: if the feature-ranking of a document on a feature-direction is faithful to the bag-of-words score for the feature-word in the document, then the feature-ranking is good. To give an example of why this assumption is useful, in the IMDB movies domain \ref{datasets:movies} Multi-Dimensional Scaling (MDS) spaces there is the case of an Indian Bollywood movie that is very unlike other movies, as its reviews only use language specific to Bollywood films and the number of reviews it has is low overall. This movie occupies a top-ranking position in a variety of feature-directions,  as a consequence of it being very dissimilar to other movies. The fine-tuning process solves this problem by attempting to match its  ranking in the vector space that is very high, to its bag-of-words value, which is zero. This results in this obscure outlier movie being moved down drastically in the rankings. 
 
-To give some real examples, in Table \ref{tabTopRanked}, names of documents are shown ranked on feature directions in the domain of place-types (See Section \ref{datasets:placetypes}). In these examples, for the cluster-feature $\{\textit{steep},\textit{climb},\textit{slope}\}$, the top ranked document \textit{mountain} is clearly relevant. However, the next two documents --- \textit{landscape} and \textit{national park} --- are not directly related to this feature. Intuitively, they are ranked highly because of their similarity to \textit{mountain} in the vector space. Similarly, for the second feature, \textit{building} is ranked highly because of its similarity to \textit{skyscraper}, despite intuitively not having this feature. Finally, \textit{fence} received a high rank for several features,  mostly because it is an outlier in the space. 
+To give some  additional examples, in Table \ref{tabTopRanked}, names of documents are shown ranked on feature directions in the domain of place-types (See Section \ref{datasets:placetypes}). In these examples, for the cluster-feature $\{\textit{steep},\textit{climb},\textit{slope}\}$, the top ranked document \textit{mountain} is clearly relevant. However, the next two documents --- \textit{landscape} and \textit{national park} --- are not directly related to this feature. Intuitively, they are ranked highly because of their similarity to \textit{mountain} in the vector space. Similarly, for the second feature, \textit{building} is ranked highly because of its similarity to \textit{skyscraper}, despite intuitively not having this feature. Finally, \textit{fence} received a high rank for several features,  mostly because it is an outlier in the space. 
 
 
 \begin{table*}[t]
 	
 	\centering
-	\setlength{\tabcolsep}{8pt}
-	\renewcommand{\arraystretch}{1.2}
-	\footnotesize
+	\setlength{\tabcolsep}{14pt}
+	\renewcommand{\arraystretch}{1}
+	\scriptsize
 	\begin{tabularx}{\textwidth}{l l l}
-		\toprule
 		\textbf{Feature direction} & Highest ranking objects & Highest fine-tuned ranking objects\\
-		\midrule              
+		\toprule             
 		\{steep, climb, slope\}                   & mountain, landscape, national park & ski slope, steep slope, slope                                     \\
 		\{illuminated, illumination, skyscraper\} & building, city, skyscraper         & tall building, office building, large building                    \\
 		\{play, kid, kids\}                       & school, field, fence               & college classroom, classroom, school                              \\
@@ -69,14 +68,14 @@ To give some real examples, in Table \ref{tabTopRanked}, names of documents are 
 		\{spire, belltower, towers\}              & building, arch, house              & bell tower, arch, religious site                                  \\
 		\{stones, moss, worldheritage\}           & landscape, fence, steps            & ancient site, ancient wall, tomb                                  \\
 		\{mosaic, tile, bronze\}                  & building, city, steps              & cathedral, church, religious site     \\
-		\bottomrule
+	
 	\end{tabularx}
 	
-	\caption{Comparing the highest ranking place-type objects in the original and fine-tuned space. \label{tabTopRanked}}
+	\caption{Comparing the highest ranking place-type objects in the original and fine-tuned space}\label{tabTopRanked}
 \end{table*}
 
 
-Generally, the method that fine-tunes vector spaces and their associated feature-directions is as follows: First, a vector space is learned from bag-of-words representations of the considered documents, using a standard similarity-centric method or neural network. Next, the method from Chapter \ref{Chapter3} is used to  obtain feature-directions and their associated words from a vector space. Then, following our assumption outlined in the previous paragraph,  documents are ranked on the feature-direction's associated words using the bag-of-words. Finally, this ranking is used to fine-tune the vector space and feature-directions so that the resulting feature-rankings are more faithful to the ranking on the bag-of-words.
+Generally, the method that fine-tunes vector spaces and their associated feature-directions is as follows: First, a vector space is learned from bag-of-words representations of the considered documents, using a standard similarity-centric method or neural network. Next, the method from chapter \ref{ch3} is used to  obtain feature-directions and their associated words from a vector space. Then, following our assumption outlined in the previous paragraph,  documents are ranked on the feature-direction's associated words using the bag-of-words. Finally, this ranking is used to fine-tune the vector space and feature-directions so that the resulting feature-rankings are more faithful to the ranking on the bag-of-words.
 
 % Why does it work? What does it mean?
 
@@ -101,14 +100,14 @@ Generally, the method that fine-tunes vector spaces and their associated feature
 
 
 
-This Chapter is a follow-up of the previous two Chapters, where previously feature-directions are identified in a variety of vector-spaces, and their potential applications are discussed, this Chapter focuses on improving the quality of these feature-directions to achieve better results. This Chapter continues with explaining the method to fine-tune a vector space and its associated feature directions using a bag-of-words in detail. Afterwards, we show  quantitative results to see how the fine-tuning affects simple interpretable classifiers (as in Chapter \ref{Chapter3}). Finally, we end with a conclusion for potential future work.
+This chapter is a follow-up of the previous two chapters, where previously feature-directions are identified in a variety of vector-spaces, and their potential applications are discussed, this Chapter focuses on improving the quality of these feature-directions to achieve better results. This chapter continues with explaining the method to fine-tune a vector space and its associated feature directions using a bag-of-words in detail. Afterwards, we show  quantitative results to see how the fine-tuning affects simple interpretable classifiers (as in chapter \ref{ch3}). Finally, we end with a conclusion for potential future work.
 
 
 %We evaluate our method using one and three depth decision trees. For trees with a single node, we argue that improving the classification score of natural domain tasks, e.g. classifying the genre of movies by their reviews, is good evidence that the dimension used to classify the objective contains relevant domain knowledge and is self contained. We find that our fine-tuned representation improves the F1 score of depth one and depth three trees, sometimes substantially, and beats our baseline. Additionallly, we find that  often the single depth trees perform well for each class, sometimes even exceeding the depth three trees. In diagram 1, we give an example of a three depth decision tree from a domain of movie reviews, used to classify the 'Horror' genre. % Just an example
 
 
 
-%We find that our fine-tuned representation consistently improves depth one and depth three decision trees, sometimes substantially. Additionally, we find that the single depth trees perform well for many classes, often performing on par with, or even better than larger decision trees. \todo{In diagram 1, we give an example of a three depth decision tree from a domain of movie reviews, used to classify the 'Horror' genre}. 
+%We find that our fine-tuned representation consistently improves depth one and depth three decision trees, sometimes substantially. Additionally, we find that the single depth trees perform well for many classes, often performing on par with, or even better than larger decision trees. 
 
 %The remainder of the paper is structured as follows. After presenting related work in the next section, Section \ref{LearningInterpretableDirections} explains how interpretable directions are identified from the initial vector space, while Section \ref{secFinetuning} introduces our proposed fine-tuning method. Finally, in Section \ref{secExperiments} we present our experimental results, showing that decision trees learned from the fine-tuned rankings perform we
 %In our work, we aim to obtain a fine-grained, conceptually sound interpretable representation in an entirely unsupervised way. We follow previous work, where authors \cite{Derrac2015} used an unsupervised method to obtain fine-grained interpretable rankings of entities from a vector space wherein entities correspond to points, and concepts to regions e.g. in a vector space learned from wine tasting notes, a ranking of wines based on how many $'tannins'$ they have. They did this by finding highly separable terms e.g. in a space learned from movie reviews, $'scary'$, $'funny'$,  $'romantic'$, and a corresponding direction for each of these terms. These directions were then clustered together  $'scary'$, $'gory'$, $'terrifying'$ using a simple K-means algorithm. Finally, a ranking was induced for each entity on each cluster (e.g. a ranking of how $'scary'$ each movie is), and used as input to an interpretable classifier, e.g. a Decision Tree classifying the genre of a movie. See Fig 1.
@@ -135,7 +134,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 % So our work is about learning a more accurate representation following Steven's work
 
-%We introduce an unsupervised method to improve the accuracy of salient directions, by using them as weights in a neural network, that trains these directions to be closer to their bag-of-words representation, while maintaining fidelity to the original rankings. To test these rankings, we then use them as the input to a low-depth decision tree, which we use as a quantitative measure to show that our features are more accurate and interpretable than both a Latent Dirchlet Allocation (LDA) baseline and previous work. We evaluate our work in three different domains, movie reviews, flickr tags describing place-types, and the 20 newsgroups dataset.
+%We introduce an unsupervised method to improve the accuracy of salient directions, by using them as scikit-learns in a neural network, that trains these directions to be closer to their bag-of-words representation, while maintaining fidelity to the original rankings. To test these rankings, we then use them as the input to a low-depth decision tree, which we use as a quantitative measure to show that our features are more accurate and interpretable than both a Latent Dirchlet Allocation (LDA) baseline and previous work. We evaluate our work in three different domains, movie reviews, flickr tags describing place-types, and the 20 newsgroups dataset.
 
 %The rest of this paper is organized as follows. Section 2 describes related literature, Section 3 describes previous work in more detail that we use to obtain directions and rankings, Section 4 describes our work, Section 5 details our experiments and we conclude the work in Section 6. 
 
@@ -169,7 +168,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 %Similarly, our feature directions are also labelled with the most closely associated words. 
 %However, while LDA only uses bag-of-words (BoW) representations, our focus is specifically on identifying and improving features that are modelled as directions in semantic spaces. 
 
-%\todo{Say something about the problem of assigning (single) labels to topics; lots of people have looked at doing something more sophisticated then simply describing topics using the top few terms, and these approaches are also relevant to this paper as we might in principle use similar methods to label our directions.}
+
 %where documents are represented by a distribution of topics, and each topic is a distribution over words \cite{Blei2003}.  By simply taking the words with the top probability for a topic, we can easily obtain coherent topics. 
 %removed a bunch of stuff about document classification
 %LDA has been extended by many approaches, e.g.\ aiming to avoid the need to manually specify the number of topics \cite{teh2005sharing}, modelling correlations between topics \cite{Blei2006}, or by incorporating meta-data such as authors \cite{rosen2004author} or time stamps \cite{wang2006topics}.
@@ -179,8 +178,8 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 
 %\textbf{Vector space models} typically use a form of matrix factorization to obtain low-dimensional document representations. By far the most common approach is to use Singular Value Decomposition \cite{ASI:ASI1}, although other approaches have been advocated as well. 
-%One approach which is of particular interest is non-negative matrix factorization (NMF), in which dimensions correspond to a non-negative combination of words. This is assumed to help interpretability as it means that dimensions can essentially be viewed as topics (i.e.\ they also correspond to weighted sets of words). 
-%\todo{Have you found any references where NMF is used for document representation (we are not so much concerned with word vectors in this paper ...)?} 
+%One approach which is of particular interest is non-negative matrix factorization (NMF), in which dimensions correspond to a non-negative combination of words. This is assumed to help interpretability as it means that dimensions can essentially be viewed as topics (i.e.\ they also correspond to scikit-learned sets of words). 
+
 %Instead of matrix factorization, another possible strategy is to use a neural network or least squares optimization approach. This is commonly used for generating word embeddings \cite{DBLP:conf/nips/MikolovSCCD13,glove2014}, but can similarly be used to learn representations of text documents \cite{DBLP:journals/corr/DaiOL15,van2016learning,DBLP:conf/sigir/JameelBS17}. Such approaches have the advantage that various forms of domain-specific structured knowledge can easily be taken into account. Some authors have also proposed hybrid models, which combine topic models and vector space models. For example, the Gaussian LDA model represents topics as multivariate Gaussian distributions over a word embedding \cite{DBLP:conf/acl/DasZD15}. Beyond document representation, topic models have also been used to improve word embedding models, by learning a different vector for each topic-word combination \cite{DBLP:conf/aaai/LiuLCS15}.
 
 %\smallskip
@@ -266,7 +265,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 %Recently, methods to obtain explanations from neural networks by perturbing the inputs and observing the changes to the outputs have risen to prominence as a method to interpret classification decisions. LIME \cite{Ribeiro2016}  obtains a method that can explain the decision of any classifier.  This approach can build trust for the prediction of any classifier, but does not explain the building blocks that lead to the solution. In contrast, our approach makes explicit the semantic relationships that it builds on for classification, and describes meaningful rankings of entities according to these relationships. Some methods, similar to ours, rely on a text-based neural network to function. In \cite{Lei2016}, pieces of input text are extracted to justify predictions, while in \cite{Li2016} the effects of erasure are used to analyse and interpret decisions. However, these methods often do not give the whole picture.  By producing an interpretable classifier, both the prediction is explained and the knowledge of how the classifier has understood the problem is explained. Even though hard to interpret models generally have higher accuracy, it can be difficulty to improve the accuracy of the model based on an explanation of the output alone. In contrast, all information used by the classifier, including its decisions in the trained model, can be both understood and controlled by the user. Further, an interpretable classifier derived from the hidden layer of a network that is classifying the same objective can serve as an explanation of the main concepts learned by the network, with the additional benefit of being able to classify new information in an interpretable way.
 
-%Similar to obtaining interpretable features, obtaining intepretable rules from neural networks has also been previously explored. The existing neural network rule extraction algorithms can be categorized as either decompositional, pedagogical or eclectic \cite{Andrews1995a}. Decompositional approaches derive rules by analysing the units of the network, while pedagogical approaches treat the network as a black box, and examine the global relationships between inputs and outputs. Eclectic approaches use elements of both decompositional and pedagogical approaches. The algorithm in \cite{Kim2000} is a decompositional approach that applies to a neural network with two hidden layers. It uses hyperplanes based on the weight parameters of the first layer, and then combines them into a decision tree. Our method is similar in that it also uses hyperplanes to obtain property directions, but we provide an unsupervised and more large-scale approach for text-classification, that results in interpretable rankings. NeuroLinear \cite{Setiono1997c} is a decompositional approach applied to a neural network with a single hidden layer that discretizes hidden unit activation values and uses a hyperplane rule to represent the relationship between the discretized values and the first layer's weights. HYPINV \cite{Saad2007b} is a pedagogical approach that calculates changes to the input of the network to find hyperplane rules that explain how the network functions.
+%Similar to obtaining interpretable features, obtaining intepretable rules from neural networks has also been previously explored. The existing neural network rule extraction algorithms can be categorized as either decompositional, pedagogical or eclectic \cite{Andrews1995a}. Decompositional approaches derive rules by analysing the units of the network, while pedagogical approaches treat the network as a black box, and examine the global relationships between inputs and outputs. Eclectic approaches use elements of both decompositional and pedagogical approaches. The algorithm in \cite{Kim2000} is a decompositional approach that applies to a neural network with two hidden layers. It uses hyperplanes based on the scikit-learn parameters of the first layer, and then combines them into a decision tree. Our method is similar in that it also uses hyperplanes to obtain property directions, but we provide an unsupervised and more large-scale approach for text-classification, that results in interpretable rankings. NeuroLinear \cite{Setiono1997c} is a decompositional approach applied to a neural network with a single hidden layer that discretizes hidden unit activation values and uses a hyperplane rule to represent the relationship between the discretized values and the first layer's scikit-learns. HYPINV \cite{Saad2007b} is a pedagogical approach that calculates changes to the input of the network to find hyperplane rules that explain how the network functions.
 
 
 
@@ -303,7 +302,6 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 %While the Kappa metric was found to perform well, one drawback is that it does not actually evaluate the ranking of the documents induced by $v_w$. To address this, in this paper we will also consider the normalized discounted cumulative gain (NDCG) metric \cite{jarvelin2002cumulated} and, following good results, the accuracy metric. 
 % ???? SHOULD WE TALK ABOUT NDCG? NOT SURE IF RESULTS ARE GOOD ????
 
-% [REMOVED, DIDNT TEST WITH PRIMAL DIRS] We also carried out some initial experiments with other ranking evaluation metrics, such as Spearman's $\rho$, but found NDCG to give the most promising results. %\todo{....} Table \ref{tabKappaNDCG} shows the words with the highest Kappa score and the words with the highest NDCG score in a space of movies. As can be observed, the Kappa score gives a higher prominence to binary properties \todo{add examples}, whereas the NDCG score leads us to select more gradual properties \todo{add examples}.
 
 
 
@@ -330,9 +328,9 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 % NOTE: These are copy pasted from past workshop paper. Probably need some changes
 
 
-%\paragraph{Identifying directions for frequent terms.} To discover terms that correspond to interpretable properties in the MDS space, the nouns and adjectives that occur in sufficiently many reviews are converted to a binary bag-of-words representation and used as input to a linear Support Vector Machine (SVM)\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html}}. The SVM is trained to find the hyperplane that best separates the entities that contain the term at least once in their associated textual description. To accommodate class imbalance, we increase the cost of positive instances such that their weight is inversely proportional to how many times the term has occurred. To assess the quality of the hyperplane found by the SVM, we use Cohen's Kappa score \cite{cohen1960}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html}} which evaluates how well the hyperplane separates positive/negative instances while taking class imbalance into account. We consider terms with a high Kappa score to be labels of properties that are modelled well by the MDS space. The direction corresponding to a given term/property is given by the vector perpendicular to the associated hyperplane. This vector in turn allows us to determine a ranking of the entities, according to how much they have the  property being modelled. This ranking is obtained by determining the orthogonal projection of each entity on an oriented line with that direction. It is easy to see that if $v$ is the vector modelling a given property, then entity $e_1$ is ranked before entity $e_2$ iff $e_1 \cdot v < e_2 \cdot v$. Another way to look at this is that entities are ranked according to their signed distance to the hyperplane.
+%\paragraph{Identifying directions for frequent terms.} To discover terms that correspond to interpretable properties in the MDS space, the nouns and adjectives that occur in sufficiently many reviews are converted to a binary bag-of-words representation and used as input to a linear Support Vector Machine (SVM)\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html}}. The SVM is trained to find the hyperplane that best separates the entities that contain the term at least once in their associated textual description. To accommodate class imbalance, we increase the cost of positive instances such that their scikit-learn is inversely proportional to how many times the term has occurred. To assess the quality of the hyperplane found by the SVM, we use Cohen's Kappa score \cite{cohen1960}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html}} which evaluates how well the hyperplane separates positive/negative instances while taking class imbalance into account. We consider terms with a high Kappa score to be labels of properties that are modelled well by the MDS space. The direction corresponding to a given term/property is given by the vector perpendicular to the associated hyperplane. This vector in turn allows us to determine a ranking of the entities, according to how much they have the  property being modelled. This ranking is obtained by determining the orthogonal projection of each entity on an oriented line with that direction. It is easy to see that if $v$ is the vector modelling a given property, then entity $e_1$ is ranked before entity $e_2$ iff $e_1 \cdot v < e_2 \cdot v$. Another way to look at this is that entities are ranked according to their signed distance to the hyperplane.
 
-%\paragraph{Improving the scoring method.} In the method described by \cite{Derrac2015}, the quality of a property was determined by how well entities that have a property were separated in a space, measured using the Kappa score. We can expect this method to find more "binary" properties, e.g. a film will either have gore, or not have any gore at all. In-order to find other kinds of properties, we can instead use a metric that measures how well a direction $d_{t}$ is modelled in the space directly. To do this, we use Normalized Discounted Cumulative Gain (nDCG) \cite{Words2002}\footnote{\url{https://gist.github.com/mblondel/7337391}} to measure the quality of the ranking induced from the direction. This method takes relevance scores for each entity, and a ranking, and outputs an nDCG score for how effective the ranking is at matching those relevance scores, with a greater weight for those entities that are higher up in the ranking. As the PPMI scores are sparse, this means that many of the entities that are relevant but have a PPMI score of 0 do not make much of an impact on the overall score, essentially allowing us to compare the rankings of those entities that do have an associated PPMI score more effectively than if we had weighted each position equally. The rankings $r$ we evaluate are the ones induced from the direction $d_{t}$, which we obtain from the dot product of the entity vector on the property direction $rank(e, d_{t})$, and we use the PPMI values as the relevance scores $ppmi(e, t)$, under the assumption that they correspond to a good baseline for what we consider to be important for an entity. 
+%\paragraph{Improving the scoring method.} In the method described by \cite{Derrac2015}, the quality of a property was determined by how well entities that have a property were separated in a space, measured using the Kappa score. We can expect this method to find more "binary" properties, e.g. a film will either have gore, or not have any gore at all. In-order to find other kinds of properties, we can instead use a metric that measures how well a direction $d_{t}$ is modelled in the space directly. To do this, we use Normalized Discounted Cumulative Gain (nDCG) \cite{Words2002}\footnote{\url{https://gist.github.com/mblondel/7337391}} to measure the quality of the ranking induced from the direction. This method takes relevance scores for each entity, and a ranking, and outputs an nDCG score for how effective the ranking is at matching those relevance scores, with a greater scikit-learn for those entities that are higher up in the ranking. As the PPMI scores are sparse, this means that many of the entities that are relevant but have a PPMI score of 0 do not make much of an impact on the overall score, essentially allowing us to compare the rankings of those entities that do have an associated PPMI score more effectively than if we had scikit-learned each position equally. The rankings $r$ we evaluate are the ones induced from the direction $d_{t}$, which we obtain from the dot product of the entity vector on the property direction $rank(e, d_{t})$, and we use the PPMI values as the relevance scores $ppmi(e, t)$, under the assumption that they correspond to a good baseline for what we consider to be important for an entity. 
 % Taken directly from the journal paper
 %\begin{align*}
 %\text{DCG}_{r}^{t} &= \sum_{i=1}^{p}\frac{\textit{ppmi}_{i}^{t}}{log_{2}(i + 1)} \\
@@ -350,7 +348,7 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 
 %************************************************************************************************
-\section{Fine-Tuning Vector Spaces And Their Associated Feature Directions}\label{secFinetuning}
+\section{Fine-Tuning Vector Spaces and their Associated Feature Directions}\label{secFinetuning}
 
 
 %This is essentially re-organizing the space so that feature-directions are prioritized. However, it is important that what was learned in the space is not forgotten. This is why feature-rankings are trained to be more faithful to the PPMI ranking, not to exactly match it. 
@@ -358,7 +356,6 @@ This Chapter is a follow-up of the previous two Chapters, where previously featu
 
 %Standard dimensionality reduction methods such as singular value decomposition or Multi-Dimensional Scaling (MDS) aim to learn a vector space that preserves, as much as possible, the similarity structure between the considered text documents. However, for our purposes, the quality of the rankings induced by the interpretable directions is more important than the overall similarity structure. 
 
-%For the property \todo{},  we find movies such as \todo{}, which are not actually related to this property. The underlying reason is that these movies are outliers in the considered collection. As a result, their vector representation will also be significantly different from the average, and thus they will tend to receive extreme positions in the rankings induced by the interpretable directions. \todo{Try to find examples (not necessarily from the movies space) of other types of issues with initial vector space that get resolved by the fine-tuning step. Maybe something with two documents that are very similar overall (and thus get a very similar vector representation), but differ in one of the properties, where because of their similarity, they initially get a similar rank, even for the property in which they differ.}
 
 To improve the directions and address these problems, we propose a method for fine-tuning the semantic space representations and corresponding feature directions. First, it is explained how to obtain target rankings from PPMI scores. Then, the neural network that uses these target rankings to improve the vector space and its associated feature-directions is described. The main  idea is to use the BoW representations of the objects as a kind of weak supervision signal: if an object should be ranked highly for a given feature, we would expect the words describing that feature to appear frequently in its description.
 %In particular, from the BoW representations, we first construct target rankings for each of the feature directions. 
@@ -388,25 +385,11 @@ Finding directions in a vector space that induce a set of given target rankings 
 Let us consider a cluster $C_j$ for which we want to determine the target feature values. Let $o_{\sigma_1},...,o_{\sigma_n}$ be an enumeration of the objects such that $\textit{ppmi}(C_j,o_{\sigma_i}) \leq \textit{ppmi}(C_j,o_{\sigma_{i+1}})$ for $i\in \{1,...,n-1\}$. The corresponding target values $\tau(C_j,o_i)$ are then obtained by solving the following optimization problem:
 \begin{align*}
 &\textbf{Minimize:}\quad\sum_{i} (\tau(C_j,o_i) - v_{C_j} \cdot o_i)^{2}\quad\quad\quad\quad\\
-&\textbf{Subject to:} \\
-\noalign{$\tau(C_j,o_{\sigma_1}) \leq \tau(C_j,o_{\sigma_2}) \leq ... \leq \tau(C_j,o_{\sigma_n})$}
+&\textbf{Subject to:}  \noalign{$\tau(C_j,o_{\sigma_1}) \leq \tau(C_j,o_{\sigma_2}) \leq ... \leq \tau(C_j,o_{\sigma_n})$}
 \end{align*}
 %-----------------------------------
 \subsection{Fine-Tuning}
 
-%\begin{figure}
-%    \centering
-%    \fbox{
-%    \parbox{0.8\columnwidth}{
-%        \begin{center}
-%            \vspace{50pt}
-%            \todo{add figure}
-%            \vspace{50pt}
-%        \end{center}
-%    }
-%    }
-%    \caption{Neural network for fine-tuning the interpretable directions of a given vector space embedding \label{figNNarchitecture}.}
-%\end{figure}
 
 We now use the target values $\tau(C_j,o_i)$ to fine-tune the initial representations. To this end, we use a simple neural network architecture with one hidden layer. As inputs to the network, we use the initial vectors $o_1,...,o_n \in \mathbb{R}^k$. These are fed into a layer of dimension $l$:
 $$
@@ -429,10 +412,6 @@ The effect of this fine-tuning step is illustrated in the right-most column of T
 
 
 
-%\todo{Stress importance of this step for making sure that space remains as similar as possible to the initial one.}
-%\todo{Discuss Table \ref{tabTopRanked}.}
-
-
 
 %********************************************************************************
 
@@ -450,7 +429,7 @@ The effect of this fine-tuning step is illustrated in the right-most column of T
 
 \section{Quantitative Evaluation}\label{secExperiments}
 
-To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learning interpretable classifiers. In particular, we learn decision trees which are limited to depth 1 and 3, which use the rankings induced by the feature directions as input. This allows us to simultaneously assess to what extent the method can identify the right features and whether these features are modelled well using the learned directions. Note that depth 1 trees are only a single direction and a cut-off, so to perform well, the method needs to identify a highly relevant feature to the considered category. We can understand that the most demonstrable improvements for this method over the original directions will be in Depth 1 trees, as if the rankings for the important feature-directions are improved then these will be also. Depth 3 decision trees are able to model categories that can be characterized using at most three feature directions.
+To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learning interpretable classifiers. In particular, we learn decision trees which are limited to depth 1 and 3, which use the rankings induced by the feature directions as input. This allows us to simultaneously assess to what extent the method can identify the right features and whether these features are modelled well using the learned directions. Recall that depth 1 trees only use a single direction and a cut-off, so to perform well, the method needs to identify a highly relevant feature to the considered category. We can understand that the most demonstrable improvements for this method over the original directions will be in Depth 1 trees, as if the rankings for the important feature-directions are improved then these will be also. Depth 3 decision trees are able to model categories that can be characterized using at most three feature directions.
 
 
 %For the depth 1 trees, only a single dimension can be used for classification. Thus, if the F1 score of this dimension increases we can assume that the class more closely corresponds to the class than it did before, making such trees good measures on the salience of the cluster.
@@ -458,9 +437,8 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 %In a similar vein, depth-3 trees can only refer to a few features to make a decision, hence they crucially rely on the availability of high-quality features. If our fine-tuning method improves the quality of the interpretable directions, we should thus expect to see a corresponding improvement in classification performance.
 \begin{table}[t]
 	\centering
-	\setlength{\tabcolsep}{8pt}
-	\begin{tabularx}{\columnwidth}{llll}
-		\toprule
+	\begin{tabular}{llll}
+
 		\textbf{20 Newsgroups}  & F1 D1 & F1 D3 & F1 DN \\
 		\midrule
 		%AWV FT      & 0.45  & 0.43  & 0.38  \\
@@ -478,8 +456,8 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 		FT AWVw  & 0.41  & 0.41  & 0.43  \\
 		AWVw    & 0.38  & 0.40  & 0.43 \\
 		LDA           & 0.40 & 0.37 & 0.35 \\  
-		\bottomrule
-	\end{tabularx}
+
+	\end{tabular}
 	
 	\caption{Results for 20 Newsgroups. \label{tabNGspaces}}
 \end{table}
@@ -503,7 +481,7 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 %\begin{description}
 %\item[Genres] This task consist in predicting which genres have been assigned to a given movie on IMDB, focusing on the 23 most frequent genres. Since each movie can have more than one genre, we consider 23 binary classification problems.
 %\item[Keywords] This task consists in predicting whether a given plot keyword has been assigned to a movie on IMDB, focusing on the 100 most common keywords. Again, we consider binary classification problems.
-%\item[Ratings] Here the task consists in predicting the correct age rating certificate for a movie. This is again treated as a binary classification problem, which consists in predicting e.g.\ whether a movie has ``at least rating 15'', where we use the ranking U/PG $<$ 12/12A $<$ 15 $<$ 18/R18 for UK age certificates and G/PG $<$ PG13 $<$ R/NC-17 for US certificates. \todo{check}
+
 %\end{description}
 
 %\begin{itemize}
@@ -525,12 +503,11 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 \begin{table*}[t]
 	\centering
 	\small
-	\setlength{\tabcolsep}{7pt}
+	\setlength{\tabcolsep}{4.4pt}
 	\renewcommand{\arraystretch}{1.1}
 	\begin{tabularx}{\textwidth}{llllllllllll}
-		\toprule{}
 		\textbf{Movie Reviews} &      &      &      &            &      &      &      &                &      &      &      \\
-		\midrule{}
+		\toprule{}
 		\textbf{Genres}        & D1   & D3   & DN   & \textbf{Keywords}   & D1   & D3   & DN   & \textbf{Ratings}        & D1   & D3   & DN   \\
 		\midrule{}FT MDS        & \textbf{0.57} & \textbf{0.56} & 0.51 & FT MDS     & \textbf{0.33} & \textbf{0.33} & 0.24 & FT MDS         & \textbf{0.49} & \textbf{0.51} & \textbf{0.46} \\
 		MDS           & 0.40 & 0.49 & \textbf{0.52} & MDS        & 0.31 & 0.32 & \textbf{0.25} & MDS            & 0.46 & 0.49 & \textbf{0.46} \\
@@ -538,34 +515,34 @@ To evaluate our method, as in Chapter \ref{ch3} we consider the problem of learn
 		AWV           & 0.35 & 0.44 & 0.43 & AWV        & 0.26 & 0.21 & 0.19 & AWV            & 0.44 & 0.48 & 0.41 \\
 		LDA           & 0.52 & 0.51 & 0.45 & LDA        & 0.22 & 0.19 & 0.18 & LDA            & 0.48 & 0.48 & 0.41 \\
 		&      &      &      &            &      &      &      &                &      &      &      \\
-		\toprule
+	
 		\textbf{Place-types}   &      &      &      &            &      &      &      &                &      &      &      \\
-		\midrule{}
+		\toprule{}
 		\textbf{Geonames}      & D1   & D3   & DN   & \textbf{Foursquare} & D1   & D3   & DN   & \textbf{OpenCYC}        & D1   & D3   & DN   \\
 		\midrule{}FT MDS        & 0.32 & 0.31 & 0.24 & FT MDS     & 0.41 & 0.44 & 0.41 & FT MDS         & 0.35 & 0.36 & 0.30 \\
 		MDS           & 0.32 & 0.31 & 0.21 & MDS        & 0.38 & 0.42 & 0.42 & MDS            & 0.35 & 0.36 & 0.29 \\
 		FT AWV        & 0.31 & 0.29 & 0.23 & FT AWV     & 0.39 & 0.42 & 0.41 & FT AWV         & 0.37 & \textbf{0.37} & 0.28 \\
 		AWV           & 0.28 & 0.28 & 0.22 & AWV        & 0.32 & 0.37 & 0.31 & AWV            & 0.33 & 0.35 & 0.26 \\
 		LDA           & \textbf{0.34} & \textbf{0.32} & \textbf{0.27} & LDA        & \textbf{0.55} & \textbf{0.48} & \textbf{0.47} & LDA            & \textbf{0.40} & 0.36 & \textbf{0.31} \\
-		\bottomrule{}
+		
 	\end{tabularx}
 	
-	\caption{The results for Movie Reviews and Place-Types on depth-1, depth-3 and unbounded trees. \label{tabResultsMoviePlaces}}
+	\caption{The results for Movie Reviews and Place-Types on depth-1, depth-3 and unbounded trees\label{tabResultsMoviePlaces}}
 \end{table*}
 \begin{table}[t]
 	\centering
 	\setlength{\tabcolsep}{10pt}
-	\begin{tabularx}{\columnwidth}{llll}
-		\toprule
+	\begin{tabular}{llll}
+		
 		\textbf{IMDB Sentiment} & D1   & D3   & DN   \\
-		\midrule
+		\toprule{}
 		FT PCA         & 0.78 & 0.80 & 0.79 \\
 		PCA            & 0.76 & \textbf{0.82} & \textbf{0.80} \\
 		FT AWV         & 0.72 & 0.76 & 0.71 \\
 		AWV            & 0.74 & 0.76 & 0.71 \\
 		LDA            & \textbf{0.79} & 0.80 & 0.79 \\
-		\bottomrule
-	\end{tabularx}
+		
+	\end{tabular}
 	\caption{Results for IMDB Sentiment. \label{tabSentiment}}
 	
 \end{table}
@@ -590,9 +567,9 @@ We used the logistic regression implementation from scikit-learn to find the dir
 %, with the primal formulation of the objective function. 
 %We deal with class imbalance by weighting the positive instances higher.  
 
-In Chapter \ref{ch3} the hyper-parameters were chosen in stages. First, parameters for the best word-directions were found. Then, these best word-directions were taken and the best cluster parameters were found for these  best word-directions. However, for these experimental results, we optimize the hyper-parameters together for word-directions, clustering and fine-tuning, where the best-parameters for each of these stages are those that ultimately produce the best-performing rankings for the fine-tuning on a decision tree.  This is because fine-tuning is sensitive to which clusters and directions are included, as optimizing the ranking for one feature-direction may disrupt the ranking for another. This can be illustrated by the idea of optimizing a ranking for a direction on a noisy term like 'berardin', which refers to some metadata from the review text was optimized, then it's unlikely that this would benefit the other directions. However, if multiple directions that correspond to different genres were optimized like 'Horror' and 'Funny', then it's likely that they would all benefit from a better representation. Cluster-directions are used because if all hyper-parameters are trained together, we can expect to find a set of directions that work with each other more easily than by limiting frequency for word-directions. 
+In Chapter \ref{ch3} the hyper-parameters were chosen in stages. First, parameters for the best word-directions were found. Then, these best word-directions were taken and the best cluster parameters were found for these  best word-directions. However, for these experimental results, we optimize the hyper-parameters together for word-directions, clustering and fine-tuning, where the best-parameters for each of these stages are those that ultimately produce the best-performing rankings for the fine-tuning on a decision tree.  This is because fine-tuning is sensitive to which clusters and directions are included, as optimizing the ranking for one feature-direction may disrupt the ranking for another. This can be illustrated by the idea of optimizing a ranking for a direction on a noisy term like 'berardin', which refers to some metadata from the review text, then it is unlikely that this would benefit the other directions. However, if multiple directions that correspond to different genres were optimized like 'Horror' and 'Funny', then it is likely that they would all benefit from a better representation. Cluster-directions are used because if all hyper-parameters are trained together, we can expect to find a set of directions that work with each other more easily than by limiting frequency for word-directions. 
 
-We evaluate for all domains described in Chapter \ref{ch2.5} excluding reuters. When learning word directions, only sufficiently frequent words are considered. In Chapter \ref{ch3} this was chosen as a hyper-parameter, but as all parameters for each stage are tuned together it would take far too much time to optimize in this way, so it  is chosen beforehand. It is chosen by pre-determining thresholds loosely based on the size of the vocabulary for the domain. We chose 100 for the movies dataset,  50 for the place-types, 30 for the 20 newsgroups datasedt, and 50 for the IMDB sentiment dataset. 
+We evaluate  all domains described in Chapter \ref{ch2.5} excluding reuters. When learning word directions, only sufficiently frequent words are considered. In Chapter \ref{ch3} this was chosen as a hyper-parameter, but as all parameters for each stage are tuned together it would take far too much time to optimize in this way, so here we will fix this value in advance.. It is chosen by pre-determining thresholds loosely based on the size of the vocabulary for the domain. We chose 100 for the movies dataset,  50 for the place-types, 30 for the 20 newsgroups datasedt, and 50 for the IMDB sentiment dataset. 
 
 For hyperparameter tuning, we take 20\% of the data from the training split as development data. %, and do not use it in training. 
 We choose the hyperparameter values that maximize the F1 score on the development data for a Decision Tree on the improved feature-rankings that the fine-tuning network produces.  As candidate values for the number of dimensions of the vector spaces we used $\{50, 100, 200\}$. The number of directions to be used as input to the clustering algorithm was chosen from $\{500, 1000, 2000\}$. The number of clusters was chosen from $\{k,2k\}$, with $k$ the chosen number of dimensions. For the hidden layer of the neural network, we fixed the number of dimensions as equal to the number of clusters. As the scoring metric for the dimensions, we considered accuracy, Kappa and NDCG. In all experiments, we used 300 epochs, a minibatch size of 200, and the tanh activation function for the hidden layer of the neural network.
@@ -600,10 +577,10 @@ After some preliminary tests we found that in most cases the parameters for the 
 We train the network using AdaGrad \cite{Duchi2011}, with default values, and the model was implemented in the Keras library. % \cite{chollet2015keras}.
 %As the performance of LDA can be sensitive to the number of topics and other parameters, we tuned the number of topics from $\{50, 100, 200, 400\}$, the topic word prior from  $\{0.1, 0.01, 0.001\}$ and the document topic prior $\{0.1, 0.01, 0.001\}$. %We used the same frequency cutoffs as when obtaining the directions.
 
-For the cluster size, we follow work by Steven Schockaert\cite{DBLP:conf/ijcai/SchockaertL15} and use twice the amount of clusters as there are dimensions in the space. %For the topic models, we use hyper-parameter testing on the amount of topics, 
+%For the cluster size, we follow work by Steven Schockaert\cite{DBLP:conf/ijcai/SchockaertL15} and use twice the amount of clusters as there are dimensions in the space. %For the topic models, we use hyper-parameter testing on the amount of topics, 
 
 To learn the decision trees, we use the scikit-learn implementation of CART, which allows us to limit the depth of the trees.
-setting the maximum depth to one, three, or not at all. We used information gain as the attribute selection criterion. 
+We will consider experiments with depth-1 trees, depth-3 trees, and with unbounded trees.  We used information gain as the attribute selection criterion. 
 To mitigate the effects of class imbalance, the less frequent class was given a higher weight during training.  
 %, we foThe reason we chose low-depth Decision Trees is because we desire concise explanations using salient clusters. We can understand that the more shallow the tree is, the more salient the clusters are that are selected, and the less likely we are to see the tree overfit on the dataset or find very specific clusters for a very small amount of movies (e.g. using a cluster about "Jaws, Speilberg, New England" to classify the "Jaws" series as Horror, which is not a useful generalization of the concept of a "Horror" movie. Following previous work, we consider each class to be a binary classification problem rather than a multi-class problem, meaning we learn one tree per-class. 
 
@@ -641,7 +618,7 @@ The results for IMDB Sentiment are shown in Table \ref{tabSentiment}. In this ca
 
 
 \section{Conclusions}
-We have introduced a method to identify and model the salient features from a given domain as directions in a semantic space. Our method is based on the observation that there is a trade-off between accurately modelling similarity in a vector space, and faithfully modelling features as directions. In particular, we introduced a post-processing step, modifying the initial semantic space, which allows us to find higher-quality directions. We provided qualitative examples that illustrate the effect of this fine-tuning step, and quantitatively evaluated its performance in a number of different domains, and for different types of semantic space representations. We found that after fine-tuning, the feature directions model the objects in a more meaningful way. This was shown in terms of an improved performance of low-depth decision trees in natural categorization tasks. However, we also found that when the considered categories are too specialized, the fine-tuning method was less effective, and in some cases even led to a slight deterioration of the results. We speculate that performance could be improved for such categories by integrating domain knowledge into the fine-tuning method. 
+We have introduced a method to fine-tune an existing document embedding in order to obtain more semantically coherent  features. Our method is based on the observation that there is a trade-off between accurately modelling similarity in a vector space, and faithfully modelling features as directions. In particular, we introduced a post-processing step, modifying the initial semantic space, which allows us to find higher-quality directions. We provided qualitative examples that illustrate the effect of this fine-tuning step, and quantitatively evaluated its performance in a number of different domains, and for different types of semantic space representations. We found that after fine-tuning, the feature directions model the objects in a more meaningful way. This was shown in terms of an improved performance of low-depth decision trees in natural categorization tasks. However, we also found that when the considered categories are too specialized, the fine-tuning method was less effective, and in some cases even led to a slight deterioration of the results. We speculate that performance could be improved for such categories by integrating domain knowledge into the fine-tuning method. 
 
 
 
