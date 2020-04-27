@@ -86,7 +86,7 @@ def write_string(string, name):
         print("Failed")
 
 def write1dArray(array, name, encoding=None):
-    file = open(name, "w", encoding=encoding)
+    file = open(name, "w", encoding="utf-8")
     for i in range(len(array)):
         file.write(str(array[i]) + "\n")
     file.close()
@@ -412,7 +412,7 @@ def importLargeTextFile(file_name, file_type="s"):
     return array
 """
 def import1dArray(file_name, file_type="s"):
-    with open(file_name, "r", encoding="cp1252") as infile:
+    with open(file_name, "r", encoding="utf-8") as infile:
         if file_type == "f":
             array = []
             lines = infile.readlines()

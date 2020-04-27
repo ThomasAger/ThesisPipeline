@@ -112,4 +112,6 @@ class RepMethod(Method):
         self.popo_array = [self.rep]
 
     def getRep(self):
-        return self.save_class.load(self.rep)
+        if self.processed is False:
+            self.rep.value = self.save_class.load(self.rep)
+        return self.rep.value

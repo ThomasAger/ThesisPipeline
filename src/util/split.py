@@ -13,7 +13,7 @@ yahoo_total = 50000
 movies_total = 13978
 placetypes_total = 1383
 anime_total = 959
-
+mafia_total = 9676
 
 from sklearn.model_selection import KFold
 import numbers
@@ -23,7 +23,6 @@ from util import check_util
 
 def get_name_dict(*params):
     print(*params)
-
 
 def get_doc_amt(data_type):
     if data_type == "imdb" or data_type == "sentiment":
@@ -40,6 +39,10 @@ def get_doc_amt(data_type):
         max_size = placetypes_total
     elif data_type == "anime":
         max_size = -1
+    elif data_type == "animecf":
+        max_size = 14478
+    elif data_type == "mafiascum":
+        max_size = mafia_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
@@ -68,6 +71,8 @@ def check_shape(features, data_type):
         max_size = placetypes_total
     elif data_type == "anime":
         max_size = anime_total
+    elif data_type == "mafiascum":
+        max_size = mafia_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
@@ -98,6 +103,9 @@ def get_split_ids(data_type, matched_ids):
     elif data_type == "anime":
         train_split = anime_train
         total = anime_total
+    elif data_type == "mafiascum":
+        train_split = int((mafia_total / 3) * 2)
+        total = mafia_total
     else:
         print("No data type found")
         return False

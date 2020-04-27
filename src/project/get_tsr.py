@@ -78,17 +78,14 @@ class GetTopScoringRanksStreamed(Method.Method):
         word_len = len(self.new_word2id_dict.keys())
         with open(self.rank_fn) as infile:
             for line in infile:
-                for k in range(len(inds)):
-                    if i == inds[k]:
-                        print(k)
-                        split = line.split()
-                        float_split = np.empty(len(split), dtype=np.float64)
-                        for j in range(len(split)):
-                            float_split[j] = float(split[j])
-                        internal_rank.append(float_split)
-                        internal_mapping[inds[k]] = amt_added
-                        amt_added += 1
-                        break
+                split = line.split()
+                float_split = np.empty(len(split), dtype=np.float64)
+                for j in range(len(split)):
+                    float_split[j] = float(split[j])
+                internal_rank.append(float_split)
+                if i == inds[i]:
+                    internal_mapping[inds[i]] = amt_added
+                amt_added += 1
                 i += 1
                 print(i, "/", word_len)
         final_rank_array = []

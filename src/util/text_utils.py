@@ -87,6 +87,7 @@ def preprocess(corpus):
 
     # Table for punctuation
     table = str.maketrans(dict.fromkeys(string.punctuation))
+
     for i in range(len(corpus)):
         # Lowercase
         preprocessed_corpus[i] = preprocessed_corpus[i].lower()
@@ -321,3 +322,4 @@ class LimitWordsNumeric(LimitWordsMaster):
         for i in range(len(list(self.bow_word_dict.value.keys()))):
             self.new_word_dict.value[list(self.bow_word_dict.value.keys())[i]] = i
         super().process()
+

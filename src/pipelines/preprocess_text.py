@@ -160,7 +160,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
-            if data_type != "sentiment" :
+            if data_type != "sentiment" and data_type != "mafiascum" :
                 mds_identifier =  "_" + str(dims[i])+"_MDS"
                 mds_fn = file_name + mds_identifier
                 classify_mds_fn = classifier_fn + mds_identifier
@@ -188,7 +188,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                                      y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
                 hyper_param.process_and_save()
                 all_test_result_rows.append(hyper_param.getTopScoringRowData())
-        if data_type != "placetypes" and data_type != "movies":
+        if data_type != "placetypes" and data_type != "movies" and data_type != "mafiascum":
             doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
             doc2vec_fn = file_name + doc2vec_identifier
             classify_doc2vec_fn = classifier_fn + doc2vec_identifier
@@ -296,6 +296,17 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             class_names[i] = str(class_names[i])
         name_of_class = "Genres"
 
+    elif data_type == "mafiascum":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        corpus = np.load(raw_folder + "user_docs.npy")
+        classes = dt.import1dArray(raw_folder + "classes.txt", "i")
+        class_names = dt.import1dArray(raw_folder + "usernames.txt")
+        name_of_class = "scum"
+        classes_freq_cutoff = 0
+
+
+
+
     window_size = [5, 10, 15]
     min_count = [1, 5, 10]
     train_epoch = [50, 100, 200]
@@ -363,7 +374,6 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         pipeline(corpus, classes, class_names, pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
              no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
                  corpus_fn=corpus_fn, name_of_class=name_of_class, classifier_fn=classifier_fn, mcm=multi_class_method)
-print(len(np.load("../../data/processed/reuters/classes/num_stwReuters_fil_classes.npy")))
 
 """
 fifty = dt.import2dArray("../../data/processed/placetypes/rep/mds/num_stw_50_MDS.txt")
@@ -382,13 +392,9 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 #xy = sp.load_npz("D:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/newsgroups/bow/NB_18_NA_0.95num_stw_ppmi.npz")
 if __name__ == '__main__':
 
-
-
-
-
     max_depths = [None, None, 3, 2, 1]
-    classifiers = ["LinearSVM","DecisionTreeNone","DecisionTree3","DecisionTree2","DecisionTree1"]
-    data_type = ["newsgroups","sentiment", "reuters", "placetypes"]
+    classifiers = ["DecisionTree3", "LinearSVM"]
+    data_type = ["mafiascum"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):

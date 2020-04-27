@@ -496,7 +496,7 @@ if __name__ == '__main__':
     #num_stw_num_stw_200_MDS_acc_2000_5000_0_rank_Foursquare_Dev_133MClass_Balanced_300_Activ_tanh_Dropout_0.25_Hsize_3_mlnrep
     mcm = "OVR"
     bonus_fn = ""
-    rewrite_all = None
+    rewrite_all = True
     """
     use_space = np.load("..\..\data\processed/"+data_types[0]+"\mln\mln/"
                         "num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_Dev_6223MClass_Balanced_200_Activ_tanh_Dropout_0.1_Hsize_3_mlnrep" + ".npy")
@@ -505,6 +505,9 @@ if __name__ == '__main__':
 
     use_space = None
     use_space_name = None
+
+
+    xxxx = np.load("E:\PhD\Code\ThesisPipeline\ThesisPipeline\data\processed/reuters\classes/num_stwReuters_classes_categorical.npy")
 
     #num_stw_num_stw_50_D2V_ndcg_2000_10000_0_rank_10_100_0.001_k-means++_200_kmeans_best_200_rank_Dev_6223MClass_Balanced_300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep.npy
     #"300_Activ_relu_Dropout_0.25_Hsize_3_mlnrep"
