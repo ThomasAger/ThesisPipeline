@@ -118,23 +118,23 @@ class MasterScore(Method.Method):
     def makePopos(self):
         included_scores = ""
         if self.f1:
-            self.f1s = SaveLoadPOPO(np.full(len(self.true_targets[1]), math.nan), self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
+            self.f1s = SaveLoadPOPO(np.full(len(self.true_targets), math.nan), self.output_folder + "f1/" + self.file_name + "_F1.txt", "1dtxtf")
             self.avg_f1 = SaveLoadPOPO(self.avg_f1, self.output_folder + "f1/" + self.file_name + "_Avg_F1.txt", "txtf")
-            self.precs = SaveLoadPOPO(np.full(len(self.true_targets[1]), math.nan), self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
+            self.precs = SaveLoadPOPO(np.full(len(self.true_targets), math.nan), self.output_folder + "prec/" + self.file_name + "_Prec.txt", "1dtxtf")
             self.avg_prec = SaveLoadPOPO(self.avg_prec, self.output_folder + "prec/" + self.file_name + "_avg_prec.txt", "txtf")
-            self.recalls = SaveLoadPOPO(np.full(len(self.true_targets[1]), math.nan), self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
+            self.recalls = SaveLoadPOPO(np.full(len(self.true_targets), math.nan), self.output_folder + "recall/" + self.file_name + "_Recall.txt", "1dtxtf")
             self.avg_recall = SaveLoadPOPO(self.avg_recall, self.output_folder + "recall/" + self.file_name + "_avg_recall.txt", "txtf")
             included_scores += "F1_"
         if self.acc:
-            self.accs = SaveLoadPOPO(np.full(len(self.true_targets[1]), math.nan), self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
+            self.accs = SaveLoadPOPO(np.full(len(self.true_targets), math.nan), self.output_folder + "acc/" + self.file_name + "_Acc.txt", "1dtxtf")
             self.avg_acc = SaveLoadPOPO(self.avg_acc, self.output_folder + "acc/" + self.file_name + "_avg_acc.txt", "txtf")
             included_scores += "ACC_"
         if self.auroc:
-            self.aurocs = SaveLoadPOPO(np.full(len(self.true_targets[1]), math.nan), self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
+            self.aurocs = SaveLoadPOPO(np.full(len(self.true_targets), math.nan), self.output_folder + "auroc/" + self.file_name + "_Auroc.txt", "1dtxtf")
             self.avg_auroc = SaveLoadPOPO(self.avg_auroc, self.output_folder + "auroc/" + self.file_name + "_avg_auroc.txt", "txtf")
             included_scores += "AUROC_"
         if self.kappa:
-            self.kappas = SaveLoadPOPO(np.full(len(self.true_targets[1]), math.nan), self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
+            self.kappas = SaveLoadPOPO(np.full(len(self.true_targets), math.nan), self.output_folder + "kappa/" + self.file_name + "_Kappa.txt", "1dtxtf")
             self.avg_kappa = SaveLoadPOPO(self.avg_kappa, self.output_folder + "kappa/" + self.file_name + "_avg_kappa.txt", "txtf")
             included_scores += "Kappa_"
         if self.save_csv:

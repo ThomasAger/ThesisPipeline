@@ -393,8 +393,8 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 if __name__ == '__main__':
 
     max_depths = [None, None, 3, 2, 1]
-    classifiers = ["DecisionTree3", "LinearSVM"]
-    data_type = ["mafiascum"]
+    classifiers = ["LinearSVM"]
+    data_type = ["movies"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):
