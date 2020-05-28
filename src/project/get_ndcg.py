@@ -402,8 +402,13 @@ class GetNDCGStreamed(Method.Method):
 
                     sorted_indices = np.flipud(np.argsort(rank_float))
                     # Get the NDCG score for the PPMI score, which is a valuation, compared to the indice of the rank
-                    ndcg = ndcg_from_ranking(np.asarray(self.ppmi[self.ppmi_id_dct[sorted_keys[i]]].todense())[0],
+                    try:
+                        ndcg = ndcg_from_ranking(np.asarray(self.ppmi[self.ppmi_id_dct[sorted_keys[i]]].todense())[0],
                                              sorted_indices)
+                    except IndexError:
+                        ndcg = 0.0
+                        print(sorted_indices)
+                        print(self.ppmi[self.ppmi_id_dct[sorted_keys[i]]].todense()[0])
                     self.ndcg_dir.value[sorted_keys[i]] = ndcg
                 self.ndcg_scores.value[sorted_vals[i]] = self.ndcg_dir.value[sorted_keys[i]]
                 print(i, "/", len(self.words.keys()), sorted_keys[i], self.ndcg_dir.value[sorted_keys[i]])
@@ -416,6 +421,86 @@ class GetNDCGStreamed(Method.Method):
         if self.processed is False:
             self.ndcg_scores.value = self.save_class.load(self.ndcg_scores)
         return self.ndcg_scores.value
+
+class GetNDCGStreamedSimple(Method.Method):
+    word_dir = None
+    words = None
+    output_directions = None
+    output_folder = None
+    directions = None
+    ranks_fn = None
+    bowmin = None
+    bowmax = None
+    new_word_dict = None
+    ppmi = None
+    LR = None
+    ppmi_id_dct = None
+
+    def __init__(self, ranks_fn, ppmi,  words, save_class, file_name, output_folder):
+        self.output_folder = output_folder
+        self.ppmi = ppmi
+        self.ranks_fn = ranks_fn
+        self.words=words
+        super().__init__(file_name, save_class)
+
+    def makePopos(self):
+        try:
+            self.ndcg_scores = SaveLoadPOPO(np.empty(len(list(self.words.keys())), dtype=np.float64),
+                                        self.output_folder  + self.file_name + "_" + str(
+                                            self.bowmin) + "_" + str(self.bowmax) + "Streamed_ndcg.npy", "npy")
+        except:
+            self.ndcg_scores = SaveLoadPOPO(np.empty(len(self.words), dtype=np.float64),
+                                            self.output_folder + self.file_name + "_" + str(
+                                                self.bowmin) + "_" + str(self.bowmax) + "Streamed_ndcg.npy", "npy")
+        # If the rankings for this situation exists, then dont load the overall.
+        self.ndcg_dir = SaveLoadPOPO({}, self.output_folder + self.file_name + "Streamed_ndcg_dir.npy", "npy_dict")
+        if self.save_class.exists([self.ndcg_dir]) and self.save_class.exists([self.ndcg_scores]) is False:
+            self.ndcg_dir.value = self.save_class.load(self.ndcg_dir)
+            print("pred_dir loaded successfully")
+        try:
+            self.csv_data = SaveLoadPOPO([["ndcg"],[],[list(self.words.keys())]],
+                                        self.output_folder + "csv/"+ self.file_name + "_" + str(
+                                            self.bowmin) + "_" + str(self.bowmax) + "Streamed_ndcg.csv","csv")
+        except:
+            self.csv_data = SaveLoadPOPO([["ndcg"],[],[self.words]],
+                                        self.output_folder + "csv/"+ self.file_name + "_" + str(
+                                            self.bowmin) + "_" + str(self.bowmax) + "Streamed_ndcg.csv","csv")
+
+
+
+    def makePopoArray(self):
+        self.popo_array = [self.ndcg_scores, self.ndcg_dir, self.csv_data]
+
+
+    def process(self):
+        j = 0
+
+        print(self.ranks_fn)
+        with open(self.ranks_fn) as infile:
+            i = 0
+            for line in infile:
+                rank_str = line.split()
+                rank_float = np.empty(len(rank_str), dtype=np.float64)
+                for j in range(len(rank_str)):
+                    rank_float[j] = float(rank_str[j])
+
+                sorted_indices = np.flipud(np.argsort(rank_float))
+                # Get the NDCG score for the PPMI score, which is a valuation, compared to the indice of the rank
+                ndcg = ndcg_from_ranking(np.asarray(self.ppmi[self.ppmi_id_dct[i]].todense())[0],  sorted_indices)
+                self.ndcg_dir.value[i] = ndcg
+                self.ndcg_scores.value[i] = self.ndcg_dir.value[i]
+                print(i, "/", len(self.words.keys()), i, self.ndcg_dir.value[i])
+
+                i += 1
+        self.csv_data.value[1] = [self.ndcg_scores.value]
+        super().process()
+
+    def getNDCG(self):
+        if self.processed is False:
+            self.ndcg_scores.value = self.save_class.load(self.ndcg_scores)
+        return self.ndcg_scores.value
+
+
 
 if __name__ == '__main__':
     print("kay")

@@ -175,6 +175,57 @@ class GetRankingsStreamed(Method.Method):
         else:
             print("Exists", self.rank_fn)
 
+class GetRankingsStreamedSimple(Method.Method):
+    word_dir = None
+    words = None
+    output_directions = None
+    output_folder = None
+    directions = None
+    dirs = None
+    bowmin = None
+    bowmax = None
+    new_word_dict = None
+    space = None
+    LR = None
+
+    def __init__(self, dirs, space,   save_class, file_name, output_folder):
+        self.output_folder = output_folder
+        self.space = space
+        self.dirs = dirs
+        super().__init__(file_name, save_class)
+        self.rank_fn = self.output_folder + "rank/" + self.file_name + "_rank.txt"
+
+    def get_dp(self, direction):
+        ranking = np.empty(len(self.space))
+        for i in range(len(self.space)):
+            ranking[i] = np.dot(direction, self.space[i])
+        return ranking
+
+    def process(self):
+        j = 0
+        with open(self.rank_fn, 'w') as write_file:
+            for i in range(len(self.dirs)):
+                ranks = self.get_dp(self.dirs[i])
+                rank_str = ""
+                for k in range(len(ranks)):
+                    rank_str += str(ranks[k]) + " "
+                write_file.write(rank_str + "\n")
+                print(j, "/", len(self.dirs))
+                j += 1
+        super().process()
+
+    def getRankings(self):
+        return self.rank_fn
+
+
+    def process_and_save(self):
+        if os.path.exists(self.rank_fn) is False or self.save_class.rewrite is True:
+            if self.save_class.rewrite is True:
+                print("Rewriting")
+            print("doesnt exist", self.rank_fn)
+            self.process()
+        else:
+            print("Exists", self.rank_fn)
 
 
 if __name__ == '__main__':

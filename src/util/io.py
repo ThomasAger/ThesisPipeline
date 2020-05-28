@@ -86,7 +86,7 @@ def write_string(string, name):
         print("Failed")
 
 def write1dArray(array, name, encoding=None):
-    file = open(name, "w", encoding=encoding)
+    file = open(name, "w", encoding="utf-8")
     for i in range(len(array)):
         file.write(str(array[i]) + "\n")
     file.close()
@@ -124,6 +124,16 @@ def write_csv(csv_fn, col_names, cols_to_add, key):
         d[col_names[c]] = cols_to_add[c]
     df = pd.DataFrame(d, index=key)
     df.to_csv(csv_fn)
+from six.moves import cPickle as pickle #for performance
+
+def save_dict(di_, filename_):
+    with open(filename_, 'wb') as f:
+        pickle.dump(di_, f)
+
+def load_dict(filename_):
+    with open(filename_, 'rb') as f:
+        ret_di = pickle.load(f)
+    return ret_di
 
 def read_csv(csv_fn, error_bad_lines=True, dtype=None):
     if dtype is not None:
@@ -186,7 +196,7 @@ def toBool(string):
 
 
 
-def save_dict(dct, file_name):
+def save_dict(file_name , dct):
     file = open(file_name, "w")
     for key, value in dct.items():
         try:
@@ -412,7 +422,7 @@ def importLargeTextFile(file_name, file_type="s"):
     return array
 """
 def import1dArray(file_name, file_type="s"):
-    with open(file_name, "r", encoding="cp1252") as infile:
+    with open(file_name, "r") as infile:
         if file_type == "f":
             array = []
             lines = infile.readlines()
@@ -607,12 +617,45 @@ def save_csv_from_dict(score_dict, class_names, csv_fn):
     class_names = np.append(class_names, "AVERAGE")
     write_csv(csv_fn, col_names, col_data, class_names)
 
-
+import string
 if __name__ == '__main__':
+
+    """ Combining spaces """
+
+
+    """ Fixing clusters from NeSy resource
+    fns, folder_fn = getFns("../../data/raw\Data_NeSy16\Cluster Classes/")
+    print(fns)
+    for i in range(len(fns)):
+        names = import1dArray(folder_fn + fns[i], file_type="s")
+        for j in range(len(names)):
+            names[j] = names[j].translate(str.maketrans('', '', string.punctuation))
+        new_names = []
+        for j in range(len(names)):
+            names_split = names[j].split()
+            first_name = names_split[0]
+            print(names_split)
+            names_split = list(np.asarray(list(reversed(names_split)))[:-1])
+            print(names_split)
+            names_split.insert(0, first_name)
+            print(names_split)
+            new_names.append(np.asarray(names_split))
+        np.save(folder_fn + fns[i][:-6] + ".npy", np.asarray(new_names))
+    """
+
+    """ Converting float txt to np array
+    fns, folder_fn = getFns("../../data/raw\Data_NeSy16\Input Vectors/")
+    print(fns)
+    for i in range(len(fns)):
+        space = import2dArray(folder_fn + fns[i], file_type="f")
+        np.save( folder_fn + fns[i][:-6] + ".npy", space)
+    """
+    """
     txt_file = import1dArray("../../data/cherrypicked/movies\some_removed.txt")
     new_txt_file = []
-    for i in range(len(txt_file)):
+    for i in range(len(txt_file)):rem
         if len(txt_file[i]) != 0:
             new_txt_file.append(" ".join(txt_file[i].split()[:4]))
     write1dArray(new_txt_file, "../../data/cherrypicked/movies\some_removed_fixed.txt")
+    """
     

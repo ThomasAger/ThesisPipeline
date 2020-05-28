@@ -96,7 +96,7 @@ def getAWV(word_lists, word_vectors):
 def getAWVStreamed(corpus_fn, word_vectors):
     vectors = []
     i = 0
-    with open(corpus_fn) as infile:
+    with open(corpus_fn, encoding="utf-8") as infile:
         print("Creating vectors")
         for line in infile:
             word_list = line.split()
