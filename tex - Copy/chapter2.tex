@@ -52,23 +52,23 @@
 In this chapter a general process to make predictions from raw text data is explained. The steps of this process are expanded on in the later sections.
 
 In this thesis we focus on the task of obtaining from raw text data that is effective for the task of document classification. 
-Document classification is the task of distinguishing between documents in a domain, where documents are e.g. movies in a domain of movie reviews, people in a domain of twitter posts, or reviews in a domain of product reviews. First, the text is pre-processed so that noise is removed, "noise" in this case referring to information in the text that is not useful when solving the domains document classification tasks. For example, html tags like [bf], or unnecessary punctuation and grammar. %It's important to remove this information at this stage as raw text data is easy to manipulate and the the result of any modifications can be clearly seen. If we tried to remove this kind-of information after obtaining a representation, it would be a much more complex process.
+Document classification is the task of distinguishing between documents in a domain, where documents are e.g.\ movies in a domain of movie reviews, people in a domain of twitter posts, or reviews in a domain of product reviews. First, the text is pre-processed so that noise is removed, "noise" in this case referring to information in the text that is not useful when solving the domains document classification tasks. For example, html tags like [bf], or unnecessary punctuation and grammar. %It's important to remove this information at this stage as raw text data is easy to manipulate and the the result of any modifications can be clearly seen. If we tried to remove this kind-of information after obtaining a representation, it would be a much more complex process.
 
 One popular and simple representation is the bag-of-words. The bag-of-words  represents a document as a vector where each element corresponds to a unique word in the corpus. The values of these elements are usually some statistic related to the word's importance in the document e.g.\ word frequency. One disadvantage of this representation is that it does not retain the context of words. Another disadvantage is that this representation is sparse, as each document vector has an element for every word in the corpus and only some of them will have a frequency above zero. This means that  to store it and process it in memory efficiently, specialized data structures and machine-learning techniques must be used. However, bag-of-words representations have the  advantage of being easy to understand for humans as each element of the vector representation for each entity corresponds to a word. 
 
-Ideally the number of dimensions would be reduced while retaining the information. One method of doing this would be hand-crafted feature selection, where words which are identified by experts as not meaningful are not included. However, making such a hard selection of which words are relevant and which words are not is challenging and high-risk. An alternative approach is to use the vector similarity between docuemnts, e.g. the similarity between their frequency BOW vectors, to produce a low-dimensional vector space, such that the similarity between the vectors in the low-dimensional space approximates the similarity between the corresponding BOW-vectors. However, this results in vectors whose elements, or "features" are no longer interpretable in the sense the bag-of-words is.
+Ideally the number of dimensions would be reduced while retaining the information. One method of doing this would be hand-crafted feature selection, where words which are identified by experts as not meaningful are not included. However, making such a hard selection of which words are relevant and which words are not is challenging and high-risk. An alternative approach is to use the vector similarity between docuemnts, e.g.\ the similarity between their frequency BOW vectors, to produce a low-dimensional vector space, such that the similarity between the vectors in the low-dimensional space approximates the similarity between the corresponding BOW-vectors. However, this results in vectors whose elements, or "features" are no longer interpretable in the sense the bag-of-words is.
 
 
 
 %For humans, our understanding of how things behave and what they are is a representation of reality,   produced from our experience with those things in the real world. Each person is constantly adjusting to some degree their representation of what different things are, and this construction and transformation of our personal representations is what we call learning. 
 
-% Machines are computational and can process large amounts of information, but it must be in a suitable representation for them to use it.  For tasks in the domain, e.g. categorizing Amazon product reviews into positive sentiment or negative sentiment, it is usually required that the representation encodes fundamental domain knowledge. Put in terms of human intelligence, it is akin to how we must have some fundamental representation of the domain before we can appropriately act in it.
+% Machines are computational and can process large amounts of information, but it must be in a suitable representation for them to use it.  For tasks in the domain, e.g.\ categorizing Amazon product reviews into positive sentiment or negative sentiment, it is usually required that the representation encodes fundamental domain knowledge. Put in terms of human intelligence, it is akin to how we must have some fundamental representation of the domain before we can appropriately act in it.
 
-%In this thesis the data used is raw text, so a scalable computational representation of the meaning of text data is required.  There are a variety of methods to achieve representations of raw text data, and each one leaves out some information from the domain and prioritizes other parts. This makes each suited to solving a different problem. For example, the bag-of-words representation is called as such because word-context is ignored, but on a task of sentiment analysis word context is important, e.g. a review for a movie that contains the sentence "This was so good I want to rip my eyes out." although sarcastic, would still count as a compliment. To achieve better results on this task, it would be better to instead use a representation that can represent context somehow. In section \ref{ch2:representations} we cover how to obtain different kinds of representations and explain how they work.
+%In this thesis the data used is raw text, so a scalable computational representation of the meaning of text data is required.  There are a variety of methods to achieve representations of raw text data, and each one leaves out some information from the domain and prioritizes other parts. This makes each suited to solving a different problem. For example, the bag-of-words representation is called as such because word-context is ignored, but on a task of sentiment analysis word context is important, e.g.\ a review for a movie that contains the sentence "This was so good I want to rip my eyes out." although sarcastic, would still count as a compliment. To achieve better results on this task, it would be better to instead use a representation that can represent context somehow. In section \ref{ch2:representations} we cover how to obtain different kinds of representations and explain how they work.
 
-%Determining  sentiment of e.g. an Amazon product review is one of many domain tasks that machine-learning can solve. This is specifically the task of categorization or "classification" that naturally occurs in many domains. For both humans and machines, the essential question when making these decisions is if the representation we have of the entities in the domain is accurate to the reality, i.e. if it represents Amazon product views well. As with the methods, there are many different ways to classify using machine-learning given a representation. However, there is no way a machine-learning classifier can perform well on a task without a good representation. Different classifiers that are used in this thesis are covered in section \ref{ch2:classifiers}.
+%Determining  sentiment of e.g.\ an Amazon product review is one of many domain tasks that machine-learning can solve. This is specifically the task of categorization or "classification" that naturally occurs in many domains. For both humans and machines, the essential question when making these decisions is if the representation we have of the entities in the domain is accurate to the reality, i.e. if it represents Amazon product views well. As with the methods, there are many different ways to classify using machine-learning given a representation. However, there is no way a machine-learning classifier can perform well on a task without a good representation. Different classifiers that are used in this thesis are covered in section \ref{ch2:classifiers}.
 
-%Growing up learning a language, people learn the complexities of that language intuitively and can recognize if something is wrong without necessarily being able to verbalize why. This is the problem of a representation that is difficult to express, and in-turn difficult to understand. In a similar way, representations for machines that can e.g. capture the context of words precisely can be difficult to understand for humans, as it is difficult to encode this complex information in a simple way. This is the problem of interpretability, taking representations and classifiers that are only intelligible to machines and making them understandable for humans as well. There are a variety of ways that more complex information can be represented interpretably, and this is covered in Section \ref{ch2:interpretability}. 
+%Growing up learning a language, people learn the complexities of that language intuitively and can recognize if something is wrong without necessarily being able to verbalize why. This is the problem of a representation that is difficult to express, and in-turn difficult to understand. In a similar way, representations for machines that can e.g.\ capture the context of words precisely can be difficult to understand for humans, as it is difficult to encode this complex information in a simple way. This is the problem of interpretability, taking representations and classifiers that are only intelligible to machines and making them understandable for humans as well. There are a variety of ways that more complex information can be represented interpretably, and this is covered in Section \ref{ch2:interpretability}. 
 
 
 
@@ -90,7 +90,7 @@ Ideally the number of dimensions would be reduced while retaining the informatio
 
 %\subsection{Interpretablility}
 
-%Simple rules are a good basis for an interpretable classifier. However, this is only possible when the features (e.g. the word frequencies in a bag-of-words) are clearly defined. This forms the basis of what an interpretable representation is viewed as in this thesis. If the features correspond to some meaningful property in the domain, e.g. "good" or "thrilling", then that is treated as an interpretable representation. In this sense, a bag-of-words is an interpretable representation, despite the approach in this thesis being different from the methods a bag-of-words employs.
+%Simple rules are a good basis for an interpretable classifier. However, this is only possible when the features (e.g.\ the word frequencies in a bag-of-words) are clearly defined. This forms the basis of what an interpretable representation is viewed as in this thesis. If the features correspond to some meaningful property in the domain, e.g.\ "good" or "thrilling", then that is treated as an interpretable representation. In this sense, a bag-of-words is an interpretable representation, despite the approach in this thesis being different from the methods a bag-of-words employs.
 
 
 %\subsection{Vector Spaces}
@@ -102,7 +102,7 @@ Ideally the number of dimensions would be reduced while retaining the informatio
 
 As mentioned in Section \ref{ch2:con} the main focus of this thesis is in disentangling the information in vector spaces into semantic features. This chapter introduces the process of obtaining bag-of-words and vector space representations from text data and using them to solve machine-learning problems, as well as giving an introduction to related work in interpretability of machine learning representations and models. To outline the process, first as covered in Section \ref{ch2:data} the data is preprocessed so that unnecessary information is removed. Then some basic representations are obtained in Section \ref{bg:BOW}, followed by more complex vector space representations in Section \ref{ch2:vectorspaces}. To complete a standard machine-learning pipeline, Section \ref{ch2:classifiers} covers different machine-learning methods. Finally, interpretable representations and classifiers are covered in Section \ref{ch2:interpretability} to provide context to the work presented in this thesis.
 
-%With the rise of services on the web that enable large-scale user-generation of text data,, the internet has become largely populated by text posts that are related to some specific, niche topic within a domain. For example, a review on Amazon for a product is specially tailored text for that product within the domain of Amazon reviews. Taken from a closer lens, we could even argue that each review-type has its own domain, e.g. Product reviews, Food reviews, Movie reviews. However, the text posts themselves are largely unstructured semantically. 
+%With the rise of services on the web that enable large-scale user-generation of text data,, the internet has become largely populated by text posts that are related to some specific, niche topic within a domain. For example, a review on Amazon for a product is specially tailored text for that product within the domain of Amazon reviews. Taken from a closer lens, we could even argue that each review-type has its own domain, e.g.\ Product reviews, Food reviews, Movie reviews. However, the text posts themselves are largely unstructured semantically. 
 
 %Text data. Why text data? What useful applications does text data have? 
 
@@ -114,17 +114,17 @@ As mentioned in Section \ref{ch2:con} the main focus of this thesis is in disent
 
 %How do machines understand text data? How do machines use text data? 
 
-%In the case of this work, we look at text split into documents, where e.g. in a collection of imdb movie reviews, each movie would be a document composed of all of its reviews. Exactly what composes a document depends on the dataset, but it is generally longer than a sentence and is an object in the domain, e.g. a news article in a domain of news websites
+%In the case of this work, we look at text split into documents, where e.g.\ in a collection of imdb movie reviews, each movie would be a document composed of all of its reviews. Exactly what composes a document depends on the dataset, but it is generally longer than a sentence and is an object in the domain, e.g.\ a news article in a domain of news websites
 
 %Where does the background go from here? What do the remaining sections cover?
 
-%This thesis is about learning interpretable features (See the discussion in Section \ref{ch1:interpret}). In this case, this means that each feature is labelled with words so that humans can understand what that feature means, e.g. in a domain where each document is a movie review, a bag-of-words is interpretable as it has the label "Scary" for a feature and its frequency value. However, this is only useful if we desired to classify
+%This thesis is about learning interpretable features (See the discussion in Section \ref{ch1:interpret}). In this case, this means that each feature is labelled with words so that humans can understand what that feature means, e.g.\ in a domain where each document is a movie review, a bag-of-words is interpretable as it has the label "Scary" for a feature and its frequency value. However, this is only useful if we desired to classify
 
 %This Chapter continues as follows: First we go-over the bag-of-words and improvements for it, then we move on to how to obtain representations that model more complex relationships between documents using a variety of methods. From there, we explain a few different types of classifiers and finally give more specific context for the work in the thesis, describing interpretable representations and other related work.
 
 
 
-%These tasks can range from Document Classification where documents are organized into categories e.g. separating news articles into "World News" and "UK News" based on their text, to Sentiment Analysis where if a text document like a movie review is classified as positive or negative. Each of these tasks requires a different representation to be most effective, for example ideally when learning a Sentiment Analysis task the representation would model sarcasm and context e.g. representing that "Now, this wasn't bad" doesn't carry the same meaning as "Now, wasn't this bad". 
+%These tasks can range from Document Classification where documents are organized into categories e.g.\ separating news articles into "World News" and "UK News" based on their text, to Sentiment Analysis where if a text document like a movie review is classified as positive or negative. Each of these tasks requires a different representation to be most effective, for example ideally when learning a Sentiment Analysis task the representation would model sarcasm and context e.g.\ representing that "Now, this wasn't bad" doesn't carry the same meaning as "Now, wasn't this bad". 
 
 
 %Text documents, pre-processing
@@ -158,7 +158,7 @@ This thesis is focused on producing disentangled representations from text data.
 
 \subsection{Text Domains}
 
-"Text domain" refers to a subject area that is unique in its vocabulary and structure. One example is the newsgroups domain (See Section \ref{data:datasets}), which is composed of online news discussion groups. Below an example post is provided from the newsgroups domain that contains unique jargon like "NOEMS", "EMM386" and a unique structure e.g. signing the post with the persons name and a personal tagline for contacting them. %In this domain, there are subject areas, topics and posts. Each subject area has topics that users create, and each topic has posts that users respond with. Within each of these subject areas, specific jargon and a unique structure specific to that subject area and the overall domain has developed. 
+"Text domain" refers to a subject area that is unique in its vocabulary and structure. One example is the newsgroups domain (See Section \ref{data:datasets}), which is composed of online news discussion groups. Below an example post is provided from the newsgroups domain that contains unique jargon like "NOEMS", "EMM386" and a unique structure e.g.\ signing the post with the persons name and a personal tagline for contacting them. %In this domain, there are subject areas, topics and posts. Each subject area has topics that users create, and each topic has posts that users respond with. Within each of these subject areas, specific jargon and a unique structure specific to that subject area and the overall domain has developed. 
 
 
 
@@ -184,9 +184,9 @@ This thesis is focused on producing disentangled representations from text data.
 	ac151@Freenet.carleton.ca  David\_Clarke@mtsa.ubc.ca  clarkec@sfu.ca
 \end{quote}
 
-These particularities to the domain are what makes the distinction between domain-specific text data to general text data. A machine-learning model will develop a representation of how to solve the task dependent on this data. If the model is given general text data examples to learn from, then it will miss out on domain-specific quirks that can help it solve the task e.g. when learning to identify if a newsgroups post belongs to the subject of windows. If the general examples do not use jargon like "AUTO" and "EMM386" then this important information will not be used. However, if the examples given are over-specialized then the model may place excess importance on domain-specific quirks that are not actually meaningful, e.g. if in the training examples of posts about windows most users signed off their text-posts with an email that includes ".ca", meaning they are from canada, then the model may identify all posts that include ".ca" emails as about windows despite this simply being a strange quirk in the data.
+These particularities to the domain are what makes the distinction between domain-specific text data to general text data. A machine-learning model will develop a representation of how to solve the task dependent on this data. If the model is given general text data examples to learn from, then it will miss out on domain-specific quirks that can help it solve the task e.g.\ when learning to identify if a newsgroups post belongs to the subject of windows. If the general examples do not use jargon like "AUTO" and "EMM386" then this important information will not be used. However, if the examples given are over-specialized then the model may place excess importance on domain-specific quirks that are not actually meaningful, e.g.\ if in the training examples of posts about windows most users signed off their text-posts with an email that includes ".ca", meaning they are from canada, then the model may identify all posts that include ".ca" emails as about windows despite this simply being a strange quirk in the data.
 
-%Although language is universal, the individualities of text domains make solving problems efficiently within those domains often depends on a domain-specific machine-learning pipeline where both the representation and the machine learning model that will solve the problem are catered towards that domain. For example, twitter posts are significantly shorter than newsgroups posts, and rely more on modern expressions of ideas e.g. using a joke format that others on the platform have used. Being able to make-use of these domain-specific insights somehow in the process is extremely important. 
+%Although language is universal, the individualities of text domains make solving problems efficiently within those domains often depends on a domain-specific machine-learning pipeline where both the representation and the machine learning model that will solve the problem are catered towards that domain. For example, twitter posts are significantly shorter than newsgroups posts, and rely more on modern expressions of ideas e.g.\ using a joke format that others on the platform have used. Being able to make-use of these domain-specific insights somehow in the process is extremely important. 
 
 %In this thesis we aim to introduce methods that can be used to a variety of domains and be used with a variety of machine-learning models, without labour from domain experts. In particular, we look at solving domain-specific tasks without catering the representation or the model to the domain using expert knowledge. With this in mind, the following sections will be focused on a more general pipeline that does not delve into domain-specific techniques.
 
@@ -201,12 +201,12 @@ These particularities to the domain are what makes the distinction between domai
 %The main point here is not that these domains are completely different, but rather that there are meaningful differences between between text from the domain and text outside of it, and although there are different rules for each domain there are still common trends between them. Typically in machine-learning the methods that perform the best use some-kind of large-scale data that is not directly related to the domain as well as a lesser amount of domain data.
 
 
-% Text from different domains is formatted differently, e.g. posts and comments
+% Text from different domains is formatted differently, e.g.\ posts and comments
 % Corpus are usually split into documents because of its associated tasks, give examples?
 % Text from different domains differ in language
 % Tasks in different domains are different
 % Text from different domains perform better using different representations and classifiers
-% There are similarities between domains that is taken advantage of e.g. using word-vectors
+% There are similarities between domains that is taken advantage of e.g.\ using word-vectors
 
 
 
@@ -255,14 +255,14 @@ The datasets used in this thesis are composed of documents. In some of these dat
 
 % noise versus not noise - what does it mean?
 
-Being able to automatically remove this noise is an essential step of building a representation and solving machine-learning problems.  The first stage of obtaining a bag-of-words is building a vocabulary $W_w$, composed of unique words $w \in W$ from the corpus. In this vocabulary, it is important that words are identified e.g. if the word "Dog" was considered to be different to the word "dog." then the vocabulary would be too noisy. There are standard methods for removing noise in a dataset. We describe them in the following bullet-points: %In Table !!! we show some examples of noise in a domain.  %examles of noies!!!!
+Being able to automatically remove this noise is an essential step of building a representation and solving machine-learning problems.  The first stage of obtaining a bag-of-words is building a vocabulary $W_w$, composed of unique words $w \in W$ from the corpus. In this vocabulary, it is important that words are identified e.g.\ if the word "Dog" was considered to be different to the word "dog." then the vocabulary would be too noisy. There are standard methods for removing noise in a dataset. We describe them in the following bullet-points: %In Table !!! we show some examples of noise in a domain.  %examles of noies!!!!
 
 \begin{itemize}
-	\item  Convert all text to lower-case, e.g. "The man and The Dog" converted to "the man and the dog"
-	\item  Remove all punctuation including excess white-space, e.g. "the man, and the dog..." converted to "the man and the dog"
-	\item Using a predefined list of "stop-words", remove words that are not useful, e.g. "the man and the dog" converted to "man dog"
-	\item Remove infrequent words, e.g. "man dog, dgo, dog man" converted to "man dog, dog man".
-	\item Domain-specific pre-processing to remove metadata, e.g. removing emails from the end of movie reviews.
+	\item  Convert all text to lower-case, e.g.\ "The man and The Dog" converted to "the man and the dog"
+	\item  Remove all punctuation including excess white-space, e.g.\ "the man, and the dog..." converted to "the man and the dog"
+	\item Using a predefined list of "stop-words", remove words that are not useful, e.g.\ "the man and the dog" converted to "man dog"
+	\item Remove infrequent words, e.g.\ "man dog, dgo, dog man" converted to "man dog, dog man".
+	\item Domain-specific pre-processing to remove metadata, e.g.\ removing emails from the end of movie reviews.
 \end{itemize}
 
 
@@ -272,11 +272,11 @@ Being able to automatically remove this noise is an essential step of building a
 
 %When using a bag-of-words as a representation in a classification task, that threshold is usually set higher, as it is more important to remove noise that would not naturally be removed when using the bag-of-words to create another representation. 
 
-%One way to remove noisy words is to apply a filter where words that are not frequent enough are removed. %Typically when creating a representation the threshold $T$ for this filter is low, e.g. two or one, so that only truly noisy words are removed. 
+%One way to remove noisy words is to apply a filter where words that are not frequent enough are removed. %Typically when creating a representation the threshold $T$ for this filter is low, e.g.\ two or one, so that only truly noisy words are removed. 
 
 %%%%%%%%%%%%% Convert to a bullet point list with better organization
 
-%However, if grammar and punctuation is removed then we can simply count that there are two occurrences of the word dog, resulting in a more robust way to count words. Some words are too common to be meaningful, to remove these words a list of "stop-words" is created - words like "the" and "and" resulting in a sentence that only contains meaningful words, e.g. "man dog dog man dgo". Finally, terms that do not occur more than a set threshold $T$ are usually pruned, with the lowest threshold being one. This is because terms which do not occur often are likely noise,   for example leaving us with a final representation of "man dog dog man", removing all remaining noise. 
+%However, if grammar and punctuation is removed then we can simply count that there are two occurrences of the word dog, resulting in a more robust way to count words. Some words are too common to be meaningful, to remove these words a list of "stop-words" is created - words like "the" and "and" resulting in a sentence that only contains meaningful words, e.g.\ "man dog dog man dgo". Finally, terms that do not occur more than a set threshold $T$ are usually pruned, with the lowest threshold being one. This is because terms which do not occur often are likely noise,   for example leaving us with a final representation of "man dog dog man", removing all remaining noise. 
 
 %Despite removing some structure and making it less readable  at-scale this pre-processed sentence results in a better representation of the meaning of the text for machines. 
 
@@ -298,9 +298,9 @@ Machines cannot parse the meaning of text like news articles, product reviews or
 
 
 
-%This thesis deals with text-document representations. Text documents are unstructured raw text data that have been separated according to their domain, e.g. Amazon product reviews separated such that each product is represented by all of its reviews, or news articles separated such that one document contains the data for one news article. One way to gain insight into this data is to count the frequencies of the words in each document. If a word is high-frequency for a document, then that word will likely be important to understand the meaning of that document. 
+%This thesis deals with text-document representations. Text documents are unstructured raw text data that have been separated according to their domain, e.g.\ Amazon product reviews separated such that each product is represented by all of its reviews, or news articles separated such that one document contains the data for one news article. One way to gain insight into this data is to count the frequencies of the words in each document. If a word is high-frequency for a document, then that word will likely be important to understand the meaning of that document. 
 
-%Text data, for example forum posts, amazon product reviews, or news articles have become readily available as the digital infrastructure that supports our lives has grown. This data largely is unstructured, and cannot be readily processed by Artificial Intelligence tools without being reformatted. For example, if the text is separated into documents e.g. the raw text for one news article is put into a separate document from another.
+%Text data, for example forum posts, amazon product reviews, or news articles have become readily available as the digital infrastructure that supports our lives has grown. This data largely is unstructured, and cannot be readily processed by Artificial Intelligence tools without being reformatted. For example, if the text is separated into documents e.g.\ the raw text for one news article is put into a separate document from another.
 
 %Need to write about the concept of salient features of a domain here.
 \subsection{Bag-Of-Words}\label{bg:BOW}
@@ -343,7 +343,7 @@ Where ${df}(w)$ is the amount of documents the word $w$ has occurred in and $d_n
 
 
 
-%If one movie review contains the word "scary" 100 times, "funny" 10 times and "romantic" 5 times, this can be represented as a vector for the movie review where each column is a word $[100, 10, 5]$. Representations like this can be used to find patterns that separate movies into genres, e.g. when comparing the previous vector to one for another movie that is more funny and less scary and romantic $[0, 100, 0]$, a simple pattern could be that \textit{IF $Scary_f$ > 50 THEN Movie is Horror} and \textit{IF $Funny_f$ > 50 THEN Movie is Comedy}.
+%If one movie review contains the word "scary" 100 times, "funny" 10 times and "romantic" 5 times, this can be represented as a vector for the movie review where each column is a word $[100, 10, 5]$. Representations like this can be used to find patterns that separate movies into genres, e.g.\ when comparing the previous vector to one for another movie that is more funny and less scary and romantic $[0, 100, 0]$, a simple pattern could be that \textit{IF $Scary_f$ > 50 THEN Movie is Horror} and \textit{IF $Funny_f$ > 50 THEN Movie is Comedy}.
 
 %By extending this  so that each word in the vocabulary $w \in W$ has an associated frequency ${wf}(d)$ for each document  $d \in D$  the result is a vector for each document composed of word-frequencies  $d = ({wf}_1, {wf}_2, ..., {wf}_n)$, with ${wf}_1$ referring to the first word in the vocabulary, and so on until the final word $n$ in the vocabulary. By using these vectors as a representation of the text documents, the result is a matrix  with columns equal to the amount of words in the vocabulary $w_n$ and rows equal to the amount of documents $d_n$. 
 
@@ -385,20 +385,87 @@ The PPMI BOW is the representation used often in this thesis for a simple repres
 
 \section{Text Document Classification}\label{ch2:classifiers}
 
-Machine learning algorithms can be split  into two distinct categories, supervised and unsupervised. Supervised problems have some data that is labelled, and some that is not labelled. The goal of a supervised task is to assign labels to the data that is not labelled, by learning with the data that is labelled. For example a twitter post can be classified as positive or negative. Unsupervised problems do not have any labelled training examples, and instead try to solve a problem just from unlabelled data. An example of an unsupervised problem is clustering, the task of finding e.g.\ similar documents and grouping them together.% Machine-learning models can be used to solve these problems.
+%Machine learning algorithms can be split  into two distinct categories, supervised and unsupervised. Supervised problems have some data that is labelled, and some that is not labelled. The goal of a supervised task is to assign labels to the data that is not labelled, by learning with the data that is labelled. For example a twitter post can be classified as positive or negative. Unsupervised problems do not have any labelled training examples, and instead try to solve a problem just from unlabelled data. An example of an unsupervised problem is clustering, the task of finding e.g.\ similar documents and grouping them together.% Machine-learning models can be used to solve these problems.
 
 %Text document classification is a supervised task that can be used for example to identify social media posts or product reviews, are positive or negative \cite{Burel2018},  identify social media posts that happen during crises and automatically categorize them to be useful to responders \cite{Burel2018},  or detect infections acquired while patients are in a hospital . 
 
- A classification problem has  labels (or "classes") where each example either has  a label or does not have. Labels can be understood as categories in the domain, e.g. in the domain of sentiment analysis on movie reviews, labels could be "very good", "good", "average", "bad", "very bad". Given a set of possible labels, documents $D$ and document/label pairs are assigned a binary truth value $(d, c) = {0, 1}$. From these values, a classifier finds a function that assigns unlabelled documents $d \in D$ to predicted labels $(d, c_p) $. This function approximates an unknown target function that can accurately label any document. For example, in a domain of movie reviews, each review is labelled as either positive or negative, and a function must be found that can determine if unlabelled movie reviews are positive or negative. 
+ A classification problem has  labels (or "classes") where each example either has  a label or does not have. Labels can be understood as categories in the domain, e.g.\ in the domain of sentiment analysis on movie reviews, labels could be "very good", "good", "average", "bad", "very bad". Given a set of possible labels, documents $D$ and document/label pairs are assigned a binary truth value $(d, c) = {0, 1}$. From these values, a classifier finds a function that assigns unlabelled documents $d \in D$ to predicted labels $(d, c_p) $. This function approximates an unknown target function that can accurately label any document. For example, in a domain of movie reviews, each review is labelled as either positive or negative, and a function must be found that can determine if unlabelled movie reviews are positive or negative. 
 
-% This is why classification tasks can measure how good a representation is, if they can perform on key domain tasks like predicting the genre of a movie based on its movie reviews then they clearly represent fundamental semantic information about movies.  As an example,  the bag-of-words can be considered a good representation if the frequencies of sentiment-related words, like "good", "bad", and "thrilling" would be good enough to achieve reasonable performance, as a machine-learning classifier could determine rules based on the frequency of these relevant words, e.g. "IF good > 30, and thrilling > 20, THEN positive sentiment". The tasks that are solved in this thesis are all classification tasks. 
+% This is why classification tasks can measure how good a representation is, if they can perform on key domain tasks like predicting the genre of a movie based on its movie reviews then they clearly represent fundamental semantic information about movies.  As an example,  the bag-of-words can be considered a good representation if the frequencies of sentiment-related words, like "good", "bad", and "thrilling" would be good enough to achieve reasonable performance, as a machine-learning classifier could determine rules based on the frequency of these relevant words, e.g.\ "IF good > 30, and thrilling > 20, THEN positive sentiment". The tasks that are solved in this thesis are all classification tasks. 
 
+
+\subsection{Overfitting} % Discuss bias/variance trade off
+
+% The problem of overfitting\dfrac{_{_{num}}}{den}
+
+If a machine-learning model is given training data, then the model could simply learn a function that memorises the training data. Ideally the model instead captures meaning in the domain that enables it to generalize well to examples it has not learned from.  This is known as the bias/variance trade-off. High variance models prioritize the correct classification of existing examples, e.g.\ in the case of a non-linear function that ensures each example in the training data is classified correctly by increasing complexity. This is at the cost of bias, or the amount of assumptions made by the model. A high bias model would make many assumptions about the target function, e.g.\ using a linear function, and because of this the function may generalize well to new examples if those assumptions are correct.
+
+In the case of a neural network,  this behaviour can be stopped by limiting the number of neurons available in the hidden layer, forcing the network to generalize the representation into a lower-dimensional vector space. However, the problem of overfitting to the examples given rather than learning a way to solve the problem in a general way is a persistent one in machine-learning tasks. To give an example, when learning with a bag-of-words the model may realize that each document was written by a different user, and that users name is recorded in the document text. A simple function would be to say:
+
+
+IF user\_name\_1 is > 0, THEN class = 1.
+
+However, this is not actually learning any domain knowledge, it is simply overfitting to noise.
+
+% Training, test, validation sets
+
+To better select hyperparameters that avoid overfitting, the data for a supervised problem is usually split into three parts:
+
+\textbf{Training data} The training data are the examples that the model learns from. It is used only when creating the model, and is not used after the model has finished learning.
+
+\textbf{Test data} The examples that the model uses to check if the function learned is correct.
+
+\textbf{Validation data} A decision tree may perform better if it is shallow and limited in depth rather than unlimited in depth, as it will not introduce nodes that are overly specific to the training data. Validation data is used for parameter tuning, e.g.\ when determining how much to limit the depth of a decision tree, ho good the parameter is would be evaluated on how well the model performs on the validation set. The separation of validation data from test data is just to ensure that we are not overfitting the parameters on specific examples.
+
+
+
+
+
+
+
+
+
+
+
+%When using a bag-of-words as a representation in a classification task, that threshold is usually set higher, as it is more important to remove noise that would not naturally be removed when using the bag-of-words to create another representation. 
+
+
+
+%One way to obtain features for text documents is to use the frequencies of words in that document. As a vector $d = ({wf}_1, {wf}_2, ..., {wf}_n)$ with ${wf}_1$ referring to first word in the vocabulary $w \in W$, and ${wf}_n$  referring to the final word in the vocabulary. This is called a Bag-Of-Words (BOW), called as such because word-order is not retained. However, to have a consistent bag-of-words representation, the text must be normalized so that any word $w \approx w$ will  $w = w$, so where a word varies in format but not alphanumeric characters it is treated as the same word, e.g.\ "Wow, wow, WOW!!!" would be treated as  "wow wow wow". This is a common step taken when producing a representation from text, where it is simplified to make it easier to represent.
+
+% Given features $x$ and labels $y$, a model $m$ learns a way to predict the label of a document given its features, and this learned method can be applied to unlabelled documents. For example, given a bag-of-words representation, one way to automatically label a news article category would be with thresholds on the frequency of words in the text e.g.\ if the word "amazing" and the word "great" both occur more frequently than a threshold $T$ determined by a model, then the label is $0$,  a "very good" movie. 
+
+\subsection{Evaluation Metrics}\label{bg:metrics}
+
+To evaluate a model, the difference between the real labels of documents and the predicted features of documents are compared. However, the value of the model is in its ability to predict the labels of documents that are unlabelled. 
+
+Here, we assume we are classifying a single binary class, where positive labels are denoted by 1 and negative labels by 0. The simplest way to evaluate a model is by its accuracy $a$, where ${C_n}$ is the number of correct predictions, and $P_n$ is the number of all predictions.
+\begin{align}
+a = \dfrac{C_n}{ P_n}  
+\end{align}
+
+However, this can give a misleadingly high score if for example, the dataset is unbalanced with many more negative labels than positive ones, and the model predicts only negatives. An example of where this would be the case is when classifying out of all social media posts, which ones are important for emergency responders to investigate. Although there are very few positive instances of this class, identifying those is very important. In the case of a model predicting only negatives, the accuracy would be high as the number of correctly predicted negatives $\textit{tn}$ is high, but the model has not actually learned anything, which we can tell by looking at the number of correctly predicted positives $\textit{tp}$. For a metric that can take this into account, we must consider the number of incorrectly predicted positives (negatives classified as positive) $\textit{fp}$ and the number of incorrectly predicted negatives $\textit{fn}$.
+
+In this situation,  recall is an informative measures. Recall $\textit{rec}$ is the proportion of true positives $\textit{tp}$ identified correctly. 
+\begin{align}
+\textit{rec} = \dfrac{\textit{tp}}{\textit{tp} + \textit{fn}}
+\end{align}
+In the case of a model predicting only negatives, the $\textit{rec}$ would be zero. Recall is useful in these situations where we are interested in how many false negatives ${fn}$ there are. However, if the model is instead prioritizing positive predictions too much rather than negative ones, we can use precision ${pre}$
+\begin{align}
+\textit{pre} = \dfrac{\textit{tp}} {\textit{tp} + \textit{fp}}
+\end{align}
+% F1 score
+
+F1 score is the harmonic mean of recall and precision, it is used to balance and measure the recall and precision at the same time where they are equally important. 
+\begin{align}
+{F1} = 2 \cdot \dfrac{\textit{pre} \cdot {rec}}{\textit{pre} + \textit{rec}}
+\end{align}
 
 \subsection{Types of Classification Problems}\label{bg:multi-label}
 
 % Binary is where you are just predicting a single class
 
-There are three kinds of classification problems that are used in this thesis. The first are binary problems. This is where there are two possible classes, and they are mutually exclusive. An example of this is a task that classifies if a movie review is positive or negative. The second kind of classification problem is multi-class. A multi-class problem has more than two mutually exclusive classes, where each example belongs to only one class e.g.\ classifying the age-rating of a movie. The final kind of classification problem is multi-label. In a multi-label classification problem examples can belong to multiple classes at once. For example, classifying if a movie contains particular themes like "blood", "romance", or "relationships". A movie can contain both "blood" and "romance", but some movies only contain "blood" and some movies only contain "romance". 
+There are three kinds of classification problems that are used in this thesis. The first are binary problems. This is where there are two possible classes, and they are mutually exclusive. An example of this is a task that classifies if a movie review is positive or negative. The second kind of classification problem is multi-class. A multi-class problem has more than two mutually exclusive classes, where each example belongs to only one class e.g.\ classifying the age-rating of a movie, where a movie is either suitable for ages 18+, 15+, 12+ or suitable for everyone. The final kind of classification problem is multi-label. In a multi-label classification problem examples can belong to multiple classes at once. For example, classifying if a movie contains particular themes like "blood", "romance", or "relationships". A movie can contain both "blood" and "romance", but some movies only contain "blood" and some movies only contain "romance". 
 
 % Multi-class are where you are just predicting one out of many
 
@@ -427,7 +494,7 @@ The tree can be viewed as a hierarchy of importance for the class, with the most
 % !!!!!!!!!!!!!!!!!!!!!!!!!
 \subsection{Linear Support Vector Machines}\label{bg:svm}
 
-Where documents are viewed as points in a vector space, where the dimensions of that space are the features,  a linear support vector machine  finds a hyper-plane that maximizes the margin between entities belonging to different classes. To classify new entities, they are placed in this space and labelled according to which side of the line they fall on. A parameter can be tuned for this classifier, the $C$ parameter. The C parameter determines how much misclassification is penalized, in other words, how much bias there is in the model. A large C value results in low bias, and high variance, as misclassifications are heavily penalized. A low C value results in high bias and low variance, as misclassifications are not highly penalized. 
+Where documents are viewed as points in a vector space, where the dimensions of that space are the features,  a linear support vector machine  finds a hyper-plane that maximizes the margin between documents belonging to different classes. To classify new documents, they are placed in this space and labelled according to which side of the line they fall on. A parameter can be tuned for this classifier, the $C$ parameter. The C parameter determines how much misclassification is penalized, in other words, how much bias there is in the model. A large C value results in low bias, and high variance, as misclassifications are heavily penalized. A low C value results in high bias and low variance, as misclassifications are not highly penalized. 
 
 
  %Below, we demonstrate this principal in a two-dimensional representation:
@@ -475,98 +542,32 @@ Each node also has an activation threshold, which the value it receives must rea
 
 One kind of neural network is the feed-forward network, where nodes only connect to nodes in subsequent layers. In this way, the feed-forward network always feeds information forwards. In standard applications of a feed-forward network, layers are "fully connected", meaning that each node is connected to every node in the subsequent layer. 
 
-Hidden layers of neural networks can be viewed as vector spaces, where the result of learning is that the position of entities in that hidden layer are better spatially organized for solving the given task. For example, entities that belong to one class may be spatially grouped together. This is an important advantage of neural network models in the context of text classification: these models jointly solve the task of representation learning (i.e. transforming some initial representation into one which is better suited for the given task) and the task of learning the actual classification model.
+Hidden layers of neural networks can be viewed as vector spaces, where the result of learning is that the position of documents in that hidden layer are better spatially organized for solving the given task. For example, documents that belong to one class may be spatially grouped together. This is an important advantage of neural network models in the context of text classification: these models jointly solve the task of representation learning (i.e. transforming some initial representation into one which is better suited for the given task) and the task of learning the actual classification model.
 
-%This benefit also has a down-side, as neural networks have so many parameters (e.g. the number of nodes, the activation function, the weight initialization) it can take a long time to find the combination of parameters that enable the network to organize entities efficiently for the associated problem. 
+%This benefit also has a down-side, as neural networks have so many parameters (e.g.\ the number of nodes, the activation function, the weight initialization) it can take a long time to find the combination of parameters that enable the network to organize entities efficiently for the associated problem. 
 
 
 %\subsection{Binary Classification}
 %\subsection{Multi-Label Classification}
-\subsection{Overfitting} % Discuss bias/variance trade off
-
-% The problem of overfitting\dfrac{_{_{num}}}{den}
-
-If a machine-learning model is given training data, then the model could simply learn a function that memorises the training data. Ideally the model instead captures meaning in the domain that enables it to generalize well to examples it has not learned from.  This is known as the bias/variance trade-off. High variance models prioritize the correct classification of existing examples, e.g.\ in the case of a non-linear function that ensures each example in the training data is classified correctly by increasing complexity. This is at the cost of bias, or the amount of assumptions made by the model. A high bias model would make many assumptions about the target function, e.g.\ using a linear function, and because of this the function may generalize well to new examples if those assumptions are correct.
-
- In the case of a neural network,  this behaviour can be stopped by limiting the number of neurons available in the hidden layer, forcing the network to generalize the representation into a lower-dimensional vector space. However, the problem of overfitting to the examples given rather than learning a way to solve the problem in a general way is a persistent one in machine-learning tasks. To give an example, when learning with a bag-of-words the model may realize that each document was written by a different user, and that users name is recorded in the document text. A simple function would be to say:
-
-
-IF user\_name\_1 is > 0, THEN class = 1.
-
-However, this is not actually learning any domain knowledge, it is simply overfitting to noise.
-
-% Training, test, validation sets
-
-To better select hyperparameters that avoid overfitting, the data for a supervised problem is usually split into three parts:
-
-\textbf{Training data} The training data are the examples that the model learns from. It is used only when creating the model, and is not used after the model has finished learning.
-
-\textbf{Test data} The examples that the model uses to check if the function learned is correct.
-
-\textbf{Validation data} A decision tree may perform better if it is shallow and limited in depth rather than unlimited in depth, as it will not introduce nodes that are overly specific to the training data. Validation data is used for parameter tuning, e.g. when determining how much to limit the depth of a decision tree, ho good the parameter is would be evaluated on how well the model performs on the validation set. The separation of validation data from test data is just to ensure that we are not overfitting the parameters on specific examples.
-
-
-
-
-
-
-
-
-
-
-
-%When using a bag-of-words as a representation in a classification task, that threshold is usually set higher, as it is more important to remove noise that would not naturally be removed when using the bag-of-words to create another representation. 
-
-
-
-%One way to obtain features for text documents is to use the frequencies of words in that document. As a vector $d = ({wf}_1, {wf}_2, ..., {wf}_n)$ with ${wf}_1$ referring to first word in the vocabulary $w \in W$, and ${wf}_n$  referring to the final word in the vocabulary. This is called a Bag-Of-Words (BOW), called as such because word-order is not retained. However, to have a consistent bag-of-words representation, the text must be normalized so that any word $w \approx w$ will  $w = w$, so where a word varies in format but not alphanumeric characters it is treated as the same word, e.g. "Wow, wow, WOW!!!" would be treated as  "wow wow wow". This is a common step taken when producing a representation from text, where it is simplified to make it easier to represent.
-
-% Given features $x$ and labels $y$, a model $m$ learns a way to predict the label of a document given its features, and this learned method can be applied to unlabelled documents. For example, given a bag-of-words representation, one way to automatically label a news article category would be with thresholds on the frequency of words in the text e.g. if the word "amazing" and the word "great" both occur more frequently than a threshold $T$ determined by a model, then the label is $0$,  a "very good" movie. 
-
-\subsection{Evaluation Metrics}\label{bg:metrics}
-
-To evaluate a model, the difference between the real labels of documents and the predicted features of documents are compared. However, the value of the model is in its ability to predict the labels of documents that are unlabelled. 
-
-Here, we assume we are classifying a single binary class, where positive labels are denoted by 1 and negative labels by 0. The simplest way to evaluate a model is by its accuracy $a$, where ${C_n}$ is the number of correct predictions, and $P_n$ is the number of all predictions.
-
-
-$a = \dfrac{C_n}{ P_n}  $
-
-
-However, this can give a misleadingly high score if for example, the dataset is unbalanced with many more negative labels than positive ones, and the model predicts only negatives. An example of where this would be the case is when classifying out of all social media posts, which ones are important for emergency responders to investigate. Although there are very few positive instances of this class, identifying those is very important. In the case of a model predicting only negatives, the accuracy would be high as the number of correctly predicted negatives $\textit{tn}$ is high, but the model has not actually learned anything, which we can tell by looking at the number of correctly predicted positives $\textit{tp}$. For a metric that can take this into account, we must consider the number of incorrectly predicted positives (negatives classified as positive) $\textit{fp}$ and the number of incorrectly predicted negatives $\textit{fn}$.
-
-In this situation,  recall is an informative measures. Recall $\textit{rec}$ is the proportion of true positives $\textit{tp}$ identified correctly. 
-
-$\textit{rec} = \dfrac{\textit{tp}}{\textit{tp} + \textit{fn}}$
-
-In the case of a model predicting only negatives, the $\textit{rec}$ would be zero. Recall is useful in these situations where we are interested in how many false negatives ${fn}$ there are. However, if the model is instead prioritizing positive predictions too much rather than negative ones, we can use precision ${pre}$
-
-$\textit{pre} = \dfrac{\textit{tp}} {\textit{tp} + \textit{fp}}$
-
-% F1 score
-
-F1 score is the harmonic mean of recall and precision, it is used to balance and measure the recall and precision at the same time where they are equally important. 
-
-${F1} = 2 \cdot \dfrac{\textit{pre} \cdot {rec}}{\textit{pre} + \textit{rec}}$
-
+\
 
 \section{Vector Spaces}\label{ch2:vectorspaces}
 
 % BOWs are common
-% BOWs do not capture complex relationships of a particular type of information e.g. commonsense reasoning
+% BOWs do not capture complex relationships of a particular type of information e.g.\ commonsense reasoning
 % Integrating similarity information has these  results
 % Just using similarity information would result in a large representation
 
 
 The bag-of-words (BOW) based on frequency statistics has the benefit of being easy to understand on a granular level, as each feature is a distinctly labelled word. However, it is difficult to deal with words in the test data that  haven't been seen during training, you can't reliably learn the importance of words that have few examples. Ideally, the  information in a bag-of-words could be represented in a lower number of dimensions while preserving the most relevant information as much as possible.% Low-dimensional vector-spaces are one way that these sparse representations can be converted into low-dimensional dense representations. 
 
-%Vector space representations are versatile, and neural network representation learning methods can be used to integrate new kinds of information into these vector spaces, e.g. contextual information, character-level information or information from other data sources. 
+%Vector space representations are versatile, and neural network representation learning methods can be used to integrate new kinds of information into these vector spaces, e.g.\ contextual information, character-level information or information from other data sources. 
 
 Low-dimensional vector spaces are generally learned by taking  semantic information  in a sparse e.g.\ BOW representation, and encoding it  such that documents that are semantically similar are close together. However, these dense vector space representations usually no longer have features (i.e. dimensions) which are meaningful to humans. This is a trade-off when going from a sparse representation to a dense representation, the features are no longer meaningful. 
 
 This can lead to unexpected disadvantages when classifying text with a simple classifier, e.g.\ a low-depth decision tree. In a bag-of-words, terms that are particularly important for classifying the task could be selected as important features at the top of the tree. However, in a low-dimensional vector space the information that is suitable for classification is not sufficiently separated into a distinct feature; rather it is encoded in the spatial relationships of the vector space.% This means that features will not be able to be appropriately selected for the representation, and a deeper tree may be required to achieve strong performance.
 
-The main focus of this thesis is in how to disentangle the semantic information encoded spatially in a vector space into semantic features. This is essentially producing a new representation that captures the same information as the initial vector space, but instead has features that are semantically meaningful similar to how a bag-of-words has individual features for each word. However, the features are not words but instead semantic properties in the space. In this case, "properties" refers to aspects of documents in the domain, for example, in a domain of movie reviews the  property of "comedy"  describes how comedic movies are.
+The main focus of this thesis is in how to disentangle the semantic information encoded spatially in a vector space into semantic features. This is essentially producing a new representation that captures the same information as the initial vector space, but instead has features that are semantically meaningful similar to how a bag-of-words has individual features for each word.  In this case, "features" refers to aspects of documents in the domain, for example, in a domain of movie reviews the  feature of "Comedy"  describes how comedic movies are.
 
 
 % we want to retain the information but reduce the dimensions
@@ -587,7 +588,7 @@ The main focus of this thesis is in how to disentangle the semantic information 
 
 
 
-% In reality we do not need a dimension per document - it is more likely that a group of documents e.g. Horror movie reviews from a domain of movies could be used as a "Horror" feature by averaging their dimensions together, the same with romantic movies or particularly cinematographally good ones. This is why typically these similarity representations are obtained with dimensionality reduction methods - with the general rule of thumb being that you want as many salient features as dimensions, where smaller dimensions represent more general concepts (with the most specific amount of dimensions being equivalent to the amount of words). 
+% In reality we do not need a dimension per document - it is more likely that a group of documents e.g.\ Horror movie reviews from a domain of movies could be used as a "Horror" feature by averaging their dimensions together, the same with romantic movies or particularly cinematographally good ones. This is why typically these similarity representations are obtained with dimensionality reduction methods - with the general rule of thumb being that you want as many salient features as dimensions, where smaller dimensions represent more general concepts (with the most specific amount of dimensions being equivalent to the amount of words). 
 
 
 
@@ -604,9 +605,9 @@ The main focus of this thesis is in how to disentangle the semantic information 
 %To do so, we can apply singular value decomposition (SVD) of a matrix that has been normalized. This method can only model linear relationships.
 
 
-%Starting with a large data matrix, e.g. the PPMI bag-of-words, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
+%Starting with a large data matrix, e.g.\ the PPMI bag-of-words, we first find the covariance matrix for these values. Then, from this covariance matrix we obtain the eigenvalues. We can then linearly transform the old data in-terms of this covariance matrix to obtain a new space of size equal to an arbitrary value smaller than our matrix.
 
-%PPMI values capture the meaning of words in documents, but are extremely sparse, with one dimension of the vector for each word. This dimensionality makes it difficult to e.g. learn a shallow decision tree that is resistant to overfitting.
+%PPMI values capture the meaning of words in documents, but are extremely sparse, with one dimension of the vector for each word. This dimensionality makes it difficult to e.g.\ learn a shallow decision tree that is resistant to overfitting.
 %Vector spaces are a popular way to represent unstructured text data, and have been broadly applied to and transformed by supervised %approaches. They vary in method, producing structure from Cosine Similarity, Matrix Factorization, Word-Vectors/Doc2Vec, etc. %More refs
 %They also vary in how they linearly separate entities. %How?
 %However, their commonality is that they are able to represent semantic relationships spatially. %ref
@@ -655,22 +656,22 @@ The main focus of this thesis is in how to disentangle the semantic information 
 % Talk about it in terms of the literature
 
 
-Principal Component Analysis (PCA) is a linear dimensionality reduction method. Given a set of objects described by feature vectors e.g.  a bag-of-words, it produces a vector space of a specified dimensionality $n$, where dimensions are  ordered by semantic importance. 
+Principal Component Analysis (PCA) is a linear dimensionality reduction method. Given a set of objects described by feature vectors e.g.\  a bag-of-words, it produces a vector space of a specified dimensionality $n$, where dimensions are  ordered by semantic importance. 
 
-Essentially, PCA works by linearly combining features in order to create new features that can differentiate entities well and are uncorrelated with previous features. This results in a new low-dimensional representation that retains information and has distinct semantic features. However, as these features are a linear combination of the previous features, they are generally not interpretable \cite{Gimenez}. 
+Essentially, PCA works by linearly combining features in order to create new features that can differentiate documents well and are uncorrelated with previous features. This results in a new low-dimensional representation that retains information and has distinct semantic features. However, as these features are a linear combination of the previous features, they are generally not interpretable \cite{Gimenez}. 
 
 
 \subsection{Multi-Dimensional Scaling}\label{ch2:MDS}
 
 % Talk about it in terms of the literature
 
-Multi-Dimensional Scaling  (MDS) is a dimensionality reduction algorithm. In this work, non-metric MDS is used. In the same way as PCA, the dimensionality of the output space is specified. As input, MDS takes a dissimilarity matrix of entities, where both rows and columns are entities and the values are the dissimilarity between those entities. To calculate the dissimilarity between two entities $e_i$ and $e_j$ the normalized angular difference is used.
+Multi-Dimensional Scaling  (MDS) is a dimensionality reduction algorithm. In this work, non-metric MDS is used. In the same way as PCA, the dimensionality of the output space is specified. As input, MDS takes a dissimilarity matrix of documents, where both rows and columns are documents and the values are the dissimilarity between those documents. To calculate the dissimilarity between two documents $di$ and $dj$ the normalized angular difference is used.
 
 \begin{align}
-ang(e_i, e_j) = \dfrac{2}{\pi} \cdot \textit{arccos}(\dfrac{v_{ei} \cdot v_{ej}}{|| v_{ei} || \cdot || v_{ej} ||})
+ang(di, dj) = \dfrac{2}{\pi} \cdot \textit{arccos}(\dfrac{v_{di} \cdot v_{dj}}{|| v_{di} || \cdot || v_{dj} ||})
 \end{align}
 
-From a bag-of-words, the way to construct this dissimilarity matrix is by finding the dissimilarity between bag-of-words features for each entity. A disadvantage of this method is that the dissimilarity matrix grows quadratically in the number of entities, which means that it may not fit in memory for larger datasets. The end-result of MDS is a representation where entities that are semantically similar according to the input matrix are spatially close to each other, and semantically different entities are spatially distant from each other.
+From a bag-of-words, the way to construct this dissimilarity matrix is by finding the dissimilarity between bag-of-words features for each entity. A disadvantage of this method is that the dissimilarity matrix grows quadratically in the number of documents, which means that it may not fit in memory for larger datasets. The end-result of MDS is a representation where documents that are semantically similar according to the input matrix are spatially close to each other, and semantically different documents are spatially distant from each other.
 
 
 
@@ -682,7 +683,7 @@ From a bag-of-words, the way to construct this dissimilarity matrix is by findin
 
 % You can find similarity information with BOW
 
-%This is similarity information, and one way to obtain this kind-of information is by taking the frequency vectors of a Bag-Of-Words and e.g. interpreting them in terms of relative cosine similarity.  They capture some interesting information about how entities are related
+%This is similarity information, and one way to obtain this kind-of information is by taking the frequency vectors of a Bag-Of-Words and e.g.\ interpreting them in terms of relative cosine similarity.  They capture some interesting information about how entities are related
 
 % BUt without reducing the dimensions of the space it would be overly large
 
@@ -693,7 +694,7 @@ From a bag-of-words, the way to construct this dissimilarity matrix is by findin
 
 %The method is unsupervised, resulting in word vectors generally being used by learning them from a large corpus of unannotated text from a variety of domains, and then applying them in domain-specific tasks.
 
-Word embeddings are a vector space representation for  words. They are typically learned using a large corpus of unstructured text, e.g.\ Wikipedia.  There are many ways to obtain word-vectors, one traditional approach is  matrix factorization \cite{Evy2007}. Recently modern methods like GloVe \cite{Pennington2014} and Word2Vec \cite{Mikolov2013} have been widely adopted. These methods learn representations of  words using the context of their surrounding words.  Essentially, the meaning of each word is determined only by  context. These representations have been extremely useful, and have semantic coherence, as shown by  being able to model relations between words, e.g.  analogical relations represented using  vector operations, where vec(word) is the word vector for a word,   vec(King) - vec(Man) $\approx$ vec(Queen).             
+Word embeddings are a vector space representation for  words. They are typically learned using a large corpus of unstructured text, e.g.\ Wikipedia.  There are many ways to obtain word-vectors, one traditional approach is  matrix factorization \cite{Evy2007}. Recently modern methods like GloVe \cite{Pennington2014} and Word2Vec \cite{Mikolov2013} have been widely adopted. These methods learn representations of  words using the context of their surrounding words.  Essentially, the meaning of each word is determined only by  context. These representations have been extremely useful, and have semantic coherence, as shown by  being able to model relations between words, e.g.\  analogical relations represented using  vector operations, where vec(word) is the word vector for a word,   vec(King) - vec(Man) $\approx$ vec(Queen).             
 
 \subsection{Doc2Vec}\label{ch2:doc2vec}
 
@@ -709,7 +710,7 @@ Doc2Vec \cite{Le2014a} extends the neural network method of learning word vector
 
 %Despite these features performing well at key-domain tasks, even when limited to using only a single feature to classify entities, it is not automatically clear what they mean. In-order to help illucidate this, the features are labelled with a cluster of words $w \in C$ which directly correspond to the semantic meaning. This is done automatically, and is qualitatively shown to be meaningful. Essentially, as the features obtained are representing  some property in the domain, domain knowledge is required to understand what the cluster label is referring to. For example, the cluster {vhs, old, dvd} does not have an immediate clear meaning to someone who is not aware that these words are used in the reviews of old movies that are released to DVD and VHS rather than being in the cinema.
 
-%The end-result of this process is to obtain a representation where each feature is a semantic property in the domain, labelled with a cluster of words. The value associated with the feature for each entity corresponds to the degree that it "has" that feature, e.g. if a movie in the domain of movie reviews had a high value for  a feature labelled with {Gore, Bloody, Horror} then we can rightly assume that the movie will contain a lot of blood. These semantic properties are derived directly from the spatial relationships in the representation, enabling us to use the versatility of information available in a variety of vector spaces to obtain interpretable representations that contain the same information. Although a low information loss is a by-product of this method, the main goal is not information loss, but just that the features obtained are useful in the domain.
+%The end-result of this process is to obtain a representation where each feature is a semantic property in the domain, labelled with a cluster of words. The value associated with the feature for each entity corresponds to the degree that it "has" that feature, e.g.\ if a movie in the domain of movie reviews had a high value for  a feature labelled with {Gore, Bloody, Horror} then we can rightly assume that the movie will contain a lot of blood. These semantic properties are derived directly from the spatial relationships in the representation, enabling us to use the versatility of information available in a variety of vector spaces to obtain interpretable representations that contain the same information. Although a low information loss is a by-product of this method, the main goal is not information loss, but just that the features obtained are useful in the domain.
 
 
 
@@ -728,7 +729,7 @@ The inspiration of the work by Derrac \cite{Derrac2015} was conceptual spaces. W
 
 The main appeal of conceptual spaces stems from the fact that they allow a wide range of cognitive and linguistic phenomena to be modelled in an elegant way. The idea of learning semantic spaces with accurate feature directions can be seen as a first step towards methods for learning conceptual space representations from data, and thus towards the use of more cognitively plausible representations of meaning in computer science. Our method also somewhat relates to the debates in cognitive science on the relationship between similarity and rule based processes  \cite{HAHN1998197}, in the sense that it allows us to explicitly link similarity based categorization methods (e.g.\ an SVM classifier trained on semantic space representations) with rule based categorization methods (e.g.\ the decision trees that we will learn from the feature directions).
 
-Fundamentally, both of these views seek to find the essential components that determine why all entities vary in the domain, and use them as features. In the case of text processing which we investigate in this work, the factors of variation found correspond to clusters of words that represent properties in the domain. The representation is considered disentangled if the features obtained are interpretable and  predictive when used in key domain tasks.
+Fundamentally, both of these views seek to find the essential components that determine why all entities vary in the domain, and use them as features. In the case of text processing which we investigate in this work, the factors of variation found correspond to clusters of words that represent properties of entities in the domain. The representation is considered disentangled if the features obtained are interpretable and  predictive when used in key domain tasks. In this thesis, the term "property" is sometimes used in place of the term "feature", to make the distinction between the "properties", which are directions in the document embedding, and "features"  that are the resulting rankings of documents on those features. 
 
 
 \subsection{Topic Models}\label{bg:TopicModels}
@@ -741,7 +742,7 @@ Compared to topic models, our work leverages clustering and similarity methods t
 
 \subsection{Generative Adversarial Network and Variational Autoencoders}
 
-Generative Adversarial Network (GAN) \cite{Goodfellow2014} are neural networks that learn representations using a discriminator and a generator, where the generator encodes a probabilistic model from which is aimed at generating entities that are similar to those from a given training set. This generator network is simultaneously trained with a discriminator network, which aims to predict whether a given entity is an actual example from the training set or was sampled from the generator.  The generator network implicitly learns a latent space of the entities from the considered domain, which has been proven useful in a wide variety of tasks, despite generally not being interpretable. However, GAN's have been extended to produce an interpretable disentangled latent space, in particular  InfoGan has shown that it can obtain interpretable features in the latent space where each feature corresponds to a salient factor, e.g. in a task of identifying what digit is written in an image of a handwritten digit, there are features for each digit and an additional digit used for the style of writing \cite{Chen2016}. GAN's have  also been applied in text \cite{Bowman2015, Kim} with some success, despite being noted as 'particularly difficult to train' in the text domain \cite{Arjovsky2017} even with advancements in this direction \cite{Mescheder2018}. The work in this thesis differs from the disentangled representations found in GAN's as it focuses on disentangling text document representations into semantic features that are relevant to text classification, and has a broad applicability to document-based text representations.
+Generative Adversarial Network (GAN) \cite{Goodfellow2014} are neural networks that learn representations using a discriminator and a generator, where the generator encodes a probabilistic model from which is aimed at generating entities that are similar to those from a given training set. This generator network is simultaneously trained with a discriminator network, which aims to predict whether a given entity is an actual example from the training set or was sampled from the generator.  The generator network implicitly learns a latent space of the entities from the considered domain, which has been proven useful in a wide variety of tasks, despite generally not being interpretable. However, GAN's have been extended to produce an interpretable disentangled latent space, in particular  InfoGan has shown that it can obtain interpretable features in the latent space where each feature corresponds to a salient factor, e.g.\ in a task of identifying what digit is written in an image of a handwritten digit, there are features for each digit and an additional digit used for the style of writing \cite{Chen2016}. GAN's have  also been applied in text \cite{Bowman2015, Kim} with some success, despite being noted as 'particularly difficult to train' in the text domain \cite{Arjovsky2017} even with advancements in this direction \cite{Mescheder2018}. The work in this thesis differs from the disentangled representations found in GAN's as it focuses on disentangling text document representations into semantic features that are relevant to text classification, and has a broad applicability to document-based text representations.
 
 %Variational auto-encoders by enforcing independence \cite{Hu2017}  disentangle key aspects in multiple  domains (images and text) by enforcing statistical independence \cite{Paige2016}.
 
@@ -749,9 +750,9 @@ Generative Adversarial Network (GAN) \cite{Goodfellow2014} are neural networks t
 
 \subsection{Sparse Representations}
 
-Methods to obtain sparse and interpretable word vectors have been developed by either adapting a learning method to include sparsity constraints e.g.  non-negative sparse embeddings adapting matrix factorization with  sparsity constraints \cite{Murphya} or \cite{Luo2015} adapting neural networks. Alternatively, some work follows a similar line to ours in that they post-process existing dense embeddings \cite{Subramanian} \cite{Park2017} \cite{Faruqui2015}. In the former category,  this approach has also been extended to sentences \cite{Trifonov2018}, and follows the idea that PCA and other dense representations are effective at compressing information into a small number of dimensions, although this results in semantically incoherent features. Instead, a larger representation with similar performance but more dimensions and high semantic coherency of its features is learned. In this way, information that was compressed into a small amount of dimensions previously has been disentangled into a larger number of features.  However, this can sometimes come with a minor loss of performance, particularly when using a lower number of dimensions. The features of these representations are labelled using the top $n$ highest-scoring words on the feature. Sparse interpretable representations have also been derived from sentences \cite{Trifonov}.
+Methods to obtain sparse and interpretable word vectors have been developed by either adapting a learning method to include sparsity constraints e.g.\  non-negative sparse embeddings adapting matrix factorization with  sparsity constraints \cite{Murphy} or \cite{Luo2015} adapting neural networks. Alternatively, some work follows a similar line to ours in that they post-process existing dense embeddings \cite{Subramanian} \cite{Park2017} \cite{Faruqui2015}. In the former category,  this approach has also been extended to sentences \cite{Trifonov2018}, and follows the idea that PCA and other dense representations are effective at compressing information into a small number of dimensions, although this results in semantically incoherent features. Instead, a larger representation with similar performance but more dimensions and high semantic coherency of its features is learned. In this way, information that was compressed into a small amount of dimensions previously has been disentangled into a larger number of features.  However, this can sometimes come with a minor loss of performance, particularly when using a lower number of dimensions. The features of these representations are labelled using the top $n$ highest-scoring words on the feature. Sparse interpretable representations have also been derived from sentences \cite{Trifonov}.
 
-There are also document representations that use sparsity constraints to obtain interpretable sparse representations like sparse PCA learned using the l1-norm, \cite{H.Zou2006} \cite{Zhang2012} or Sparse MDS \cite{Silva2004}. Compared to sparse representations, the methods in this thesis also attempt to post-process a dense representation in order to disentangle them, but it does not aim to produce a sparse representation that may perform poorly with a small number of features. Instead, the objective of the representation obtained in this thesis is to perform well with a small number of features, under the assumption that if we are able to identify key properties in the domain as features then we should only need a small number of features to perform well at key domain tasks like text classification.  
+There are also document representations that use sparsity constraints to obtain interpretable sparse representations like sparse PCA learned using the l1-norm, \cite{H.Zou2006} \cite{Zhang2012} or Sparse MDS \cite{Silva2004}. Compared to sparse representations, the methods in this thesis also attempt to post-process a dense representation in order to disentangle them, but it does not aim to produce a sparse representation that may perform poorly with a small number of features. Instead, the objective of the representation obtained in this thesis is to perform well with a small number of features, under the assumption that if we are able to identify key features of the domain then we should only need a small number of features to perform well at key domain tasks like text classification.  
 
 One method that does not produce a sparse representation but still learns an interpretable representation is \cite{Koc}, where features correspond to concepts. In their work, an external lexical resource is used to define  concepts that will correspond to features in the representation before training. This differs from our work in that we do not use any external resources apart from a bag-of-words from the domain to determine the features, rather they are determined by what the vector space representation itself prioritizes, as the features are derived directly from the semantic relationships that are spatially encoded in the representation. 
 
@@ -776,7 +777,7 @@ One method that does not produce a sparse representation but still learns an int
 
 
 
-%Interpretable representations are those representations where the features are meaningful, which bag-of-words is a part of. However, this work instead focuses on obtaining dense fine-grained interpretable features that retain the dimensionality reduction quality. In this case, fine-grained means that the features are rich rather than sparse, detailing exact differences between documents according to features e.g. in a ranking. For this reason, we do not include representations in this section that claim interpretability but are sparse, instead focusing on those methods that are able to achieve a similarly dense representation that also has interpretable features.
+%Interpretable representations are those representations where the features are meaningful, which bag-of-words is a part of. However, this work instead focuses on obtaining dense fine-grained interpretable features that retain the dimensionality reduction quality. In this case, fine-grained means that the features are rich rather than sparse, detailing exact differences between documents according to features e.g.\ in a ranking. For this reason, we do not include representations in this section that claim interpretability but are sparse, instead focusing on those methods that are able to achieve a similarly dense representation that also has interpretable features.
 
 
 %\section{Classification}
@@ -800,7 +801,7 @@ One method that does not produce a sparse representation but still learns an int
 
  Bag-of-words (BOW) representations are simple and meaningful, achieving strong results despite not being complex. BOW representations are also interpretable in principle, but because the considered vocabularies typically contain tens (or hundreds) of thousands of words, the resulting learned models are nonetheless difficult to inspect and understand. Further, the sparsity and dimensionality of this representation limits its applications. Topic models and low-dimensional vector space embeddings are two alternative approaches for generating low-dimensional document representations, with the usual advantage of topic models over vector-space models being that their features are interpretable, as the features are labelled with a group of words. However, vector space models are used on a larger variety of tasks as they are very versatile. %copy pasted
 
-In this thesis a  disentangled representation is obtained from a low-dimensional vector space, where each feature is semantically coherent. Some variations of Generative Adversarial Networks can achieve a disentangled representation, but they are difficult to train on text data. Methods to obtain sparse interpretable representations in word-vectors are similar to this work in that they post-process a dense representation, but these methods are limited to word vectors and suffer in performance with low-dimensionality, which we identify as a desirable property of our representation. To the author's knowledge, there is no existing work on obtaining an interpretable document representation from dense vectors that does not utilize sparsity constraints.
+In this thesis a  disentangled representation is obtained from a low-dimensional vector space, where each feature is semantically coherent. Some variations of Generative Adversarial Networks can achieve a disentangled representation, but they are difficult to train on text data. Methods to obtain sparse interpretable representations in word-vectors are similar to this work in that they post-process a dense representation, but these methods are limited to word vectors and suffer in performance with low-dimensionality, which we identify as a desirable characteristic of our representation. To the author's knowledge, there is no existing work on obtaining an interpretable document representation from dense vectors that does not utilize sparsity constraints.
 
 This thesis continues as follows: given the background in this chapter, the datasets that will be used in text classification tasks and to produce the dense and interpretable representations are introduced. Then, the method to re-organize dense vector spaces into interpretable representations is deeply experimented on and quantitatively and qualitatively validated. Following this, the dense vector space representations of neural networks are investigated, with the intention to better understand these models with unexpected results. Finally, a method to improve both the semantic coherence and performance of these  interpretable representations  is introduced and quantitatively and qualitatively validated. 
 
