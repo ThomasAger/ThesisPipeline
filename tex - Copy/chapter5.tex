@@ -265,7 +265,7 @@ The network is hyper-parameter tuned with the following values:
 The batch size is 100 for all experiments, excluding the place-types which used a batch-size of 10 as there were so few entities. For the linear SVM and the Decision Trees of depth-3, hyper-parameter optimization for these models was used with the same parameters as described in Section \ref{ch3:hyperparam}.
 
 
-\subsection{Quantitative Results for Feedforward Network}
+\subsection{Quantitative Results for Feedforward Network}\label{quan-feed}
 
 This section shows the performance  of NNET-U and NNET-B,  and the results for the best performing linear SVM that uses an unsupervised document embedding as input are shown. Additionally, results for decision trees limited to a depth of 3 that use disentangled feature representations derived from NNET-U and NNET-B as input are shown. Essentially, the results of NNET-U, NNET-B and the linear SVM that uses the best performing unsupervised document embedding as input serve as a reference point for the decision tree results. If the decision tree results do indeed outperform or match the neural networks, then they are performing well.  The first intention of these results is to validate that  disentangled feature representations are composed of semantic features, and this is measured as in Chapter \ref{ch3} by the performance of low-depth decision trees when they are used as input.  The second but more primary intention is to try and determine what can be expected qualitatively from these disentangled feature representations, and this is determined by comparison between different models. The main comparison, informed by the results and investigation in Chapter \ref{ch3}, is by comparing the results for the depth-3 limited decision trees that use  disentangled feature representations derived from neural networks as input to the performance of the decision trees that used disentangled feature representations derived from unsupervised document embeddings as input. %The intention of this section is to give preliminary insights that inform what can be expected from the qualitative investigation of directions in Section \ref{ch5:qual}, and to investigate if  depth-3 decision trees that use disentangled feature representations derived from the hidden layers of neural networks  perform well on the associated domain tasks. 
 As a general overview of the results,  the disentangled feature embeddings derived from neural networks perform as well as or better than the unsupervised representations on the task. 
@@ -871,56 +871,70 @@ In Section \ref{ch5:place-typesentities} it was found that entities for features
 
 %Obtaining directions from this space takes much longer than normal vector spaces.
 
-\section{Qualitative Evaluation of Auto-encoders}\label{auto-encoder-qual}
+\section{Quantitative Evaluation of Auto-Encoders}\label{auto-quan}
 
-We base our experiments on the movie reviews domain. To collect the terms that are likely to correspond to property names, we collect adjectives and nouns that occur at least 200 times in the movie review data set, collecting 17,840 terms overall.  These parameters are used for all entity embeddings induced by the auto-encoder. 
+In this section, a quantitative experiment is conducted similar to the one in Section \ref{quan-feed} for feed-forward networks, where  clusters obtained from the  hidden layers of auto-encoders are used as input to low-depth decision trees, and evaluated on how well they can classify key domain tasks. The intention of this experiment is to quantify how meaningful the properties captured are, on the understanding that if they do not perform well on key domain tasks, they are not capturing key concepts in the domain. The results of this experiment are that generally, auto-encoders do not capture meaningful properties in the domain. To better understand these results, the deeper auto-encoder layers are further investigated, and it is found that they capture properties that correspond to more frequent words. 
 
 \subsection{Software, Architecture and Settings}
 
+We base our experiments on the movie reviews domain. To collect the terms that are likely to correspond to property names, we collect adjectives and nouns that occur at least 200 times in the movie review data set, collecting 17,840 terms overall.  These parameters are used for all entity embeddings induced by the auto-encoder.
+
 To implement the denoising auto-encoders, the Keras\footnote{\href{https://keras.io/}{Keras}}  library is used. As in Chapter \ref{ch3}, scikit-learn is used for the SVM implementation. All of the code and data for this Chapter is available on GitHub\footnote{\url{https://github.com/eygrr/RulesFromAuto-encoders}}. A 200 dimensional MDS space is used as the input to our stack of auto-encoders, as this performed the best in Chapter \ref{ch3}. The network is trained using stochastic gradient descent and the mean squared error loss function. For the encoders and decoders, the tanh activation function is used. For the first auto-encoder,  the same size layer as the input is maintained. Afterwards, the hidden representation size is halved each time it is used  as input to another auto-encoder, and this process is repeated three times, resulting in four new hidden representations $\{Input: 200, Hidden: 200, 100, 50, 25\}$. The input space is corrupted using  Gaussian noise with a standard deviation of 0.6 each time. This was chosen as higher noise values seemed to result in meaningless directions in initial results, but lesser noise values did not result in much change. As the lower layers are closer to the bag-of-words representation and are higher dimensional, the Kappa scores are higher in earlier spaces, as it is easier to separate entities. We address this in the clusters by setting the  score threshold $T$ using Kappa score  such that the number of terms we choose from is twice the number of dimensions in the space. Similarly, we set the threshold for the frequency of the words such that 12,000 directions are available to assign to the cluster centres in every space. 
 
-\subsection{Qualitative Evaluation of Induced Clusters}
 
-In Table \ref{ch5:labelcomparison}, we illustrate the differences between clusters obtained using standard auto-encoders and denoising auto-encoders. Layer 1 refers to the hidden representation of the first auto-encoder, and Layer 4 refers to the hidden representation of the final auto-encoder. As single labels can lead to ambiguity, in Table 1 we label clusters using the top three highest scoring terms in the cluster. Clusters are arranged from highest to lowest Kappa score. 
+\subsection{Quantitative Evaluation of the Quality of Auto-Encoder Properties}
 
-Both auto-encoders model increasingly general properties, but the properties obtained when using denoising auto-encoder properties are more general. For example, the normal auto-encoder captures properties like ``Horror" and ``Thriller", but does not capture more general properties like ``Society" and ``Relationship". Further, ``Gore"  is the  most similar to the directions ``Zombie" and ``Zombies" in Layer 1, the most similar directions of ``Budget" and ``Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the more general idea of a "Horror" movie, rather than a "Zombie" movie, by being grouped with directions that are more relevant to all horror movies rather than only some horror movies. 
+In this section, the rankings of entities on cluster properties obtained from the original  Multi-Dimensional Scaling vectors for the movies are compared to the rankings of entities on cluster properties obtained from the layers of the auto-encoder. In Table \ref{quan_results}, the input vectors and their associated cluster rankings are compared to the auto-encoder layers in terms of accuracy and F1-score. It is found that the accuracy of the rankings of entities on cluster properties obtained from the layers of auto-encoders have a significant loss of accuracy for the genres task and the keywords task, and a loss in F1-score in most cases. Clusters and their associated top three highest scoring terms  are shown in Table \ref{ch5:labelcomparison}.  Layer 1 refers to the hidden representation of the first auto-encoder, and Layer 4 refers to the hidden representation of the final auto-encoder. 
 
 \begin{sidewaystable}
 	\vspace{5 mm}
 	
 	\setlength\extrarowheight{-3pt}
-
-		\begin{tabular}{llll}
-
-			\bf Standard Auto-encoder &   & \textbf{Denoising Auto-encoder} &   \\
-			 Layer 1     &  Layer 4  &  Layer 1   &  Layer 4 \\
-\toprule
-			horror: terror, horrific & horror: victims, nudity  & gore: zombie, zombies & society: view, understand \\
-			thriller: thrillers, noir & documentary: perspective, insight  & jokes: chuckle, fart & emotional: insight, portrays \\
-			comedies: comedy, timing & blood: killing, effects   & horror: terror, horrific & stupid: flick, silly  \\
-			adults: disney, childrens & suspense: mysterious, tense & emotionally: tragic, strength &  gore: budget, effects  \\
-			husband: wife, husbands &  thriller: thrillers, cop  & gags: zany, parodies & military: war, ship \\
-			relationships: intimate, angst & gory: gruesome, zombie  & hindi: bollywood, indian & romance: younger, handsome \\
-			nudity: naked, gratuitous & beautifully: satisfying, brilliantly & touching: teach, relate & ridiculous: awful, worse   \\
-			political: politics, nation & emotional: complex, struggle & scary: frightening, terrifying & government: technology, footage  \\
-			smart: slick, sophisticated &  laughed: laughing, loud & documentary: document, narration & awesome: chick, looked\\
-			creepy: sinister, atmospheric & charming: delightful, loves & adults: disney, teaches &  political: country, documentary\\
-			laughed: humorous, offensive & hilarious: funny, parody & laughed: brow, laughter & relationship: relationships, sensitive \\
-			adventure: adventures, ship & scares: halloween, slasher & thriller: thrillers, procedural & horror: genre, dark  \\
-			actions: reaction, innocent & funniest: funnier, gags & cgi: animated, animation &  waste: concept, plain   \\
-			cute: adorable, rom & emotions: respect, relationships & suspense: clues, atmospheric & army: disc, studio\\
-			british: england, accent & laugh: mom, crazy & dumb: mindless, car & combat: enemy, weapons  \\
-			horrible: worse, cheap & filmmaker: approach, artist & political: propaganda, citizens & supporting: office, married \\
-			narrative: filmmaker, structure & drama: portrayed, portrayal & witty: delightfully, sarcastic & amazon: bought, copy \\
-			digital: dolby, definition & interviews: included, showed & laughing: outrageous, mouthed & study: details, detail \\
-			gory: graphic, gruesome & comedic: comedies, humorous & relationships: ensemble, interactions & land: water, super \\
-			romantic: handsome, attractive & emotionally: central, relationships & creepy: mysterious, eerie & chemistry, comedies, comedic \\
+	
+	\begin{tabular}{llll}
 		
-		\end{tabular}
-	\caption{A comparison between the first layers and the fourth layers of two different kinds of auto-encoders.}
+		\bf Standard Auto-encoder &   & \textbf{Denoising Auto-encoder} &   \\
+		Layer 1     &  Layer 4  &  Layer 1   &  Layer 4 \\
+		\toprule
+		horror: terror, horrific & horror: victims, nudity  & gore: zombie, zombies & society: view, understand \\
+		thriller: thrillers, noir & documentary: perspective, insight  & jokes: chuckle, fart & emotional: insight, portrays \\
+		comedies: comedy, timing & blood: killing, effects   & horror: terror, horrific & stupid: flick, silly  \\
+		adults: disney, childrens & suspense: mysterious, tense & emotionally: tragic, strength &  gore: budget, effects  \\
+		husband: wife, husbands &  thriller: thrillers, cop  & gags: zany, parodies & military: war, ship \\
+		relationships: intimate, angst & gory: gruesome, zombie  & hindi: bollywood, indian & romance: younger, handsome \\
+		nudity: naked, gratuitous & beautifully: satisfying, brilliantly & touching: teach, relate & ridiculous: awful, worse   \\
+		political: politics, nation & emotional: complex, struggle & scary: frightening, terrifying & government: technology, footage  \\
+		smart: slick, sophisticated &  laughed: laughing, loud & documentary: document, narration & awesome: chick, looked\\
+		creepy: sinister, atmospheric & charming: delightful, loves & adults: disney, teaches &  political: country, documentary\\
+		laughed: humorous, offensive & hilarious: funny, parody & laughed: brow, laughter & relationship: relationships, sensitive \\
+		adventure: adventures, ship & scares: halloween, slasher & thriller: thrillers, procedural & horror: genre, dark  \\
+		actions: reaction, innocent & funniest: funnier, gags & cgi: animated, animation &  waste: concept, plain   \\
+		cute: adorable, rom & emotions: respect, relationships & suspense: clues, atmospheric & army: disc, studio\\
+		british: england, accent & laugh: mom, crazy & dumb: mindless, car & combat: enemy, weapons  \\
+		horrible: worse, cheap & filmmaker: approach, artist & political: propaganda, citizens & supporting: office, married \\
+		narrative: filmmaker, structure & drama: portrayed, portrayal & witty: delightfully, sarcastic & amazon: bought, copy \\
+		digital: dolby, definition & interviews: included, showed & laughing: outrageous, mouthed & study: details, detail \\
+		gory: graphic, gruesome & comedic: comedies, humorous & relationships: ensemble, interactions & land: water, super \\
+		romantic: handsome, attractive & emotionally: central, relationships & creepy: mysterious, eerie & chemistry, comedies, comedic \\
+		
+	\end{tabular}
+	\caption{A comparison between the first layers and the fourth layers of two different kinds of auto-encoders. Arranged from top to bottom by highest to lowest Kappa score of their highest Kappa score term. }
 	\label{ch5:labelcomparison}
-
+	
 \end{sidewaystable}
+
+The normal auto-encoder captures properties like ``Horror" and ``Thriller", but does not capture properties like ``Society" and ``Relationship". Further, ``Gore"  is the  most similar to the directions ``Zombie" and ``Zombies" in Layer 1, the most similar directions of ``Budget" and ``Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the more general idea of a "Horror" movie, rather than a "Zombie" movie, by being grouped with directions that are more relevant to all horror movies rather than only some horror movies. 
+
+
+This shows that unsupervised denoising auto-encoders, unlike feed-forward networks, are not able to meaningfully capture properties in the domain. To identify how the denoising auto-encoder is transforming the representation, an experiment is conducted examining the frequency of words used in the clusters for each auto-encoder layer. Clusters are populated with all terms above a threshold, such that many of the terms are not necessarily relevant to the cluster, rather they are just the most similar to them. In-order to capture the meaning of the clusters, the top five terms are taken as representative of the cluster. The results are shown in Table \ref{quan_results_freq}, where the average frequency of the top five words in a cluster are compared between layers. It is found that the frequency of words increases as the layers become deeper. This shows that although the auto-encoders are unable to capture meaningful properties in the domain, they are able to transform the representation of the space. In this case, the auto-encoders are transforming the space such that properties are more frequent. 
+
+
+
+\section{Qualitative Evaluation of Auto-Encoders}\label{auto-encoder-qual}
+
+\subsection{Qualitative Evaluation of Induced Clusters} % Needs to be re-done according to new results
+
+
 
 \subsection{Qualitative Evaluation of Induced Symbolic Rules}
 
