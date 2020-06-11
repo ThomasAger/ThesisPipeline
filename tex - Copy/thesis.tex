@@ -25,13 +25,18 @@
 
 \makeatletter
 % Copy pasted junk
-
+\usepackage{soul}
+\usepackage{color}
 \newcommand{\green}[1]{\textcolor{green}{#1}}
-
+%\newcommand{\m}[1]{\hl{#1}}
+\newcommand{\m}[1]{\textbf{#1}}
+\newcommand{\hmark}[1]{{\sethlcolor{green}\hl{#1}}}
 
 %Graphics
 %\usepackage{graphicx}
 % Langbein added these - Tom
+
+
 \usepackage{caption}
 \usepackage{footmisc}
 \usepackage{paralist}
@@ -83,7 +88,7 @@
  \usepackage{acronym}
  %Inline lists
  \usepackage{paralist}
-
+ar
 % Page dimensions
 \usepackage{vmargin}
 \setpapersize{A4}
@@ -223,6 +228,7 @@
 \usepackage{tabularx}
 \usepackage{eepic}
 
+
 % Algorithm environment
 \newcounter{algorithm}[chapter]
 \renewcommand{\thealgorithm}{\thechapter.\@arabic\c@algorithm}
@@ -244,7 +250,7 @@
 \newcommand\listofalgorithms{%
     \if@twocolumn
       \@restonecoltrue\onecolumn
-    \else
+    \elsea
       \@restonecolfalse
     \fi
     \chapter*{\listalgorithmsname}%
@@ -331,7 +337,7 @@
 
 \begin{center}
 \vspace*{3ex}
-\textbf{\Huge Disentangling \new{L}ow-\new{D}imensional \new{V}ector \new{S}pace \new{R}epresentations of \new{T}ext \new{D}ocuments}\\[2ex]
+\textbf{\Huge Disentangling \m{L}ow-\m{D}imensional \m{V}ector \m{S}pace \m{R}epresentations of \m{T}ext \m{D}ocuments}\\[2ex]
 %\textbf{\Huge Title line 2}\\[12ex]
 \textbf{\large A thesis submitted in partial fulfilment}\\[1ex]
 \textbf{\large of the requirement for the degree of Doctor of
