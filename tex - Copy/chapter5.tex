@@ -5,13 +5,22 @@
 
 \section{Introduction}
 
-The previous chapter showed how in a vector space of entities (e.g.\ different movies) fine-grained semantic relationships can be identified with directions (e.g.\ more violent than) and used as features in a document classification task. This chapter explores how these fine-grained semantic relationships can be used to gain insights into the characteristics of learned neural network models. Two kinds of neural networks are investigated, feed-forward networks and auto-encoders. The hidden layers of these networks are viewed as vector spaces, and are re-organized into interpretable feature representations using the method in Chapter \ref{ch3}.  Additionally, the use of these semantic features derived from neural network embeddings as disentangled feature representations  is qualitatively and quantitatively investigated. In the case of the feed-forward networks, these feature representations are quantitatively verified to be meaningful using low-depth decision trees, and are qualitatively investigated using examples. It is found that semantic features can indeed be obtained from these neural network representations, and that the rankings of entities on these feature-directions make sense. Interestingly, the results of the low-depth decision tree obtained for the 20-newsgroups that uses a disentangled feature representation of cluster-features as input even  outperforms the original neural network.
+The previous chapter showed how in a vector space of entities (e.g.\ different movies) fine-grained semantic relationships can be identified with directions (e.g.\ more violent than) and used as features in a document classification task. 
+
+\hmark{This Chapter addresses two research questions:}
+\begin{itemize}
+	\item{Can good disentangled representations be obtained from neural networks?}
+	\item{Can these networks be better understood through the lens of these semantic features?}
+\end{itemize}
+
+Two kinds of neural networks are investigated, feed-forward networks and auto-encoders. The hidden layers of these networks are viewed as vector spaces, and are re-organized into interpretable feature representations using the method in Chapter \ref{ch3}. \hmark{These disentangled feature representations are quantitatively tested, and the labelled outputs are qualitatively investigated. In the case of the feed-forward networks, it is found that good disentangled representations can be obtained from them using low-depth decision trees, and  qualitatively examples further validate this claim.}  In particular, it is found that a low-depth decision tree that uses a disentangled feature representation obtained from a feed-forward neural network hidden layer can outperform the original neural network.\hmark{ In this case, in the 20 newsgroups domain. This is likely due to finding features through the unsupervised process that correspond closely to the task, essentially serving as an inductive bias for the decision tree.} It is also found that feed-forward networks do not necessarily introduce new properties in-order to perform well, but rather improve relevant properties to the classification task.
 
 
-Auto-encoders are also investigated by obtaining semantic features from their  layers, and their use is investigated in the context of learning about relationships between properties in the domain. Specifically, auto-encoders are used to obtain a sequence of increasingly low-dimensional entity embeddings that are expected to model increasingly abstract relationships. Features from each auto-encoder vector space are then used to induce symbolic rules that relate specific properties to more general ones. Illustrative examples are provided of the hidden layers and these rules. As an example, below is one of the rules derived with this method, where the first two terms are from one entity embedding, and the final term is from a more abstract entity embedding.
+Auto-encoders are also investigated by obtaining semantic features from their  layers. \hmark{First, a negative result is found using a quantitative experiment that shows that there is a significant drop in accuracy and f1-score between properties from the original representation and those obtained from the hidden-layers of a stacked denoising auto-encoder. However, it is observed that the properties obtained in the representation derived from the stacked denoising auto-encoder layers are indeed meaningful. In particular, it is found that earlier in the stacked denoising auto-encoder less frequent (i.e. specific to fewer documents) features are obtained, and in later layers more frequent (i.e. more general to more  documents) features are obtained.  Following this insight, symbolic rules are induced that relate less frequent properties to more frequent ones.} Illustrative examples are provided of the hidden layers and these rules. As an example, below is one of the rules derived with this method, where the first two terms are from one entity embedding, and the final term is from a more abstract entity embedding.
 \begin{align}\label{rule1}\texttt{IF Emotions  AND  Journey THEN Adventure}\end{align} 
 
-This method generally has two goals, the first is to qualitatively investigate if neural networks can help identify relationships between features, and the second is  to investigate the kind of features encoded in auto-encoders. One potential application of this work in recommendations is in the robustness of explanations using these features. In the domain of movies, we may have a situation where the synopsis or reviews mention the words "Emotions" and "Journey", from which the system could derive that it is probably an "Adventure" movie and use that term as a part of its supporting explanation e.g.\ "You liked how this movie was an emotional and a journey, so you may like this adventure movie." Of-course if these features are indeed salient and can be linked in this way, these features are also be useful for investigating how  neural networks represent information.
+
+One potential application of this work in recommendations is in the robustness of explanations using these features. In the domain of movies, we may have a situation where the synopsis or reviews mention the words "Emotions" and "Journey", from which the system could derive that it is probably an "Adventure" movie and use that term as a part of its supporting explanation e.g.\ "You liked how this movie was an emotional and a journey, so you may like this adventure movie." Of-course if these features are indeed salient and can be linked in this way, these features are also be useful for investigating how  neural networks represent information.
 
 %To investigate the denoising auto-encoders, the problem of how to learn symbolic rules from unstructured text documents that describe entities of interest in terms of increasingly abstract properties is considered, e.g.\ how the property of "Blood" relates to the property of "Violence" for movies. A straightforward approach to obtain a similar result might be to directly learn rules from bag-of-words representations of documents. However, such an approach would typically lead to a large number of rules of little interest, e.g.\ rules pertaining more to which words are used together rather than capturing capturing meaningful semantic relationships.  %Obtaining meaningful and interpretable symbolic rules is important in fields like exploratory data analysis, or explaining classifier decisions, as they can be interpreted easily by human users.
 
@@ -201,7 +210,11 @@ Another recent topic that relates to our work is improving neural networks and e
 
 % Using these directions and rankings, we obtain interpretable representations
 
+\subsection{Stacked Denoising Auto-encoders}
 
+\hmark{In this section, the method to obtain a series of  entity embeddings from stacked denoising auto-encoders explained. The intention is to evaluate what is represented in the hidden-layers of stacked denoising auto-encoders, and to understand the relationship between the layers of the representation. }
+
+The MDS embedding on the movies dataset is used, as it performed the best on low-depth Decision Trees in Chapter \ref{ch3} and its features were used in previous qualitative analysis and found to be intuitive. To construct embeddings that are different from the initial embedding provided by the MDS method, stacked denoising auto-encoders \cite{Vincent2008a} are used. Standard auto-encoders are composed of an "encoder" that maps the input representation into a hidden layer, and a "decoder" that aims to recreate the input from the hidden layer. Auto-encoders are normally trained using an objective function that minimizes information loss (e.g.\ Mean Squared Error) between the input and output layer~\cite{Bengio2009}. The task of recreating the input is made non-trivial by constraining the dimensionality of the hidden layer to be smaller than the input layer, forcing the information to be represented using fewer dimensions, or in denoising auto-encoders by corrupting the input with random noise, \hmark{forcing the auto-encoder to generalize specific information into abstract information, as it must "fill in the gaps".} By repeatedly  using the hidden layer as input to another auto-encoder,\hmark{ we can repeatedly transform the representation.} To obtain the entity representations from our auto-encoders, we use the activations of the neurons in a hidden layer as the coordinates of entities in a new vector space. 
 
 \subsection{Feed-forward networks}
 
@@ -231,13 +244,7 @@ To learn NNET-U, the input is the unsupervised document embedding associated wit
 
 % We simply take the hidden-layer representation and look at what's going on. 
 
-\subsection{Inducing Rules from Auto-Encoder Entity Embeddings}\label{InducingRulesFromEntityEmbeddings}
 
-In this section, the method to obtain a series of increasingly general entity embeddings is explained, as well as the methodology of how symbolic rules can be learned that link properties from subsequent spaces together. 
-
-For this method with auto-encoders, the MDS embedding on the movies dataset is used, as it performed the best on low-depth Decision Trees in Chapter \ref{ch3} and its features were used in previous qualitative analysis and found to be intuitive. To construct more general embeddings from the initial embedding provided by the MDS method, stacked denoising auto-encoders \cite{Vincent2008a} are used. Standard auto-encoders are composed of an "encoder" that maps the input representation into a hidden layer, and a "decoder" that aims to recreate the input from the hidden layer. Auto-encoders are normally trained using an objective function that minimizes information loss (e.g.\ Mean Squared Error) between the input and output layer~\cite{Bengio2009}. The task of recreating the input is made non-trivial by constraining the dimensionality of the hidden layer to be smaller than the input layer, forcing the information to be represented using fewer dimensions, or in denoising auto-encoders by corrupting the input with random noise, forcing the auto-encoder to use more general commonalities between the input features. By repeatedly  using the hidden layer as input to another auto-encoder, we can obtain increasingly general representations. To obtain the entity representations from our auto-encoders, we use the activations of the neurons in a hidden layer as the coordinates of entities in a new vector space. 
-
-One interesting  novelty of the approach is that  it introduces a method to characterize semantic features (i.e.\ clusters of directions)  modelled in one space  in terms of salient properties that are modelled in another space. To do so, the off-the-shelf rule learner JRip (Using the "RIPPER" algorithm \cite{Cohen1995})  is used to predict which entities will be highly ranked, according to a given cluster direction, using the rankings induced by the clusters of the preceding space   as features. To improve the readability of the resulting rules, rather than using the precise ranks as input, the ranks are aggregated by percentile, i.e $1\%, 2\%, ..., 100\%$, where an entity has a $1\%$ label if it is among the $1\%$ highest ranked entities, for a given cluster direction. For the class labels,  a movie is defined as a positive instance if it is among the highest ranked entities (e.g.\ top 2\%) of the considered cluster direction. Using the input features of each layer and the class labels  from the subsequent layer, these rules can be used to explain the semantic relationships between properties modelled by different vector spaces. One drawback of discretizing continuous attributes is that the accuracy of the rules extracted from the network may decrease \cite{Setiono2008a}.  However, in our setting, understanding what is meant by the rules is more important than accuracy, as  these rules are not intended for making predictions, but only for getting insight into data and potentially  generating explanations of domain knowledge.
 
 % Using the interpretable representation, we create a mapping from layer-to-layer using a rule-based classifier
 
@@ -270,7 +277,7 @@ The batch size is 100 for all experiments, excluding the place-types which used 
 The  \hmark{intention of this experiment} is to validate that \hmark{the disentangled feature representations derived from feedforward networks} are composed of semantic features, and this is measured as in Chapter \ref{ch3} by the performance of low-depth decision trees when they are used as input.  The second but more primary intention is to try and determine what can be expected qualitatively from these disentangled feature representations, and this is determined by comparison between different models. The main comparison, informed by the results and investigation in Chapter \ref{ch3}, is by comparing the results for the depth-3 limited decision trees that use  disentangled feature representations derived from neural networks as input to the performance of the decision trees that used disentangled feature representations derived from unsupervised document embeddings as input. %The intention of this section is to give preliminary insights that inform what can be expected from the qualitative investigation of directions in Section \ref{ch5:qual}, and to investigate if  depth-3 decision trees that use disentangled feature representations derived from the hidden layers of neural networks  perform well on the associated domain tasks. 
 As a general overview of the results,  the disentangled feature embeddings derived from neural networks perform as well as or better than the unsupervised representations on the task. 
 
-\hmark{The results in Table \ref{ch5:quantresults} first shows the performance in F1-score  of the neural networks NNET-U and NNET-B. Alongside this,  the best performing unsupervised document embedding used as input to a linear SVM is shown}. These results serve as a reference point for the performanc results. The results for properties derived from these networks and this unsupervised document embedding are then shown when used as input to decision trees limited to a depth of three.  If the decision tree results do indeed outperform or match the neural networks, then they are performing well.  
+\hmark{The results in Table \ref{ch5:quantresults} first shows the performance in F1-score  of the neural networks NNET-U and NNET-B. Alongside this,  the best performing unsupervised document embedding used as input to a linear SVM is shown}. These results serve as a reference point for the performance of the properties. The results for properties derived from these networks and this unsupervised document embedding are then shown when used as input to decision trees limited to a depth of three.  If the decision tree results do indeed outperform or match the neural networks, then they are performing well.  }
 %The results for place-types were obtained as their entities can be easily understood without expert knowledge (e.g.\ "tree" and "cliff" rather than "The Shining" in the case of the movies). It is not unexpected that they performed poorly in the neural networks, as they have a very low number of entities (391) and it is also an unbalanced task. 
 
 \begin{table}[]
@@ -290,7 +297,7 @@ As a general overview of the results,  the disentangled feature embeddings deriv
 \end{tabular}\caption{F1-scores for each embedding type and domain}\label{ch5:quantresults}
 \end{table}
 
-In particular, the quantitative results in Table \ref{ch5:quantresults} are , where "U-Embedding" is the initial embedding. The various methods used to obtain the results are as follows:
+In particular, the quantitative results in Table \ref{ch5:quantresults} are, where "U-Embedding" is the initial embedding. The various methods used to obtain the results are as follows:
 
 \begin{itemize}
 	\item \textbf{U-Embedding Linear SVM:} The best performing linear SVM for the task that used an unsupervised document embedding is used as input  from Chapter \ref{ch3}.
@@ -300,9 +307,9 @@ In particular, the quantitative results in Table \ref{ch5:quantresults} are , wh
 	\item \textbf{Cluster-features:} This refers to the results for decision trees limited to a depth of 3 when using  disentangled feature representations as input, composed of rankings of entities on cluster directions.
 \end{itemize}
 
-The assumption that interpretable features can be obtained from the neural networks using the method in Chapter \ref{ch3} is validated, as not much predictive power is lost over the original neural network in most cases. In particular, for the domain of place-types and the domain of newsgroups the Decision Trees of depth 3 that used  single-term features and cluster-features derived from NNET-B outperformed the other approaches by a significant margin. In the newsgroups domain, the low-depth decision trees that used the disentangled feature representation as input outperformed the neural network that  it was derived from. This verifies  the idea that decision trees of depth 3 that use disentangled feature representations as input can outperform more complex classifiers. Interestingly however, in the  movies domain the neural network that used an unsupervised document embedding as input (NNET-U) performed the best, and NNET-B had a relatively low performance.  This is likely because the vocabulary for the movies is large (limited to 100,000 unique terms for movies from the original vocabulary size of 551,080 versus 51,064 for newsgroups, see Section \ref{ch2.5:technical}), and this resulted in overfitting. 
+The assumption that good  features can be obtained from the neural networks using the method in Chapter \ref{ch3} is validated, as not much predictive power is lost over the original neural network in most cases. In particular, for the domain of place-types and the domain of newsgroups the Decision Trees of depth 3 that used  single-term features and cluster-features derived from NNET-B outperformed the other approaches by a significant margin. In the newsgroups domain, the low-depth decision trees that used the disentangled feature representation as input outperformed the neural network that  it was derived from. This \hmark{gives credence to}  the idea that decision trees of depth 3 that use disentangled feature representations as input can outperform more complex classifiers. Interestingly however, in the  movies domain the neural network that used an unsupervised document embedding as input (NNET-U) performed the best, and NNET-B had a relatively low performance.  This is likely because the vocabulary for the movies is large (limited to 100,000 unique terms for movies from the original vocabulary size of 551,080 versus 51,064 for newsgroups, see Section \ref{ch2.5:technical}), and this resulted in overfitting. 
 
-These results give an  expectation that well-represented (i.e. have a high NDCG score) features of the disentangled representation derived from NNET-U  will be relevant to the task. Similarly, as in the movies domain the neural network that used a  bag-of-words as input (NNET-B) performed poorly, it can be expected that properties that are well represented in this representation are less relevant to the task. However, all of these representations performed similarly in the depth-3 decision trees. This likely means that they  have all been able to identify  features that are particularly relevant to the class, e.g.\ a feature that corresponds to "Horror" when classifying the genres. This brings up the question, why does NNET-U perform better than the others, and NNET-B significantly worse, but the low-depth decision trees that use disentangled feature representations derived from NNET-U and NNET-B perform similarly to each other? The explanation assumed in this section is that the features that are well-represented in NNET-U and NNET-B are not used in the decision trees, as features that are common to all representations are sufficient for good performance. This hypothesis is further investigated in the qualitative analysis (Section \ref{ch5:qual}).
+These results give an  expectation that well-represented (i.e. have a high NDCG score) features of the disentangled representation derived from NNET-U  will be relevant to the task. Similarly, as in the movies domain the neural network that used a  bag-of-words as input (NNET-B) performed poorly, it can be expected that properties that are well represented in this representation are less relevant to the task. However, all of these representations performed similarly in the depth-3 decision trees. This likely means that they  have all been able to identify  features that are particularly relevant to the class, e.g.\ a feature that corresponds to "Horror" when classifying the genres. NNET-U performs better than the others, and NNET-B significantly worse, but the low-depth decision trees that use disentangled feature representations derived from NNET-U and NNET-B perform similarly to each other. This can be understood by seeing that the features that are well-represented in NNET-U and NNET-B are not used in the decision trees, as features that are common to all representations are sufficient for good performance. This idea is \hmark{expanded on} in the qualitative analysis (Section \ref{ch5:qual}).
 
 %In particular, it can be assumed that the reason that NNET-U performed well, but the disentangled feature representation derived from it did not retain that performance is likely because it did not disentangle features such that those relevant to the class were grouped together. This means that although properties like "comedies" are more separable in the space, as they are not similar to the cluster-direction for "comedy", instead forming their own cluster-direction, the "comedies" cluster-feature is not used in the depth-3 decision tree, making it meaningless for the interpretable classifier but meaningful for the neural network. We find evidence to support this idea in Section .
 
@@ -834,9 +841,9 @@ The results show that in most cases, entities are semantically similar, meaning 
 
 First, directions in the movie domain were examined. When looking at top scoring terms in Section \ref{ch5:topscore}, it was found that NNET-U retained highly separable metadata directions. This seems to indicate that despite directions being uninformative, the neural network will not change the representation enough to make these directions less separable despite adjusting the embedding to better suit the task. In Section \ref{ch5:commonunique} it was found that NNET-U did not contain many unique directions in its top 2,000 scoring terms, but NNET-B did. The directions that were common to all embeddings seemed most relevant to the task. This  gave an explanation for the reason that the disentangled feature representations derived from NNET-U, NNET-B and the initial embedding all performed similarly:  they all contained the directions that are most relevant to the task. 
 
-In \ref{ch5:diffsection} the largest differences in score between directions was examined. It was found that terms relevant to the task had an increased associated NDCG score in the NNET-U representation, and NNET-B had the highest score increases for directions that were not relevant to the task. This gives some explanation for why NNET-B performed worse than NNET-U, NNET-B likely represented terms that were not relevant to the task. In \ref{ch5:cluster-features} it was hypothesized that the reason that this did not result in overall higher performance  in a low-depth decision tree when using a disentangled feature representation derived from NNET-B as input is because despite it improving performance when classifying the "Adventure" genre, it sacrificed performance on another genre, because a cluster-feature relevant to classifying the "Animation" genre was not present. 
+In \ref{ch5:diffsection} the largest differences in score between directions was examined. It was found that terms relevant to the task had an increased associated NDCG score in the NNET-U representation, and NNET-B had the highest score increases for directions that were not relevant to the task. This gives some explanation for why NNET-B performed worse than NNET-U, NNET-B likely represented terms that were not relevant to the task. In \ref{ch5:cluster-features} it was hypothesized that the reason that this did not result in overall higher performance  in a low-depth decision tree when using a disentangled feature representation derived from NNET-B as input is because despite it improving performance when classifying the "Adventure" genre, it sacrificed performance on another genre, because a cluster-feature relevant to classifying the "Animation" genre was not present.  \hmark{To summarize, the feed-forward neural network that performed well refined directions relevant to the task in-order to achieve a good classification accuracy, rather than finding new properties.}
 
-In Section \ref{ch5:newsgroupsquant} cluster-features derived from NNET-B in the newsgroups domain were examined, as they performed as well as NNET-B. It was found that for NNET-B, the features used as the top decision tree nodes seemed to capture abstract concepts more relevant to the task than in the case of NNET-U or the initial embedding. This simply explains the increase in performance.
+In Section \ref{ch5:newsgroupsquant} cluster-features derived from NNET-B in the newsgroups domain were examined, as they performed as well as NNET-B. It was found that for NNET-B, the features used as the top decision tree nodes seemed to capture abstract concepts more relevant to the task than in the case of NNET-U or the initial embedding.\hmark{ This explains the increase in performance for the cluster-features used in the decision tree, NNET-U achieves strong performance by focusing on improving the feed-forward neural network features, but NNET-B achieves strong performance when using the cluster features because it is able to find unique properties that are relevant to the task.}
 
 In Section \ref{ch5:place-typesentities} it was found that entities for features are meaningful in almost all cases, and across all embedding models. This further verifies that features are semantic across domains even when derived from neural network embeddings. It is speculated that using meaningful entities could make the features more understandable. This is further investigated in section \ref{ch5:commonterms}, where it is found that single-term directions common to all embeddings have similar entities across all embeddings. This further validates the idea in section \ref{ch5:commonunique} that each embedding model in the movies domain found similar relevant directions and associated entities that are most relevant to the task, as it shows that common directions are likely common in entity rankings for the domain as well.
 
@@ -876,69 +883,118 @@ In Section \ref{ch5:place-typesentities} it was found that entities for features
 
 
 
-\section{Quantitative Evaluation of Auto-encoders}
-
-To evaluate if it is possible to obtain semantic properties from the hidden layers of stacked denoising auto-encoders, the experiment described in 
 
 
-\subsection{Software, Architecture and Settings}
+
+\section{Evaluation of Auto-encoders}
+
+\subsection{Software, Architecture and Settings}\label{howto}
 
 We base our experiments on the movie reviews domain. To collect the terms that are likely to correspond to property names, we collect adjectives and nouns that occur at least 200 times in the movie review data set, collecting 17,840 terms overall.  These parameters are used for all entity embeddings induced by the auto-encoder. 
 
 To implement the denoising auto-encoders, the Keras\footnote{\href{https://keras.io/}{Keras}}  library is used. As in Chapter \ref{ch3}, scikit-learn is used for the SVM implementation.  A 200 dimensional MDS space is used as the input to our stack of auto-encoders, as this performed the best in Chapter \ref{ch3}. The network is trained using stochastic gradient descent and the mean squared error loss function. For the encoders and decoders, the tanh activation function is used. For the first auto-encoder,  the same size layer as the input is maintained. Afterwards, the hidden representation size is halved each time it is used  as input to another auto-encoder, and this process is repeated three times, resulting in four new hidden representations $\{Input: 200, Hidden: 200, 100, 50, 25\}$. The input space is corrupted using  Gaussian noise with a standard deviation of 0.6 each time. This was chosen as higher noise values seemed to result in meaningless directions in initial results, but lesser noise values did not result in much change. As the lower layers are closer to the bag-of-words representation and are higher dimensional, the Kappa scores are higher in earlier spaces, as it is easier to separate entities. We address this in the clusters by setting the  score threshold $T$ using Kappa score  such that the number of terms we choose from is twice the number of dimensions in the space. Similarly, we set the threshold for the frequency of the words such that 12,000 directions are available to assign to the cluster centres in every space. 
 
+\subsection{Quantitative Evaluation of Cluster Representation}\label{quan-auto}
+
+% Explain what the experiment is and what it's for
 
 
-\section{Qualitative Evaluation of Auto-encoders}\label{auto-encoder-qual}
+
+% It's to see how good the properties are in auto-encoders
+
+\hmark{This section evaluates if it is possible to obtain good  properties from the hidden layers of stacked denoising auto-encoders, following the same procedure as in Chapter \ref{ch4}. A representation composed of cluster properties is obtained from the hidden layers of the stacked denoising auto-encoder as described in Section \ref{howto}, then these representations are used as input to low-depth decision trees to classify the genres, keywords and ratings tasks for the movies domain. If the decision trees score higher or equal to the original input representation, we know that the properties represent key domain concepts as well as or better than the original representation. Otherwise we can expect that the representations do not contain properties that describe key domain concepts. The results are shown in Table \ref{quanautoresult}.}
+
+
+\begin{table}[]
+	\caption{Table!}\label{quanautoresult}
+\end{table}[]
+
+
+% The properties are not good, really bad accuracy values
+
+\hmark{The results of this experiment are negative. The accuracy and f1-scores of the properties obtained from the hidden layers of stacked auto-encoders is significantly lower than the properties obtained from the original representation. This signifies that the hidden-layers of these auto-encoders do not represent key domain properties. However, when observing examples these properties do seem to have meaning. This is further investigated in  Section \ref{auto-encoder-qual}.}
 
 
 
-\subsection{Qualitative Evaluation of Induced Clusters}
+
+\subsection{Qualitative Evaluation of Cluster Representations}\label{auto-encoder-qual}
+
+% Although there is a significant drop-off in accuracy, it seems that there is a meaningful difference between the properties. 
 
 \hmark{In this section, the properties induced from the auto-encoder spaces described in Section \ref{quan-auto} are qualitatively investigated.} In Table \ref{ch5:labelcomparison}, we illustrate the differences between clusters obtained using standard auto-encoders and denoising auto-encoders. Layer 1 refers to the hidden representation of the first auto-encoder, and Layer 4 refers to the hidden representation of the final auto-encoder. As single labels can lead to ambiguity, in Table 1 we label clusters using the top three highest scoring terms in the cluster. Clusters are arranged from highest to lowest Kappa score. 
 
-Both auto-encoders model increasingly general properties, but the properties obtained when using denoising auto-encoder properties are more general. For example, the normal auto-encoder captures properties like "Horror" and "Thriller", but does not capture more general properties like "Society" and "Relationship". Further, "Gore"  is the  most similar to the directions "Zombie" and "Zombies" in Layer 1, the most similar directions of "Budget" and "Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the more general idea of a "Horror" movie, rather than a "Zombie" movie, by being grouped with directions that are more relevant to all horror movies rather than only some horror movies. 
+Both auto-encoders model different properties across their layers, but the properties obtained when using a denoising auto-encoder seem to be significantly different. For example, the normal auto-encoder captures properties like "Horror" and "Thriller", but does not capture properties like "Society" and "Relationship". Further, "Gore"  is the  most similar to the directions "Zombie" and "Zombies" in Layer 1, the most similar directions of "Budget" and "Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the  idea of budget "Horror" movie, which is significantly different to a "Zombie" movie. This change, from "Zombie" to "Effects" seems to be a difference between a low-frequency word that is specific to only some movies "Zombie", and a high-frequency word that is meaningful for many movies. In Section \label{freq-eval} the relationship between properties in the earlier layers and those in the later ones is more precisely quantified as a relationship of frequency, i.e. relevancy to many documents rather than few.
 
 \begin{sidewaystable}
 	\vspace{5 mm}
 	
 	\setlength\extrarowheight{-3pt}
-
-		\begin{tabular}{llll}
-
-			\bf Standard Auto-encoder &   & \textbf{Denoising Auto-encoder} &   \\
-			 Layer 1     &  Layer 4  &  Layer 1   &  Layer 4 \\
-\toprule
-			horror: terror, horrific & horror: victims, nudity  & gore: zombie, zombies & society: view, understand \\
-			thriller: thrillers, noir & documentary: perspective, insight  & jokes: chuckle, fart & emotional: insight, portrays \\
-			comedies: comedy, timing & blood: killing, effects   & horror: terror, horrific & stupid: flick, silly  \\
-			adults: disney, childrens & suspense: mysterious, tense & emotionally: tragic, strength &  gore: budget, effects  \\
-			husband: wife, husbands &  thriller: thrillers, cop  & gags: zany, parodies & military: war, ship \\
-			relationships: intimate, angst & gory: gruesome, zombie  & hindi: bollywood, indian & romance: younger, handsome \\
-			nudity: naked, gratuitous & beautifully: satisfying, brilliantly & touching: teach, relate & ridiculous: awful, worse   \\
-			political: politics, nation & emotional: complex, struggle & scary: frightening, terrifying & government: technology, footage  \\
-			smart: slick, sophisticated &  laughed: laughing, loud & documentary: document, narration & awesome: chick, looked\\
-			creepy: sinister, atmospheric & charming: delightful, loves & adults: disney, teaches &  political: country, documentary\\
-			laughed: humorous, offensive & hilarious: funny, parody & laughed: brow, laughter & relationship: relationships, sensitive \\
-			adventure: adventures, ship & scares: halloween, slasher & thriller: thrillers, procedural & horror: genre, dark  \\
-			actions: reaction, innocent & funniest: funnier, gags & cgi: animated, animation &  waste: concept, plain   \\
-			cute: adorable, rom & emotions: respect, relationships & suspense: clues, atmospheric & army: disc, studio\\
-			british: england, accent & laugh: mom, crazy & dumb: mindless, car & combat: enemy, weapons  \\
-			horrible: worse, cheap & filmmaker: approach, artist & political: propaganda, citizens & supporting: office, married \\
-			narrative: filmmaker, structure & drama: portrayed, portrayal & witty: delightfully, sarcastic & amazon: bought, copy \\
-			digital: dolby, definition & interviews: included, showed & laughing: outrageous, mouthed & study: details, detail \\
-			gory: graphic, gruesome & comedic: comedies, humorous & relationships: ensemble, interactions & land: water, super \\
-			romantic: handsome, attractive & emotionally: central, relationships & creepy: mysterious, eerie & chemistry, comedies, comedic \\
+	
+	\begin{tabular}{llll}
 		
-		\end{tabular}
+		\bf Standard Auto-encoder &   & \textbf{Denoising Auto-encoder} &   \\
+		Layer 1     &  Layer 4  &  Layer 1   &  Layer 4 \\
+		\toprule
+		horror: terror, horrific & horror: victims, nudity  & gore: zombie, zombies & society: view, understand \\
+		thriller: thrillers, noir & documentary: perspective, insight  & jokes: chuckle, fart & emotional: insight, portrays \\
+		comedies: comedy, timing & blood: killing, effects   & horror: terror, horrific & stupid: flick, silly  \\
+		adults: disney, childrens & suspense: mysterious, tense & emotionally: tragic, strength &  gore: budget, effects  \\
+		husband: wife, husbands &  thriller: thrillers, cop  & gags: zany, parodies & military: war, ship \\
+		relationships: intimate, angst & gory: gruesome, zombie  & hindi: bollywood, indian & romance: younger, handsome \\
+		nudity: naked, gratuitous & beautifully: satisfying, brilliantly & touching: teach, relate & ridiculous: awful, worse   \\
+		political: politics, nation & emotional: complex, struggle & scary: frightening, terrifying & government: technology, footage  \\
+		smart: slick, sophisticated &  laughed: laughing, loud & documentary: document, narration & awesome: chick, looked\\
+		creepy: sinister, atmospheric & charming: delightful, loves & adults: disney, teaches &  political: country, documentary\\
+		laughed: humorous, offensive & hilarious: funny, parody & laughed: brow, laughter & relationship: relationships, sensitive \\
+		adventure: adventures, ship & scares: halloween, slasher & thriller: thrillers, procedural & horror: genre, dark  \\
+		actions: reaction, innocent & funniest: funnier, gags & cgi: animated, animation &  waste: concept, plain   \\
+		cute: adorable, rom & emotions: respect, relationships & suspense: clues, atmospheric & army: disc, studio\\
+		british: england, accent & laugh: mom, crazy & dumb: mindless, car & combat: enemy, weapons  \\
+		horrible: worse, cheap & filmmaker: approach, artist & political: propaganda, citizens & supporting: office, married \\
+		narrative: filmmaker, structure & drama: portrayed, portrayal & witty: delightfully, sarcastic & amazon: bought, copy \\
+		digital: dolby, definition & interviews: included, showed & laughing: outrageous, mouthed & study: details, detail \\
+		gory: graphic, gruesome & comedic: comedies, humorous & relationships: ensemble, interactions & land: water, super \\
+		romantic: handsome, attractive & emotionally: central, relationships & creepy: mysterious, eerie & chemistry, comedies, comedic \\
+		
+	\end{tabular}
 	\caption{A comparison between the first layers and the fourth layers of two different kinds of auto-encoders.}
 	\label{ch5:labelcomparison}
-
+	
 \end{sidewaystable}
+
+
+\subsection{Quantitative Frequency Evaluation}\ref{freq-eval}
+
+\hmark{Although there is an indication that the properties in the later layers of a stacked denoising auto-encoder have some meaningful change, it is unclear what that change is. Following the qualitative analysis in Section \ref{auto-encoder-qual} it seems that the later properties are relevant to more documents, while the earlier properties are relevant to fewer documents. In other words, the earlier representations model properties that are more specific, in the sense that they are relevant to only some documents, and the later representations model properties that are more general, in the sense that they are relevant to more documents.} 
+
+\hmark{Essentially, this section must investigate how frequent the clusters are.  The highest kappa score terms are added to the cluster first, which means that the initial words in the cluster are better modelled in the representation than those later others. Following this, we can understand that a more accurate representation of if more frequent terms are well modelled in the space can be obtained by taking the frequency of the first $N$ terms from each cluster and averaging them. Additionally, as there is a maximum cluster size, and all terms must be added, taking the top $N$ terms also removes the problem of terms being included that were added to clusters just because they were the least dissimilar compared to the other clusters, despite not being relevant to the cluster. 
+	
+\begin{table}[]
+	\caption{Table!}\label{quan-freq-table}
+\end{table}[]
+
+In Table \ref{quan-freq-table} the average frequency of the clusters in each layer is shown for a variety of thresholds. Following the qualitative observations in Section \ref{auto-encoder-qual}, it is clear that as the auto-encoder layers get deeper, the frequency of the terms that are well modelled goes up. In conclusion, the stacked denoising auto-encoder models increasingly frequent terms.
+
+
+
+% To further investigate the idea that these properties are more frequent, they are investigated in this section
+
+% We take the top X to represent the cluster because all terms don't make sense
+
+% We test multiple top X to make sure that it isn't just a bias result or whatever
+
+% We find that they are indeed more general/frequent
+
+
+\section{Inducing Rules from Auto-Encoder Entity Embeddings}\label{InducingRulesFromEntityEmbeddings}
+
+As described in the previous section, stacked denoising auto-encoders model increasingly frequent properties. Based on this observation, in this section a method is introduced  to characterize semantic features (i.e.\ clusters of directions)  modelled in one space  in terms of salient properties that are modelled in another space. To do so, the off-the-shelf rule learner JRip (Using the "RIPPER" algorithm \cite{Cohen1995})  is used to predict which entities will be highly ranked, according to a given cluster direction, using the rankings induced by the clusters of the preceding space   as features. To improve the readability of the resulting rules, rather than using the precise ranks as input, the ranks are aggregated by percentile, i.e $1\%, 2\%, ..., 100\%$, where an entity has a $1\%$ label if it is among the $1\%$ highest ranked entities, for a given cluster direction. For the class labels,  a movie is defined as a positive instance if it is among the highest ranked entities (e.g.\ top 2\%) of the considered cluster direction. Using the input features of each layer and the class labels  from the subsequent layer, these rules can be used to explain the semantic relationships between properties modelled by different vector spaces. One drawback of discretizing continuous attributes is that the accuracy of the rules extracted from the network may decrease \cite{Setiono2008a}.  However, in our setting, understanding what is meant by the rules is more important than accuracy, as  these rules are not intended for making predictions, but only for getting insight into data and potentially  generating explanations of domain knowledge.
+
 
 \subsection{Qualitative Evaluation of Induced Symbolic Rules}
 
-Our aim in this work is to derive symbolic rules that can be used to explain the semantic relationships between properties derived from increasingly general entity embeddings. We provide examples of such rules in this section. Since the number of all induced rules is large, here we only show high accuracy rules that cover 200 samples or more.  Still, we naturally cannot list even all the accurate rules covering more than 200 samples. Therefore we focus here on the rules which are either interesting in their own right or exhibit interesting properties, strengths or limitations of the proposed approach. 
+% Based on the findings that they are frequent, perhaps it is possible to induce symbolic rules.
+In this section, the method used to obtain rules that describe the semantic relationships between properties derived from the stacked denoising auto-encoder is qualitatively investigated. Since the number of all induced rules is large, here we only show high accuracy rules that cover 200 samples or more.  Still, we naturally cannot list even all the accurate rules covering more than 200 samples. Therefore we focus here on the rules which are either interesting in their own right or exhibit interesting properties, strengths or limitations of the proposed approach. 
 
 For easier readability, we post-process the induced rules. For instance, the following is a rule obtained for the property "Gore" in the third layer of the network shown in the original format produced by JRip:
 

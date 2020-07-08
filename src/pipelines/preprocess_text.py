@@ -26,15 +26,17 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     if auroc is True:
         probability = True
 
+
     doc_amt = split.get_doc_amt(data_type)
     no_below = int(doc_amt * no_below_fraction)
     print("Filtering all words that do not appear in", no_below, "documents")
-    classes_save = SaveLoad(rewrite=rewrite_all)
-    classes_process = util.classify.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
-                                                   no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
-    classes_process.process_and_save()
-    classes = classes_process.getClasses()
-    class_names = classes_process.getClassNames()
+    if classes is not None:
+        classes_save = SaveLoad(rewrite=rewrite_all)
+        classes_process = util.classify.ProcessClasses(classes, class_names, file_name, output_folder, bowmin, no_below,
+                                                       no_above, classes_freq_cutoff, remove_stop_words, classes_save, name_of_class)
+        classes_process.process_and_save()
+        classes = classes_process.getClasses()
+        class_names = classes_process.getClassNames()
 
     # Process and save corpus
     corpus_save = SaveLoad(rewrite=rewrite_all)
@@ -47,18 +49,20 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         p_corpus = process_corpus.Corpus(corpus,  classes,name_of_class, file_name, output_folder, bowmin, no_below,
                                          no_above, remove_stop_words, corpus_save)
     p_corpus.process_and_save()
-    p_classes = p_corpus.getClasses()
-    matched_ids = []
-    try:
-        class_entities = dt.import1dArray(output_folder + "classes/" + name_of_class + "_entities.txt")
-        entity_names = dt.import1dArray(output_folder + "corpus/entity_names.txt")
-        for i in range(len(class_entities)):
-            for j in range(len(entity_names)):
-                if class_entities[i] == entity_names[j]:
-                    matched_ids.append(j)
-                    break
-    except FileNotFoundError:
-        matched_ids = None
+
+    if classes is not None:
+        p_classes = p_corpus.getClasses()
+        matched_ids = []
+        try:
+            class_entities = dt.import1dArray(output_folder + "classes/" + name_of_class + "_entities.txt")
+            entity_names = dt.import1dArray(output_folder + "corpus/entity_names.txt")
+            for i in range(len(class_entities)):
+                for j in range(len(entity_names)):
+                    if class_entities[i] == entity_names[j]:
+                        matched_ids.append(j)
+                        break
+        except FileNotFoundError:
+            matched_ids = None
 
     # Get the PPMI values
     ppmi_save = SaveLoad(rewrite=rewrite_all)
@@ -77,20 +81,21 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
     ppmi_filtered.process_and_save()
     ppmi_filtered_matrix = ppmi_filtered.getMatrix()
 
-    # Get the dev splits
-    split_ids = split.get_split_ids(data_type, matched_ids)
-    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_classes, split_ids, dev_percent_of_train=dev_percent)
+    if classes is not None:
+        # Get the dev splits
+        split_ids = split.get_split_ids(data_type, matched_ids)
+        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(ppmi_filtered_matrix.toarray(), p_classes, split_ids, dev_percent_of_train=dev_percent)
 
-    all_test_result_rows = []
+        all_test_result_rows = []
 
-    hpam_save = SaveLoad(rewrite=rewrite_all)
-    hyper_param = HParam(class_names,  kfold_hpam_dict, model_type, classify_ppmi_fn,
-                                      output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
-                         y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
-                         mcm=mcm)
-    hyper_param.process_and_save()
+        hpam_save = SaveLoad(rewrite=rewrite_all)
+        hyper_param = HParam(class_names,  kfold_hpam_dict, model_type, classify_ppmi_fn,
+                                          output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                             y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
+                             mcm=mcm)
+        hyper_param.process_and_save()
     
-    all_test_result_rows.append(hyper_param.getTopScoringRowData())
+        all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
     # Creating and testing spaces, MDS not included in the creation process
     for i in range(len(dims)):
@@ -98,6 +103,7 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
         pca_identifier = "_" + str(dims[i]) + "_PCA"
         pca_fn = file_name + pca_identifier
         classify_pca_fn = classifier_fn + pca_identifier
+
 
         hpam_save = SaveLoad(rewrite=rewrite_all)
         hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_pca_fn,
@@ -110,19 +116,20 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             pca_instance.process_and_save()
             pca_space = pca_instance.getRep()
 
-            split_ids = split.get_split_ids(data_type, matched_ids)
-            x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(pca_space,
-                                                                              p_classes, split_ids,
-                                                                              dev_percent_of_train=dev_percent)
-        hpam_save = SaveLoad(rewrite=rewrite_all)
-        hyper_param = HParam(class_names,
-                                          kfold_hpam_dict, model_type, classify_pca_fn,
-                                     output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all,
-                             x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
-                             mcm=mcm)
-        hyper_param.process_and_save()
+            if classes is not None:
+                split_ids = split.get_split_ids(data_type, matched_ids)
+                x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(pca_space,
+                                                                                  p_classes, split_ids,
+                                                                                  dev_percent_of_train=dev_percent)
+        if classes is not None:
+            hpam_save = SaveLoad(rewrite=rewrite_all)
+            hyper_param = HParam(class_names,kfold_hpam_dict, model_type, classify_pca_fn, output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all,
+                                 x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
+                                 mcm=mcm)
 
-        all_test_result_rows.append(hyper_param.getTopScoringRowData())
+            hyper_param.process_and_save()
+
+            all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
         wv_path =  os.path.abspath("../../data/raw/glove/" + "glove.6B." + str(dims[i]) + 'd.txt')
         wv_path_d2v =  os.path.abspath("../../data/raw/glove/" + "glove.6B.300d.txt")
@@ -134,31 +141,31 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
             awv_identifier =  "_" + str(dims[i]) + "_AWVEmp"
             awv_fn = file_name + awv_identifier
             classify_awv_fn = classifier_fn + awv_identifier
-
-            hpam_save = SaveLoad(rewrite=rewrite_all)
-            hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_awv_fn,
-                                 output_folder=output_folder + "rep/", save_class=hpam_save, rewrite_model=rewrite_all,
-                                 score_metric=score_metric, mcm=mcm)
+            if classes is not None:
+                hpam_save = SaveLoad(rewrite=rewrite_all)
+                hyper_param = HParam(hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_awv_fn,
+                                     output_folder=output_folder + "rep/", save_class=hpam_save, rewrite_model=rewrite_all,
+                                     score_metric=score_metric, mcm=mcm)
             if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
 
                 awv_instance = awv.AWV(p_corpus.getSplitCorpus(), dims[i], awv_fn, output_folder + "rep/awv/" , awv_save, wv_path=wv_path, corpus_fn_to_stream=corpus_fn)
                 awv_instance.process_and_save()
                 awv_space = awv_instance.getRep()
+                if classes is not None:
+                    split_ids = split.get_split_ids(data_type, matched_ids)
+                    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(awv_space,
+                                                                                      p_classes, split_ids,
+                                                                                      dev_percent_of_train=dev_percent)
+            if classes is not None:
+                hpam_save = SaveLoad(rewrite=rewrite_all)
+                hyper_param = HParam(class_names,
+                                                  kfold_hpam_dict, model_type, classify_awv_fn,
+                                             output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
+                                     y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
+                                     mcm=mcm)
+                hyper_param.process_and_save()
 
-                split_ids = split.get_split_ids(data_type, matched_ids)
-                x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(awv_space,
-                                                                                  p_classes, split_ids,
-                                                                                  dev_percent_of_train=dev_percent)
-
-            hpam_save = SaveLoad(rewrite=rewrite_all)
-            hyper_param = HParam(class_names,
-                                              kfold_hpam_dict, model_type, classify_awv_fn,
-                                         output_folder + "rep/", hpam_save, probability, rewrite_model=rewrite_all, x_train=x_train,
-                                 y_train=y_train, x_test=x_test, y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc,
-                                 mcm=mcm)
-            hyper_param.process_and_save()
-
-            all_test_result_rows.append(hyper_param.getTopScoringRowData())
+                all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
             if data_type != "sentiment" and data_type != "mafiascum" :
                 mds_identifier =  "_" + str(dims[i])+"_MDS"
@@ -166,29 +173,29 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
                 classify_mds_fn = classifier_fn + mds_identifier
                 import_fn = output_folder + "rep/mds/"+mds_fn+".npy"
 
-                ####HERE TEMP CODE
+                #### HERE TEMP CODE
                 rewrite_mds = rewrite_all
                 ##################
-
-                hpam_save = SaveLoad(rewrite=rewrite_mds)
-                hyper_param = HParam( hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_mds_fn,
-                                      output_folder=output_folder + "rep/", save_class=hpam_save,rewrite_model=rewrite_mds, score_metric=score_metric,
-                                      mcm=mcm)
+                if classes is not None:
+                    hpam_save = SaveLoad(rewrite=rewrite_mds)
+                    hyper_param = HParam( hpam_dict=kfold_hpam_dict, model_type=model_type, file_name=classify_mds_fn,
+                                          output_folder=output_folder + "rep/", save_class=hpam_save,rewrite_model=rewrite_mds, score_metric=score_metric,
+                                          mcm=mcm)
                 if not hyper_param.save_class.exists(hyper_param.popo_array) or hyper_param.save_class.rewrite is True:
                     mds = np.load(import_fn)
-
-                    split_ids = split.get_split_ids(data_type, matched_ids)
-                    x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(mds,
-                                                                                      p_classes, split_ids,
-                                                                                      dev_percent_of_train=dev_percent)
-
-                hpam_save = SaveLoad(rewrite=rewrite_mds)
-                hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder + "rep/", hpam_save,
-                                     probability, rewrite_model=rewrite_mds, x_train=x_train, y_train=y_train, x_test=x_test,
-                                     y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
-                hyper_param.process_and_save()
-                all_test_result_rows.append(hyper_param.getTopScoringRowData())
-        if data_type != "placetypes" and data_type != "movies" and data_type != "mafiascum":
+                    if classes is not None:
+                        split_ids = split.get_split_ids(data_type, matched_ids)
+                        x_train, y_train, x_test, y_test, x_dev, y_dev = split.split_data(mds,
+                                                                                          p_classes, split_ids,
+                                                                                          dev_percent_of_train=dev_percent)
+                if classes is not None:
+                    hpam_save = SaveLoad(rewrite=rewrite_mds)
+                    hyper_param = HParam(class_names, kfold_hpam_dict, model_type, classify_mds_fn, output_folder + "rep/", hpam_save,
+                                         probability, rewrite_model=rewrite_mds, x_train=x_train, y_train=y_train, x_test=x_test,
+                                         y_test=y_test, x_dev=x_dev, y_dev=y_dev, score_metric=score_metric, auroc=auroc, mcm=mcm)
+                    hyper_param.process_and_save()
+                    all_test_result_rows.append(hyper_param.getTopScoringRowData())
+        if data_type != "placetypes" and data_type != "movies" and data_type != "mafiascum" and data_type != "runescape":
             doc2vec_identifier =  "_" + str(dims[i]) + "_D2V"
             doc2vec_fn = file_name + doc2vec_identifier
             classify_doc2vec_fn = classifier_fn + doc2vec_identifier
@@ -213,23 +220,23 @@ def pipeline(corpus, classes, class_names, file_name, output_folder, dims, kfold
 
             all_test_result_rows.append(hyper_param.getTopScoringRowData())
 
+    if classes is not None:
+            # Make the combined csv of all space types
+        # Make the combined CSV of all the dims of all the space types
+        all_r = np.asarray(all_test_result_rows).transpose()
+        rows = all_r[1]
+        for i in range(len(rows)):
+            if len(rows[i]) == 7:
+                rows[i] = rows[i][:5]
 
-        # Make the combined csv of all space types
-    # Make the combined CSV of all the dims of all the space types
-    all_r = np.asarray(all_test_result_rows).transpose()
-    rows = all_r[1]
-    for i in range(len(rows)):
-        if len(rows[i]) == 7:
-            rows[i] = rows[i][:5]
-
-            if len(rows[i]) != 5:
-                print(len(rows[i]))
-                raise ValueError("No, bro.")
-    cols = np.asarray(rows.tolist()).transpose()
-    col_names = all_r[0][0]
-    key = all_r[2]
-    dt.write_csv(output_folder + "rep/score/csv_final/" +file_name+"reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
-    print("a")
+                if len(rows[i]) != 5:
+                    print(len(rows[i]))
+                    raise ValueError("No, bro.")
+        cols = np.asarray(rows.tolist()).transpose()
+        col_names = all_r[0][0]
+        key = all_r[2]
+        dt.write_csv(output_folder + "rep/score/csv_final/" +file_name+"reps"+model_type+"_" + name_of_class + ".csv", col_names, cols, key)
+        print("a")
 
 
 def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model_type="LinearSVMNOvR", no_below=0.001,
@@ -277,6 +284,20 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         class_names = [foursquare_names, geonames_names, opencyc_names]
         name_of_class = ["Foursquare", "Geonames", "OpenCYC"]
         classes_freq_cutoff = 0
+    elif data_type == "placetypes":
+        corpus_fn = raw_folder + "corpus.txt"
+        corpus = None
+        foursquare = dt.import2dArray(raw_folder + "/Foursquare/class-all", "i")
+        foursquare_names = dt.import1dArray(raw_folder + "/Foursquare/names.txt", "s")
+        geonames = dt.import2dArray(raw_folder + "/Geonames/class-all", "i")
+        geonames_names = dt.import1dArray(raw_folder + "/Geonames/names.txt", "s")
+        opencyc = dt.import2dArray(raw_folder + "/OpenCYC/class-all", "i")
+        opencyc_names = dt.import1dArray(raw_folder + "/OpenCYC/names.txt", "s")
+        classes = [foursquare, geonames, opencyc]
+        class_names = [foursquare_names, geonames_names, opencyc_names]
+        name_of_class = ["Foursquare", "Geonames", "OpenCYC"]
+        classes_freq_cutoff = 0
+
 
     elif data_type == "reuters":
         corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
@@ -303,9 +324,14 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         class_names = dt.import1dArray(raw_folder + "usernames.txt")
         name_of_class = "scum"
         classes_freq_cutoff = 0
-
-
-
+    elif data_type == "runescape":
+        add_fn = "07-cheat"
+        corpus_fn = processed_folder + "corpus/"+ "num_stw_corpus_processed.txt"
+        corpus = np.load("E:/business\ForumScraper\data\docs/07-cheat_all_docs.npy")
+        classes = None
+        class_names = None
+        name_of_class = "None"
+        classes_freq_cutoff = None
 
     window_size = [5, 10, 15]
     min_count = [1, 5, 10]
@@ -394,11 +420,16 @@ if __name__ == '__main__':
 
     max_depths = [None, None, 3, 2, 1]
     classifiers = ["LinearSVM"]
-    data_type = ["movies"]
+    data_type = ["runescape"]
+    no_below = 0.001
+    no_above = 0.95
+    if data_type[0] == "runescape":
+        no_below = 0
+        no_above = 1
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):
                 print(data_type[j])
                 main(data_type[j], "../../data/raw/"+data_type[j]+"/",  "../../data/processed/"+data_type[j]+"/", proj_folder="../../data/proj/"+data_type[j]+"/",
-                                        grams=0, model_type=classifiers[i], no_below=0.001, no_above=0.95, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
+                                        grams=0, model_type=classifiers[i], no_below=no_below, no_above=no_above, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
                                         score_metric="avg_f1", max_depth=max_depths[i], multiclass="OVR")

@@ -14,6 +14,7 @@ movies_total = 13978
 placetypes_total = 1383
 anime_total = 959
 mafia_total = 9676
+rs_total = 2857
 
 from sklearn.model_selection import KFold
 import numbers
@@ -43,6 +44,8 @@ def get_doc_amt(data_type):
         max_size = 14478
     elif data_type == "mafiascum":
         max_size = mafia_total
+    elif data_type == "runescape":
+        max_size = rs_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
@@ -73,6 +76,9 @@ def check_shape(features, data_type):
         max_size = anime_total
     elif data_type == "mafiascum":
         max_size = mafia_total
+    elif data_type == "runescape":
+
+        max_size = rs_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
@@ -106,6 +112,8 @@ def get_split_ids(data_type, matched_ids):
     elif data_type == "mafiascum":
         train_split = int((mafia_total / 3) * 2)
         total = mafia_total
+    elif data_type == "runescape":
+        total = rs_total
     else:
         print("No data type found")
         return False
