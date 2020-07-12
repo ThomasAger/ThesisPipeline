@@ -905,9 +905,21 @@ To implement the denoising auto-encoders, the Keras\footnote{\href{https://keras
 \hmark{This section evaluates if it is possible to obtain good  properties from the hidden layers of stacked denoising auto-encoders, following the same procedure as in Chapter \ref{ch4}. A representation composed of cluster properties is obtained from the hidden layers of the stacked denoising auto-encoder as described in Section \ref{howto}, then these representations are used as input to low-depth decision trees to classify the genres, keywords and ratings tasks for the movies domain. If the decision trees score higher or equal to the original input representation, we know that the properties represent key domain concepts as well as or better than the original representation. Otherwise we can expect that the representations do not contain properties that describe key domain concepts. The results are shown in Table \ref{quanautoresult}.}
 
 
+
 \begin{table}[]
-	\caption{Table!}\label{quanautoresult}
-\end{table}[]
+	\centering
+	\begin{tabular}{lllllll}
+		\textbf{Clusters}      & \textbf{Genres}   &          & \textbf{Keywords} &          & \textbf{Ratings}  &          \\
+		\toprule
+		Depth-3 Trees & Accuracy & F1-Score & Accuracy & F1-Score & Accuracy & F1-Score \\
+		L0            & 0.91     & 0.43     & 0.71     & 0.22     & 0.65     & 0.49     \\
+		L1            & 0.64     & 0.27     & 0.63     & 0.17     & 0.64     & 0.41     \\
+		L2            & 0.71     & 0.32     & 0.65     & 0.19     & 0.64     & 0.44     \\
+		L3            & 0.66     & 0.27     & 0.62     & 0.17     & 0.61     & 0.44     \\
+		L4            & 0.66     & 0.26     & 0.54     & 0.15     & 0.55     & 0.40    
+	\end{tabular}
+\caption{Table!}\label{quanautoresult}
+\end{table}
 
 
 % The properties are not good, really bad accuracy values
@@ -923,7 +935,7 @@ To implement the denoising auto-encoders, the Keras\footnote{\href{https://keras
 
 \hmark{In this section, the properties induced from the auto-encoder spaces described in Section \ref{quan-auto} are qualitatively investigated.} In Table \ref{ch5:labelcomparison}, we illustrate the differences between clusters obtained using standard auto-encoders and denoising auto-encoders. Layer 1 refers to the hidden representation of the first auto-encoder, and Layer 4 refers to the hidden representation of the final auto-encoder. As single labels can lead to ambiguity, in Table 1 we label clusters using the top three highest scoring terms in the cluster. Clusters are arranged from highest to lowest Kappa score. 
 
-Both auto-encoders model different properties across their layers, but the properties obtained when using a denoising auto-encoder seem to be significantly different. For example, the normal auto-encoder captures properties like "Horror" and "Thriller", but does not capture properties like "Society" and "Relationship". Further, "Gore"  is the  most similar to the directions "Zombie" and "Zombies" in Layer 1, the most similar directions of "Budget" and "Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the  idea of budget "Horror" movie, which is significantly different to a "Zombie" movie. This change, from "Zombie" to "Effects" seems to be a difference between a low-frequency word that is specific to only some movies "Zombie", and a high-frequency word that is meaningful for many movies. In Section \label{freq-eval} the relationship between properties in the earlier layers and those in the later ones is more precisely quantified as a relationship of frequency, i.e. relevancy to many documents rather than few.
+Both auto-encoders model different properties across their layers, but the properties obtained when using a denoising auto-encoder seem to be significantly different. For example, the normal auto-encoder captures properties like "Horror" and "Thriller", but does not capture properties like "Society" and "Relationship". Further, "Gore"  is the  most similar to the directions "Zombie" and "Zombies" in Layer 1, the most similar directions of "Budget" and "Effects" in Layer 4. We can assume that this means that the feature in Layer 4 represents the  idea of budget "Horror" movie, which is significantly different to a "Zombie" movie. This change, from "Zombie" to "Effects" seems to be a difference between a low-frequency word that is specific to only some movies "Zombie", and a high-frequency word that is meaningful for many movies. In Section \ref{freq-eval} the relationship between properties in the earlier layers and those in the later ones is more precisely quantified as a relationship of frequency, i.e. relevancy to many documents rather than few.
 
 \begin{sidewaystable}
 	\vspace{5 mm}
@@ -963,17 +975,32 @@ Both auto-encoders model different properties across their layers, but the prope
 \end{sidewaystable}
 
 
-\subsection{Quantitative Frequency Evaluation}\ref{freq-eval}
+\subsection{Quantitative Frequency Evaluation}\label{freq-eval}
 
 \hmark{Although there is an indication that the properties in the later layers of a stacked denoising auto-encoder have some meaningful change, it is unclear what that change is. Following the qualitative analysis in Section \ref{auto-encoder-qual} it seems that the later properties are relevant to more documents, while the earlier properties are relevant to fewer documents. In other words, the earlier representations model properties that are more specific, in the sense that they are relevant to only some documents, and the later representations model properties that are more general, in the sense that they are relevant to more documents.} 
 
-\hmark{Essentially, this section must investigate how frequent the clusters are.  The highest kappa score terms are added to the cluster first, which means that the initial words in the cluster are better modelled in the representation than those later others. Following this, we can understand that a more accurate representation of if more frequent terms are well modelled in the space can be obtained by taking the frequency of the first $N$ terms from each cluster and averaging them. Additionally, as there is a maximum cluster size, and all terms must be added, taking the top $N$ terms also removes the problem of terms being included that were added to clusters just because they were the least dissimilar compared to the other clusters, despite not being relevant to the cluster. 
-	
-\begin{table}[]
-	\caption{Table!}\label{quan-freq-table}
-\end{table}[]
+\hmark{Essentially, this section must investigate how frequent the clusters are.  The highest kappa score terms are added to the cluster first, which means that the initial words in the cluster are better modelled in the representation than those later others. Following this, we can understand that a more accurate representation of if more frequent terms are well modelled in the space can be obtained by taking the frequency of the first $N$ terms from each cluster and averaging them. Additionally, as there is a maximum cluster size, and all terms must be added, taking the top $N$ terms also removes the problem of terms being included that were added to clusters just because they were the least dissimilar compared to the other clusters, despite not being relevant to the cluster.}
 
-In Table \ref{quan-freq-table} the average frequency of the clusters in each layer is shown for a variety of thresholds. Following the qualitative observations in Section \ref{auto-encoder-qual}, it is clear that as the auto-encoder layers get deeper, the frequency of the terms that are well modelled goes up. In conclusion, the stacked denoising auto-encoder models increasingly frequent terms.
+
+\hmark{In Table \ref{quan-freq-table} the average frequency of the clusters in each layer is shown for a variety of thresholds. Following the qualitative observations in Section \ref{auto-encoder-qual}, it is clear that as the auto-encoder layers get deeper, the frequency of the terms that are well modelled goes up. In conclusion, the stacked denoising auto-encoder models increasingly frequent terms.}
+
+	
+
+\begin{table}[]
+	\centering
+	\begin{tabular}{llllll}
+		AVG   & \textbf{L0 Freq} & \textbf{L1 Freq} & \textbf{L2 Freq} & \textbf{ L3 Freq} & \textbf{L4 Freq} \\
+		\toprule
+		Top 1 & 23298   & 29984   & 37277   & 41952   & 36489   \\
+		Top 2 & 20399   & 25356   & 31184   & 37764   & 35785   \\
+		Top 3 & 17065   & 22595   & 30465   & 36935   & 34893   \\
+		Top 4 & 14986   & 20555   & 28780   & 36798   & 35107   \\
+		Top 5 & 13352   & 18982   & 27724   & 35446   & 34705   \\
+		ALL   & 7556    & 12187   & 16440   & 17684   & 9611   
+	\end{tabular}
+\caption{Table!}\label{quan-freq-table}
+\end{table}
+
 
 
 

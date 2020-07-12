@@ -355,7 +355,7 @@ Pointwise Mutual Information (PMI) comes from  information theory, and is a metr
 
 
 \begin{align*}
-\textit{pmi}(w, d) = \log\big(\frac{p_{{w}(d)}}{p_{w} \cdotp p_{d}}\big)
+\textit{pmi}(w, d) = \log\big(\frac{p_{{w}(d)}}{p_{w} \cdotp p_{d}}\big) &
 \end{align*}
 
 where $P_{{w}(d)}$ is equal to the chance of the word occurring in the document assuming they are dependent on each other 
@@ -363,7 +363,7 @@ where $P_{{w}(d)}$ is equal to the chance of the word occurring in the document 
 
 
 \begin{align*}
-P_{{w}(d)} &= \frac{{w}(d)}{\sum_{w} \sum_{d} {w}(d)}
+P_{{w}(d)} &= \frac{{w}(d)}{\sum_{w} \sum_{d} {w}(d)} &
 \end{align*}
 
 and ${w}(d)$ is the frequency of a word for a document. To calculate the chance that a word will occur, we simply take the chance the word will occur in any document (estimated by its summed frequency) over all frequencies, and for the document we take the chance that the document  will occur (represented by the sum of the  frequencies of all words that occur in it) over all frequencies:
@@ -378,7 +378,7 @@ P_{d} &= \frac{\sum_{w} {w}(d)}{\sum_{w} \sum_{d} {w}(d)} &
 As this value can sometimes be negative when words are less correlated than expected, we use Positive Pointwise Mutual Information (PPMI), as we are only interested in words which are positively correlated.
 
 \begin{align*}
-\textit{ppmi}_{{w}(d)} = \big  \max  {(0, pmi)}
+\textit{ppmi}_{{w}(d)} = \big  \max  {(0, pmi)} &
 \end{align*}
 
 The PPMI BOW is the representation used often in this thesis for a simple representation of meaning in the domain. It forms the basis of more complex representations and is also sufficient as a simple interpretable representation.
