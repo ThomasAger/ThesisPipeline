@@ -333,6 +333,21 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
         name_of_class = "None"
         classes_freq_cutoff = None
 
+    elif data_type == "sutras":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        corpus = dt.import1dArray(raw_folder + "all_text.txt")
+        classes = None
+        class_names = None
+        name_of_class = "None"
+        classes_freq_cutoff = None
+    elif data_type == "sutra_keywords":
+        corpus_fn = processed_folder + "corpus/" + "num_stw_corpus_processed.txt"
+        corpus = dt.import1dArray(raw_folder + "as_documents.txt")
+        classes = None
+        class_names = None
+        name_of_class = "None"
+        classes_freq_cutoff = None
+
     window_size = [5, 10, 15]
     min_count = [1, 5, 10]
     train_epoch = [50, 100, 200]
@@ -393,12 +408,12 @@ def main(data_type, raw_folder, processed_folder,proj_folder="",  grams=0, model
             classifier_fn = pipeline_fn + "_" + name_of_class[i] + "_" + multiclass
             pipeline(corpus, classes[i], class_names[i], pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin,
                  no_below,
-                 no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=False, remove_stop_words=True,
+                 no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=True, remove_stop_words=True,
                  score_metric=score_metric, auroc=False, corpus_fn=corpus_fn, name_of_class=name_of_class[i], classifier_fn=classifier_fn, mcm=multi_class_method)
     else:
         classifier_fn = pipeline_fn + "_" + multiclass
         pipeline(corpus, classes, class_names, pipeline_fn, processed_folder, dims, kfold_hpam_dict, hpam_dict, bowmin, no_below,
-             no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=False, remove_stop_words=True, score_metric=score_metric, auroc=False,
+             no_above, classes_freq_cutoff, model_type, dev_percent, data_type, rewrite_all=True, remove_stop_words=True, score_metric=score_metric, auroc=False,
                  corpus_fn=corpus_fn, name_of_class=name_of_class, classifier_fn=classifier_fn, mcm=multi_class_method)
 
 """
@@ -420,16 +435,21 @@ if __name__ == '__main__':
 
     max_depths = [None, None, 3, 2, 1]
     classifiers = ["LinearSVM"]
-    data_type = ["runescape"]
-    no_below = 0.001
+
+    data_type = ["sutra_keywords"]
+    no_below = 0.01
     no_above = 0.95
-    if data_type[0] == "runescape":
+    if data_type[0] == "runescape" or data_type[0] == ["sutra_keywords"]:
         no_below = 0
         no_above = 1
+    if data_type[0] == "sutra_keywords":
+        bowmin = 0
+    else:
+        bowmin = 2
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):
                 print(data_type[j])
                 main(data_type[j], "../../data/raw/"+data_type[j]+"/",  "../../data/processed/"+data_type[j]+"/", proj_folder="../../data/proj/"+data_type[j]+"/",
-                                        grams=0, model_type=classifiers[i], no_below=no_below, no_above=no_above, classes_freq_cutoff=100, bowmin=2, dev_percent=0.2,
+                                        grams=0, model_type=classifiers[i], no_below=no_below, no_above=no_above, classes_freq_cutoff=100, bowmin=bowmin, dev_percent=0.2,
                                         score_metric="avg_f1", max_depth=max_depths[i], multiclass="OVR")

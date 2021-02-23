@@ -43,16 +43,16 @@ from util import py
 def pipeline(URM, tags, words, dct, file_name, output_folder, data_type, rewrite_all=False, processed_folder="", LR=False):
 
     doc_amt = split.get_doc_amt(data_type)
-    """
+
     pca_save = SaveLoad(rewrite=rewrite_all)
-    pca_identifier = "_" + str(200) + "_PCA"
+    pca_identifier = "_" + str(10) + "_PCA"
     model_fn = file_name + pca_identifier
 
-    pca_instance = pca.PCA(URM, doc_amt, 200,  model_fn, output_folder + "rep/pca/", pca_save)
+    pca_instance = pca.PCA(URM, doc_amt, 10,  model_fn, output_folder + "rep/pca/", pca_save)
     pca_instance.process_and_save()
     space = pca_instance.getRep()
-    """
 
+    """
     nmf_save = SaveLoad(rewrite=rewrite_all)
     nmf_identifier = "_" + str(200) + "_NMF"
     model_fn = file_name + nmf_identifier
@@ -60,7 +60,7 @@ def pipeline(URM, tags, words, dct, file_name, output_folder, data_type, rewrite
     nmf_instance =  nmf.NMF(URM, doc_amt, 200,  model_fn, output_folder + "rep/nmf/", nmf_save)
     nmf_instance.process_and_save()
     space = nmf_instance.getRep()
-
+"""
     dir_save = SaveLoad(rewrite=rewrite_all)
 
     file_name = model_fn
@@ -143,6 +143,14 @@ def main(data_type, raw_folder, processed_folder, proj_folder="", grams=0, model
         dct = np.load(processed_folder + "/bow/metadata/num_stw_bowdict.pkl")
         words = list(np.load(processed_folder + "/bow/metadata/num_stw_bowdict.pkl").token2id.keys())
         tags = tags.toarray()
+    elif data_type == "sutras":
+        URM = sp.load_npz(processed_folder + "/bow/num_stw_sparse_corpus.npz")
+        tags = sp.load_npz(processed_folder + "/bow/num_stw_sparse_corpus.npz")
+        dct = np.load(processed_folder + "/bow/metadata/num_stw_bowdict.pkl")
+        words = list(np.load(processed_folder + "/bow/metadata/num_stw_bowdict.pkl").token2id.keys())
+        tags = tags.toarray()
+
+
     tags = np.asarray(tags, dtype=np.int32)
     tags[tags >= 1] = 1
 
@@ -183,8 +191,8 @@ np.save("../../data/processed/placetypes/rep/mds/num_stw_200_MDS.npy", two_hundy
 if __name__ == '__main__':
     LR = True
     max_depths = [None, None, 3, 2, 1]
-    classifiers = ["LinearSVM", "DecisionTree3"]
-    data_type = ["animecf"]
+    classifiers = ["LinearSVM"]
+    data_type = ["sutras"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):

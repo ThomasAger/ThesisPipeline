@@ -67,12 +67,14 @@ def filterBow(tokenized_corpus, no_below, no_above):
 
 def removeEmpty(processed_corpus, tokenized_corpus, classes):
     remove_ind = []
+    print("removing empty")
     for i in range(len(processed_corpus)):
         if len(tokenized_corpus[i]) <= 0:
-            print("DEL", processed_corpus[i])
+            print("DEL", processed_corpus[i], i)
             remove_ind.append(i)
     processed_corpus = np.delete(processed_corpus, remove_ind)
     tokenized_corpus = np.delete(tokenized_corpus, remove_ind)
+    print("removed", len(remove_ind))
     classes = np.delete(classes, remove_ind, axis=0)
     return processed_corpus, tokenized_corpus, remove_ind, classes
 

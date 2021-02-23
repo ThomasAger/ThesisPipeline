@@ -20,7 +20,7 @@ class PPMI(Method):
 
     def checkFrequencyMatrix(self, doc_amt):
         if self.frequency_matrix.shape[0] != doc_amt and self.frequency_matrix.shape[1] != doc_amt:
-            raise ValueError("Incorrect number of documents")
+            raise ValueError("Incorrect number of documents", "expected", doc_amt, "got", self.frequency_matrix.shape[0], "or", self.frequency_matrix.shape[1])
         # Check if the words, typically the more frequent, are the rows or the columns, and transpose so they are the rows
         if self.frequency_matrix.shape[0] == doc_amt:
             self.frequency_matrix = self.frequency_matrix.transpose()

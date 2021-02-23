@@ -1,0 +1,571 @@
+% This thesis template has been put together and edited by Diego Pizzocaro
+% It's a collection/edit of files produced by Frank C Langbein for his PhD thesis
+% and then edited by Ahmed Alazzawi, Hmood Al Dossari, Manar I. Hosny, H.Z. Al-Dossari 
+% and kindly shared by them.
+%
+% Following, the original GNU license chosen by Frank C Langbein, 
+% which is the same license for distributing this package.
+%
+% beautification.tex -- Beautification of Reverse Engineered Geometric Models
+%% PhD Thesis by Frank C. Langbein%
+% Maintainer: Frank C. Langbein <frank@langbein.org>
+% Version: 1.0
+% Copyright (c) 2003 Frank C Langbein.
+% Permission is granted to copy, distribute and/or modify this document
+% under the terms of the GNU Free Documentation License, Version 1.2 or
+% any later version published by the Free Software Foundation; with no
+% Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A
+% copy of the license is included in the section entitled "GNU Free
+% Documentation License".
+%
+
+
+\documentclass[a4paper,oneside,onecolumn,openright,12pt]{book}
+
+
+\makeatletter
+% Copy pasted junk
+\usepackage{soul}
+\usepackage{color}
+%\newcommand{\m}[1]{\hl{#1}}
+
+\newcommand\hmark[1]{\textcolor{blue}{#1}}
+%Graphics
+%\usepackage{graphicx}
+% Langbein added these - Tom
+
+
+\usepackage{caption}
+\usepackage{footmisc}
+\usepackage{paralist}
+\usepackage{array}
+\usepackage{epsf}
+\usepackage{amsmath}
+\usepackage{rotating}
+\usepackage{listings}
+\usepackage{varwidth}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{amsthm}
+\usepackage{longtable}
+\usepackage{afterpage}
+\usepackage{subfig}
+%\usepackage{algorithm}
+%\usepackage{rotating}
+%\usepackage{amssymb}
+\usepackage{multibib}
+\usepackage{booktabs}
+% Fonts, encoding, etc.
+\usepackage{type1cm}
+\usepackage[latin1]{inputenc}
+\usepackage[british]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{longtable}
+%\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+%\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+%\usepackage{subfigure}
+% Line spacing
+\def\baselinestretch{1.5}
+\parindent0cm
+\parskip1.5ex\@plus.7ex\@minus.1ex\relax
+\lstset{
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+	keepspaces=true,
+}
+
+%Acronyms
+\usepackage{acronym}
+%Inline lists
+\usepackage{paralist}
+\usepackage{vmargin}
+\setpapersize{A4}
+\setmarginsrb{25mm}{20mm}{25mm}{10mm}{14.5pt}{8mm}{0pt}{11mm}
+
+% Footer and header
+\usepackage{afterpage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO,RE]{\slshape \leftmark}
+\fancyfoot{}
+\renewcommand{\chaptermark}[1]{}
+\renewcommand{\sectionmark}[1]%
+             {\markboth{\thesection\ #1}{\thesection\ #1}}
+\renewcommand{\subsectionmark}[1]{}
+\fancypagestyle{plain}{%
+  \fancyhead{}
+  \fancyhead[LE,RO]{\thepage}
+  \fancyfoot{}
+  \renewcommand{\headrulewidth}{.6pt}
+}
+
+% Chapter
+\def\@makechapterhead#1{%
+  \ \\[-35.5pt]\hbox to \textwidth {%
+    \hfill {\vbox{\hbox{\rule[5pt]{140pt}{4pt}}%
+        \hbox to 140pt {\hfill\huge\bfseries\slshape \@chapapp\space\thechapter\/}}}}%
+  \vskip55\p@%
+  {\parindent \z@ \raggedright \normalfont%
+    \interlinepenalty\@M%
+    \Huge \bfseries #1\par\nobreak%
+    \vskip 45\p@%
+  }}
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+                       \if@mainmatter
+                         \refstepcounter{chapter}%
+                         \typeout{\@chapapp\space\thechapter.}%
+                         \addcontentsline{toc}{chapter}%
+                                   {\protect\numberline{\thechapter}#1}%
+                       \else
+                         \addcontentsline{toc}{chapter}{#1}%
+                       \fi
+                    \else
+                      \addcontentsline{toc}{chapter}{#1}%
+                    \fi
+                    \chaptermark{#1}%
+                    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                    \addtocontents{loa}{\protect\addvspace{10\p@}}%
+                    \if@twocolumn
+                      \@topnewpage[\@makechapterhead{#2}]%
+                    \else
+                      \@makechapterhead{#2}%
+                      \@afterheading
+                    \fi}
+\def\@schapter#1{\addcontentsline{toc}{chapter}{#1}%
+                 \markboth{#1}{#1}%
+                 \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                 \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                 \addtocontents{loa}{\protect\addvspace{10\p@}}%
+                 \if@twocolumn%
+                    \@topnewpage[\@makeschapterhead{#1}]%
+                 \else%
+                    \@makeschapterhead{#1}%
+                    \@afterheading%
+                 \fi}
+\def\@makeschapterhead#1{%
+  \ \\[-35.5pt]\hbox to \textwidth {%
+    \hfill {\vbox{\hbox{\rule[5pt]{140pt}{0pt}\rule[5pt]{0pt}{4pt}}%
+        \hbox to 140pt {\hfill\huge\bfseries\slshape \ \/}}}}%
+  \vskip55\p@%
+  {\parindent \z@ \raggedright \normalfont%
+    \interlinepenalty\@M%
+    \Huge \bfseries  #1\par\nobreak%
+    \vskip 45\p@%
+  }}
+
+% Table of contents
+\def\contentsname{Contents}
+\renewcommand\tableofcontents{%
+    \if@twocolumn%
+      \@restonecoltrue\onecolumn%
+    \else%
+      \@restonecolfalse%
+    \fi%
+    \chapter*{\contentsname}%
+    \@starttoc{toc}%
+    \if@restonecol\twocolumn\fi%
+    }
+
+% Bibliography
+\renewenvironment{thebibliography}[1]
+     {\chapter*{\bibname}%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+
+% Floats
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{\textbf{#1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    \textbf{#1: #2.}\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.9}
+
+% Tables
+\usepackage{dcolumn}
+\usepackage{hhline}
+
+% Graphics
+
+\usepackage{rotating}
+\usepackage{psfrag}
+\usepackage{epic}
+\usepackage{tabularx}
+\usepackage{eepic}
+
+
+% Algorithm environment
+\newcounter{algorithm}[chapter]
+\renewcommand{\thealgorithm}{\thechapter.\@arabic\c@algorithm}
+\def\fps@algorithm{t}
+\def\ftype@algorithm{1}
+\def\ext@algorithm{loa}
+\def\fnum@algorithm{Algorithm~\thealgorithm}
+\newenvironment{algorithm}{\@float{algorithm}}{\end@float}
+\newenvironment{algorithm*}{\@dblfloat{algorithm}}{\end@dblfloat}
+\newenvironment{alevel}%
+   {\begin{list}{}{%
+      \setlength{\topsep}{0pt}%
+      \setlength{\parskip}{0pt}%
+      \setlength{\partopsep}{0pt}%
+      \setlength{\parsep}{0pt}%
+      \setlength{\itemsep}{0pt}}}%
+   {\end{list}}
+\newcommand\listalgorithmsname{List of Algorithms}
+\newcommand\listofalgorithms{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \elsea
+      \@restonecolfalse
+    \fi
+    \chapter*{\listalgorithmsname}%
+      \@mkboth{\listalgorithmsname}{\listalgorithmsname}%
+    \@starttoc{loa}%
+    \if@restonecol\twocolumn\fi
+    }
+\newcommand*\l@algorithm{\@dottedtocline{1}{1.5em}{2.3em}}
+
+% List of figures and tables
+\renewcommand\listoffigures{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapter*{\listfigurename}%
+      \@mkboth{\listfigurename}{\listfigurename}%
+    \@starttoc{lof}%
+    \if@restonecol\twocolumn\fi
+    }
+\renewcommand\listoftables{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapter*{\listtablename}%
+      \@mkboth{\listtablename}{\listtablename}%
+    \@starttoc{lot}%
+    \if@restonecol\twocolumn\fi
+    }
+
+% Math symbols, fonts, etc.
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\renewcommand{\S}{\mathbb{S}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+
+\newcommand{\Cf}{\mathfrak{C}}
+\newcommand{\Pf}{\mathfrak{P}}
+
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\avg}{avg}
+\DeclareMathOperator{\floor}{floor}
+\DeclareMathOperator{\ceil}{ceil}
+\DeclareMathOperator{\round}{round}
+
+\providecommand{\abs}[1]{\lvert#1\rvert}
+\providecommand{\absd}[1]{\left\lvert#1\right\rvert}
+\providecommand{\card}[1]{\lvert#1\rvert}
+\providecommand{\norm}[1]{\lVert#1\rVert}
+
+% URLs
+\usepackage{url}
+%% Define a new 'leo' style for the package that will use a smaller font.
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\footnotesize\ttfamily}}}
+\makeatother
+%% Now actually use the newly defined style.
+\urlstyle{leo}
+
+
+
+\makeatother
+
+
+\begin{document}
+
+
+\frontmatter
+
+
+\begin{titlepage}
+
+\begin{center}
+\vspace*{3ex}
+\textbf{\Huge Disentangling Low-Dimensional Vector Space Representations of Text Documents}\\[2ex]
+%\textbf{\Huge Title line 2}\\[12ex]
+\textbf{\large A thesis submitted in partial fulfilment}\\[1ex]
+\textbf{\large of the requirement for the degree of Doctor of
+  Philosophy}\\[16ex]
+\textbf{\LARGE Thomas J. Ager}\\
+\vfill
+\textbf{\LARGE January 2020}\\
+\vfill
+\textbf{\LARGE Cardiff University}\\[1ex]
+\textbf{\LARGE School of Computer Science \& Informatics}\\[4ex]
+\end{center}
+
+\end{titlepage}
+\newpage\thispagestyle{empty}\cleardoublepage
+
+
+\thispagestyle{plain}
+
+\textbf{\large Declaration}
+
+This thesis is the result of my own independent work, except where otherwise stated,
+and the views expressed are my own. Other sources are acknowledged by explicit references.
+The thesis has not been edited by a third party beyond what is permitted by
+Cardiff University's Use of Third Party Editors by Research Degree Students Procedure.\\[2ex]
+Signed \dotfill \ (candidate) \hspace*{10em}\\[1ex]
+Date\ \ \ \ \ \dotfill \hspace*{18em}
+
+\vfill
+
+\vfill
+
+\textbf{\large Statement 1}
+
+This thesis is being submitted in partial fulfilment of the requirements for the degree of PhD.\\[2ex]
+Signed \dotfill \ (candidate) \hspace*{10em}\\[1ex]
+Date\ \ \ \ \ \dotfill \hspace*{18em}
+
+\textbf{\large Statement 2}
+
+This thesis is the result of my own independent work/investigation,
+except where otherwise stated. Other sources are acknowledged by
+explicit references.\\[2ex]
+Signed \dotfill \ (candidate) \hspace*{10em}\\[1ex]
+Date\ \ \ \ \ \dotfill \hspace*{18em}
+
+\vfill
+
+\textbf{\large Statement 3}
+
+I hereby give consent for my thesis, if accepted, to be available for photocopying and for inter-library loan,
+ and for the title and summary to be made available to outside organisations.\\[2ex]
+Signed \dotfill \ (candidate) \hspace*{10em}\\[1ex]
+Date\ \ \ \ \ \dotfill \hspace*{18em}
+
+\vfill
+
+\vspace*{3ex}
+
+\textbf{\large Word Count}  \ \ \ \ \dotfill \hspace*{18em}
+
+(Excluding Abstract, acknowledgements, declarations, contents pages, appendices, tables,
+diagrams and figures, references, bibliography, footnotes and endnotes)
+
+
+
+\ \vspace*{1.11cm}
+\markboth{Dedication}{}
+\begin{flushright}
+\textbf{\large To my parents.}\\
+\textbf{\large for their invaluable and unwavering support.}
+\end{flushright}
+\newpage
+\markboth{}{}
+\cleardoublepage
+
+
+\chapter*{Abstract}
+
+%%%%%%%%%%%%%%%%% OLD WORK
+
+%NESY 
+%Vector space embeddings can be used as a tool for learning semantic relationships from unstructured text documents. Among others, earlier work has shown how in a vector space of entities (e.g.\ different movies) fine-grained semantic relationships can be identified with directions (e.g.\ more violent than).
+
+%IJCAI 
+%In many applications, it is important for classification models to be interpretable. Unfortunately, however, prominent While dimensionality reduction methods could be used in principle, the resulting dimensions would typically not be interpretable. To address this shortcoming, we propose a method to learn interpretable features from a given low-dimensional vector space representation.
+
+%CONLL
+%In this paper we consider semantic spaces consisting of objects from some particular domain (e.g.\ IMDB movie reviews). and 
+
+%%%%%%%%%%%%%%%%% OLD WORK
+
+
+
+%%% NEW THOUGHTS
+
+% Low-dimensional vector space representations don't have features that correspond to properties, because the meaning is distributed across the dimensions
+
+% This work is about getting features which correspond to properties from low-dimensional vector spaces]
+
+
+
+
+
+
+% General problem introduction, why it matters, what past work did, what the results will achieve
+
+% Most vector spaces are entangled
+
+
+% By the way, if you use the word disentangled in the title of your thesis, you should explain this term in the abstract.
+
+% Broader context
+
+%This thesis is concerned with vector space representations of  documents in a given domain (e.g.\ movies in a domain of movie reviews). Such representations are often learned from text documents that describe these entities. 
+In contrast to traditional document representations such as bags-of-words, the kind of vector space representations that are currently most popular tend to be lower-dimensional. This has important advantages, e.g.\ making the representation of a given document less dependent on the exact words that are used. However, this also comes at an important cost, namely that \hmark{the features of the representation are entangled, i.e.\ each feature is not  individually meaningful.} The main aim of this thesis is to address this problem  by disentangling   vector spaces into representations that are composed of  meaningful features \hmark{that are predictive for key domain tasks in the given domain.} For instance, in the domain of IMDB movie reviews, where each document is a review, \hmark{a} disentangled feature representation would be separated into features that describe how ("Scary", "Romantic", ..., "Comedic") the  movie is. 
+
+\hmark{This thesis} builds on an initial approach introduced by  \hmark{Derrac and Schockaert} \cite{Derrac2015}, \hmark{which derives features from low-dimensional vector spaces. The method} begins by using a linear classifier to find a hyper-plane that separates documents that have a term from those that  do not have a term. Then, from each hyper-plane the orthogonal vector is taken as a direction that goes from documents that are least related to the word (as they are furthest from the hyper-plane on the negative side) to documents that are most related to it (as they are furthest from the hyper-plane on the positive side). To identify which of these words describe semantically important features, \hmark{they are scored by how well the linear classifier performs on a standard classification metric},  which approximates how linearly separable the documents are that contain the term in the vector space. \hmark{The assumption is that the more separable a term is, the better modelled it is in the space.} The \hmark{ highest scoring} terms are selected, and documents are ranked  by calculating the dot product between the orthogonal vector to the hyper-plane and each document vector. This results in  a value that corresponds to how  far up documents are on the direction, enabling    documents to be ranked \hmark{on how strongly expressed a particular  feature is},  e.g.\ movies can be ranked on how "Scary" they are. %In terms of application, a representation like this can be used in entity oriented search engines, recommendation systems, among others, or perhaps even be used as input to a simple classifier as an alternative to a hard to decipher  neural networks. 
+
+% Contribution 1
+
+The work by \hmark{Derrac and Schockaert} \cite{Derrac2015} obtained semantic features from Multi-Dimensional Scaling (MDS) document embeddings and validated their work by classifying documents using a rule-based classifier (FOIL), resulting in rules of the form "\textbf{IF} \textit{x} is more scary than most horror films \textbf{THEN} \textit{x} is a horror film.". \hmark{We introduce the use of low-depth decision trees to quantitatively evaluate the semantic features}, with the first main contribution of this thesis being a \hmark{deep} investigation of the method introduced by \hmark{Derrac and Schockaert} by \hmark{quantitatively} validating that the  features derived from the initial embeddings are \hmark{predictive for key domain tasks} across a variety of unsupervised document embedding models and domains.  \hmark{Further, variations of the method are introduced and a qualitative investigation is conducted into these features.}
+
+% Contribution 2
+
+Neural network architectures have advanced to  state-of-the-art  in many tasks. The second main contribution of the work  follows the idea that the  hidden layers of a neural network can be viewed as document embeddings. Specifically, \hmark{meaningful features} can be  derived from the  hidden layers of neural networks. In particular, \hmark{ feed-forward neural networks and stacked auto-encoders are quantitatively and qualitatively investigated.} Auto-encoders are  stacked by using their hidden-layer as the input  to another auto-encoder. \hmark{We find that semantic (meaningful) features that are quantitatively predictive for   a  classification problem can be derived from the hidden layers of feed-forward networks that classify that problem. Further, a qualitative analysis is conducted and  characteristics of  learned feed-forward networks are identified}. In the case of auto-encoders, it is \hmark{quantitatively and qualitatively validated} that as  auto-encoders are  stacked, increasingly abstract features can be derived from them. For example, in the initial auto-encoder layers, features like "Horror" and "Comedy" can be separated well by the linear classifier, meanwhile  features like "\hmark{S}ociety" and "\hmark{R}elationships" are \hmark{more separable} in \hmark{deeper} layers. After identifying directions that model important features of documents in each stacked auto-encoder, symbolic rules are induced that relate specific features to more general ones. These rules \hmark{can} clarify the nature of the transformations that are learned by the neural network, for example:
+
+\begin{align}\label{rule1}\texttt{IF Emotions  AND  Journey THEN Adventure}\end{align} 
+
+% Contribution 3 AM HERE!!
+
+ In addition to introducing variants of the method in \hmark{Derrac and Schockaert} \cite{Derrac2015}, this thesis also introduces an additional post-processing step for improving disentangled feature representations\hmark{. This is done} by fine-tuning the original embedding such \hmark{that rankings of documents on a term match frequency statistics of that term for that document}. Methods for learning document embeddings  are mostly aimed at modelling similarity. It is found  that there is an inherent trade-off between capturing similarity and faithfully modelling features as directions. Following this observation, a simple method to fine-tune  document embeddings is proposed, with the aim of improving the quality of the feature directions obtained from them. \hmark{This  method is also  unsupervised}, requiring only a bag-of-words representation of the \hmark{documents} as input.  In particular,  clusters of terms are identified that refer to semantically \hmark{meaningful} and important features of the considered domain, and a simple neural network model is used to learn a new representation in which each of these features is more faithfully modelled as a direction. It is found that in most cases this method improves the ranking of documents, and results in increased performance when disentangled feature representations are used as input to classifiers. %As in Chapter \ref {ch3}, the usefulness of this approach is validated using low-depth decision trees, where it is found that in most cases performance improves.
+
+
+%The objective of this thesis is to improve how such semantically meaningful feature directions can be learned from a given  document embedding.  This thesis concerns itself with application of this methodology to a variety of document embeddings. These semantic features are beneficial for a variety of purposes,  One important examples is the fact that they provide a useful inductive bias.  they may provide insight into what the neural network is doing correctly or incorrectly in its learning process. 
+
+ %The how semantic these features are is evaluated using a document classification task that classifies decision trees with a limited depth. This limitation verifies that the feature representation has captured features that correspond to domain knowledge, as if the classifier can perform well with a low amount of features those features must be semantic. 
+
+
+
+% Paragraph focusing on how methods can be useful for your applications
+
+Overall, this thesis quantitatively and qualitatively \hmark{confirms}  that disentangled feature representations of meaningful features can be derived from low-dimensional vector spaces of documents, across a variety of domains and document embedding models.  New variants of the method introduced by Derrac and Schockaert \cite{Derrac2015} are evaluated and found to be effective. Neural networks are investigated, and in the case of  stacked auto-encoders,  features become more abstract as auto-encoders are stacked, and a method that links specific features to more general ones is introduced. In the case of feed-forward networks, a variety of interesting characteristics are observed, in particular that feed-forward networks make features that are more relevant to the task more separable. Finally, a new method is introduced to fine-tune existing document embeddings such that their features are more meaningful. 
+
+
+
+%This won't be clear, as you haven't actually explained that the semantic features allow you to derive a more interpretable, feature-based representation of the entities.
+
+
+
+
+%This sentence is not clear. I think you are talking about existing approaches to learn disentangled neural network representations (like InfoGAN), but that won't be clear to the reader + probably this is too much detail for the abstract anyway. 
+
+% features like these are usually obtained by using a specialized learning procedure, e.g.\ by enforcing sparsity constraints or orthogonality between features, and learned from the original text data.
+
+ 
+
+%Can this method be applied to a variety of representations?
+%Can this method be applied to more domains?
+%Does this method result in a representation of clear semantic features?
+%Can these semantic features be used to form a useful alternative representation?
+%Are the features meaningful qualitatively in a variety of domains and for a variety of representations?
+
+%The work in Chapter \ref{ch3} addresses these questions, and introduces variants to their method that result in  better performance on tasks.
+
+%There are a variety of approaches to obtaining vector space representations where features are clear and semantic. 
+
+%simple models such as (small) decision trees cannot readily be applied to text documents due to the size of the underlying feature space. 
+ 
+
+  
+
+
+
+
+
+% Disentanglement and why it matters
+
+% Existing disentanglement methods and why they dont fit the gap
+
+% What we actually did to solve this problem 1st chapter
+
+% What the results were 1st chapter
+
+% What we did 2nd
+
+% Results 2nd
+
+% What we did 3rd
+
+% Results 3rd
+
+% Overall conclusions
+
+%Vector space representations of documents can be re-organized  such that their dimensions correspond to clear semantic features. Furthermore, these disentangled representations can be used to provide a useful inductive bias to classifiers, and as the features are disentangled, they can be used to qualitatively investigate the hidden layers of neural networks to gain valuable insights into how they represent documents. 
+%\def\baselinestretch{1}\normalfont
+
+\def\baselinestretch{1.5}\normalfont
+
+
+\chapter*{Acknowledgements}
+
+It has been a long journey from the start of this PhD to the end of it, and I owe almost all of my success to my supervisor Steven Schockaert, and my unofficial co-supervisor Ondrej Kuzelka. I would like to thank them especially for all their guidance and their many ideas about the work undertaken in the thesis.
+
+I would also like to thank my colleagues at Cardiff University, who provided a community to engage with when I needed an audience for my presentations, or to discuss my thoughts about the work. It is certainly in large part thanks to them that I was able to be where I am today.
+
+Finally, my deepest thanks go to my parents and guides who were able to support me through the final years of my PhD. 
+
+\tableofcontents
+
+\input{listofpublications.tex}
+
+\listoffigures
+
+\listoftables
+
+%\listofalgorithms
+
+%\input{acronyms.tex}
+
+\mainmatter
+%begin each chapter chapter1.tex by \Chapter{chapter1}, for example, then the sections and so on...
+\input{chapter1}
+\input{chapter2}
+\input{chapter25}
+\input{chapter3}
+\input{chapter5}
+\input{chapter4}
+\input{chapter6}
+\backmatter 
+
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+
+\end{document}

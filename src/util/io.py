@@ -422,7 +422,7 @@ def importLargeTextFile(file_name, file_type="s"):
     return array
 """
 def import1dArray(file_name, file_type="s"):
-    with open(file_name, "r") as infile:
+    with open(file_name, "r", encoding="utf-8") as infile:
         if file_type == "f":
             array = []
             lines = infile.readlines()

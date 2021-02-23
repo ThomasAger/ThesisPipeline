@@ -159,7 +159,7 @@ if __name__ == '__main__':
     LR = True
     max_depths = [None, None, 3, 2, 1]
     classifiers = ["LinearSVM", "DecisionTree3"]
-    data_type = ["animecf"]
+    data_type = ["mafiascum"]
     if __name__ == '__main__':
         for j in range(len(data_type)):
             for i in range(len(classifiers)):

@@ -15,6 +15,8 @@ placetypes_total = 1383
 anime_total = 959
 mafia_total = 9676
 rs_total = 2857
+sutra_total = 485
+sutra_keywords_total = 485
 
 from sklearn.model_selection import KFold
 import numbers
@@ -46,6 +48,10 @@ def get_doc_amt(data_type):
         max_size = mafia_total
     elif data_type == "runescape":
         max_size = rs_total
+    elif data_type == "sutras":
+        max_size = sutra_total
+    elif data_type == "sutra_keywords":
+        max_size = sutra_keywords_total
     else:
         print("No data type found")
         raise ValueError("Data type not found", data_type)
