@@ -9,7 +9,7 @@ def stringToArray(string):
 
 def keepNumbers(string):
     s = stripPunctuation(string)
-    s = string.lower()
+    s = s.lower()
     s = "".join(s.split())
     numbers = re.compile('\d+(?:\.\d+)?')
     s = numbers.findall(s)
@@ -23,6 +23,11 @@ def lowercaseSplit(string):
     string = string.lower()
     string = "".join(string.split())
     return string
+
+def lower_nopunct(string):
+    s = stripPunctuation(string)
+    s = s.lower()
+    return s
 
 
 def stripPunctuation(text):
